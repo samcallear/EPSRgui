@@ -289,7 +289,7 @@
                        </size>
                       </property>
                       <property name="currentIndex">
-                       <number>5</number>
+                       <number>0</number>
                       </property>
                       <widget class="QWidget" name="tab">
                        <attribute name="title">
@@ -739,7 +739,7 @@
                            </widget>
                           </item>
                           <item row="9" column="5">
-                           <widget class="QLineEdit" name="lineEdit_2">
+                           <widget class="QLineEdit" name="tetherCoordZLineEdit">
                             <property name="text">
                              <string>0.000000E+00</string>
                             </property>
@@ -815,7 +815,7 @@
                            </spacer>
                           </item>
                           <item row="9" column="1">
-                           <widget class="QLineEdit" name="tolcoordLineEdit">
+                           <widget class="QLineEdit" name="tetherCoordXLineEdit">
                             <property name="text">
                              <string>0.000000E+00</string>
                             </property>
@@ -852,7 +852,7 @@
                            </widget>
                           </item>
                           <item row="9" column="3">
-                           <widget class="QLineEdit" name="lineEdit">
+                           <widget class="QLineEdit" name="tetherCoordYLineEdit">
                             <property name="text">
                              <string>0.000000E+00</string>
                             </property>
@@ -986,7 +986,7 @@
                           <item row="6" column="1">
                            <widget class="QLabel" name="label_51">
                             <property name="text">
-                             <string>Tethering atom (0 for COM)</string>
+                             <string>Number for tethering atom (0 for COM)</string>
                             </property>
                            </widget>
                           </item>
@@ -2864,6 +2864,86 @@
     <hint type="destinationlabel">
      <x>570</x>
      <y>592</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>molTetherCheckBox</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>tetherAtomLineEdit</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>300</x>
+     <y>507</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>526</x>
+     <y>531</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>molTetherCheckBox</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>tolLineEdit</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>411</x>
+     <y>506</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>512</x>
+     <y>566</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>molTetherCheckBox</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>tetherCoordXLineEdit</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>373</x>
+     <y>513</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>394</x>
+     <y>597</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>molTetherCheckBox</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>tetherCoordYLineEdit</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>434</x>
+     <y>507</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>521</x>
+     <y>603</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>molTetherCheckBox</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>tetherCoordZLineEdit</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>364</x>
+     <y>504</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>723</x>
+     <y>604</y>
     </hint>
    </hints>
   </connection>

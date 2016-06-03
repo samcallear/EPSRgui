@@ -689,9 +689,21 @@ bool MainWindow::readMolFile()
         ui.tolLineEdit->setText(dataLineato.at(0));
         lineato = streamato.readLine();
     }
-    if (lineato.contains("T") == true)
+    if (lineato.contains("T") == true)  //the following depends on the number of items in this line NOT CHANGING!!!!!
     {
         ui.molTetherCheckBox->setChecked(true);
+        dataLineato = lineato.split(" ",QString::SkipEmptyParts);
+        QString tetherCoordX = dataLineato.at(4);
+        ui.tetherCoordXLineEdit->setText(tetherCoordX);
+        QString tetherCoordY = dataLineato.at(5);
+        ui.tetherCoordYLineEdit->setText(tetherCoordY);
+        QString tetherCoordZ = dataLineato.at(6);
+        ui.tetherCoordZLineEdit->setText(tetherCoordZ);
+        QString string = dataLineato.at(7);
+        QString tetherAtomStr = string.remove("T");
+        int tetherAtom = tetherAtomStr.toInt();
+        tetherAtomStr = QString::number(tetherAtom);
+        ui.tetherAtomLineEdit->setText(tetherAtomStr);
     }
     else
     {
@@ -975,8 +987,11 @@ bool MainWindow::updateMolFile()
     dataLineato.clear();
     QString originalato;
     QString tether;
-    double tetherAtom = ui.tetherAtomLineEdit->text().toDouble();
-    tetherAtom = QString("%1").arg(tetherAtom, 5, 'f', '0');
+    int tetherAtom = ui.tetherAtomLineEdit->text().toInt();
+    QString tetherAtomStr = QString("%1").arg(tetherAtom, 5, 10, QChar('0'));
+    QString tetherCoordX = ui.tetherCoordXLineEdit->text();
+    QString tetherCoordY = ui.tetherCoordYLineEdit->text();
+    QString tetherCoordZ = ui.tetherCoordZLineEdit->text();
     if (ui.molTetherCheckBox->isChecked() == true)
     {
         tether = "T";
@@ -1007,11 +1022,11 @@ bool MainWindow::updateMolFile()
     streamatoW << "\n";
     lineato = streamatoR.readLine();
     dataLineato = lineato.split(" ",QString::SkipEmptyParts);
-    for (int i = 0; i < dataLineato.count()-3; i++ )
+    for (int i = 0; i < 4; i++ )
     {
         streamatoW << "   " << dataLineato.at(i);   //this is the line starting with the number of atoms and containing tether
     }
-    streamatoW << "   " << tether+tetherAtom << "               0     1\n";
+    streamatoW << "   " << tetherCoordX << "   " << tetherCoordY << "   " << tetherCoordZ << "   " << tether+tetherAtomStr << "               0     1\n";
 
     do {
         lineato = streamatoR.readLine();
