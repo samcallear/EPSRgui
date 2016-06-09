@@ -4,3 +4,6 @@ MakeFile.Release
 object_script.EPSRgui.Debug
 object_script.EPSRgui.Release
 ui_*
+
+release/
+debug/
