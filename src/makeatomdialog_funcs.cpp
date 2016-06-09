@@ -12,18 +12,17 @@ MakeAtomDialog::MakeAtomDialog(QWidget *parent) : QDialog(parent)
     //restrict what can be entered into each of the boxes
     QRegExp namerx("[A-Z][A-Za-z0-9]{2}");
     ui.nameLineEdit->setValidator(new QRegExpValidator(namerx, this));
-    QRegExp massrx("^\\d*\\.?\\d*$");
-    ui.epsilonLineEdit->setValidator(new QRegExpValidator(massrx, this));
-    ui.sigmaLineEdit->setValidator(new QRegExpValidator(massrx, this));
-    ui.massLineEdit->setValidator(new QRegExpValidator(massrx, this));
+    QRegExp numberrx("^\\d*\\.?\\d*$");
+    ui.epsilonLineEdit->setValidator(new QRegExpValidator(numberrx, this));
+    ui.sigmaLineEdit->setValidator(new QRegExpValidator(numberrx, this));
+    ui.massLineEdit->setValidator(new QRegExpValidator(numberrx, this));
+    ui.densityLineEdit->setValidator(new QRegExpValidator(numberrx, this));
     QRegExp chargerx("^-?\\d*\\.?\\d*$");
     ui.chargeLineEdit->setValidator(new QRegExpValidator(chargerx, this));
     QRegExp symbolrx("[A-Z]{1}[a-z]?");
     ui.symbolLineEdit->setValidator(new QRegExpValidator(symbolrx, this));
     QRegExp temprx("^[0-9]{5}");
     ui.tempLineEdit->setValidator(new QRegExpValidator(temprx, this));
-    QRegExp densityrx("^\\d*\\.?\\d*$");
-    ui.densityLineEdit->setValidator(new QRegExpValidator(densityrx, this));
 
     connect(ui.okButton, SIGNAL(clicked()), this, SLOT(accept()));
     connect(ui.cancelButton, SIGNAL(clicked()), this, SLOT(reject()));

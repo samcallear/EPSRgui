@@ -422,11 +422,7 @@ void MainWindow::on_createAtomButton_clicked(bool checked)
 
 void MainWindow::on_createLatticeButton_clicked(bool checked)
 {
-    //dialog to create a new .unit file or use an exisiting (browse to this)
-    //depending on option selected, disable other option
-    //lineedit for number unit cells along each axis
-    // lineedit for name of lattice.ato
-
+    //make the .ato file for the lattice (the lattice can only be single atoms as 'molecules' not multiatom moleucles)
     if (!makeLatticeDialog)
     {
         makeLatticeDialog = new MakeLatticeDialog(this);
@@ -440,10 +436,133 @@ void MainWindow::on_createLatticeButton_clicked(bool checked)
 
     if (latticeDialog == MakeLatticeDialog::Accepted)
     {
+        QString atoFileName = makeLatticeDialog->unitFileName();
+        QString aLatt = makeLatticeDialog->cellsAlongA();
+        QString bLatt = makeLatticeDialog->cellsAlongB();
+        QString cLatt = makeLatticeDialog->cellsAlongC();
 
+        QProcess processMakeLattice;
+        processMakeLattice.setProcessChannelMode(QProcess::ForwardedChannels);
+        QString projDir = workingDir_;
+        projDir = QDir::toNativeSeparators(projDir);
+        processMakeLattice.start(epsrBinDir_+"makelattice.exe", QStringList() << projDir << "makelattice" );
+        if (!processMakeLattice.waitForStarted()) return;
+
+        processMakeLattice.write(qPrintable(atoFileName+"\r\n"));
+        QByteArray result = processMakeLattice.readAll();
+        qDebug(result);
+
+        processMakeLattice.write(qPrintable(aLatt+" "+bLatt+" "+cLatt+"\r\n"));
+        result = processMakeLattice.readAll();
+        qDebug(result);
+
+        processMakeLattice.write(qPrintable(atoFileName+"\r\n"));
+        result = processMakeLattice.readAll();
+        qDebug(result);
+
+        if (!processMakeLattice.waitForFinished()) return;
+
+        printf("\nmakelattice finished\n");
+
+        //make the .mol files for each atom in the lattice
+        QStringList atomTypes = makeLatticeDialog->atomTypes(); //get list of atom labels from paramTable
+
+        //read in .unit file to get epsilon, sigma, amu, charge, atom symbol for each atom type and write out to each .mol file
+        QFile file(unitFileName_);
+        if(!file.open(QFile::ReadOnly | QFile::Text))
+        {
+            QMessageBox msgBox;
+            msgBox.setText("Could not open .unit file");
+            msgBox.exec();
+            return 0;
+        }
+
+        QTextStream stream(&file);
+        QString line;
+        QStringList dataLine;
+        dataLine.clear();
+
+        line = stream.readLine();
+        dataLine = line.split(" ", QString::SkipEmptyParts);
+        if (dataLine.count() == 0)
+        {
+            QMessageBox msgBox;
+            msgBox.setText("Could not read .unit file");
+            msgBox.exec();
+            return 0;
+        }
+        line = stream.readLine();
+        line = stream.readLine();
+        line = stream.readLine();
+        int numberAtoms = line.toInt();
+        for (int i = 0; i < numberAtoms; i++)
+        {
+            line = stream.readLine();
+        }
+
+        for (int i = 0; i < atomTypes.count(); i++)
+        {
+            QString molFileName = atomTypes.at(i);
+            QFile fileWrite(workingDir_+molFileName+".mol");
+            if(!fileWrite.open(QFile::WriteOnly | QFile::Text))
+            {
+                QMessageBox msgBox;
+                msgBox.setText("Could not create .mol file");
+                msgBox.exec();
+                return;
+            }
+
+            line = stream.readLine();
+            dataLine = line.split(" ", QString::SkipEmptyParts);
+            QString symbol = dataLine.at(1);
+            line = stream.readLine();
+            dataLine = line.split(" ", QString::SkipEmptyParts);
+            QString epsilon = dataLine.at(0);
+            QString sigma = dataLine.at(1);
+            QString mass = dataLine.at(2);
+            QString charge = dataLine.at(3);
+
+            QTextStream streamWrite(&fileWrite);
+            streamWrite << "  .gmol           0\n"
+                        << " atom            1  001     0.00000E+00  0.00000E+00  0.00000E+00           0\n"
+                        << "changelabel 001 " << atomTypes.at(i) << "\n"
+                        << "potential " << atomTypes.at(i) << " " << epsilon << " " << sigma << " " << mass << " " << charge << " " << symbol << "\n"
+                        << "temperature 300\n"
+                        << "vibtemp  0.650000E+02\n"
+                        << "angtemp  0.100000E+01\n"
+                        << "dihtemp  0.100000E+02\n"
+                        << "ecoredcore    0.00000    1.00000\n"
+                        << "density  0.1\n";
+            fileWrite.close();
+
+            ui.molFileList->QListWidget::addItem(molFileName);
+        }
+        file.close();
+
+        //update lattice.ato with correct .mol files at bottom **************************TO DO*******************************************
+
+        //update ato file table
+        int lastAtoFile = ui.atoFileTable->count();
+        ui.atoFileTable->insertRow(lastAtoFile);
+        QTableWidgetItem *item = new QTableWidgetItem(atoFileName);
+        item->setFlags(item->flags() & ~Qt::ItemIsEditable);
+        ui.atoFileTable->setItem(lastAtoFile,0, item);
+        ui.atoFileTable->setItem(lastAtoFile,1, new QTableWidgetItem(makeLatticeDialog->charge()));
+        ui.atoFileTable->setItem(lastAtoFile,2, new QTableWidgetItem("0"));
+
+        //update mol file table
+        for (int i = 0; i < atomTypes.count(); i++)
+        {
+            ui.molFileList->addItem(atomTypes.at(i)+".mol");
+        }
+        nMolFiles = ui.molFileList->count();
+        ui.molFileList->setCurrentRow(nMolFiles-1);
+
+        //update LJ etc tables
+        readMolFile();
+
+        ui.messagesLineEdit->setText("Finished making new atom");
     }
-
-
 }
 
 void MainWindow::on_makeMolExtButton_clicked(bool checked)
