@@ -125,7 +125,7 @@ bool PlotDialog::readatofile()
     // Declare and initialise matrix for column to find atom pair partial in...
     ij.initialise(N_atomLabels,N_atomLabels);
 
-    // Populate it
+    // Populate it: first atompair_index = 0
     int count = 0;
     for (int i = 0; i < N_atomLabels; ++i)
     {
@@ -893,15 +893,10 @@ bool PlotDialog::partialsplot()
         int i = iList.at(pair); // this is the row of the first atom of the pair
         int j = jList.at(pair); // this is the row of the second atom in the pair
         int atompair_index = ij.ref(i,j);
-        int CNpair_column = atompair_index*2+1;
-        if (i > j)
-        {
-            CNpair_column++;
-        }
-
         QString partialsFileName;
         QString CNFileName;
 
+        //the first file contains 100 pairs (even columns from 2 to 200) and atompair_indexes from 0 - 99
         if (atompair_index < 100)
         {
             partialsFileName = (baseFileName_+".EPSR.g01");
@@ -934,6 +929,13 @@ bool PlotDialog::partialsplot()
             partialsFileName = (baseFileName_+".EPSR.g05");
             CNFileName = (baseFileName_+".EPSR.z05");
             atompair_index = atompair_index-400;
+        }
+
+        //the first atom pair index = 0 therefore need to x2 and +1 in order to get to correct column.
+        int CNpair_column = atompair_index*2+1;
+        if (i > j)
+        {
+            CNpair_column++;
         }
 
         QFile file(partialsFileName);
