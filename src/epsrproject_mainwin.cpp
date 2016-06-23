@@ -847,7 +847,11 @@ void MainWindow::runEPSRcheck()
     QString atoBaseFileName = atoFileName_.split(".",QString::SkipEmptyParts).at(0);
     QProcess processrunEPSR;
     processrunEPSR.setProcessChannelMode(QProcess::ForwardedChannels);
+#ifdef _WIN32
     processrunEPSR.start(epsrBinDir_+"epsr.exe", QStringList() << workingDir_ << "epsr" << atoBaseFileName);
+#else
+    processrunEPSR.start(epsrBinDir_+"epsr", QStringList() << workingDir_ << "epsr" << atoBaseFileName);
+#endif
     if (!processrunEPSR.waitForStarted()) return;
     if (!processrunEPSR.waitForFinished(1800000)) return;
 

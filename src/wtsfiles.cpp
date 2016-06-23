@@ -63,7 +63,11 @@ bool MainWindow::makeNwtsSetup()
     {
         QProcess processWtsSetup;
         processWtsSetup.setProcessChannelMode(QProcess::ForwardedChannels);
+#ifdef _WIN32
         processWtsSetup.start(epsrBinDir_+"upset.exe", QStringList() << workingDir_ << "upset" << "nwts" << wtsBaseFileName_);
+#else
+        processWtsSetup.start(epsrBinDir_+"upset", QStringList() << workingDir_ << "upset" << "nwts" << wtsBaseFileName_);
+#endif
         if (!processWtsSetup.waitForStarted()) return false;
 
         processWtsSetup.write("\n");          // move to fnameato line
@@ -105,7 +109,11 @@ bool MainWindow::makeXwtsSetup()
     {
         QProcess processWtsSetup;
         processWtsSetup.setProcessChannelMode(QProcess::ForwardedChannels);
+#ifdef _WIN32
         processWtsSetup.start(epsrBinDir_+"upset.exe", QStringList() << workingDir_ << "upset" << "xwts" << wtsBaseFileName_);
+#else
+        processWtsSetup.start(epsrBinDir_+"upset", QStringList() << workingDir_ << "upset" << "xwts" << wtsBaseFileName_);
+#endif
         if (!processWtsSetup.waitForStarted()) return false;
 
         processWtsSetup.write("\n");          // move to fnameato line
@@ -430,7 +438,11 @@ void MainWindow::makeNwts()
 
     QProcess processMakeWts;
     processMakeWts.setProcessChannelMode(QProcess::ForwardedChannels);
+#ifdef _WIN32
     processMakeWts.start(epsrBinDir_+"nwts.exe", QStringList() << workingDir_ << "nwts" << wtsBaseFileName_);
+#else
+    processMakeWts.start(epsrBinDir_+"nwts", QStringList() << workingDir_ << "nwts" << wtsBaseFileName_);
+#endif
     if (!processMakeWts.waitForStarted()) return;
     if (!processMakeWts.waitForFinished()) return;
     printf("\nfinished making wts file\n");
@@ -523,7 +535,11 @@ void MainWindow::makeXwts()
 
     QProcess processMakeWts;
     processMakeWts.setProcessChannelMode(QProcess::ForwardedChannels);
+#ifdef _WIN32
     processMakeWts.start(epsrBinDir_+"xwts.exe", QStringList() << workingDir_ << "xwts" << wtsBaseFileName_);
+#else
+    processMakeWts.start(epsrBinDir_+"xwts", QStringList() << workingDir_ << "xwts" << wtsBaseFileName_);
+#endif
     if (!processMakeWts.waitForStarted()) return;
     if (!processMakeWts.waitForFinished()) return;
     printf("\nfinished making wts file\n");

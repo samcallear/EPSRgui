@@ -18,7 +18,11 @@ void MainWindow::on_setupEPSRButton_clicked(bool checked)
     {
         QProcess processEpsrSetup;
         processEpsrSetup.setProcessChannelMode(QProcess::ForwardedChannels);
+#ifdef _WIN32
         processEpsrSetup.start(epsrBinDir_+"upset.exe", QStringList() << workingDir_ << "upset" << "epsr" << atoBaseFileName);
+#else
+        processEpsrSetup.start(epsrBinDir_+"upset", QStringList() << workingDir_ << "upset" << "epsr" << atoBaseFileName);
+#endif
         if (!processEpsrSetup.waitForStarted()) return;
 
         processEpsrSetup.write("fnameato\n");          // move to fnameato line
@@ -447,7 +451,11 @@ void MainWindow::updateInpFile()
     //now format the file correctly by opening in setup epsr and then exiting and saving
     QProcess processEpsrSetup;
     processEpsrSetup.setProcessChannelMode(QProcess::ForwardedChannels);
+#ifdef _WIN32
     processEpsrSetup.start(epsrBinDir_+"upset.exe", QStringList() << workingDir_ << "upset" << "epsr" << atoBaseFileName);
+#else
+    processEpsrSetup.start(epsrBinDir_+"upset", QStringList() << workingDir_ << "upset" << "epsr" << atoBaseFileName);
+#endif
     if (!processEpsrSetup.waitForStarted()) return;
 
     processEpsrSetup.write("e\n");
@@ -558,7 +566,11 @@ void MainWindow::updatePcofFile()
     //now format the file correctly by opening in setup epsr and then exiting and saving
     QProcess processEpsrSetup;
     processEpsrSetup.setProcessChannelMode(QProcess::ForwardedChannels);
+#ifdef _WIN32
     processEpsrSetup.start(epsrBinDir_+"upset.exe", QStringList() << workingDir_ << "upset" << "epsr" << atoBaseFileName);
+#else
+    processEpsrSetup.start(epsrBinDir_+"upset", QStringList() << workingDir_ << "upset" << "epsr" << atoBaseFileName);
+#endif
     if (!processEpsrSetup.waitForStarted()) return;
 
     processEpsrSetup.write("e\n");

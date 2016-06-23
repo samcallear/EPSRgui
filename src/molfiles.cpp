@@ -47,6 +47,7 @@ bool MainWindow::runjmol()
     // set jmol save directory to EPSR directory
     QDir::setCurrent(workingDir_);
     processjmol.start("java", QStringList() << "-jar" << program);
+    //linux: java -jar ~/src/EPSR25/bin/Jmol.jar
 //    if (!processjmol.waitForStarted()) return false;
     if (!processjmol.waitForFinished(1800000))
     {
@@ -102,6 +103,7 @@ bool MainWindow::runjmol()
         QProcess processMol;
         processMol.setProcessChannelMode(QProcess::ForwardedChannels);
         processMol.start(workingDir_+"mopac"+jmolBaseFileName+".bat");
+        //linux:
         if (!processMol.waitForStarted()) return false;
 
         processMol.write("3\r\n");          // select bonding patterns and changelabel section
@@ -154,7 +156,12 @@ bool MainWindow::runjmol()
     {
         QProcess processMol;
         processMol.setProcessChannelMode(QProcess::ForwardedChannels);
+#ifdef _WIN32
         processMol.start(epsrBinDir_+"readmole.exe", QStringList() << workingDir_ << "jmolfile "+jmolFileName);
+#else
+        processMol.start(epsrBinDir_+"readmole", QStringList() << workingDir_ << "jmolfile "+jmolFileName);
+        //linux: ~/src/EPSR25/bin/readmole ~/src/EPSR25/run/test2/ jmolfile molecule.jmol
+#endif
         if (!processMol.waitForStarted()) return false;
 
         processMol.write("3\r\n");          // select bonding patterns and changelabel section
@@ -246,7 +253,12 @@ void MainWindow::on_molFileLoadButton_clicked(bool checked)
 
             QString projDir = workingDir_;
             projDir = QDir::toNativeSeparators(projDir);
+#ifdef _WIN32
             processMakemole.start(epsrBinDir_+"makemole.exe", QStringList() << projDir << "makemole" << cropped_fileName);
+#else
+            processMakemole.start(epsrBinDir_+"makemole", QStringList() << projDir << "makemole" << cropped_fileName);
+            //linux: ~/src/EPSR25/bin/makemole ~/src/EPSR25/run/test2/ makemole molecule
+#endif
             if (!processMakemole.waitForStarted()) return;
             if (!processMakemole.waitForFinished()) return;
         }
@@ -301,7 +313,12 @@ void MainWindow::on_createAtomButton_clicked(bool checked)
         processMakeAto.setProcessChannelMode(QProcess::ForwardedChannels);
         QString projDir = workingDir_;
         projDir = QDir::toNativeSeparators(projDir);
+#ifdef _WIN32
         processMakeAto.start(epsrBinDir_+"makeato.exe", QStringList() << projDir << "makeato" );
+#else
+        processMakeAto.start(epsrBinDir_+"makeato", QStringList() << projDir << "makeato" );
+        //linux: ~/src/EPSR25/bin/makeato ~/src/EPSR25/run/test2/ makeato
+#endif
         if (!processMakeAto.waitForStarted()) return;
 
         processMakeAto.write(qPrintable(atomName+"\r\n"));
@@ -436,7 +453,7 @@ void MainWindow::on_createLatticeButton_clicked(bool checked)
 
     if (latticeDialog == MakeLatticeDialog::Accepted)
     {
-        QString atoFileName = makeLatticeDialog->unitFileName();
+        QString unitFileName = makeLatticeDialog->unitFileName(); //this has the .unit extension on it
         QString aLatt = makeLatticeDialog->cellsAlongA();
         QString bLatt = makeLatticeDialog->cellsAlongB();
         QString cLatt = makeLatticeDialog->cellsAlongC();
@@ -445,10 +462,14 @@ void MainWindow::on_createLatticeButton_clicked(bool checked)
         processMakeLattice.setProcessChannelMode(QProcess::ForwardedChannels);
         QString projDir = workingDir_;
         projDir = QDir::toNativeSeparators(projDir);
+#ifdef _WIN32
         processMakeLattice.start(epsrBinDir_+"makelattice.exe", QStringList() << projDir << "makelattice" );
+#else
+        processMakeLattice.start(epsrBinDir_+"makelattice", QStringList() << projDir << "makelattice" );
+#endif
         if (!processMakeLattice.waitForStarted()) return;
 
-        processMakeLattice.write(qPrintable(atoFileName+"\r\n"));
+        processMakeLattice.write(qPrintable(unitFileName+"\r\n"));
         QByteArray result = processMakeLattice.readAll();
         qDebug(result);
 
@@ -456,7 +477,7 @@ void MainWindow::on_createLatticeButton_clicked(bool checked)
         result = processMakeLattice.readAll();
         qDebug(result);
 
-        processMakeLattice.write(qPrintable(atoFileName+"\r\n"));
+        processMakeLattice.write(qPrintable(unitFileName+"\r\n"));
         result = processMakeLattice.readAll();
         qDebug(result);
 
@@ -468,13 +489,13 @@ void MainWindow::on_createLatticeButton_clicked(bool checked)
         QStringList atomTypes = makeLatticeDialog->atomTypes(); //get list of atom labels from paramTable
 
         //read in .unit file to get epsilon, sigma, amu, charge, atom symbol for each atom type and write out to each .mol file
-        QFile file(unitFileName_);
+        QFile file(workingDir_+unitFileName);
         if(!file.open(QFile::ReadOnly | QFile::Text))
         {
             QMessageBox msgBox;
             msgBox.setText("Could not open .unit file");
             msgBox.exec();
-            return 0;
+            return;
         }
 
         QTextStream stream(&file);
@@ -489,7 +510,7 @@ void MainWindow::on_createLatticeButton_clicked(bool checked)
             QMessageBox msgBox;
             msgBox.setText("Could not read .unit file");
             msgBox.exec();
-            return 0;
+            return;
         }
         line = stream.readLine();
         line = stream.readLine();
@@ -535,33 +556,80 @@ void MainWindow::on_createLatticeButton_clicked(bool checked)
                         << "density  0.1\n";
             fileWrite.close();
 
-            ui.molFileList->QListWidget::addItem(molFileName);
+            QProcess processMakemole;
+            processMakemole.setProcessChannelMode(QProcess::ForwardedChannels);
+
+            QString projDir = workingDir_;
+            projDir = QDir::toNativeSeparators(projDir);
+#ifdef _WIN32
+            processMakemole.start(epsrBinDir_+"makemole.exe", QStringList() << projDir << "makemole" << molFileName);
+#else
+            processMakemole.start(epsrBinDir_+"makemole", QStringList() << projDir << "makemole" << molFileName);
+#endif
+            if (!processMakemole.waitForStarted()) return;
+            if (!processMakemole.waitForFinished()) return;
+
+            ui.molFileList->QListWidget::addItem(molFileName+".mol");
         }
         file.close();
 
-        //update lattice.ato with correct .mol files at bottom **************************TO DO*******************************************
+        //update lattice.ato with correct .mol files at bottom
+        QString atoFileName = unitFileName.split(".", QString::SkipEmptyParts).at(0);
+        QFile fileato(workingDir_+atoFileName+".ato");
+        if(!fileato.open(QFile::ReadWrite | QFile::Text))
+        {
+            QMessageBox msgBox;
+            msgBox.setText("Could not open lattice .ato file");
+            msgBox.exec();
+            return;
+        }
+
+        QTextStream streamato(&fileato);
+        QString lineato;
+        QStringList dataLineato;
+        dataLineato.clear();
+        QString originalato;
+        int ctr_moltype = 0;
+
+        while (!streamato.atEnd())
+        {
+            lineato = streamato.readLine();
+            originalato.append(lineato+"\n");
+            if (lineato.isEmpty()) break;
+            if (lineato.contains("moltype"))
+            {
+                originalato.remove(lineato+"\n");
+                dataLineato = lineato.split(" ", QString::SkipEmptyParts);
+                originalato.append("   "+dataLineato.at(0)+"  "+atomTypes.at(ctr_moltype)+"  "+dataLineato.at(2)+"  "+dataLineato.at(3)+"  "+dataLineato.at(4)+"  "+dataLineato.at(5)+"\n");
+                ctr_moltype++;
+            }
+        }
+        fileato.resize(0);
+        streamato << originalato;
+        fileato.close();
 
         //update ato file table
-        int lastAtoFile = ui.atoFileTable->count();
+        int lastAtoFile = ui.atoFileTable->rowCount();
         ui.atoFileTable->insertRow(lastAtoFile);
-        QTableWidgetItem *item = new QTableWidgetItem(atoFileName);
+        QTableWidgetItem *item = new QTableWidgetItem(atoFileName+".ato");
         item->setFlags(item->flags() & ~Qt::ItemIsEditable);
         ui.atoFileTable->setItem(lastAtoFile,0, item);
-        ui.atoFileTable->setItem(lastAtoFile,1, new QTableWidgetItem(makeLatticeDialog->charge()));
+        //THIS ISNT WORKING **********************************************************************************
+        QString lattCharge = makeLatticeDialog->charge();
+        item = new QTableWidgetItem(lattCharge);
+        item->setFlags(item->flags() & ~Qt::ItemIsEditable);
+        ui.atoFileTable->setItem(lastAtoFile,1, item);
+//        ui.atoFileTable->setItem(lastAtoFile,1, new QTableWidgetItem(makeLatticeDialog->charge()));
         ui.atoFileTable->setItem(lastAtoFile,2, new QTableWidgetItem("0"));
 
-        //update mol file table
-        for (int i = 0; i < atomTypes.count(); i++)
-        {
-            ui.molFileList->addItem(atomTypes.at(i)+".mol");
-        }
+        //set mol file table to select last item and update (runs via 'selectionChanged' signal
         nMolFiles = ui.molFileList->count();
         ui.molFileList->setCurrentRow(nMolFiles-1);
 
         //update LJ etc tables
-        readMolFile();
+       // readMolFile();
 
-        ui.messagesLineEdit->setText("Finished making new atom");
+        ui.messagesLineEdit->setText("Finished making new lattice");
     }
 }
 
@@ -1076,7 +1144,11 @@ bool MainWindow::updateMolFile()
 
     QProcess processFmole;
     processFmole.setProcessChannelMode(QProcess::ForwardedChannels);
+#ifdef _WIN32
     processFmole.start(epsrBinDir_+"fmole.exe", QStringList() << workingDir_ << "fmole" << molBaseFileName << "0" << "0");
+#else
+    processFmole.start(epsrBinDir_+"fmole", QStringList() << workingDir_ << "fmole" << molBaseFileName << "0" << "0");
+#endif
     if (!processFmole.waitForStarted()) return false;
 
     if (!processFmole.waitForFinished()) return false;
@@ -1329,6 +1401,10 @@ void MainWindow::on_molChangeAtobutton_clicked(bool checked)
 
     QProcess processEditAto;
     processEditAto.setProcessChannelMode(QProcess::ForwardedChannels);
+#ifdef _WIN32
     processEditAto.startDetached(epsrBinDir_+"changeato.exe", QStringList() << workingDir_ << "changeato" << atoBaseFileName);
+#else
+    processEditAto.startDetached(epsrBinDir_+"changeato", QStringList() << workingDir_ << "changeato" << atoBaseFileName);
+#endif
     ui.messagesLineEdit->setText("Changeato opened in separate window");
 }

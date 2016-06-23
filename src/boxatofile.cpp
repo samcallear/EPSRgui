@@ -50,7 +50,11 @@ void MainWindow::on_mixatoButton_clicked(bool checked)
 
     QString projDir = workingDir_;
     projDir = QDir::toNativeSeparators(projDir);
+#ifdef _WIN32
     processMixato.start(epsrBinDir_+"mixato.exe", QStringList() << projDir << "mixato");
+#else
+    processMixato.start(epsrBinDir_+"mixato", QStringList() << projDir << "mixato");
+#endif
     if (!processMixato.waitForStarted()) return;
 
     processMixato.write(qPrintable(QString::number(nIndex)+"\r\n"));
@@ -159,7 +163,11 @@ void MainWindow::on_addatoButton_clicked(bool checked)
 
     QString projDir = workingDir_;
     projDir = QDir::toNativeSeparators(projDir);
+#ifdef _WIN32
     processMixato.start(epsrBinDir_+"addato.exe", QStringList() << projDir << "addato");
+#else
+    processMixato.start(epsrBinDir_+"addato", QStringList() << projDir << "addato");
+#endif
     if (!processMixato.waitForStarted()) return;
 
     processMixato.write(qPrintable(QString::number(nIndex)+"\r\n"));
@@ -332,7 +340,11 @@ void MainWindow::on_randomiseButton_clicked(bool checked)
 
         QProcess processRandomise;
         processRandomise.setProcessChannelMode(QProcess::ForwardedChannels);
+#ifdef _WIN32
         processRandomise.start(epsrBinDir_+"randomise.exe", QStringList() << workingDir_ << "randomise" << atoBaseFileName);
+#else
+        processRandomise.start(epsrBinDir_+"randomise", QStringList() << workingDir_ << "randomise" << atoBaseFileName);
+#endif
         if (!processRandomise.waitForStarted()) return;
 
         if (!processRandomise.waitForFinished(1800000)) return;
@@ -453,7 +465,11 @@ void MainWindow::on_fmoleButton_clicked(bool checked)
 
     QProcess processFmole;
     processFmole.setProcessChannelMode(QProcess::ForwardedChannels);
+#ifdef _WIN32
     processFmole.startDetached(epsrBinDir_+"fmole.exe", QStringList() << workingDir_ << "fmole" << atoBaseFileName << qPrintable(QString::number(fmoleIter)) << "0");
+#else
+    processFmole.startDetached(epsrBinDir_+"fmole", QStringList() << workingDir_ << "fmole" << atoBaseFileName << qPrintable(QString::number(fmoleIter)) << "0");
+#endif
 //    if (!processFmole.waitForStarted()) return;
 
 //    if (!processFmole.waitForFinished(1800000)) return;
@@ -523,7 +539,11 @@ void MainWindow::on_atoEPSRButton_clicked(bool checked)
 
     QProcess processEditAto;
     processEditAto.setProcessChannelMode(QProcess::ForwardedChannels);
+#ifdef _WIN32
     processEditAto.startDetached(epsrBinDir_+"changeato.exe", QStringList() << workingDir_ << "changeato" << atoBaseFileName);
+#else
+    processEditAto.startDetached(epsrBinDir_+"changeato", QStringList() << workingDir_ << "changeato" << atoBaseFileName);
+#endif
     ui.messagesLineEdit->setText("Changeato opened in separate window");
 }
 
