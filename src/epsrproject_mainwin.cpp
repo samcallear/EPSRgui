@@ -229,7 +229,11 @@ void MainWindow::createNew()
         QFile::copy(epsrDir_+"/startup/gnubonds.txt", workingDir_+"/gnubonds.txt");
         QFile::copy(epsrDir_+"/startup/gnuatoms.txt", workingDir_+"/gnuatoms.txt");
         QFile::copy(epsrDir_+"/startup/system_commands.txt", workingDir_+"/system_commands.txt");
+#ifdef _WIN32
         QFile::copy(epsrDir_+"/startup/epsr.bat", workingDir_+"/epsr.bat");
+#else
+        QFile::copy(epsrDir_+"/startup/epsr", workingDir_+"/epsr");
+#endif
 
         //activate tabs
         ui.tabWidget->setEnabled(true);
@@ -873,7 +877,11 @@ void MainWindow::runEPSR()
 
     QString atoBaseFileName = atoFileName_.split(".",QString::SkipEmptyParts).at(0);
 
+#ifdef _WIN32
     QFile batFile(workingDir_+"run"+atoBaseFileName+".bat");
+#else
+    QFile batFile(workingDir_+"run"+atoBaseFileName+".sh");
+#endif
     if(!batFile.open(QFile::WriteOnly | QFile::Text))
     {
         QMessageBox msgBox;
@@ -901,12 +909,26 @@ void MainWindow::runEPSR()
 
         //run EPSR on loop with dlputils output line
         QTextStream stream(&batFile);
+#ifdef _WIN32
         stream << "set EPSRbin=" << epsrBinDir_ << "\n"
                 << "set EPSRrun=" << workingDir_ << "\n"
                 << ":loop\n"
                 << "%EPSRbin%epsr.exe " << workingDir_ << " epsr " << atoBaseFileName << "\n"
                 << "%EPSRbin%writexyz.exe " << workingDir_ << " writexyz " << atoBaseFileName << " y 0 " << halfboxLengthStr << " " << halfboxLengthStr << " -" << halfboxLengthStr << " " << halfboxLengthStr << " 0 0 0 0" << "\n"
                 << "if not exist %EPSRrun%killepsr ( goto loop ) else del %EPSRrun%killepsr\n";
+#else
+        stream << "export EPSRbin=" << epsrBinDir_ << "\n"
+                << "export EPSRrun=" << workingDir_ << "\n"
+                << "while :\n"
+                << "do\n"
+                << "  \"$EPSRbin\"'epsr' " << workingDir_ << " epsr " << atoBaseFileName << "\n"
+                << "%\"$EPSRbin\"'writexyz' " << workingDir_ << " writexyz " << atoBaseFileName << " y 0 " << halfboxLengthStr << " " << halfboxLengthStr << " -" << halfboxLengthStr << " " << halfboxLengthStr << " 0 0 0 0" << "\n"
+                << "  if ([ -e " << workingDir_ << " ])\n"
+                << "  then break\n"
+                << "  fi\n"
+                << "done\n"
+                << "rm -r " << workDir_ << "killepsr\n";
+#endif
         batFile.close();
     }
 
@@ -914,11 +936,24 @@ void MainWindow::runEPSR()
     {
     //run EPSR on loop
     QTextStream stream(&batFile);
+#ifdef _WIN32
     stream << "set EPSRbin=" << epsrBinDir_ << "\n"
             << "set EPSRrun=" << workingDir_ << "\n"
             << ":loop\n"
-            << "%EPSRbin%epsr.exe " << workingDir_ << " epsr " << atoBaseFileName << "\n"
-            << "if not exist %EPSRrun%killepsr ( goto loop ) else del %EPSRrun%killepsr\n";
+            << "\"$EPSRbin\"'epsr' " << workingDir_ << " epsr " << atoBaseFileName << "\n"
+            << "if not exist \"$EPSRrun\"'killepsr' ( goto loop ) else del \"$EPSRrun\"'killepsr'\n";
+#else //THIS ISN:T CORRECT!!!!!!!!!!!!!!!!!!!!!! ***************************************************************************************
+        stream << "export EPSRbin=" << epsrBinDir_ << "\n"
+                << "export EPSRrun=" << workingDir_ << "\n"
+                << "while :\n"
+                << "do\n"
+                << "  \"$EPSRbin\"'epsr' " << workingDir_ << " epsr " << atoBaseFileName << "\n"
+                << "  if ([ -e " << workingDir_ << " ])\n"
+                << "  then break\n"
+                << "  fi\n"
+                << "done\n"
+                << "rm -r " << workDir_ << "killepsr\n";
+#endif
     batFile.close();
     }
 
@@ -926,7 +961,11 @@ void MainWindow::runEPSR()
 
     QProcess processrunEPSRscript;
     processrunEPSRscript.setProcessChannelMode(QProcess::ForwardedChannels);
+#ifdef _WIN32
     processrunEPSRscript.startDetached("run"+atoBaseFileName+".bat");
+#else
+    processrunEPSRscript.startDetached("run"+atoBaseFileName+".sh");
+#endif
 
     ui.messagesLineEdit->setText("EPSR is running in a separate window");
 

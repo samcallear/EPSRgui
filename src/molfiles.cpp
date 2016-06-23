@@ -86,7 +86,11 @@ bool MainWindow::runjmol()
     if (mopacOption != 0)
     {
         QString jmolBaseFileName=jmolFileName.split(".",QString::SkipEmptyParts).at(0);
+#ifdef _WIN32
         QFile jmolBatFile(workingDir_+"mopac"+jmolBaseFileName+".bat");
+#else
+        QFile jmolBatFile(workingDir_+"mopac"+jmolBaseFileName+".sh");
+#endif
         if(!jmolBatFile.open(QFile::WriteOnly | QFile::Text))
         {
             QMessageBox msgBox;
@@ -95,14 +99,24 @@ bool MainWindow::runjmol()
         }
 
         QTextStream stream(&jmolBatFile);
+#ifdef _WIN32
         stream << "set EPSRbin=" << epsrBinDir_ << "\n"
                << "set EPSRrun=" << workingDir_ << "\n"
                << "%EPSRbin%readmole.exe " << workingDir_ << " readmole .jmol " << jmolBaseFileName << "\n";
+#else
+        stream << "export EPSRbin=" << epsrBinDir_ << "\n"
+               << "export EPSRrun=" << workingDir_ << "\n"
+               << "\"$EPSRbin\"'readmole' " << workingDir_ << " readmole .jmol " << jmolBaseFileName << "\n";
+#endif
         jmolBatFile.close();
 
         QProcess processMol;
         processMol.setProcessChannelMode(QProcess::ForwardedChannels);
+#ifdef _WIN32
         processMol.start(workingDir_+"mopac"+jmolBaseFileName+".bat");
+#else
+        processMol.start(workingDir_+"mopac"+jmolBaseFileName+".sh");
+#endif
         //linux:
         if (!processMol.waitForStarted()) return false;
 
@@ -675,7 +689,11 @@ void MainWindow::on_viewMolFileButton_clicked(bool checked)
     {
         QString atoBaseFileName = molFileName_.split(".",QString::SkipEmptyParts).at(0);
 
+#ifdef _WIN32
         QFile jmolFile(workingDir_+"plot"+atoBaseFileName+".bat");
+#else
+        QFile jmolFile(workingDir_+"plot"+atoBaseFileName+".sh");
+#endif
         if(!jmolFile.open(QFile::WriteOnly | QFile::Text))
         {
             QMessageBox msgBox;
@@ -684,16 +702,26 @@ void MainWindow::on_viewMolFileButton_clicked(bool checked)
         }
 
         QTextStream stream(&jmolFile);
+#ifdef _WIN32
         stream << "set EPSRbin=" << epsrBinDir_ << "\n"
                << "set EPSRrun=" << workingDir_ << "\n"
                << "%EPSRbin%plotato.exe " << workingDir_ << " plotato " << atoBaseFileName << " 3 0 0\n";
+#else
+        stream << "export EPSRbin=" << epsrBinDir_ << "\n"
+               << "export EPSRrun=" << workingDir_ << "\n"
+               << "\"$EPSRbin\"'plotato' " << workingDir_ << " plotato " << atoBaseFileName << " 3 0 0\n";
+#endif
         jmolFile.close();
 
         QDir::setCurrent(workingDir_);
 
         QProcess processplotato;
         processplotato.setProcessChannelMode(QProcess::ForwardedChannels);
+#ifdef _WIN32
         processplotato.startDetached("plot"+atoBaseFileName+".bat");
+#else
+        processplotato.startDetached("plot"+atoBaseFileName+".sh");
+#endif
         ui.messagesLineEdit->setText(".mol file plotted in separate window");
 
 /*

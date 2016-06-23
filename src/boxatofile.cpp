@@ -498,14 +498,18 @@ void MainWindow::on_viewAtoFileButton_clicked(bool checked)
     }
 
     QString atoBaseFileName = atoFileName_.split(".",QString::SkipEmptyParts).at(0);
-
+#ifdef _WIN32
     QFile jmolFile(workingDir_+"plot"+atoBaseFileName+".bat");
+#else
+    QFile jmolFile(workingDir_+"plot"+atoBaseFileName+".sh");
+#endif
     if(!jmolFile.open(QFile::WriteOnly | QFile::Text))
     {
         QMessageBox msgBox;
         msgBox.setText("Could not make Jmol plotting file.");
         msgBox.exec();;
     }
+#ifdef _WIN32
     if (plotCentre == "0")
     {
         QTextStream stream(&jmolFile);
@@ -522,12 +526,34 @@ void MainWindow::on_viewAtoFileButton_clicked(bool checked)
                << "%EPSRbin%plotato.exe " << workingDir_ << " plotato " << atoBaseFileName << " 3" << " "+plotCentre << " "+maxDist << " "+rotCoord << " "+listExcAtoms << "\n";
         jmolFile.close();
     }
+#else
+    if (plotCentre == "0")
+    {
+        QTextStream stream(&jmolFile);
+        stream << "export EPSRbin=" << epsrBinDir_ << "\n"
+               << "export EPSRrun=" << workingDir_ << "\n"
+               << "\"$EPSRbin\"'plotato' " << workingDir_ << " plotato " << atoBaseFileName << " 3" << " "+plotCentre << " "+listExcAtoms << "\n";
+        jmolFile.close();
+    }
+    else
+    {
+        QTextStream stream(&jmolFile);
+        stream << "export EPSRbin=" << epsrBinDir_ << "\n"
+               << "export EPSRrun=" << workingDir_ << "\n"
+               << "\"$EPSRbin\"'plotato' " << workingDir_ << " plotato " << atoBaseFileName << " 3" << " "+plotCentre << " "+maxDist << " "+rotCoord << " "+listExcAtoms << "\n";
+        jmolFile.close();
+    }
+#endif
 
     QDir::setCurrent(workingDir_);
 
     QProcess processplotato;
     processplotato.setProcessChannelMode(QProcess::ForwardedChannels);
+#ifdef _WIN32
     processplotato.startDetached("plot"+atoBaseFileName+".bat");
+#else
+    processplotato.startDetached("plot"+atoBaseFileName+".sh");
+#endif
     ui.messagesLineEdit->setText("Box .ato file plotted in separate window");
 }
 
