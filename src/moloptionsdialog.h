@@ -1,9 +1,9 @@
 #ifndef MOLOPTIONSDIALOG_H
 #define MOLOPTIONSDIALOG_H
 
-#include <QtWidgets\QDialog>
-#include <QtWidgets\QWidget>
-#include <QtWidgets\QComboBox>
+#include <QDialog>
+#include <QWidget>
+#include <QComboBox>
 #include "ui_moloptionsdialog.h"
 
 class MolOptionsDialog : public QDialog

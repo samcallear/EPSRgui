@@ -113,26 +113,26 @@ bool MainWindow::runjmol()
         QProcess processMol;
         processMol.setProcessChannelMode(QProcess::ForwardedChannels);
 #ifdef _WIN32
-        processMol.start(workingDir_+"mopac"+jmolBaseFileName+".bat");
+        processMol.start("mopac"+jmolBaseFileName+".bat");
 #else
-        processMol.start(workingDir_+"mopac"+jmolBaseFileName+".sh");
+        processMol.start("sh mopac"+jmolBaseFileName+".sh");
 #endif
         //linux:
         if (!processMol.waitForStarted()) return false;
 
-        processMol.write("3\r\n");          // select bonding patterns and changelabel section
+        processMol.write("3\n");          // select bonding patterns and changelabel section
         QByteArray result = processMol.readAll();
         qDebug(result);
 
-        processMol.write("y\r\n");          //yes to running mopac
+        processMol.write("y\n");          //yes to running mopac
         result = processMol.readAll();
         qDebug(result);
 
-        processMol.write(qPrintable(mopacOptionStr+"\r\n"));    //mopac option number
+        processMol.write(qPrintable(mopacOptionStr+"\n"));    //mopac option number
         result = processMol.readAll();
         qDebug(result);
 
-        processMol.write(qPrintable(molChargeStr+"\r\n"));      //molecular charge
+        processMol.write(qPrintable(molChargeStr+"\n"));      //molecular charge
         result = processMol.readAll();
         qDebug(result);
 
@@ -178,11 +178,11 @@ bool MainWindow::runjmol()
 #endif
         if (!processMol.waitForStarted()) return false;
 
-        processMol.write("3\r\n");          // select bonding patterns and changelabel section
+        processMol.write("3\n");          // select bonding patterns and changelabel section
         QByteArray result = processMol.readAll();
         qDebug(result);
 
-        processMol.write("n\r\n");    //don't run mopac here as calls to "%EPSRbin%" in path which obviously isn't defined!
+        processMol.write("n\n");    //don't run mopac here as calls to "%EPSRbin%" in path which obviously isn't defined!
         result = processMol.readAll();
         qDebug(result);
 
@@ -335,35 +335,35 @@ void MainWindow::on_createAtomButton_clicked(bool checked)
 #endif
         if (!processMakeAto.waitForStarted()) return;
 
-        processMakeAto.write(qPrintable(atomName+"\r\n"));
+        processMakeAto.write(qPrintable(atomName+"\n"));
         QByteArray result = processMakeAto.readAll();
         qDebug(result);
 
-        processMakeAto.write(qPrintable(atomEpsilon+"\r\n"));
+        processMakeAto.write(qPrintable(atomEpsilon+"\n"));
         result = processMakeAto.readAll();
         qDebug(result);
 
-        processMakeAto.write(qPrintable(atomSigma+"\r\n"));
+        processMakeAto.write(qPrintable(atomSigma+"\n"));
         result = processMakeAto.readAll();
         qDebug(result);
 
-        processMakeAto.write(qPrintable(atomMass+"\r\n"));
+        processMakeAto.write(qPrintable(atomMass+"\n"));
         result = processMakeAto.readAll();
         qDebug(result);
 
-        processMakeAto.write(qPrintable(atomCharge+"\r\n"));
+        processMakeAto.write(qPrintable(atomCharge+"\n"));
         result = processMakeAto.readAll();
         qDebug(result);
 
-        processMakeAto.write(qPrintable(atomSymbol+"\r\n"));
+        processMakeAto.write(qPrintable(atomSymbol+"\n"));
         result = processMakeAto.readAll();
         qDebug(result);
 
-        processMakeAto.write(qPrintable(atomTemp+"\r\n"));
+        processMakeAto.write(qPrintable(atomTemp+"\n"));
         result = processMakeAto.readAll();
         qDebug(result);
 
-        processMakeAto.write(qPrintable(atomDensity+"\r\n"));
+        processMakeAto.write(qPrintable(atomDensity+"\n"));
         result = processMakeAto.readAll();
         qDebug(result);
 
@@ -483,15 +483,15 @@ void MainWindow::on_createLatticeButton_clicked(bool checked)
 #endif
         if (!processMakeLattice.waitForStarted()) return;
 
-        processMakeLattice.write(qPrintable(unitFileName+"\r\n"));
+        processMakeLattice.write(qPrintable(unitFileName+"\n"));
         QByteArray result = processMakeLattice.readAll();
         qDebug(result);
 
-        processMakeLattice.write(qPrintable(aLatt+" "+bLatt+" "+cLatt+"\r\n"));
+        processMakeLattice.write(qPrintable(aLatt+" "+bLatt+" "+cLatt+"\n"));
         result = processMakeLattice.readAll();
         qDebug(result);
 
-        processMakeLattice.write(qPrintable(unitFileName+"\r\n"));
+        processMakeLattice.write(qPrintable(unitFileName+"\n"));
         result = processMakeLattice.readAll();
         qDebug(result);
 
@@ -720,7 +720,7 @@ void MainWindow::on_viewMolFileButton_clicked(bool checked)
 #ifdef _WIN32
         processplotato.startDetached("plot"+atoBaseFileName+".bat");
 #else
-        processplotato.startDetached("plot"+atoBaseFileName+".sh");
+        processplotato.startDetached("sh plot"+atoBaseFileName+".sh");
 #endif
         ui.messagesLineEdit->setText(".mol file plotted in separate window");
 

@@ -1,10 +1,10 @@
 #ifndef MAKELATTICEDIALOG_H
 #define MAKELATTICEDIALOG_H
 
-#include <QtWidgets\QDialog>
-#include <QtWidgets\QWidget>
-#include <QtWidgets\QComboBox>
-#include <QtCore\QDir>
+#include <QDialog>
+#include <QWidget>
+#include <QComboBox>
+#include <QDir>
 #include "ui_makelatticedialog.h"
 
 class MainWindow;
@@ -39,7 +39,7 @@ public:
     QString cellsAlongC();
     QString unitFileName();
     QStringList atomTypes();
-
+    QString charge();
 };
 
 #endif

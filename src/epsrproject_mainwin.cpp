@@ -258,7 +258,7 @@ void MainWindow::createNew()
         ui.removeDataFileButton->setEnabled(true);
 
         //change window title to contain projectName
-        this->setWindowTitle("EPSRProject: "+projectName_);
+        this->setWindowTitle("EPSRgui: "+projectName_);
         ui.messagesLineEdit->setText("New project "+projectName_+" created");
     }
 }
@@ -927,7 +927,7 @@ void MainWindow::runEPSR()
                 << "  then break\n"
                 << "  fi\n"
                 << "done\n"
-                << "rm -r " << workDir_ << "killepsr\n";
+                << "rm -r " << workingDir_ << "killepsr\n";
 #endif
         batFile.close();
     }
@@ -942,7 +942,7 @@ void MainWindow::runEPSR()
             << ":loop\n"
             << "\"$EPSRbin\"'epsr' " << workingDir_ << " epsr " << atoBaseFileName << "\n"
             << "if not exist \"$EPSRrun\"'killepsr' ( goto loop ) else del \"$EPSRrun\"'killepsr'\n";
-#else //THIS ISN:T CORRECT!!!!!!!!!!!!!!!!!!!!!! ***************************************************************************************
+#else
         stream << "export EPSRbin=" << epsrBinDir_ << "\n"
                 << "export EPSRrun=" << workingDir_ << "\n"
                 << "while :\n"
@@ -952,7 +952,7 @@ void MainWindow::runEPSR()
                 << "  then break\n"
                 << "  fi\n"
                 << "done\n"
-                << "rm -r " << workDir_ << "killepsr\n";
+                << "rm -r " << workingDir_ << "killepsr\n";
 #endif
     batFile.close();
     }
@@ -964,7 +964,7 @@ void MainWindow::runEPSR()
 #ifdef _WIN32
     processrunEPSRscript.startDetached("run"+atoBaseFileName+".bat");
 #else
-    processrunEPSRscript.startDetached("run"+atoBaseFileName+".sh");
+    processrunEPSRscript.startDetached("sh run"+atoBaseFileName+".sh");
 #endif
 
     ui.messagesLineEdit->setText("EPSR is running in a separate window");

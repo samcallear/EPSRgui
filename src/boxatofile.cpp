@@ -53,11 +53,11 @@ void MainWindow::on_mixatoButton_clicked(bool checked)
 #ifdef _WIN32
     processMixato.start(epsrBinDir_+"mixato.exe", QStringList() << projDir << "mixato");
 #else
-    processMixato.start(epsrBinDir_+"mixato", QStringList() << projDir << "mixato");
+    processMixato.start(epsrBinDir_+"mixato", QStringList() << workingDir_ << "mixato");
 #endif
     if (!processMixato.waitForStarted()) return;
 
-    processMixato.write(qPrintable(QString::number(nIndex)+"\r\n"));
+    processMixato.write(qPrintable(QString::number(nIndex)+"\n"));
     QByteArray result = processMixato.readAll();
     qDebug(result);
 
@@ -70,21 +70,21 @@ void MainWindow::on_mixatoButton_clicked(bool checked)
             result = processMixato.readAll();
             qDebug(result);
         }
-        processMixato.write("y\r\n");
+        processMixato.write("y\n");
         result = processMixato.readAll();
         qDebug(result);
 
         int nMols = numberOfMolecules.at(i).toInt();
-        processMixato.write(qPrintable(QString::number(nMols)+"\r\n"));
+        processMixato.write(qPrintable(QString::number(nMols)+"\n"));
         result = processMixato.readAll();
         qDebug(result);
     }
         double numberDensity = ui.numberDensityLineEdit->text().toDouble();
-        processMixato.write(qPrintable(QString::number(numberDensity)+"\r\n"));
+        processMixato.write(qPrintable(QString::number(numberDensity)+"\n"));
         result = processMixato.readAll();
         qDebug(result);
 
-        processMixato.write(qPrintable(atoFileBaseName+"\r\n"));
+        processMixato.write(qPrintable(atoFileBaseName+"\n"));
         result = processMixato.readAll();
         qDebug(result);
 
@@ -170,7 +170,7 @@ void MainWindow::on_addatoButton_clicked(bool checked)
 #endif
     if (!processMixato.waitForStarted()) return;
 
-    processMixato.write(qPrintable(QString::number(nIndex)+"\r\n"));
+    processMixato.write(qPrintable(QString::number(nIndex)+"\n"));
     QByteArray result = processMixato.readAll();
     qDebug(result);
 
@@ -184,12 +184,12 @@ void MainWindow::on_addatoButton_clicked(bool checked)
             result = processMixato.readAll();
             qDebug(result);
         }
-        processMixato.write("y\r\n");
+        processMixato.write("y\n");
         result = processMixato.readAll();
         qDebug(result);
 
         int nMols = numberOfMolecules.at(i).toInt();
-        processMixato.write(qPrintable(QString::number(nMols)+"\r\n"));
+        processMixato.write(qPrintable(QString::number(nMols)+"\n"));
         result = processMixato.readAll();
         qDebug(result);
     }
@@ -202,18 +202,18 @@ void MainWindow::on_addatoButton_clicked(bool checked)
         result = processMixato.readAll();
         qDebug(result);
     }
-    processMixato.write("y\r\n");
+    processMixato.write("y\n");
     result = processMixato.readAll();
     qDebug(result);
 
 
-    processMixato.write(qPrintable(atoFileBaseName+"\r\n"));
+    processMixato.write(qPrintable(atoFileBaseName+"\n"));
     result = processMixato.readAll();
     qDebug(result);
 
     if (!processMixato.waitForFinished(1800000)) return;
 
-    printf("\nfinished writing %s file", qPrintable(atoFileName_));
+    printf("\nfinished writing %s file\n", qPrintable(atoFileName_));
     ui.messagesLineEdit->setText("Finished writing box .ato file");
 
     ui.boxAtoLabel->setText(atoFileName_);
@@ -552,7 +552,7 @@ void MainWindow::on_viewAtoFileButton_clicked(bool checked)
 #ifdef _WIN32
     processplotato.startDetached("plot"+atoBaseFileName+".bat");
 #else
-    processplotato.startDetached("plot"+atoBaseFileName+".sh");
+    processplotato.startDetached("sh plot"+atoBaseFileName+".sh");
 #endif
     ui.messagesLineEdit->setText("Box .ato file plotted in separate window");
 }

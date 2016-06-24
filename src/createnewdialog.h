@@ -1,11 +1,11 @@
 #ifndef CREATENEWDIALOG_H
 #define CREATENEWDIALOG_H
 
-#include <QtWidgets\QDialog>
-#include <QtWidgets\QWidget>
-#include <QtWidgets\QRadioButton>
+#include <QDialog>
+#include <QWidget>
+#include <QRadioButton>
 #include "ui_createnewdialog.h"
-#include <QtCore\QDir>
+#include <QDir>
 
 class MainWindow;
 

@@ -1,9 +1,9 @@
 #ifndef MAKEATOMDIALOG_H
 #define MAKEATOMDIALOG_H
 
-#include <QtWidgets\QDialog>
-#include <QtWidgets\QWidget>
-#include <QtWidgets\QComboBox>
+#include <QDialog>
+#include <QWidget>
+#include <QComboBox>
 #include "ui_makeatomdialog.h"
 
 class MakeAtomDialog : public QDialog

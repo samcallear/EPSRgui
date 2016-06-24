@@ -42,7 +42,7 @@ void MainWindow::on_setupEPSRButton_clicked(bool checked)
         qDebug(result);
 
         int N_data = dataFileList.count();
-        processEpsrSetup.write(qPrintable(QString::number(N_data)+"\r\n\n"));          // move to ndata line
+        processEpsrSetup.write(qPrintable(QString::number(N_data)+"\n\n"));          // move to data section
         result = processEpsrSetup.readAll();
         qDebug(result);
 

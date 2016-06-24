@@ -1,10 +1,10 @@
 #ifndef SETTINGSDIALOG
 #define SETTINGSDIALOG
 
-#include <QtWidgets\QDialog>
-#include <QtWidgets\QWidget>
+#include <QDialog>
+#include <QWidget>
 #include "ui_settingsdialog.h"
-#include <QtCore\QDir>
+#include <QDir>
 
 class MainWindow;
 

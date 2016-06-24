@@ -1,12 +1,12 @@
 #ifndef PLOTDIALOG_H
 #define PLOTDIALOG_H
 
-#include <QtWidgets\QDialog>
-#include <QtWidgets\QWidget>
-#include <QtWidgets\QRadioButton>
+#include <QDialog>
+#include <QWidget>
+#include <QRadioButton>
 #include "ui_plotdialog.h"
 #include "array.h"
-#include <QtCore\QDir>
+#include <QDir>
 
 class MainWindow;
 
