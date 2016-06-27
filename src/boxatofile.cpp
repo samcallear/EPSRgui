@@ -90,7 +90,7 @@ void MainWindow::on_mixatoButton_clicked(bool checked)
 
     if (!processMixato.waitForFinished(1800000)) return;
 
-    printf("\nfinished writing %s file", qPrintable(atoFileName_));
+    printf("\nfinished writing %s file\n", qPrintable(atoFileName_));
     ui.messagesLineEdit->setText("Finished writing box .ato file");
 
     ui.boxAtoLabel->setText(atoFileName_);
@@ -114,6 +114,9 @@ void MainWindow::on_mixatoButton_clicked(bool checked)
     ui.addLJRowAboveButton->setDisabled(true);
     ui.addLJRowBelowButton->setDisabled(true);
     ui.deleteLJRowButton->setDisabled(true);
+    ui.mixatoButton->setDisabled(true);
+    ui.addatoButton->setDisabled(true);
+    ui.atoAsBoxButton->setDisabled(true);
 }
 
 void MainWindow::on_addatoButton_clicked(bool checked)
@@ -151,27 +154,27 @@ void MainWindow::on_addatoButton_clicked(bool checked)
             return;
         }
         atoFileIndexes.append(atoFileIndex);
-        printf("%s\n", qPrintable(atoFileIndexes.at(i)));
+//        printf("%s\n", qPrintable(atoFileIndexes.at(i)));
         QString numberMol = ui.atoFileTable->item(i,2)->text();
         numberOfMolecules.append(numberMol);
     }
 
     int nIndex = atoFileIndexes.count()-1; //this is the number of files to be added to the first file listed in the table
 
-    QProcess processMixato;
-    processMixato.setProcessChannelMode(QProcess::ForwardedChannels);
+    QProcess processAddato;
+    processAddato.setProcessChannelMode(QProcess::ForwardedChannels);
 
     QString projDir = workingDir_;
     projDir = QDir::toNativeSeparators(projDir);
 #ifdef _WIN32
-    processMixato.start(epsrBinDir_+"addato.exe", QStringList() << projDir << "addato");
+    processAddato.start(epsrBinDir_+"addato.exe", QStringList() << projDir << "addato");
 #else
-    processMixato.start(epsrBinDir_+"addato", QStringList() << projDir << "addato");
+    processAddato.start(epsrBinDir_+"addato", QStringList() << projDir << "addato");
 #endif
-    if (!processMixato.waitForStarted()) return;
+    if (!processAddato.waitForStarted()) return;
 
-    processMixato.write(qPrintable(QString::number(nIndex)+"\n"));
-    QByteArray result = processMixato.readAll();
+    processAddato.write(qPrintable(QString::number(nIndex)+"\n"));
+    QByteArray result = processAddato.readAll();
     qDebug(result);
 
     // press enter to get to each ato file listed in the table that will be added to the first ato file in the table
@@ -180,17 +183,17 @@ void MainWindow::on_addatoButton_clicked(bool checked)
         int newlines = atoFileIndexes.at(i).toInt();
         for (int nl = 0; nl < newlines; nl++)
         {
-            processMixato.write("\n");
-            result = processMixato.readAll();
+            processAddato.write("\n");
+            result = processAddato.readAll();
             qDebug(result);
         }
-        processMixato.write("y\n");
-        result = processMixato.readAll();
+        processAddato.write("y\n");
+        result = processAddato.readAll();
         qDebug(result);
 
         int nMols = numberOfMolecules.at(i).toInt();
-        processMixato.write(qPrintable(QString::number(nMols)+"\n"));
-        result = processMixato.readAll();
+        processAddato.write(qPrintable(QString::number(nMols)+"\n"));
+        result = processAddato.readAll();
         qDebug(result);
     }
 
@@ -198,20 +201,19 @@ void MainWindow::on_addatoButton_clicked(bool checked)
     int newlines = atoFileIndexes.at(0).toInt();
     for (int nl = 0; nl < newlines; nl++)
     {
-        processMixato.write("\n");
-        result = processMixato.readAll();
+        processAddato.write("\n");
+        result = processAddato.readAll();
         qDebug(result);
     }
-    processMixato.write("y\n");
-    result = processMixato.readAll();
+    processAddato.write("y\n");
+    result = processAddato.readAll();
     qDebug(result);
 
-
-    processMixato.write(qPrintable(atoFileBaseName+"\n"));
-    result = processMixato.readAll();
+    processAddato.write(qPrintable(atoFileBaseName+"\n"));
+    result = processAddato.readAll();
     qDebug(result);
 
-    if (!processMixato.waitForFinished(1800000)) return;
+    if (!processAddato.waitForFinished(1800000)) return;
 
     printf("\nfinished writing %s file\n", qPrintable(atoFileName_));
     ui.messagesLineEdit->setText("Finished writing box .ato file");
@@ -237,6 +239,17 @@ void MainWindow::on_addatoButton_clicked(bool checked)
     ui.addLJRowAboveButton->setDisabled(true);
     ui.addLJRowBelowButton->setDisabled(true);
     ui.deleteLJRowButton->setDisabled(true);
+    ui.mixatoButton->setDisabled(true);
+    ui.addatoButton->setDisabled(true);
+    ui.atoAsBoxButton->setDisabled(true);
+}
+
+void MainWindow::on_atoAsBoxButton_clicked (bool checked)
+{
+    QMessageBox msgBox;
+    msgBox.setText("This is not currently implemented.\n");
+    msgBox.exec();
+    return;
 }
 
 bool MainWindow::readAtoFileBoxDetails()
@@ -255,14 +268,25 @@ bool MainWindow::readAtoFileBoxDetails()
     QStringList dataLine;
     dataLine.clear();
     QString numberMol;
-    QString boxLength;
 
     line = stream.readLine();
     dataLine = line.split("  ", QString::SkipEmptyParts);
     numberMol = dataLine.at(0);
     if (dataLine.count() == 3)
     {
-        boxLength = dataLine.at(1);
+        QString boxLengthstr;
+        boxLengthstr = dataLine.at(1);
+        ui.boxAtoLengthA->setText(boxLengthstr);
+        ui.boxAtoLengthB->clear();
+        ui.boxAtoLengthC->clear();
+        ui.boxAtoAxisA->setText("90.0000");
+        ui.boxAtoAxisB->setText("0.0000");
+        ui.boxAtoAxisG->setText("0.0000");
+        double boxLength = boxLengthstr.toDouble();
+        double boxVol = boxLength*boxLength*boxLength;
+        QString boxVolstr;
+        boxVolstr.sprintf("%.2f", boxVol);
+        ui.boxAtoVol->setText(boxVolstr);
     }
     else
     {
@@ -277,12 +301,33 @@ bool MainWindow::readAtoFileBoxDetails()
         boxbstr.sprintf("%.4f", boxb);
         QString boxcstr;
         boxcstr.sprintf("%.4f", boxc);
-        boxLength = boxastr+", "+boxbstr+", "+boxcstr;
+        ui.boxAtoLengthA->setText(boxastr);
+        ui.boxAtoLengthB->setText(boxbstr);
+        ui.boxAtoLengthC->setText(boxcstr);
+
+        line = stream.readLine();
+        dataLine = line.split(" ", QString::SkipEmptyParts);
+        double boxtb = dataLine.at(0).toDouble();
+        double boxtc = dataLine.at(1).toDouble();
+        double boxpb = dataLine.at(2).toDouble();
+        QString boxtbstr;
+        boxtbstr.sprintf("%.4f", boxtb);
+        QString boxtcstr;
+        boxtcstr.sprintf("%.4f", boxtc);
+        QString boxpbstr;
+        boxpbstr.sprintf("%.4f", boxpb);
+        ui.boxAtoAxisA->setText(boxtbstr);
+        ui.boxAtoAxisB->setText(boxtcstr);
+        ui.boxAtoAxisG->setText(boxpbstr);
+        double boxVol = boxa*boxb*sin(boxtb*3.14159265/180)*boxc*cos(boxtc*3.14159265/180);
+        QString boxVolstr;
+        boxVolstr.sprintf("%.2f", boxVol);
+        ui.boxAtoVol->setText(boxVolstr);
     }
     file.close();
 
     ui.boxAtoMols->setText(numberMol);
-    ui.boxAtoLength->setText(boxLength);
+    ui.boxAtoAtoms->setText("not available");
 }
 
 bool MainWindow::readAtoFileAtomPairs()

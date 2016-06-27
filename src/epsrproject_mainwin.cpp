@@ -241,6 +241,9 @@ void MainWindow::createNew()
         //activate menu options
         ui.saveAct->setEnabled(true);
         ui.saveAsAct->setEnabled(true);
+        ui.copyAct->setEnabled(true);
+        ui.cutAct->setEnabled(true);
+        ui.pasteAct->setEnabled(true);
 
         //activate buttons (in case disabled from previous project)
         ui.createMolFileButton->setEnabled(true);
@@ -285,7 +288,13 @@ void MainWindow::reset()
     ui.boxAtoLabel->clear();
     ui.boxAtoCharge->clear();
     ui.boxAtoMols->clear();
-    ui.boxAtoLength->clear();
+    ui.boxAtoLengthA->clear();
+    ui.boxAtoLengthB->clear();
+    ui.boxAtoLengthC->clear();
+    ui.boxAtoAxisA->clear();
+    ui.boxAtoAxisB->clear();
+    ui.boxAtoAxisG->clear();
+    ui.boxAtoVol->clear();
     ui.temperatureLineEdit->setText("300");
     ui.vibtempLineEdit->setText("65");
     ui.angtempLineEdit->setText("1");
@@ -309,6 +318,22 @@ void MainWindow::reset()
     ui.minDistanceTable->clearContents();
     epsrInpFileName_.clear();
 
+    //re-enable all buttons
+    ui.createMolFileButton->setEnabled(true);
+    ui.molFileLoadButton->setEnabled(true);
+    ui.createAtomButton->setEnabled(true);
+    ui.createLatticeButton->setEnabled(true);
+    ui.removeMolFileButton->setEnabled(true);
+    ui.makeMolExtButton->setEnabled(true);
+    ui.addLJRowAboveButton->setEnabled(true);
+    ui.addLJRowBelowButton->setEnabled(true);
+    ui.deleteLJRowButton->setEnabled(true);
+    ui.mixatoButton->setEnabled(true);
+    ui.addatoButton->setEnabled(true);
+    ui.atoAsBoxButton->setEnabled(true);
+    ui.dataFileBrowseButton->setEnabled(true);
+    ui.removeDataFileButton->setEnabled(true);
+
     //clear plots
     ui.plot1->clearGraphs();
     ui.plot1->clearItems();
@@ -318,6 +343,17 @@ void MainWindow::reset()
     ui.plot2->clearItems();
     ui.plot2->clearPlottables();
     ui.plot2->replot();
+
+    //disable menu actions
+    ui.saveAct->setEnabled(false);
+    ui.saveAsAct->setEnabled(false);
+    ui.copyAct->setEnabled(false);
+    ui.cutAct->setEnabled(false);
+    ui.pasteAct->setEnabled(false);
+    ui.checkAct->setEnabled(false);
+    ui.runAct->setEnabled(false);
+    ui.stopAct->setEnabled(false);
+    ui.plotAct->setEnabled(false);
 }
 
 void MainWindow::open()
@@ -406,6 +442,7 @@ void MainWindow::open()
                     ui.deleteLJRowButton->setDisabled(true);
                     ui.mixatoButton->setDisabled(true);
                     ui.addatoButton->setDisabled(true);
+                    ui.atoAsBoxButton->setDisabled(true);
                 }
                 if (dataLine.at(0) == "numberDensity")
                 {
@@ -464,6 +501,10 @@ void MainWindow::open()
                     ui.plot2Button->setEnabled(true);
                     ui.dataFileBrowseButton->setDisabled(true);
                     ui.removeDataFileButton->setEnabled(false);
+                    ui.checkAct->setEnabled(true);
+                    ui.runAct->setEnabled(true);
+                    ui.stopAct->setEnabled(true);
+                    ui.plotAct->setEnabled(true);
                 }
                 if (dataLine.at(0) == "dlputils")
                 {
@@ -518,6 +559,9 @@ void MainWindow::open()
         //activate menu options
         ui.saveAct->setEnabled(true);
         ui.saveAsAct->setEnabled(true);
+        ui.copyAct->setEnabled(true);
+        ui.cutAct->setEnabled(true);
+        ui.pasteAct->setEnabled(true);
 
         //change window title to contain projectName
         this->setWindowTitle("EPSRProject: "+projectName_);
@@ -902,8 +946,8 @@ void MainWindow::runEPSR()
 
     if (ui.dlputilsOutCheckBox->isChecked())
     {
-        //get box side length and divide by 2 to get value for bat file
-        double boxLength = ui.boxAtoLength->text().toDouble();
+        //get box side length and divide by 2 to get value for bat file ****only works for cubic!***************************************************************************
+        double boxLength = ui.boxAtoLengthA->text().toDouble();
         double halfboxLength = boxLength/2;
         QString halfboxLengthStr = QString::number(halfboxLength);
 
