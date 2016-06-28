@@ -91,6 +91,9 @@ void MainWindow::createActions()
     ui.plotAct->setStatusTip(tr("Plot EPSR outputs"));
     connect(ui.plotAct, SIGNAL(triggered()), this, SLOT(plot()));
 
+    ui.plotEPSRshellAct->setStatusTip(tr("Plot EPSR using EPSRshell"));
+    connect(ui.plotEPSRshellAct, SIGNAL(triggered()), this, SLOT(plotEPSRshell()));
+
     ui.settingsAct->setStatusTip(tr("Change EPSRProject settings"));
     connect(ui.settingsAct, SIGNAL(triggered()), this, SLOT(settings()));
 
@@ -505,6 +508,7 @@ void MainWindow::open()
                     ui.runAct->setEnabled(true);
                     ui.stopAct->setEnabled(true);
                     ui.plotAct->setEnabled(true);
+                    ui.plotEPSRshellAct->setEnabled(true);
                 }
                 if (dataLine.at(0) == "dlputils")
                 {
@@ -1068,6 +1072,23 @@ void MainWindow::plot()
     plotDialog->show();
     plotDialog->raise();
     plotDialog->activateWindow();
+}
+
+void MainWindow::plotEPSRshell()
+{
+    QDir::setCurrent(workingDir_);
+
+    QString atoBaseFileName = atoFileName_.split(".",QString::SkipEmptyParts).at(0);
+    //Error: "system cannot find the path specified"*?!?!??!?!?**************************************************************************************
+    QProcess processrunEPSRplot;
+    processrunEPSRplot.setProcessChannelMode(QProcess::ForwardedChannels);
+//#ifdef _WIN32
+    processrunEPSRplot.startDetached(epsrBinDir_+"epsrshell.exe");
+//#else
+    processrunEPSRplot.startDetached(epsrBinDir_+"epsrshell");
+//#endif
+
+    ui.messagesLineEdit->setText("started EPSRshell for external plotting options");
 }
 
 void MainWindow::settings()

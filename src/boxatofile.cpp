@@ -274,15 +274,15 @@ bool MainWindow::readAtoFileBoxDetails()
     numberMol = dataLine.at(0);
     if (dataLine.count() == 3)
     {
+        double boxLength = dataLine.at(1).toDouble();
         QString boxLengthstr;
-        boxLengthstr = dataLine.at(1);
+        boxLengthstr.sprintf("%.4f", boxLength);
         ui.boxAtoLengthA->setText(boxLengthstr);
         ui.boxAtoLengthB->clear();
         ui.boxAtoLengthC->clear();
         ui.boxAtoAxisA->setText("90.0000");
         ui.boxAtoAxisB->setText("0.0000");
         ui.boxAtoAxisG->setText("0.0000");
-        double boxLength = boxLengthstr.toDouble();
         double boxVol = boxLength*boxLength*boxLength;
         QString boxVolstr;
         boxVolstr.sprintf("%.2f", boxVol);
@@ -324,10 +324,21 @@ bool MainWindow::readAtoFileBoxDetails()
         boxVolstr.sprintf("%.2f", boxVol);
         ui.boxAtoVol->setText(boxVolstr);
     }
+
+    int atomctr = 0;
+    QRegExp atomLabelrx(" ([A-Z][A-Za-z0-9 ]{2})   ([0-9 ]{1,4})      0");
+    do {
+        line = stream.readLine();
+        if (atomLabelrx.exactMatch(line))
+        {
+            atomctr++;
+        }
+    } while (!line.isNull());
     file.close();
 
+    QString numberAtom = QString::number(atomctr);
     ui.boxAtoMols->setText(numberMol);
-    ui.boxAtoAtoms->setText("not available");
+    ui.boxAtoAtoms->setText(numberAtom);
 }
 
 bool MainWindow::readAtoFileAtomPairs()
@@ -343,7 +354,7 @@ bool MainWindow::readAtoFileAtomPairs()
     QTextStream stream(&file);
     QString line;
     QRegExp atomPairrx(" ([A-Z][A-Za-z0-9 ]{2}) ([A-Za-z ]{1,2})   ([0-1]{1})");
-    if (!atomPairrx.isValid()) printf("Could not find atom pairs in ato file.\n");
+//    if (!atomPairrx.isValid()) printf("Could not find atom pairs in ato file.\n");
     atoAtomLabels.clear();
 
     do {

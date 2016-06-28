@@ -14,12 +14,16 @@ void MainWindow::on_dataFileBrowseButton_clicked(bool checked)
     QString newDataFileName;
     if (ui.neutronDataRB->isChecked())
     {
-        newDataFileName = QFileDialog::getOpenFileName(this, "Choose dataset", workingDir_, tr(".mint01 files (*.mint01)"));
+        QString filters(".mint01 files (*.mint01);;All files (*.*)");
+        QString defaultFilter(".mint01 files (*.mint01)");
+        newDataFileName = QFileDialog::getOpenFileName(this, "Choose dataset", workingDir_, filters, &defaultFilter);
     }
     else
     if (ui.xrayDataRB->isChecked())
     {
-        newDataFileName = QFileDialog::getOpenFileName(this, "Choose dataset", workingDir_, tr(".int01 files (*.int01)"));
+        QString filters(".int01 files (*.int01);;All files (*.*)");
+        QString defaultFilter(".int01 files (*.int01)");
+        newDataFileName = QFileDialog::getOpenFileName(this, "Choose dataset", workingDir_, filters, &defaultFilter);
     }
     if (!newDataFileName.isEmpty())
     {

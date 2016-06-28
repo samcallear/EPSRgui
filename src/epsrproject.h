@@ -34,6 +34,7 @@ private slots:
     void runEPSR();
     void runEPSRcheck();
     void plot();
+    void plotEPSRshell();
     void settings();
     void stopEPSR();
     void deleteEPSRinpFile();
@@ -140,6 +141,7 @@ private:
 private slots:
     void on_mixatoButton_clicked(bool checked);
     void on_addatoButton_clicked(bool checked);
+    void on_atoAsBoxButton_clicked (bool checked);
     void on_randomiseButton_clicked(bool checked);
     void on_updateAtoFileButton_clicked(bool checked);
     void on_fmoleButton_clicked(bool checked);

@@ -14,7 +14,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>EPSRproject</string>
+   <string>EPSRgui</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayout_5">
@@ -115,7 +115,7 @@
                  <item>
                   <widget class="QPushButton" name="createLatticeButton">
                    <property name="text">
-                    <string>Create lattice</string>
+                    <string>Create atomic lattice</string>
                    </property>
                   </widget>
                  </item>
@@ -308,17 +308,17 @@
                           </column>
                           <column>
                            <property name="text">
-                            <string>Epsilon</string>
+                            <string>Epsilon (kJ/mole)</string>
                            </property>
                           </column>
                           <column>
                            <property name="text">
-                            <string>Sigma</string>
+                            <string>Sigma (Å)</string>
                            </property>
                           </column>
                           <column>
                            <property name="text">
-                            <string>AW</string>
+                            <string>AW (amu)</string>
                            </property>
                           </column>
                           <column>
@@ -390,7 +390,7 @@
                           </column>
                           <column>
                            <property name="text">
-                            <string>Distance (A)</string>
+                            <string>Distance (Å)</string>
                            </property>
                           </column>
                          </widget>
@@ -465,7 +465,7 @@
                           </column>
                           <column>
                            <property name="text">
-                            <string>Angle ()</string>
+                            <string>Angle (°)</string>
                            </property>
                           </column>
                          </widget>
@@ -537,7 +537,7 @@
                           </column>
                           <column>
                            <property name="text">
-                            <string>Angle ()</string>
+                            <string>Angle (°)</string>
                            </property>
                           </column>
                          </widget>
@@ -697,23 +697,30 @@
                        <layout class="QVBoxLayout" name="verticalLayout_14">
                         <item>
                          <layout class="QGridLayout" name="gridLayout_8">
-                          <item row="6" column="3">
-                           <widget class="QLineEdit" name="tetherAtomLineEdit">
+                          <item row="0" column="0" colspan="2">
+                           <widget class="QLabel" name="label_32">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
-                             <string>0</string>
+                             <string>Component box axes (Å)</string>
                             </property>
                            </widget>
                           </item>
-                          <item row="12" column="0" colspan="2">
-                           <widget class="QLabel" name="label_23">
-                            <property name="sizePolicy">
-                             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                              <horstretch>0</horstretch>
-                              <verstretch>1</verstretch>
-                             </sizepolicy>
-                            </property>
+                          <item row="9" column="4">
+                           <widget class="QLabel" name="label_26">
                             <property name="text">
-                             <string>ecoredcore</string>
+                             <string>z</string>
+                            </property>
+                           </widget>
+                          </item>
+                          <item row="3" column="2">
+                           <widget class="QLabel" name="label_50">
+                            <property name="text">
+                             <string>theta</string>
                             </property>
                            </widget>
                           </item>
@@ -721,6 +728,20 @@
                            <widget class="QLineEdit" name="lineEdit_6">
                             <property name="text">
                              <string/>
+                            </property>
+                           </widget>
+                          </item>
+                          <item row="6" column="3">
+                           <widget class="QLineEdit" name="tetherAtomLineEdit">
+                            <property name="text">
+                             <string>0</string>
+                            </property>
+                           </widget>
+                          </item>
+                          <item row="9" column="5">
+                           <widget class="QLineEdit" name="tetherCoordZLineEdit">
+                            <property name="text">
+                             <string>0.000000E+00</string>
                             </property>
                            </widget>
                           </item>
@@ -738,17 +759,23 @@
                             </property>
                            </widget>
                           </item>
-                          <item row="9" column="5">
-                           <widget class="QLineEdit" name="tetherCoordZLineEdit">
-                            <property name="text">
-                             <string>0.000000E+00</string>
-                            </property>
-                           </widget>
-                          </item>
                           <item row="3" column="0">
                            <widget class="QLabel" name="label_48">
                             <property name="text">
                              <string>phi</string>
+                            </property>
+                           </widget>
+                          </item>
+                          <item row="11" column="0" colspan="2">
+                           <widget class="QLabel" name="label_23">
+                            <property name="sizePolicy">
+                             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                              <horstretch>0</horstretch>
+                              <verstretch>1</verstretch>
+                             </sizepolicy>
+                            </property>
+                            <property name="text">
+                             <string>ecoredcore</string>
                             </property>
                            </widget>
                           </item>
@@ -759,34 +786,6 @@
                             </property>
                            </widget>
                           </item>
-                          <item row="3" column="2">
-                           <widget class="QLabel" name="label_50">
-                            <property name="text">
-                             <string>theta</string>
-                            </property>
-                           </widget>
-                          </item>
-                          <item row="9" column="4">
-                           <widget class="QLabel" name="label_26">
-                            <property name="text">
-                             <string>z</string>
-                            </property>
-                           </widget>
-                          </item>
-                          <item row="0" column="0" colspan="2">
-                           <widget class="QLabel" name="label_32">
-                            <property name="text">
-                             <string>Component box axes</string>
-                            </property>
-                           </widget>
-                          </item>
-                          <item row="13" column="4" colspan="2">
-                           <widget class="QPushButton" name="molChangeAtobutton">
-                            <property name="text">
-                             <string>Run changeato for selected .mol file</string>
-                            </property>
-                           </widget>
-                          </item>
                           <item row="7" column="3">
                            <widget class="QLineEdit" name="tolLineEdit">
                             <property name="text">
@@ -794,10 +793,17 @@
                             </property>
                            </widget>
                           </item>
-                          <item row="9" column="0">
-                           <widget class="QLabel" name="label_24">
+                          <item row="9" column="2">
+                           <widget class="QLabel" name="label_25">
                             <property name="text">
-                             <string>x</string>
+                             <string>y</string>
+                            </property>
+                           </widget>
+                          </item>
+                          <item row="12" column="4" colspan="2">
+                           <widget class="QPushButton" name="molChangeAtobutton">
+                            <property name="text">
+                             <string>Run changeato for selected .mol file</string>
                             </property>
                            </widget>
                           </item>
@@ -814,10 +820,38 @@
                             </property>
                            </spacer>
                           </item>
-                          <item row="9" column="1">
-                           <widget class="QLineEdit" name="tetherCoordXLineEdit">
+                          <item row="9" column="0">
+                           <widget class="QLabel" name="label_24">
+                            <property name="text">
+                             <string>x</string>
+                            </property>
+                           </widget>
+                          </item>
+                          <item row="9" column="3">
+                           <widget class="QLineEdit" name="tetherCoordYLineEdit">
                             <property name="text">
                              <string>0.000000E+00</string>
+                            </property>
+                           </widget>
+                          </item>
+                          <item row="1" column="3">
+                           <widget class="QLineEdit" name="lineEdit_3">
+                            <property name="text">
+                             <string/>
+                            </property>
+                           </widget>
+                          </item>
+                          <item row="1" column="5">
+                           <widget class="QLineEdit" name="lineEdit_4">
+                            <property name="text">
+                             <string/>
+                            </property>
+                           </widget>
+                          </item>
+                          <item row="7" column="1">
+                           <widget class="QLabel" name="label_28">
+                            <property name="text">
+                             <string>Tethering tolerance</string>
                             </property>
                            </widget>
                           </item>
@@ -837,49 +871,27 @@
                             </property>
                            </widget>
                           </item>
-                          <item row="9" column="2">
-                           <widget class="QLabel" name="label_25">
+                          <item row="2" column="0" colspan="2">
+                           <widget class="QLabel" name="label_33">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
-                             <string>y</string>
+                             <string>Component box spherical polar angles (°)</string>
                             </property>
                            </widget>
                           </item>
-                          <item row="1" column="5">
-                           <widget class="QLineEdit" name="lineEdit_4">
-                            <property name="text">
-                             <string/>
-                            </property>
-                           </widget>
-                          </item>
-                          <item row="9" column="3">
-                           <widget class="QLineEdit" name="tetherCoordYLineEdit">
+                          <item row="9" column="1">
+                           <widget class="QLineEdit" name="tetherCoordXLineEdit">
                             <property name="text">
                              <string>0.000000E+00</string>
                             </property>
                            </widget>
                           </item>
-                          <item row="2" column="0" colspan="2">
-                           <widget class="QLabel" name="label_33">
-                            <property name="text">
-                             <string>Component box spherical polar angles</string>
-                            </property>
-                           </widget>
-                          </item>
-                          <item row="7" column="1">
-                           <widget class="QLabel" name="label_28">
-                            <property name="text">
-                             <string>Tethering tolerance</string>
-                            </property>
-                           </widget>
-                          </item>
-                          <item row="1" column="3">
-                           <widget class="QLineEdit" name="lineEdit_3">
-                            <property name="text">
-                             <string/>
-                            </property>
-                           </widget>
-                          </item>
-                          <item row="12" column="3">
+                          <item row="11" column="3">
                            <widget class="QTableWidget" name="molEcoreDcoreTable">
                             <property name="minimumSize">
                              <size>
@@ -978,6 +990,12 @@
                           </item>
                           <item row="8" column="1">
                            <widget class="QLabel" name="label_4">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>Tethering origin coordinates</string>
                             </property>
@@ -1188,8 +1206,8 @@
                 <layout class="QHBoxLayout" name="horizontalLayout_23">
                  <item>
                   <layout class="QGridLayout" name="gridLayout_2">
-                   <item row="3" column="1">
-                    <widget class="QLabel" name="boxAtoLength">
+                   <item row="1" column="1">
+                    <widget class="QLabel" name="boxAtoMols">
                      <property name="sizePolicy">
                       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                        <horstretch>7</horstretch>
@@ -1201,17 +1219,218 @@
                      </property>
                     </widget>
                    </item>
-                   <item row="13" column="1">
+                   <item row="12" column="0">
+                    <widget class="QLabel" name="label_7">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                       <horstretch>0</horstretch>
+                       <verstretch>1</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="text">
+                      <string>Vibtemp</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="4" column="1">
+                    <widget class="QLabel" name="boxAtoLengthA">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                       <horstretch>7</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="text">
+                      <string/>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="7" column="2">
+                    <widget class="QLabel" name="label_37">
+                     <property name="text">
+                      <string>°</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="13" column="0">
+                    <widget class="QLabel" name="label_8">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                       <horstretch>0</horstretch>
+                       <verstretch>1</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="text">
+                      <string>Angtemp</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="0" column="1">
+                    <widget class="QLabel" name="boxAtoLabel">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                       <horstretch>7</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="text">
+                      <string/>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="21" column="2" colspan="2">
+                    <widget class="QPushButton" name="fmoleButton">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                       <horstretch>2</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>0</width>
+                       <height>0</height>
+                      </size>
+                     </property>
+                     <property name="text">
+                      <string>Run fmole</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="16" column="0">
+                    <widget class="QLabel" name="label_31">
+                     <property name="text">
+                      <string>Group rotation step size</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="21" column="0">
+                    <widget class="QLabel" name="label_11">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                       <horstretch>0</horstretch>
+                       <verstretch>1</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>0</width>
+                       <height>0</height>
+                      </size>
+                     </property>
+                     <property name="text">
+                      <string>Fmole iterations</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="11" column="0">
+                    <widget class="QLabel" name="label_6">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                       <horstretch>0</horstretch>
+                       <verstretch>1</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="text">
+                      <string>Temperature</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="4" column="2" colspan="2">
+                    <widget class="QLabel" name="label_18">
+                     <property name="text">
+                      <string>Å</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="20" column="0">
+                    <spacer name="horizontalSpacer_23">
+                     <property name="orientation">
+                      <enum>Qt::Horizontal</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>71</width>
+                       <height>20</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
+                   <item row="19" column="0">
+                    <widget class="QLabel" name="label_10">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                       <horstretch>0</horstretch>
+                       <verstretch>1</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="text">
+                      <string>Ecoredcore</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="3" column="0">
+                    <widget class="QLabel" name="boxAtoChargeLabel">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                       <horstretch>3</horstretch>
+                       <verstretch>2</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>0</width>
+                       <height>20</height>
+                      </size>
+                     </property>
+                     <property name="text">
+                      <string>Total charge of system</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="14" column="0">
+                    <widget class="QLabel" name="label_9">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                       <horstretch>0</horstretch>
+                       <verstretch>1</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="text">
+                      <string>Dihtemp</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="15" column="1">
                     <widget class="QLineEdit" name="intraTransSSLineEdit_2">
                      <property name="text">
                       <string>0.10000E+00</string>
                      </property>
                     </widget>
                    </item>
-                   <item row="3" column="2" colspan="2">
-                    <widget class="QLabel" name="label_18">
+                   <item row="15" column="0">
+                    <widget class="QLabel" name="label_35">
                      <property name="text">
-                      <string>Angstrom</string>
+                      <string>Intramolecular translation step size</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="4" column="0">
+                    <widget class="QLabel" name="boxAtoLengthLabel">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                       <horstretch>3</horstretch>
+                       <verstretch>2</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>0</width>
+                       <height>20</height>
+                      </size>
+                     </property>
+                     <property name="text">
+                      <string>Box axes</string>
                      </property>
                     </widget>
                    </item>
@@ -1234,119 +1453,8 @@
                      </property>
                     </widget>
                    </item>
-                   <item row="2" column="0">
-                    <widget class="QLabel" name="boxAtoChargeLabel">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                       <horstretch>3</horstretch>
-                       <verstretch>2</verstretch>
-                      </sizepolicy>
-                     </property>
-                     <property name="minimumSize">
-                      <size>
-                       <width>0</width>
-                       <height>20</height>
-                      </size>
-                     </property>
-                     <property name="text">
-                      <string>Total charge of system</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="18" column="0">
-                    <spacer name="horizontalSpacer_23">
-                     <property name="orientation">
-                      <enum>Qt::Horizontal</enum>
-                     </property>
-                     <property name="sizeHint" stdset="0">
-                      <size>
-                       <width>71</width>
-                       <height>20</height>
-                      </size>
-                     </property>
-                    </spacer>
-                   </item>
-                   <item row="9" column="0">
-                    <widget class="QLabel" name="label_6">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                       <horstretch>0</horstretch>
-                       <verstretch>1</verstretch>
-                      </sizepolicy>
-                     </property>
-                     <property name="text">
-                      <string>Temperature</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="12" column="0">
-                    <widget class="QLabel" name="label_9">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                       <horstretch>0</horstretch>
-                       <verstretch>1</verstretch>
-                      </sizepolicy>
-                     </property>
-                     <property name="text">
-                      <string>Dihtemp</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="3" column="0">
-                    <widget class="QLabel" name="boxAtoLengthLabel">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                       <horstretch>3</horstretch>
-                       <verstretch>2</verstretch>
-                      </sizepolicy>
-                     </property>
-                     <property name="minimumSize">
-                      <size>
-                       <width>0</width>
-                       <height>20</height>
-                      </size>
-                     </property>
-                     <property name="text">
-                      <string>Box axes</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="17" column="0">
-                    <widget class="QLabel" name="label_10">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                       <horstretch>0</horstretch>
-                       <verstretch>1</verstretch>
-                      </sizepolicy>
-                     </property>
-                     <property name="text">
-                      <string>Ecoredcore</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="13" column="0">
-                    <widget class="QLabel" name="label_35">
-                     <property name="text">
-                      <string>Intramolecular translation step size</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="15" column="0">
-                    <widget class="QLabel" name="label_30">
-                     <property name="text">
-                      <string>Whole molecule rotation step size</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="16" column="0">
-                    <widget class="QLabel" name="label_29">
-                     <property name="text">
-                      <string>Whole molecule translation step size</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="0" column="1">
-                    <widget class="QLabel" name="boxAtoLabel">
+                   <item row="3" column="1">
+                    <widget class="QLabel" name="boxAtoCharge">
                      <property name="sizePolicy">
                       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                        <horstretch>7</horstretch>
@@ -1355,51 +1463,6 @@
                      </property>
                      <property name="text">
                       <string/>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="19" column="0">
-                    <widget class="QLabel" name="label_11">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                       <horstretch>0</horstretch>
-                       <verstretch>1</verstretch>
-                      </sizepolicy>
-                     </property>
-                     <property name="minimumSize">
-                      <size>
-                       <width>0</width>
-                       <height>0</height>
-                      </size>
-                     </property>
-                     <property name="text">
-                      <string>Fmole iterations</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="19" column="2" colspan="2">
-                    <widget class="QPushButton" name="fmoleButton">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                       <horstretch>2</horstretch>
-                       <verstretch>0</verstretch>
-                      </sizepolicy>
-                     </property>
-                     <property name="minimumSize">
-                      <size>
-                       <width>0</width>
-                       <height>0</height>
-                      </size>
-                     </property>
-                     <property name="text">
-                      <string>Run fmole</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="14" column="0">
-                    <widget class="QLabel" name="label_31">
-                     <property name="text">
-                      <string>Group rotation step size</string>
                      </property>
                     </widget>
                    </item>
@@ -1418,111 +1481,25 @@
                       </size>
                      </property>
                      <property name="text">
-                      <string>Total number of components in box</string>
+                      <string>Total number of molecules in box</string>
                      </property>
                     </widget>
                    </item>
-                   <item row="2" column="1">
-                    <widget class="QLabel" name="boxAtoCharge">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                       <horstretch>7</horstretch>
-                       <verstretch>0</verstretch>
-                      </sizepolicy>
-                     </property>
-                     <property name="text">
-                      <string/>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="1" column="1">
-                    <widget class="QLabel" name="boxAtoMols">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                       <horstretch>7</horstretch>
-                       <verstretch>0</verstretch>
-                      </sizepolicy>
-                     </property>
-                     <property name="text">
-                      <string/>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="11" column="0">
-                    <widget class="QLabel" name="label_8">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                       <horstretch>0</horstretch>
-                       <verstretch>1</verstretch>
-                      </sizepolicy>
-                     </property>
-                     <property name="text">
-                      <string>Angtemp</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="6" column="2">
-                    <widget class="QLabel" name="label_37">
-                     <property name="text">
-                      <string>degrees</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="10" column="0">
-                    <widget class="QLabel" name="label_7">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                       <horstretch>0</horstretch>
-                       <verstretch>1</verstretch>
-                      </sizepolicy>
-                     </property>
-                     <property name="text">
-                      <string>Vibtemp</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="9" column="2">
+                   <item row="11" column="2">
                     <widget class="QLabel" name="label_17">
                      <property name="text">
                       <string>K</string>
                      </property>
                     </widget>
                    </item>
-                   <item row="16" column="1">
-                    <widget class="QLineEdit" name="molTransSSLineEdit_2">
+                   <item row="11" column="1">
+                    <widget class="QLineEdit" name="temperatureLineEdit">
                      <property name="text">
-                      <string>0.10000E+01</string>
+                      <string>300</string>
                      </property>
                     </widget>
                    </item>
-                   <item row="14" column="1">
-                    <widget class="QLineEdit" name="grpRotSSLineEdit_2">
-                     <property name="text">
-                      <string>0.00000E+00</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="18" column="1">
-                    <widget class="QPushButton" name="updateAtoFileButton">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                       <horstretch>0</horstretch>
-                       <verstretch>1</verstretch>
-                      </sizepolicy>
-                     </property>
-                     <property name="text">
-                      <string>Update box</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="15" column="1">
-                    <widget class="QLineEdit" name="molRotSSLineEdit_2">
-                     <property name="text">
-                      <string>0.30000E+00</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="17" column="1">
+                   <item row="19" column="1">
                     <widget class="QTableWidget" name="ecoredcoreTable">
                      <property name="maximumSize">
                       <size>
@@ -1572,35 +1549,61 @@
                      </item>
                     </widget>
                    </item>
+                   <item row="17" column="1">
+                    <widget class="QLineEdit" name="molRotSSLineEdit_2">
+                     <property name="text">
+                      <string>0.30000E+00</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="20" column="1">
+                    <widget class="QPushButton" name="updateAtoFileButton">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                       <horstretch>0</horstretch>
+                       <verstretch>1</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="text">
+                      <string>Update box</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="16" column="1">
+                    <widget class="QLineEdit" name="grpRotSSLineEdit_2">
+                     <property name="text">
+                      <string>0.00000E+00</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="18" column="1">
+                    <widget class="QLineEdit" name="molTransSSLineEdit_2">
+                     <property name="text">
+                      <string>0.10000E+01</string>
+                     </property>
+                    </widget>
+                   </item>
                    <item row="9" column="1">
-                    <widget class="QLineEdit" name="temperatureLineEdit">
+                    <widget class="QLabel" name="boxAtoAxisG">
+                     <property name="minimumSize">
+                      <size>
+                       <width>0</width>
+                       <height>20</height>
+                      </size>
+                     </property>
                      <property name="text">
-                      <string>300</string>
+                      <string/>
                      </property>
                     </widget>
                    </item>
-                   <item row="12" column="1">
-                    <widget class="QLineEdit" name="dihtempLineEdit">
+                   <item row="7" column="0">
+                    <widget class="QLabel" name="label_36">
                      <property name="text">
-                      <string>1</string>
+                      <string>Box angles (polar)</string>
                      </property>
                     </widget>
                    </item>
-                   <item row="11" column="1">
-                    <widget class="QLineEdit" name="angtempLineEdit">
-                     <property name="text">
-                      <string>1</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="10" column="1">
-                    <widget class="QLineEdit" name="vibtempLineEdit">
-                     <property name="text">
-                      <string>65</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="19" column="1">
+                   <item row="21" column="1">
                     <widget class="QLineEdit" name="fmoleLineEdit">
                      <property name="sizePolicy">
                       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
@@ -1619,69 +1622,28 @@
                      </property>
                     </widget>
                    </item>
-                   <item row="6" column="0">
-                    <widget class="QLabel" name="label_36">
+                   <item row="12" column="1">
+                    <widget class="QLineEdit" name="vibtempLineEdit">
                      <property name="text">
-                      <string>Box angles (polar)</string>
+                      <string>65</string>
                      </property>
                     </widget>
                    </item>
-                   <item row="4" column="0">
-                    <widget class="QLabel" name="label_38">
-                     <property name="text">
-                      <string/>
+                   <item row="5" column="1">
+                    <widget class="QLabel" name="boxAtoLengthB">
+                     <property name="minimumSize">
+                      <size>
+                       <width>0</width>
+                       <height>20</height>
+                      </size>
                      </property>
-                    </widget>
-                   </item>
-                   <item row="5" column="0">
-                    <widget class="QLabel" name="label_39">
-                     <property name="text">
-                      <string/>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="7" column="0">
-                    <widget class="QLabel" name="label_40">
-                     <property name="text">
-                      <string/>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="8" column="0">
-                    <widget class="QLabel" name="label_41">
                      <property name="text">
                       <string/>
                      </property>
                     </widget>
                    </item>
                    <item row="6" column="1">
-                    <widget class="QLabel" name="label_42">
-                     <property name="minimumSize">
-                      <size>
-                       <width>0</width>
-                       <height>20</height>
-                      </size>
-                     </property>
-                     <property name="text">
-                      <string/>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="5" column="1">
-                    <widget class="QLabel" name="label_43">
-                     <property name="minimumSize">
-                      <size>
-                       <width>0</width>
-                       <height>20</height>
-                      </size>
-                     </property>
-                     <property name="text">
-                      <string/>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="4" column="1">
-                    <widget class="QLabel" name="label_44">
+                    <widget class="QLabel" name="boxAtoLengthC">
                      <property name="minimumSize">
                       <size>
                        <width>0</width>
@@ -1694,7 +1656,7 @@
                     </widget>
                    </item>
                    <item row="7" column="1">
-                    <widget class="QLabel" name="label_45">
+                    <widget class="QLabel" name="boxAtoAxisA">
                      <property name="minimumSize">
                       <size>
                        <width>0</width>
@@ -1706,8 +1668,36 @@
                      </property>
                     </widget>
                    </item>
+                   <item row="9" column="0">
+                    <widget class="QLabel" name="label_41">
+                     <property name="text">
+                      <string/>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="8" column="0">
+                    <widget class="QLabel" name="label_40">
+                     <property name="text">
+                      <string/>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="5" column="0">
+                    <widget class="QLabel" name="label_38">
+                     <property name="text">
+                      <string/>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="6" column="0">
+                    <widget class="QLabel" name="label_39">
+                     <property name="text">
+                      <string/>
+                     </property>
+                    </widget>
+                   </item>
                    <item row="8" column="1">
-                    <widget class="QLabel" name="label_46">
+                    <widget class="QLabel" name="boxAtoAxisB">
                      <property name="minimumSize">
                       <size>
                        <width>0</width>
@@ -1716,6 +1706,81 @@
                      </property>
                      <property name="text">
                       <string/>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="13" column="1">
+                    <widget class="QLineEdit" name="angtempLineEdit">
+                     <property name="text">
+                      <string>1</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="14" column="1">
+                    <widget class="QLineEdit" name="dihtempLineEdit">
+                     <property name="text">
+                      <string>1</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="17" column="0">
+                    <widget class="QLabel" name="label_30">
+                     <property name="text">
+                      <string>Whole molecule rotation step size</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="18" column="0">
+                    <widget class="QLabel" name="label_29">
+                     <property name="text">
+                      <string>Whole molecule translation step size</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="2" column="0">
+                    <widget class="QLabel" name="label_53">
+                     <property name="minimumSize">
+                      <size>
+                       <width>0</width>
+                       <height>20</height>
+                      </size>
+                     </property>
+                     <property name="text">
+                      <string>Total number of atoms in box</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="2" column="1">
+                    <widget class="QLabel" name="boxAtoAtoms">
+                     <property name="text">
+                      <string/>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="10" column="0">
+                    <widget class="QLabel" name="label_42">
+                     <property name="text">
+                      <string>Box volume</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="10" column="1">
+                    <widget class="QLabel" name="boxAtoVol">
+                     <property name="minimumSize">
+                      <size>
+                       <width>0</width>
+                       <height>20</height>
+                      </size>
+                     </property>
+                     <property name="text">
+                      <string/>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="10" column="2">
+                    <widget class="QLabel" name="label_43">
+                     <property name="text">
+                      <string>Å&lt;sup&gt;3&lt;/sup&gt;</string>
                      </property>
                     </widget>
                    </item>
@@ -1804,7 +1869,7 @@
                    <item>
                     <widget class="QLabel" name="label">
                      <property name="text">
-                      <string>atoms / Angstrom^3</string>
+                      <string>atoms / Å&lt;sup&gt;3&lt;/sup&gt;</string>
                      </property>
                     </widget>
                    </item>
@@ -1842,7 +1907,7 @@
                    <item>
                     <widget class="QLabel" name="label_3">
                      <property name="text">
-                      <string>     or     </string>
+                      <string>  or  </string>
                      </property>
                     </widget>
                    </item>
@@ -1850,6 +1915,20 @@
                     <widget class="QPushButton" name="addatoButton">
                      <property name="text">
                       <string>Addato</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLabel" name="label_52">
+                     <property name="text">
+                      <string>  or  </string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="atoAsBoxButton">
+                     <property name="text">
+                      <string>Use .ato file as box</string>
                      </property>
                     </widget>
                    </item>
@@ -2312,7 +2391,7 @@
               <item>
                <widget class="QPushButton" name="updateInpPcofFilesButton">
                 <property name="text">
-                 <string>Update</string>
+                 <string>Save changes</string>
                 </property>
                </widget>
               </item>
@@ -2737,6 +2816,7 @@
      <string>Plot</string>
     </property>
     <addaction name="plotAct"/>
+    <addaction name="plotEPSRshellAct"/>
    </widget>
    <widget class="QMenu" name="settingsMenu">
     <property name="title">
@@ -2777,16 +2857,25 @@
    </property>
   </action>
   <action name="cutAct">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>&amp;Cut</string>
    </property>
   </action>
   <action name="copyAct">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>&amp;Copy</string>
    </property>
   </action>
   <action name="pasteAct">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>&amp;Paste</string>
    </property>
@@ -2797,21 +2886,33 @@
    </property>
   </action>
   <action name="checkAct">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Run check</string>
    </property>
   </action>
   <action name="runAct">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Run EPSR</string>
    </property>
   </action>
   <action name="stopAct">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Stop EPSR</string>
    </property>
   </action>
   <action name="plotAct">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Plot data</string>
    </property>
@@ -2830,13 +2931,27 @@
    </property>
   </action>
   <action name="deleteEPSRinpFileAct">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Delete EPSR.inp file</string>
    </property>
   </action>
   <action name="deleteBoxAtoFileAct">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Delete box .ato file</string>
+   </property>
+  </action>
+  <action name="plotEPSRshellAct">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Plot using EPSRshell</string>
    </property>
   </action>
  </widget>
