@@ -84,14 +84,18 @@ void MainWindow::on_setupEPSRButton_clicked(bool checked)
 
         printf("\nfinished making EPSR setup file %s\n", qPrintable(epsrInpFileName_));
     }
+
     readEPSRinpFile();
     updateInpFileTables();
-    readAtoFileAtomPairs();
     readEPSRpcofFile();
     updatePcofFileTables();
     ui.epsrInpFileName->setText(epsrInpFileName_);
     ui.dataFileBrowseButton->setDisabled(true);
     ui.removeDataFileButton->setDisabled(true);
+    ui.checkAct->setEnabled(true);
+    ui.runAct->setEnabled(true);
+    ui.stopAct->setEnabled(true);
+    ui.plotAct->setEnabled(true);
 
     ui.messagesLineEdit->setText("EPSR .inp file created");
 }

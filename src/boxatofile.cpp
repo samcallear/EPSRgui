@@ -9,10 +9,10 @@
 #include "epsrproject.h"
 #include "molfiles.h"
 #include "moloptionsdialog.h"
+#include "boxcompositiondialog.h"
 
 void MainWindow::on_mixatoButton_clicked(bool checked)
 {
-
     QString atoFileBaseName = projectName_+"box";
     atoFileName_ = atoFileBaseName+".ato";
 
@@ -219,8 +219,8 @@ void MainWindow::on_addatoButton_clicked(bool checked)
     ui.messagesLineEdit->setText("Finished writing box .ato file");
 
     ui.boxAtoLabel->setText(atoFileName_);
-    readAtoFileBoxDetails();
     readAtoFileAtomPairs();
+    readAtoFileBoxDetails();
     ui.atoAtomList->clear();
 
     for (int n=0; n < atoAtomLabels.count(); ++n)
@@ -267,11 +267,10 @@ bool MainWindow::readAtoFileBoxDetails()
     QString line;
     QStringList dataLine;
     dataLine.clear();
-    QString numberMol;
 
     line = stream.readLine();
     dataLine = line.split("  ", QString::SkipEmptyParts);
-    numberMol = dataLine.at(0);
+    QString numberMol = dataLine.at(0);
     if (dataLine.count() == 3)
     {
         double boxLength = dataLine.at(1).toDouble();
@@ -287,9 +286,12 @@ bool MainWindow::readAtoFileBoxDetails()
         QString boxVolstr;
         boxVolstr.sprintf("%.2f", boxVol);
         ui.boxAtoVol->setText(boxVolstr);
+        ui.temperatureLineEdit->setText(dataLine.at(2));
     }
     else
     {
+        ui.temperatureLineEdit->setText(dataLine.at(1));
+
         line = stream.readLine();
         dataLine = line.split("  ", QString::SkipEmptyParts);
         double boxa = dataLine.at(0).toDouble();
@@ -303,7 +305,7 @@ bool MainWindow::readAtoFileBoxDetails()
         boxcstr.sprintf("%.4f", boxc);
         ui.boxAtoLengthA->setText(boxastr);
         ui.boxAtoLengthB->setText(boxbstr);
-        ui.boxAtoLengthC->setText(boxcstr);
+        ui.boxAtoLengthC->setText(boxcstr);       
 
         line = stream.readLine();
         dataLine = line.split(" ", QString::SkipEmptyParts);
@@ -325,20 +327,55 @@ bool MainWindow::readAtoFileBoxDetails()
         ui.boxAtoVol->setText(boxVolstr);
     }
 
+    line = stream.readLine();
+    dataLine = line.split("  ", QString::SkipEmptyParts);
+    ui.intraTransSSLineEdit->setText(dataLine.at(1));
+    ui.grpRotSSLineEdit->setText(dataLine.at(2));
+    ui.molRotSSLineEdit->setText(dataLine.at(3));
+    ui.molTransSSLineEdit->setText(dataLine.at(4));
+    ui.vibtempLineEdit->setText(dataLine.at(5));
+    ui.angtempLineEdit->setText(dataLine.at(6));
+    ui.dihtempLineEdit->setText(dataLine.at(7));
+
     int atomctr = 0;
+    numberAtomLabels.clear();
+    numberAtomLabels.resize(atoAtomLabels.count());
     QRegExp atomLabelrx(" ([A-Z][A-Za-z0-9 ]{2})   ([0-9 ]{1,4})      0");
+    QRegExp ecoredcorerx("  ([0-9]{1}[.]{1}[0-9]{5}[E+]{2}[0-9]{2})  ([0-9]{1}[.]{1}[0-9]{5}[E+]{2}[0-9]{2})");
     do {
         line = stream.readLine();
         if (atomLabelrx.exactMatch(line))
         {
             atomctr++;
+            dataLine = line.split("  ", QString::SkipEmptyParts);
+            QString data = dataLine.at(0).trimmed();
+            for (int i = 0; i < atoAtomLabels.count(); i++)
+            {
+                if (data == atoAtomLabels.at(i))
+                {
+                    numberAtomLabels.operator [](i)++;
+                }
+            }
+        }
+        if (ecoredcorerx.exactMatch(line))
+        {
+            dataLine = line.split("  ", QString::SkipEmptyParts);
+            ui.ecoredcoreTable->setItem(0,0, new QTableWidgetItem(dataLine.at(0)));
+            ui.ecoredcoreTable->setItem(0,1, new QTableWidgetItem(dataLine.at(1)));
         }
     } while (!line.isNull());
     file.close();
-
     QString numberAtom = QString::number(atomctr);
     ui.boxAtoMols->setText(numberMol);
     ui.boxAtoAtoms->setText(numberAtom);
+
+    //calculate atomic number density and input into box
+    double totalNumberAtoms = ui.boxAtoAtoms->text().toDouble();
+    double boxVolume = ui.boxAtoVol->text().toDouble();
+    double numberDensity = totalNumberAtoms/boxVolume;
+    QString numberDensityStr;
+    numberDensityStr.sprintf("%.6f", numberDensity);
+    ui.numberDensityLineEdit->setText(numberDensityStr);
 }
 
 bool MainWindow::readAtoFileAtomPairs()
@@ -361,7 +398,7 @@ bool MainWindow::readAtoFileAtomPairs()
         line = stream.readLine();
         if (atomPairrx.exactMatch(line))
         {
-            atoAtomLabels << atomPairrx.cap(1);
+            atoAtomLabels << atomPairrx.cap(1).trimmed();
         }
 
     } while (!line.isNull());
@@ -386,6 +423,17 @@ bool MainWindow::readAtoFileAtomPairs()
     }
     nPartials = count;
     return false;
+}
+
+void MainWindow::on_boxCompositionButton_clicked(bool checked)
+{
+    BoxCompositionDialog boxCompositionDialog(this);
+
+    boxCompositionDialog.show();
+    boxCompositionDialog.raise();
+    boxCompositionDialog.activateWindow();
+
+    boxCompositionDialog.exec();
 }
 
 void MainWindow::on_randomiseButton_clicked(bool checked)
@@ -461,7 +509,7 @@ void MainWindow::on_updateAtoFileButton_clicked(bool checked)
     {
         streamWrite << "   " << dataLine.at(0) << "  " << dataLine.at(1) << "  " << atoTempstr.setNum(atoTemp,'E',5) << "\n";
     }
-    //for non cubic boxes there are 2 items on the first line - #mols and temp
+    //for non-cubic boxes there are 2 items on the first line - #mols and temp
     //the next 2 lines are the axes lengths and angles
     else
     {
@@ -632,7 +680,7 @@ void MainWindow::on_atoEPSRButton_clicked(bool checked)
 bool MainWindow::checkBoxCharge()
 {
     double boxCharge = 0;
-    for (int i = 0; i < nMolFiles; i++)
+    for (int i = 0; i < ui.atoFileTable->rowCount(); i++)
     {
         QString molChargeCalcdStr = ui.atoFileTable->item(i,1)->text();
         if (molChargeCalcdStr == "n/a")

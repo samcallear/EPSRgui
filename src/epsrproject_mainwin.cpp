@@ -6,6 +6,7 @@
 #include "settingsdialog.h"
 #include "makeatomdialog.h"
 #include "makelatticedialog.h"
+#include "boxcompositiondialog.h"
 
 #include <QtGui>
 #include <QMainWindow>
@@ -55,6 +56,9 @@ MainWindow::MainWindow(QMainWindow *parent) : QMainWindow(parent)
     ui.atoFileTable->verticalHeader()->setVisible(false);
     ui.atoFileTable->horizontalHeader()->setVisible(true);
 
+    ui.ecoredcoreTable->setColumnWidth(0,75);
+    ui.ecoredcoreTable->setColumnWidth(1,75);
+
     plotDialog = 0;
 //    createNewDialog = 0;
     molOptionsDialog = 0;
@@ -79,11 +83,14 @@ void MainWindow::createActions()
     ui.openAct->setStatusTip(tr("Open an existing EPSR Project"));
     connect(ui.openAct, SIGNAL(triggered()), this, SLOT(open()));
 
+    ui.saveAct->setStatusTip(tr("Save the current EPSR Project"));
+    connect(ui.saveAct, SIGNAL(triggered()), this, SLOT(save()));
+
     ui.saveAsAct->setStatusTip(tr("Make a copy of the current EPSR Project"));
     connect(ui.saveAsAct, SIGNAL(triggered()), this, SLOT(saveAs()));
 
-    ui.saveAct->setStatusTip(tr("Save the current EPSR Project"));
-    connect(ui.saveAct, SIGNAL(triggered()), this, SLOT(save()));
+    ui.saveCopyAct->setStatusTip(tr("Save the current EPSR Project"));
+    connect(ui.saveCopyAct, SIGNAL(triggered()), this, SLOT(saveCopy()));
 
     ui.exitAct->setStatusTip(tr("Exit the application"));
     connect(ui.exitAct, SIGNAL(triggered()), this, SLOT(close()));
@@ -244,6 +251,7 @@ void MainWindow::createNew()
         //activate menu options
         ui.saveAct->setEnabled(true);
         ui.saveAsAct->setEnabled(true);
+        ui.saveCopyAct->setEnabled(true);
         ui.copyAct->setEnabled(true);
         ui.cutAct->setEnabled(true);
         ui.pasteAct->setEnabled(true);
@@ -350,6 +358,7 @@ void MainWindow::reset()
     //disable menu actions
     ui.saveAct->setEnabled(false);
     ui.saveAsAct->setEnabled(false);
+    ui.saveCopyAct->setEnabled(false);
     ui.copyAct->setEnabled(false);
     ui.cutAct->setEnabled(false);
     ui.pasteAct->setEnabled(false);
@@ -411,10 +420,16 @@ void MainWindow::open()
             {
                 if (dataLine.at(0) == "mol")
                 {
-                    ui.molFileList->QListWidget::addItem(dataLine.at(1)+".mol");
+                    ui.molFileList->QListWidget::addItem(dataLine.at(1));
                     nMolFiles = ui.molFileList->count();
                     ui.atoFileTable->setRowCount(nMolFiles);
-                    QTableWidgetItem *item = new QTableWidgetItem(dataLine.at(1)+".ato");
+                    QStringList filename = dataLine.at(1).split(".", QString::SkipEmptyParts);
+                    if (filename.at(1) == "ato")
+                    {
+                        ui.mixatoButton->setDisabled(true);
+                        ui.atoAsBoxButton->setDisabled(true);
+                    }
+                    QTableWidgetItem *item = new QTableWidgetItem(filename.at(0)+".ato");
                     item->setFlags(item->flags() & ~Qt::ItemIsEditable);
                     ui.atoFileTable->setItem(nMolFiles-1,0, item);
                     ui.atoFileTable->setItem(nMolFiles-1,2, new QTableWidgetItem(dataLine.at(2)));
@@ -425,8 +440,8 @@ void MainWindow::open()
                     atoFileName_ = dataLine.at(1);
                     printf("Box .ato filename is %s\n", qPrintable(atoFileName_));
                     ui.boxAtoLabel->setText(atoFileName_);
-                    readAtoFileBoxDetails();
                     readAtoFileAtomPairs();
+                    readAtoFileBoxDetails();
                     for (int n=0; n < atoAtomLabels.count(); ++n)
                     {
                         QListWidgetItem* item = new QListWidgetItem(atoAtomLabels.at(n));
@@ -446,39 +461,7 @@ void MainWindow::open()
                     ui.mixatoButton->setDisabled(true);
                     ui.addatoButton->setDisabled(true);
                     ui.atoAsBoxButton->setDisabled(true);
-                }
-                if (dataLine.at(0) == "numberDensity")
-                {
-                    ui.numberDensityLineEdit->setText(dataLine.at(1));
-                }
-                if (dataLine.at(0) == "temperature")
-                {
-                    ui.temperatureLineEdit->setText(dataLine.at(1));
-                }
-                if (dataLine.at(0) == "vibtemp")
-                {
-                    ui.vibtempLineEdit->setText(dataLine.at(1));
-                }
-                if (dataLine.at(0) == "angtemp")
-                {
-                    ui.angtempLineEdit->setText(dataLine.at(1));
-                }
-                if (dataLine.at(0) == "dihtemp")
-                {
-                    ui.dihtempLineEdit->setText(dataLine.at(1));
-                }
-                if (dataLine.at(0) == "ecoredcore")
-                {
-                    ui.ecoredcoreTable->setColumnCount(2);
-                    ui.ecoredcoreTable->setRowCount(1);
-                    ui.ecoredcoreTable->horizontalHeader()->setVisible(false);
-                    ui.ecoredcoreTable->verticalHeader()->setVisible(false);
-                    ui.ecoredcoreTable->setItem(0,0, new QTableWidgetItem(dataLine.at(1)));
-                    ui.ecoredcoreTable->setItem(0,1, new QTableWidgetItem(dataLine.at(2)));
-                }
-                if (dataLine.at(0) == "fmoleIter")
-                {
-                    ui.fmoleLineEdit->setText(dataLine.at(1));
+                    ui.deleteBoxAtoFileAct->setEnabled(true);
                 }
                 if (dataLine.at(0) == "data")
                 {
@@ -497,7 +480,6 @@ void MainWindow::open()
                     ui.epsrInpFileName->setText(epsrInpFileName_);
                     readEPSRinpFile();
                     updateInpFileTables();
-                    readAtoFileAtomPairs();
                     readEPSRpcofFile();
                     updatePcofFileTables();
                     ui.plot1Button->setEnabled(true);
@@ -509,6 +491,7 @@ void MainWindow::open()
                     ui.stopAct->setEnabled(true);
                     ui.plotAct->setEnabled(true);
                     ui.plotEPSRshellAct->setEnabled(true);
+                    ui.deleteEPSRinpFileAct->setEnabled(true);
                 }
                 if (dataLine.at(0) == "dlputils")
                 {
@@ -563,6 +546,7 @@ void MainWindow::open()
         //activate menu options
         ui.saveAct->setEnabled(true);
         ui.saveAsAct->setEnabled(true);
+        ui.saveCopyAct->setEnabled(true);
         ui.copyAct->setEnabled(true);
         ui.cutAct->setEnabled(true);
         ui.pasteAct->setEnabled(true);
@@ -592,7 +576,321 @@ bool MainWindow::save()
     return saveFile();
 }
 
+bool MainWindow::saveFile()
+{
+    QString saveFileName = workingDir_+projectName_+".EPSR.pro";
+    QFile file(saveFileName);
+
+    if(!file.open(QFile::WriteOnly | QFile::Text))
+    {
+        QMessageBox msgBox;
+        msgBox.setText("Could not save to "+projectName_+".EPSR.pro");
+        msgBox.exec();
+    }
+
+    QTextStream streamWrite(&file);
+
+    //mol files and number of them in box
+    if (ui.molFileList->count() != 0)
+    {
+        for (int i = 0; i < ui.molFileList->count(); i++)
+        {
+            streamWrite << "mol " << ui.molFileList->item(i)->text()
+                        << " " << ui.atoFileTable->item(i,2)->text() << "\n";
+        }
+    }
+
+    //box ato file details
+    if (!atoFileName_.isEmpty())
+    {
+        streamWrite << "boxAtoFileName " << atoFileName_ << "\n";
+    }
+
+    //data and wts files
+    if (ui.dataFileTable->rowCount() != 0)
+    {
+        for (int i = 0; i < ui.dataFileTable->rowCount(); i++)
+        {
+            streamWrite << "data " << ui.dataFileTable->item(i,1)->text() << " " << ui.dataFileTable->item(i,0)->text() << " " << ui.dataFileTable->item(i,2)->text() << "\n";
+        }
+        for (int i = 0; i < wtsFileList.count(); i++)
+        {
+            streamWrite << "wts " << ui.dataFileTable->item(i,3)->text() << "\n";
+        }
+    }
+
+    //EPSR.inp and .pcof files
+    if (!epsrInpFileName_.isEmpty())
+    {
+        QString atoBaseFileName = atoFileName_.split(".",QString::SkipEmptyParts).at(0);
+        streamWrite << "EPSRinp " << atoBaseFileName << "\n";
+    }
+
+    //Additional options
+    if (ui.dlputilsOutCheckBox->isChecked())
+    {
+        streamWrite << "dlputils" << "\n";
+    }
+
+    file.close();
+
+    printf("Current EPSR project settings saved to %s.EPSR.pro\n", qPrintable(projectName_));
+    ui.messagesLineEdit->setText("Saved current EPSR project");
+    return false;
+
+    if (!epsrInpFileName_.isEmpty())
+    {
+        updateInpFile();
+        updatePcofFile();
+    }
+}
+
 bool MainWindow::saveAs()
+{
+    CreateNewDialog createNewDialog(this);
+
+    createNewDialog.show();
+    createNewDialog.raise();
+    createNewDialog.activateWindow();
+
+    newDialog = createNewDialog.exec();
+
+    if (newDialog == CreateNewDialog::Accepted)
+    {
+        //set file directories
+        QString projectNameCopy = createNewDialog.getEPSRname();
+        QString epsrDirCopy = createNewDialog.getEPSRdir();
+        QString workingDirCopy = (epsrDirCopy+"/run/"+projectNameCopy+"/");
+        workingDirCopy = QDir::toNativeSeparators(workingDirCopy);
+        QDir workingDir(workingDir_);
+
+        //make new directory and make a list of everything in the current directory
+        QDir().mkdir(workingDirCopy);
+        QStringList fileList = workingDir.entryList(QDir::Files);
+
+        //copy everything into new folder
+        for (int i = 0; i < fileList.count(); i++)
+        {
+            QFile::copy(workingDir_+fileList.at(i), workingDirCopy+fileList.at(i));
+        }
+
+        //rename everything with original atoFileName_ in title
+        QDir newDir(workingDirCopy);
+        QStringList newfileList = newDir.entryList(QDir::Files);
+        for (int i = 0; i < newfileList.count(); i++)
+        {
+            QString oldfilename = newfileList.at(i);
+            QString newfilename = newfileList.at(i);
+            newfilename.replace(projectName_+"box", projectNameCopy+"box");
+            QFile::rename(workingDirCopy+oldfilename, workingDirCopy+newfilename);
+        }
+
+        //delete original .EPSR.pro file
+        QString epsrProFile = workingDirCopy+projectName_+".EPSR.pro";
+        QFile filedelete(epsrProFile);
+        filedelete.remove();
+
+        //make new .EPSR.pro file
+        QString epsrProFileCopy = workingDirCopy+projectNameCopy+".EPSR.pro";
+        QFile file(epsrProFileCopy);
+
+        if(!file.open(QFile::WriteOnly | QFile::Text))
+        {
+            QMessageBox msgBox;
+            msgBox.setText("Could not save to "+projectNameCopy+".EPSR.pro");
+            msgBox.exec();
+        }
+
+        QTextStream streamWrite(&file);
+
+        //mol files and number of them in box
+        if (ui.molFileList->count() != 0)
+        {
+            for (int i = 0; i < ui.molFileList->count(); i++)
+            {
+                streamWrite << "mol " << ui.molFileList->item(i)->text().split(".",QString::SkipEmptyParts).at(0)
+                            << " " << ui.atoFileTable->item(i,2)->text() << "\n";
+            }
+        }
+
+        //box ato file details
+        if (!atoFileName_.isEmpty())
+        {
+            streamWrite << "boxAtoFileName " << projectNameCopy+"box.ato" << "\n";
+            streamWrite << "numberDensity " << ui.numberDensityLineEdit->text() << "\n";
+            streamWrite << "temperature " << ui.temperatureLineEdit->text() << "\n";
+            streamWrite << "vibtemp " << ui.vibtempLineEdit->text() << "\n";
+            streamWrite << "angtemp " << ui.angtempLineEdit->text() << "\n";
+            streamWrite << "dihtemp " << ui.dihtempLineEdit->text() << "\n";
+            streamWrite << "ecoredcore " << ui.ecoredcoreTable->item(0,0)->text() << " " << ui.ecoredcoreTable->item(0,1)->text() << "\n";
+
+            //fmole iterations
+            streamWrite << "fmoleIter " << ui.fmoleLineEdit->text() << "\n";
+        }
+
+        //data and wts files
+        if (ui.dataFileTable->rowCount() != 0)
+        {
+            for (int i = 0; i < ui.dataFileTable->rowCount(); i++)
+            {
+                streamWrite << "data " << ui.dataFileTable->item(i,1)->text() << " " << ui.dataFileTable->item(i,0)->text() << " " << ui.dataFileTable->item(i,2)->text() << "\n";
+            }
+            for (int i = 0; i < wtsFileList.count(); i++)
+            {
+                streamWrite << "wts " << ui.dataFileTable->item(i,3)->text() << "\n";
+            }
+        }
+
+        //change fnameato in NWTS.dat and XWTS.dat
+        if (!wtsFileList.isEmpty())
+        {
+            for (int i = 0; i < wtsFileList.count(); i++)
+            {
+                QString wtsFileName;
+                QString wtsFileType = wtsFileList.at(i).split(".",QString::SkipEmptyParts).at(1);
+                if (wtsFileType == "XWTS")
+                {
+                    wtsFileName = wtsFileList.at(i).split(".",QString::SkipEmptyParts).at(0)+".XWTS.dat";
+                }
+                else
+                {
+                    wtsFileName = wtsFileList.at(i).split(".",QString::SkipEmptyParts).at(0)+".NWTS.dat";
+                }
+
+                QFile filewts(workingDirCopy+wtsFileName);
+                if(!filewts.open(QFile::ReadWrite | QFile::Text))
+                {
+                    QMessageBox msgBox;
+                    msgBox.setText("Could not open .wts file");
+                    msgBox.exec();
+                    return false;
+                }
+
+                QTextStream streamwts(&filewts);
+                QString linewts;
+                QStringList dataLinewts;
+                dataLinewts.clear();
+                QString originalwts;
+
+                while (!streamwts.atEnd())
+                {
+                    linewts = streamwts.readLine();
+                    dataLinewts = linewts.split("  ", QString::SkipEmptyParts);
+                    originalwts.append(linewts+"\n");
+                    if (dataLinewts.count()!=0)
+                    {
+                        if (dataLinewts.at(0) == "fnameato")
+                        {
+                            originalwts.remove(linewts+"\n");
+                            originalwts.append("fnameato    "+projectNameCopy+"box.ato               Name of .ato file\n");
+                        }
+                    }
+                }
+
+                filewts.resize(0);
+                streamwts << originalwts;
+                filewts.close();
+            }
+        }
+
+        //EPSR.inp and .pcof files
+        if (!epsrInpFileName_.isEmpty())
+        {
+            streamWrite << "EPSRinp " << projectNameCopy+"box" << "\n";
+        }
+
+        file.close();
+
+        //edit EPSR.inp file so first line, fnameato and fnamepcof are updated
+        if (!epsrInpFileName_.isEmpty())
+        {
+            QFile fileRead(workingDir_+projectName_+"box.EPSR.inp");
+            if(!fileRead.open(QFile::ReadOnly | QFile::Text))
+            {
+                QMessageBox msgBox;
+                msgBox.setText("Could not open .EPSR.inp file to copy");
+                msgBox.exec();
+                return false;
+            }
+
+            QFile fileWrite(workingDirCopy+projectNameCopy+"box.EPSR.inp");
+            if(!fileWrite.open(QFile::WriteOnly | QFile::Text))
+            {
+                QMessageBox msgBox;
+                msgBox.setText("Could not open new .EPSR.inp file to write to");
+                msgBox.exec();
+                return false;
+            }
+
+            QTextStream streamRead(&fileRead);
+            QTextStream streamWrite(&fileWrite);
+            QString line;
+            QStringList dataLine;
+            dataLine.clear();
+            QString original;
+
+            line = streamRead.readLine();
+            streamWrite << projectNameCopy+"box.EPSR               Title of this file\n";
+
+            while (!streamRead.atEnd())
+            {
+                line = streamRead.readLine();
+                dataLine = line.split("   ", QString::SkipEmptyParts);
+                original.append(line+"\n");
+                if (dataLine.count()!=0)
+                {
+                    if (dataLine.at(0) == "fnameato")
+                    {
+                        original.remove(line+"\n");
+                        original.append("fnameato    "+projectNameCopy+"box.ato               Name of .ato file\n");
+                    }
+                    if (dataLine.at(0) == "fnamepcof")
+                    {
+                        original.remove(line+"\n");
+                        original.append("fnamepcof   "+projectNameCopy+"box.pcof               Name of potential coefficients file.\n");
+                    }
+                }
+            }
+
+            fileWrite.resize(0);
+            streamWrite << original;
+            fileWrite.close();
+            fileRead.close();
+        }
+
+        // set file directories etc
+        projectName_ = projectNameCopy;
+        printf("Current EPSR project name is %s\n", qPrintable(projectName_));
+        workingDir_ = workingDirCopy;
+        workingDir_ = QDir::toNativeSeparators(workingDir_);
+        printf("Current working directory is %s\n", qPrintable(workingDir_));
+        QDir::setCurrent(workingDir_);
+        epsrDir_ = epsrDirCopy;
+        epsrBinDir_ = (epsrDir_+"bin/");
+        epsrBinDir_ = QDir::toNativeSeparators(epsrBinDir_);
+        printf("Current EPSR binaries directory is %s\n", qPrintable(epsrBinDir_));
+        if (!atoFileName_.isEmpty())
+        {
+            atoFileName_ = projectNameCopy+"box.ato";
+        }
+        if (!epsrInpFileName_.isEmpty())
+        {
+            epsrInpFileName_ = workingDir_+projectName_+"box.EPSR.inp";
+        }
+
+        //ensure current settings are saved to .pro file
+        saveFile();
+
+        //change window title to contain projectName
+        this->setWindowTitle("EPSRProject: "+projectName_);
+
+        printf("EPSR project to saved to %s\n", qPrintable(workingDirCopy));
+        ui.messagesLineEdit->setText("EPSR project saved to "+workingDirCopy);
+    }
+    return false;
+}
+
+bool MainWindow::saveCopy()
 {
     CreateNewDialog createNewDialog(this);
 
@@ -811,84 +1109,6 @@ bool MainWindow::saveAs()
     return false;
 }
 
-bool MainWindow::saveFile()
-{
-    QString saveFileName = workingDir_+projectName_+".EPSR.pro";
-    QFile file(saveFileName);
-
-    if(!file.open(QFile::WriteOnly | QFile::Text))
-    {
-        QMessageBox msgBox;
-        msgBox.setText("Could not save to "+projectName_+".EPSR.pro");
-        msgBox.exec();
-    }
-
-    QTextStream streamWrite(&file);
-
-    //mol files and number of them in box
-    if (ui.molFileList->count() != 0)
-    {
-        for (int i = 0; i < ui.molFileList->count(); i++)
-        {
-            streamWrite << "mol " << ui.molFileList->item(i)->text().split(".",QString::SkipEmptyParts).at(0)
-                        << " " << ui.atoFileTable->item(i,2)->text() << "\n";
-        }
-    }
-
-    //box ato file details
-    if (!atoFileName_.isEmpty())
-    {
-        streamWrite << "boxAtoFileName " << atoFileName_ << "\n";
-        streamWrite << "numberDensity " << ui.numberDensityLineEdit->text() << "\n";
-        streamWrite << "temperature " << ui.temperatureLineEdit->text() << "\n";
-        streamWrite << "vibtemp " << ui.vibtempLineEdit->text() << "\n";
-        streamWrite << "angtemp " << ui.angtempLineEdit->text() << "\n";
-        streamWrite << "dihtemp " << ui.dihtempLineEdit->text() << "\n";
-        streamWrite << "ecoredcore " << ui.ecoredcoreTable->item(0,0)->text() << " " << ui.ecoredcoreTable->item(0,1)->text() << "\n";
-
-        //fmole iterations
-        streamWrite << "fmoleIter " << ui.fmoleLineEdit->text() << "\n";
-    }
-
-    //data and wts files
-    if (ui.dataFileTable->rowCount() != 0)
-    {
-        for (int i = 0; i < ui.dataFileTable->rowCount(); i++)
-        {
-            streamWrite << "data " << ui.dataFileTable->item(i,1)->text() << " " << ui.dataFileTable->item(i,0)->text() << " " << ui.dataFileTable->item(i,2)->text() << "\n";
-        }
-        for (int i = 0; i < wtsFileList.count(); i++)
-        {
-            streamWrite << "wts " << ui.dataFileTable->item(i,3)->text() << "\n";
-        }
-    }
-
-    //EPSR.inp and .pcof files
-    if (!epsrInpFileName_.isEmpty())
-    {
-        QString atoBaseFileName = atoFileName_.split(".",QString::SkipEmptyParts).at(0);
-        streamWrite << "EPSRinp " << atoBaseFileName << "\n";
-    }
-
-    //Additional options
-    if (ui.dlputilsOutCheckBox->isChecked())
-    {
-        streamWrite << "dlputils" << "\n";
-    }
-
-    file.close();
-
-    printf("Current EPSR project settings saved to %s.EPSR.pro\n", qPrintable(projectName_));
-    ui.messagesLineEdit->setText("Saved current EPSR project");
-    return false;
-
-    if (!epsrInpFileName_.isEmpty())
-    {
-        updateInpFile();
-        updatePcofFile();
-    }
-}
-
 void MainWindow::runEPSRcheck()
 {
     updateInpFile();
@@ -988,8 +1208,8 @@ void MainWindow::runEPSR()
     stream << "set EPSRbin=" << epsrBinDir_ << "\n"
             << "set EPSRrun=" << workingDir_ << "\n"
             << ":loop\n"
-            << "\"$EPSRbin\"'epsr' " << workingDir_ << " epsr " << atoBaseFileName << "\n"
-            << "if not exist \"$EPSRrun\"'killepsr' ( goto loop ) else del \"$EPSRrun\"'killepsr'\n";
+            << "%EPSRbin%epsr.exe " << workingDir_ << " epsr " << atoBaseFileName << "\n"
+            << "if not exist %EPSRrun%killepsr ( goto loop ) else del %EPSRrun%killepsr\n";
 #else
         stream << "export EPSRbin=" << epsrBinDir_ << "\n"
                 << "export EPSRrun=" << workingDir_ << "\n"
@@ -1018,6 +1238,10 @@ void MainWindow::runEPSR()
     ui.messagesLineEdit->setText("EPSR is running in a separate window");
 
     //enable plotting as data files should now exist ************if this is clicked before files exist does program crash?
+    ui.inpSettingsTable->setDisabled(true);
+    ui.dataFileSettingsTable->setDisabled(true);
+    ui.pcofSettingsTable->setDisabled(true);
+    ui.minDistanceTable->setDisabled(true);
     ui.plot1Button->setEnabled(true);
     ui.plot2Button->setEnabled(true);
 }
@@ -1036,6 +1260,12 @@ void MainWindow::stopEPSR()
 
     connect(&epsrFinished_, SIGNAL(fileChanged(const QString &)), this, SLOT(enableButtons()));
     epsrFinished_.addPath(workingDir_+"killepsr");
+
+    //preferably only enable once finished iteration *********************************************************************
+    ui.inpSettingsTable->setDisabled(false);
+    ui.dataFileSettingsTable->setDisabled(false);
+    ui.pcofSettingsTable->setDisabled(false);
+    ui.minDistanceTable->setDisabled(false);
 }
 
 void MainWindow::enableButtons()
@@ -1128,6 +1358,17 @@ QString MainWindow::epsrDir()
 {
     return epsrDir_;
 }
+
+QStringList MainWindow::atomLabels()
+{
+    return atoAtomLabels;
+}
+
+QVector<int> MainWindow::numberOfEachAtomLabel()
+{
+    return numberAtomLabels;
+}
+
 
 void MainWindow::deleteEPSRinpFile()
 {

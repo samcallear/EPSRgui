@@ -16,7 +16,6 @@ MakeAtomDialog::MakeAtomDialog(QWidget *parent) : QDialog(parent)
     ui.epsilonLineEdit->setValidator(new QRegExpValidator(numberrx, this));
     ui.sigmaLineEdit->setValidator(new QRegExpValidator(numberrx, this));
     ui.massLineEdit->setValidator(new QRegExpValidator(numberrx, this));
-    ui.densityLineEdit->setValidator(new QRegExpValidator(numberrx, this));
     QRegExp chargerx("^-?\\d*\\.?\\d*$");
     ui.chargeLineEdit->setValidator(new QRegExpValidator(chargerx, this));
     QRegExp symbolrx("[A-Z]{1}[a-z]?");
@@ -73,7 +72,3 @@ QString MakeAtomDialog::getTemp()
     return ui.tempLineEdit->text();
 }
 
-QString MakeAtomDialog::getDensity()
-{
-    return ui.densityLineEdit->text();
-}

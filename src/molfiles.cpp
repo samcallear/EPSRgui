@@ -47,13 +47,12 @@ bool MainWindow::runjmol()
     // set jmol save directory to EPSR directory
     QDir::setCurrent(workingDir_);
     processjmol.start("java", QStringList() << "-jar" << program);
-    //linux: java -jar ~/src/EPSR25/bin/Jmol.jar
-//    if (!processjmol.waitForStarted()) return false;
     if (!processjmol.waitForFinished(1800000))
     {
         ui.messagesLineEdit->setText("Jmol timed out");
         return false;
     }
+
     //find most recently modified *.jmol file
     QDir dir;
     dir.setSorting(QDir::Time);
@@ -117,7 +116,7 @@ bool MainWindow::runjmol()
 #else
         processMol.start("sh mopac"+jmolBaseFileName+".sh");
 #endif
-        //linux:
+
         if (!processMol.waitForStarted()) return false;
 
         processMol.write("3\n");          // select bonding patterns and changelabel section
@@ -138,33 +137,7 @@ bool MainWindow::runjmol()
 
         if (!processMol.waitForFinished()) return false;
 
-
-//        QString jmolBaseFileName = jmolFileName.split(".",QString::SkipEmptyParts).at(0);
-//        QFile(mopacFile)(workingDir_+jmolBaseFileName+".log");
-//        if(!mopacFile.open(QFile::WriteOnly | QFile::Text))
-//        {
-//            QMessageBox msgBox;
-//            msgBox.setText("Could not create mopac instruction file.");
-//            msgBox.exec();
-//            return false;
-//        }
-
-//        QTextStream streamWrite(&mopacFile);
-
-//        streamWrite << " " <<  mopacOptionStr << "   " << "MMOK SYMMETRY PRECISE GEO-OK CHARGE=" << molChargeStr << "\n"
-//                    << " " << workingDir_+jmolBaseFileName << "\n"
-//                    << " " << "Run to minimize energy\n";
-//        mopacFile.close();
-
-//        //also need to make another file with some more details in it ******************************************
-
-//        QProcess processMopac;
-//        processMopac.setProcessChannelMode(QProcess::ForwardedChannels);
-//        processMopac.start(epsrBinDir_+"MOPAC_7.exe", QStringList() << workingDir_+jmolBaseFileName);
-//        if (!processMopac.waitForStarted()) return false;
-//        if (!processMopac.waitForFinished()) return false;
-
-//        printf("\nMOPAC finished - check %s.out file for results of calculation.\n", qPrintable(jmolBaseFileName));
+        printf("\nMOPAC finished - check %s.out file for results of calculation.\n", qPrintable(jmolBaseFileName));
     }
     else
     {
@@ -174,7 +147,6 @@ bool MainWindow::runjmol()
         processMol.start(epsrBinDir_+"readmole.exe", QStringList() << workingDir_ << "jmolfile "+jmolFileName);
 #else
         processMol.start(epsrBinDir_+"readmole", QStringList() << workingDir_ << "jmolfile "+jmolFileName);
-        //linux: ~/src/EPSR25/bin/readmole ~/src/EPSR25/run/test2/ jmolfile molecule.jmol
 #endif
         if (!processMol.waitForStarted()) return false;
 
@@ -219,7 +191,6 @@ bool MainWindow::runjmol()
     nMolFiles = ui.molFileList->count();
     ui.molFileList->setCurrentRow(nMolFiles-1);
 
-
     //update ato file table in box ato tab
     ui.atoFileTable->setRowCount(nMolFiles);
     if (nMolFiles > 0)
@@ -244,20 +215,35 @@ void MainWindow::on_molFileLoadButton_clicked(bool checked)
     QString molFile = QFileDialog::getOpenFileName(this, "Choose EPSR .mol file", workingDir_, tr(".mol files (*.mol)"));
     if (!molFile.isEmpty())
     {
-//        workingDir = QFileInfo
-//        //check if molFileName is in the working directory, if not copy it to the working directory with the .ato file
+        QString molFilePath = QFileInfo(molFile).path()+"/";
+        molFilePath = QDir::toNativeSeparators(molFilePath);
+        QFileInfo fi(molFile);
+        QString molFileName = fi.fileName();
+        molFileName_= molFileName;
 
-//        if (QFile::exists(workingDir_+"/"+molfilename) == 0)
-//        {
-//             QFile::copy(molFileName, workingdir+molfilename);
+        if (molFilePath != workingDir_)
+        {
+            if (QFile::exists(workingDir_+molFileName) == true)
+            {
+                QMessageBox::StandardButton msgBox;
+                msgBox  = QMessageBox::question(this, "Warning", "This will overwrite the .mol file already present in the project folder with the same name.\nProceed?", QMessageBox::Ok|QMessageBox::Cancel);
+                if (msgBox == QMessageBox::Cancel)
+                {
+                    return;
+                }
+                else
+                {
+                    QFile::copy(molFile, workingDir_+molFileName);
+                }
+            }
+            else
+            {
+                QFile::copy(molFile, workingDir_+molFileName);
+            }
+        }
 
-             QFileInfo fi(molFile);
-             QString molFileName = fi.fileName();
-             molFileName_= molFileName;
-             QString cropped_fileName = molFileName.split(".",QString::SkipEmptyParts).at(0);
-             QString atoFileName = cropped_fileName+".ato";
-//             QFile::copy(atoFileName, workingdir+atofilename);
-//        }
+        QString cropped_fileName = molFileName.split(".",QString::SkipEmptyParts).at(0);
+        QString atoFileName = cropped_fileName+".ato";
 
         //check if equivalent .ato file also exists and, if not, run makemole to generate it
         if (QFile::exists(atoFileName) == 0)
@@ -289,12 +275,11 @@ void MainWindow::on_molFileLoadButton_clicked(bool checked)
         {
             QTableWidgetItem *item = new QTableWidgetItem(atoFileName);
             item->setFlags(item->flags() & ~Qt::ItemIsEditable);
-//            item->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEnabled);
             ui.atoFileTable->setItem(nMolFiles-1,0, item);
             ui.atoFileTable->setItem(nMolFiles-1,2, new QTableWidgetItem("0"));
         }
 
-        // update mol bond distance/angles/etc tables
+//        // update mol bond distance/angles/etc tables
         readMolFile();
     }
 }
@@ -321,7 +306,6 @@ void MainWindow::on_createAtomButton_clicked(bool checked)
         QString atomCharge = makeAtomDialog->getCharge();
         QString atomSymbol = makeAtomDialog->getSymbol();
         QString atomTemp = makeAtomDialog->getTemp();
-        QString atomDensity = makeAtomDialog->getDensity();
 
         QProcess processMakeAto;
         processMakeAto.setProcessChannelMode(QProcess::ForwardedChannels);
@@ -363,7 +347,7 @@ void MainWindow::on_createAtomButton_clicked(bool checked)
         result = processMakeAto.readAll();
         qDebug(result);
 
-        processMakeAto.write(qPrintable(atomDensity+"\n"));
+        processMakeAto.write(qPrintable("0.1\n"));
         result = processMakeAto.readAll();
         qDebug(result);
 
@@ -423,7 +407,7 @@ void MainWindow::on_createAtomButton_clicked(bool checked)
                     << "angtemp  0.100000E+01\n"
                     << "dihtemp  0.100000E+02\n"
                     << "ecoredcore    1.00000    2.00000\n"
-                    << "density  " << atomDensity << "\n";
+                    << "density  0.1\n";
 
         fileRead.close();
         fileWrite.close();
@@ -468,6 +452,9 @@ void MainWindow::on_createLatticeButton_clicked(bool checked)
     if (latticeDialog == MakeLatticeDialog::Accepted)
     {
         QString unitFileName = makeLatticeDialog->unitFileName(); //this has the .unit extension on it
+        QString croppedUnitFileName = unitFileName.split(".", QString::SkipEmptyParts).at(0);
+        QString atoFileName = croppedUnitFileName+".ato";
+
         QString aLatt = makeLatticeDialog->cellsAlongA();
         QString bLatt = makeLatticeDialog->cellsAlongB();
         QString cLatt = makeLatticeDialog->cellsAlongC();
@@ -491,7 +478,7 @@ void MainWindow::on_createLatticeButton_clicked(bool checked)
         result = processMakeLattice.readAll();
         qDebug(result);
 
-        processMakeLattice.write(qPrintable(unitFileName+"\n"));
+        processMakeLattice.write(qPrintable(croppedUnitFileName+"\n"));
         result = processMakeLattice.readAll();
         qDebug(result);
 
@@ -499,149 +486,213 @@ void MainWindow::on_createLatticeButton_clicked(bool checked)
 
         printf("\nmakelattice finished\n");
 
-        //make the .mol files for each atom in the lattice
-        QStringList atomTypes = makeLatticeDialog->atomTypes(); //get list of atom labels from paramTable
-
-        //read in .unit file to get epsilon, sigma, amu, charge, atom symbol for each atom type and write out to each .mol file
-        QFile file(workingDir_+unitFileName);
-        if(!file.open(QFile::ReadOnly | QFile::Text))
+        // if use lattice as box
+        if (makeLatticeDialog->useAsBox() == 1)
         {
-            QMessageBox msgBox;
-            msgBox.setText("Could not open .unit file");
-            msgBox.exec();
-            return;
-        }
+            //make the .mol files for each atom in the lattice
+            QStringList atomTypes = makeLatticeDialog->atomTypes(); //get list of atom labels from paramTable
 
-        QTextStream stream(&file);
-        QString line;
-        QStringList dataLine;
-        dataLine.clear();
-
-        line = stream.readLine();
-        dataLine = line.split(" ", QString::SkipEmptyParts);
-        if (dataLine.count() == 0)
-        {
-            QMessageBox msgBox;
-            msgBox.setText("Could not read .unit file");
-            msgBox.exec();
-            return;
-        }
-        line = stream.readLine();
-        line = stream.readLine();
-        line = stream.readLine();
-        int numberAtoms = line.toInt();
-        for (int i = 0; i < numberAtoms; i++)
-        {
-            line = stream.readLine();
-        }
-
-        for (int i = 0; i < atomTypes.count(); i++)
-        {
-            QString molFileName = atomTypes.at(i);
-            QFile fileWrite(workingDir_+molFileName+".mol");
-            if(!fileWrite.open(QFile::WriteOnly | QFile::Text))
+            //read in .unit file to get epsilon, sigma, amu, charge, atom symbol for each atom type and write out to each .mol file
+            QFile file(workingDir_+unitFileName);
+            if(!file.open(QFile::ReadOnly | QFile::Text))
             {
                 QMessageBox msgBox;
-                msgBox.setText("Could not create .mol file");
+                msgBox.setText("Could not open .unit file");
                 msgBox.exec();
                 return;
             }
 
+            QTextStream stream(&file);
+            QString line;
+            QStringList dataLine;
+            dataLine.clear();
+
             line = stream.readLine();
             dataLine = line.split(" ", QString::SkipEmptyParts);
-            QString symbol = dataLine.at(1);
-            line = stream.readLine();
-            dataLine = line.split(" ", QString::SkipEmptyParts);
-            QString epsilon = dataLine.at(0);
-            QString sigma = dataLine.at(1);
-            QString mass = dataLine.at(2);
-            QString charge = dataLine.at(3);
-
-            QTextStream streamWrite(&fileWrite);
-            streamWrite << "  .gmol           0\n"
-                        << " atom            1  001     0.00000E+00  0.00000E+00  0.00000E+00           0\n"
-                        << "changelabel 001 " << atomTypes.at(i) << "\n"
-                        << "potential " << atomTypes.at(i) << " " << epsilon << " " << sigma << " " << mass << " " << charge << " " << symbol << "\n"
-                        << "temperature 300\n"
-                        << "vibtemp  0.650000E+02\n"
-                        << "angtemp  0.100000E+01\n"
-                        << "dihtemp  0.100000E+02\n"
-                        << "ecoredcore    0.00000    1.00000\n"
-                        << "density  0.1\n";
-            fileWrite.close();
-
-            QProcess processMakemole;
-            processMakemole.setProcessChannelMode(QProcess::ForwardedChannels);
-
-            QString projDir = workingDir_;
-            projDir = QDir::toNativeSeparators(projDir);
-#ifdef _WIN32
-            processMakemole.start(epsrBinDir_+"makemole.exe", QStringList() << projDir << "makemole" << molFileName);
-#else
-            processMakemole.start(epsrBinDir_+"makemole", QStringList() << projDir << "makemole" << molFileName);
-#endif
-            if (!processMakemole.waitForStarted()) return;
-            if (!processMakemole.waitForFinished()) return;
-
-            ui.molFileList->QListWidget::addItem(molFileName+".mol");
-        }
-        file.close();
-
-        //update lattice.ato with correct .mol files at bottom
-        QString atoFileName = unitFileName.split(".", QString::SkipEmptyParts).at(0);
-        QFile fileato(workingDir_+atoFileName+".ato");
-        if(!fileato.open(QFile::ReadWrite | QFile::Text))
-        {
-            QMessageBox msgBox;
-            msgBox.setText("Could not open lattice .ato file");
-            msgBox.exec();
-            return;
-        }
-
-        QTextStream streamato(&fileato);
-        QString lineato;
-        QStringList dataLineato;
-        dataLineato.clear();
-        QString originalato;
-        int ctr_moltype = 0;
-
-        while (!streamato.atEnd())
-        {
-            lineato = streamato.readLine();
-            originalato.append(lineato+"\n");
-            if (lineato.isEmpty()) break;
-            if (lineato.contains("moltype"))
+            if (dataLine.count() == 0)
             {
-                originalato.remove(lineato+"\n");
-                dataLineato = lineato.split(" ", QString::SkipEmptyParts);
-                originalato.append("   "+dataLineato.at(0)+"  "+atomTypes.at(ctr_moltype)+"  "+dataLineato.at(2)+"  "+dataLineato.at(3)+"  "+dataLineato.at(4)+"  "+dataLineato.at(5)+"\n");
-                ctr_moltype++;
+                QMessageBox msgBox;
+                msgBox.setText("Could not read .unit file");
+                msgBox.exec();
+                return;
+            }
+            line = stream.readLine();
+            line = stream.readLine();
+            line = stream.readLine();
+            int numberAtoms = line.toInt();
+            for (int i = 0; i < numberAtoms; i++)
+            {
+                line = stream.readLine();
+            }
+
+            QStringList atomCharges;
+            atomCharges.clear();
+
+            for (int i = 0; i < atomTypes.count(); i++)
+            {
+                QString molFileName = atomTypes.at(i);
+                QFile fileWrite(workingDir_+molFileName+".mol");
+                if(!fileWrite.open(QFile::WriteOnly | QFile::Text))
+                {
+                    QMessageBox msgBox;
+                    msgBox.setText("Could not create .mol file");
+                    msgBox.exec();
+                    return;
+                }
+
+                line = stream.readLine();
+                dataLine = line.split(" ", QString::SkipEmptyParts);
+                QString symbol = dataLine.at(1);
+                line = stream.readLine();
+                dataLine = line.split(" ", QString::SkipEmptyParts);
+                QString epsilon = dataLine.at(0);
+                QString sigma = dataLine.at(1);
+                QString mass = dataLine.at(2);
+                QString charge = dataLine.at(3);
+                atomCharges.append(dataLine.at(3));
+
+                QTextStream streamWrite(&fileWrite);
+                streamWrite << "  .gmol           0\n"
+                            << " atom            1  001     0.00000E+00  0.00000E+00  0.00000E+00           0\n"
+                            << "changelabel 001 " << atomTypes.at(i) << "\n"
+                            << "potential " << atomTypes.at(i) << " " << epsilon << " " << sigma << " " << mass << " " << charge << " " << symbol << "\n"
+                            << "temperature 300\n"
+                            << "vibtemp  0.650000E+02\n"
+                            << "angtemp  0.100000E+01\n"
+                            << "dihtemp  0.100000E+02\n"
+                            << "ecoredcore    0.00000    1.00000\n"
+                            << "density  0.1\n";
+                fileWrite.close();
+
+                QProcess processMakemole;
+                processMakemole.setProcessChannelMode(QProcess::ForwardedChannels);
+
+                QString projDir = workingDir_;
+                projDir = QDir::toNativeSeparators(projDir);
+#ifdef _WIN32
+                processMakemole.start(epsrBinDir_+"makemole.exe", QStringList() << projDir << "makemole" << molFileName);
+#else
+                processMakemole.start(epsrBinDir_+"makemole", QStringList() << projDir << "makemole" << molFileName);
+#endif
+                if (!processMakemole.waitForStarted()) return;
+                if (!processMakemole.waitForFinished()) return;
+
+                ui.molFileList->QListWidget::addItem(molFileName+".mol");
+//                lattMols_.append(molFileName+".mol");
+            }
+            file.close();
+
+            //update lattice.ato with correct .mol files at bottom
+            QFile fileato(workingDir_+atoFileName);
+            if(!fileato.open(QFile::ReadWrite | QFile::Text))
+            {
+                QMessageBox msgBox;
+                msgBox.setText("Could not open lattice .ato file");
+                msgBox.exec();
+                return;
+            }
+
+            QTextStream streamato(&fileato);
+            QString lineato;
+            QStringList dataLineato;
+            dataLineato.clear();
+            QString originalato;
+            int ctr_moltype = 0;
+
+            while (!streamato.atEnd())
+            {
+                lineato = streamato.readLine();
+                originalato.append(lineato+"\n");
+                if (lineato.isEmpty()) break;
+                if (lineato.contains("moltype"))
+                {
+                    originalato.remove(lineato+"\n");
+                    dataLineato = lineato.split(" ", QString::SkipEmptyParts);
+                    originalato.append("   "+dataLineato.at(0)+"  "+atomTypes.at(ctr_moltype)+"  "+dataLineato.at(2)+"  "+dataLineato.at(3)+"  "+dataLineato.at(4)+"  "+dataLineato.at(5)+"\n");
+                    ctr_moltype++;
+                }
+            }
+            fileato.resize(0);
+            streamato << originalato;
+            fileato.close();
+
+            //change filename to be appropriate and update atoFileName_
+            QFile::rename(workingDir_+atoFileName, workingDir_+projectName_+"box.ato");
+            QFile::remove(workingDir_+atoFileName);
+            atoFileName_ = projectName_+"box.ato";
+
+            ui.boxAtoLabel->setText(atoFileName_);
+            readAtoFileAtomPairs();
+            readAtoFileBoxDetails();
+            ui.atoAtomList->clear();
+
+            for (int n=0; n < atoAtomLabels.count(); ++n)
+            {
+                QListWidgetItem* item = new QListWidgetItem(atoAtomLabels.at(n));
+                item->setData(Qt::UserRole, n);
+                ui.atoAtomList->addItem(item);
+            }
+
+            //update atoFileTable to contain atom .ato files
+            ui.atoFileTable->setRowCount(atomTypes.count());
+            for (int i = 0; i < atomTypes.count(); i++)
+            {
+                QTableWidgetItem *item = new QTableWidgetItem(atomTypes.at(i)+".ato");
+                item->setFlags(item->flags() & ~Qt::ItemIsEditable);
+                ui.atoFileTable->setItem(i,0, item);
+                ui.atoFileTable->setItem(i,1, new QTableWidgetItem(atomCharges.at(i)));
+                ui.atoFileTable->setItem(i,2, new QTableWidgetItem(QString::number(numberAtomLabels.at(i))));
+            }
+            checkBoxCharge();
+
+            ui.createMolFileButton->setDisabled(true);
+            ui.molFileLoadButton->setDisabled(true);
+            ui.createAtomButton->setDisabled(true);
+            ui.createLatticeButton->setDisabled(true);
+            ui.makeMolExtButton->setDisabled(true);
+            ui.removeMolFileButton->setDisabled(true);
+            ui.addLJRowAboveButton->setDisabled(true);
+            ui.addLJRowBelowButton->setDisabled(true);
+            ui.deleteLJRowButton->setDisabled(true);
+            ui.mixatoButton->setDisabled(true);
+            ui.addatoButton->setDisabled(true);
+            ui.atoAsBoxButton->setDisabled(true);
+        }
+
+        // otherwise use lattice as a component **NB** This is the only workflow that doesn't use a .mol file.
+        else
+        {
+            //add .ato to molFileList <make sure molFileList doesn't assume an extension and reads the extension to check what to do.
+            ui.molFileList->addItem(atoFileName);
+
+            //add .ato to atoFileTable
+            int row = ui.molFileList->count();
+            ui.atoFileTable->setRowCount(row);
+            if (nMolFiles > 0)
+            {
+                QTableWidgetItem *item = new QTableWidgetItem(atoFileName);
+                item->setFlags(item->flags() & ~Qt::ItemIsEditable);
+                ui.atoFileTable->setItem(row-1,0, item);
+
+                //calculate charge for ato file
+                QString lattCharge = makeLatticeDialog->charge();    //THIS ISNT WORKING **********************************************************************************
+                QTableWidgetItem *item1 = new QTableWidgetItem(lattCharge);
+                item1->setFlags(item1->flags() & ~Qt::ItemIsEditable);
+                ui.atoFileTable->setItem(row-1,1, item1);
+
+                //put 1 in 'number in box' column and disable
+                QTableWidgetItem *item2 = new QTableWidgetItem("1");
+                item2->setFlags(item2->flags() & ~Qt::ItemIsEditable);
+                ui.atoFileTable->setItem(row-1,2, item2);
+                //disable mixato, only allow addato
+                ui.mixatoButton->setDisabled(true);
+                ui.atoAsBoxButton->setDisabled(true);
             }
         }
-        fileato.resize(0);
-        streamato << originalato;
-        fileato.close();
 
-        //update ato file table
-        int lastAtoFile = ui.atoFileTable->rowCount();
-        ui.atoFileTable->insertRow(lastAtoFile);
-        QTableWidgetItem *item = new QTableWidgetItem(atoFileName+".ato");
-        item->setFlags(item->flags() & ~Qt::ItemIsEditable);
-        ui.atoFileTable->setItem(lastAtoFile,0, item);
-        //THIS ISNT WORKING **********************************************************************************
-        QString lattCharge = makeLatticeDialog->charge();
-        item = new QTableWidgetItem(lattCharge);
-        item->setFlags(item->flags() & ~Qt::ItemIsEditable);
-        ui.atoFileTable->setItem(lastAtoFile,1, item);
-//        ui.atoFileTable->setItem(lastAtoFile,1, new QTableWidgetItem(makeLatticeDialog->charge()));
-        ui.atoFileTable->setItem(lastAtoFile,2, new QTableWidgetItem("0"));
-
-        //set mol file table to select last item and update (runs via 'selectionChanged' signal
+        //set mol file table to select last item and update mol tables(runs via 'selectionChanged' signal)
         nMolFiles = ui.molFileList->count();
         ui.molFileList->setCurrentRow(nMolFiles-1);
-
-        //update LJ etc tables
-       // readMolFile();
 
         ui.messagesLineEdit->setText("Finished making new lattice");
     }
@@ -671,7 +722,15 @@ void MainWindow::setSelectedMolFile()
     QString molFileName = ui.molFileList->item(row)->text();
     molFileName_ = molFileName;
 
-    readMolFile();
+    QString extension = molFileName_.split(".",QString::SkipEmptyParts).at(1);
+    if (extension == "ato")
+    {
+        readAtoFile();
+    }
+    else
+    {
+        readMolFile();
+    }
 }
 
 void MainWindow::on_viewMolFileButton_clicked(bool checked)
@@ -763,6 +822,12 @@ void MainWindow::on_removeMolFileButton_clicked(bool checked)
         ui.molDihedralTable->clearContents();
         ui.molRotTable->clearContents();
         ui.molLJTable->clearContents();
+        ui.molBoxA->clear();
+        ui.molBoxB->clear();
+        ui.molBoxC->clear();
+        ui.molBoxPhi->clear();
+        ui.molBoxTheta->clear();
+        ui.molBoxChi->clear();
     }
     ui.messagesLineEdit->setText(".mol file removed");
 }
@@ -777,7 +842,7 @@ void MainWindow::on_molFileList_itemSelectionChanged()
 
 bool MainWindow::readMolFile()
 {
-    QFile file(molFileName_);
+    QFile file(workingDir_+molFileName_);
     if(!file.open(QFile::ReadOnly | QFile::Text))
     {
         QMessageBox msgBox;
@@ -869,17 +934,19 @@ bool MainWindow::readMolFile()
             ecorestr=dataLine.at(1);
             dcorestr=dataLine.at(2);
         }
-
     } while (!line.isNull());
     file.close();
 
     //read .ato file for .mol to get additional details
-    QString atoFile = molFileName_.split(".",QString::SkipEmptyParts).at(0);
-    QFile fileato(atoFile+".ato");
+    QString atoFile;
+    atoFile = molFileName_.split(".",QString::SkipEmptyParts).at(0);
+    atoFile = atoFile+".ato";
+
+    QFile fileato(atoFile);
     if(!fileato.open(QFile::ReadOnly | QFile::Text))
     {
         QMessageBox msgBox;
-        msgBox.setText("Could not open .ato file");
+        msgBox.setText("Could not open .ato file.");
         msgBox.exec();
         return 0;
     }
@@ -889,25 +956,62 @@ bool MainWindow::readMolFile()
     dataLineato.clear();
 
     lineato = streamato.readLine();
-    dataLineato=lineato.split(" ",QString::SkipEmptyParts);
-    if (dataLineato.count() == 2)       //This is for non-cubic .ato files
+    dataLineato=lineato.split("  ",QString::SkipEmptyParts);
+    if (dataLineato.count() == 3)       //This is for cubic .ato files
     {
-        lineato = streamato.readLine(); //READ IN OTHER ADDITIONAL DETAILS**********************************
-        lineato = streamato.readLine();
-        lineato = streamato.readLine();
-        lineato = streamato.readLine();
+        double boxLength = dataLineato.at(1).toDouble();
+        QString boxLengthstr;
+        boxLengthstr.sprintf("%.4f", boxLength);
+        ui.molBoxA->setText(boxLengthstr);
+        ui.molBoxB->setText(boxLengthstr);
+        ui.molBoxC->setText(boxLengthstr);
+        ui.molBoxPhi->setText("90.0000");
+        ui.molBoxTheta->setText("0.0000");
+        ui.molBoxChi->setText("0.0000");
     }
-    else                                //this is for cubic .ato files
+    else                                //this is for non-cubic .ato files
     {
-        lineato = streamato.readLine(); //READ IN OTHER ADDITIONAL DETAILS**********************************
-        dataLineato=lineato.split(" ",QString::SkipEmptyParts);
-        ui.tolLineEdit->setText(dataLineato.at(0));
-        lineato = streamato.readLine();
+        lineato = stream.readLine();
+        dataLineato = lineato.split("  ", QString::SkipEmptyParts);
+        double boxa = dataLineato.at(0).toDouble();
+        double boxb = dataLineato.at(1).toDouble();
+        double boxc = dataLineato.at(2).toDouble();
+        QString boxastr;
+        boxastr.sprintf("%.4f", boxa);
+        QString boxbstr;
+        boxbstr.sprintf("%.4f", boxb);
+        QString boxcstr;
+        boxcstr.sprintf("%.4f", boxc);
+        ui.molBoxA->setText(boxastr);
+        ui.molBoxB->setText(boxbstr);
+        ui.molBoxC->setText(boxcstr);
+
+        lineato = stream.readLine();
+        dataLineato = lineato.split(" ", QString::SkipEmptyParts);
+        double boxtb = dataLineato.at(0).toDouble();
+        double boxtc = dataLineato.at(1).toDouble();
+        double boxpb = dataLineato.at(2).toDouble();
+        QString boxtbstr;
+        boxtbstr.sprintf("%.4f", boxtb);
+        QString boxtcstr;
+        boxtcstr.sprintf("%.4f", boxtc);
+        QString boxpbstr;
+        boxpbstr.sprintf("%.4f", boxpb);
+        ui.molBoxPhi->setText(boxtbstr);
+        ui.molBoxTheta->setText(boxtcstr);
+        ui.molBoxChi->setText(boxpbstr);
     }
-    if (lineato.contains("T") == true)  //the following depends on the number of items in this line NOT CHANGING!!!!!
+
+    lineato = streamato.readLine();
+    dataLineato = lineato.split(" ",QString::SkipEmptyParts);
+    QString tetherTol = dataLineato.at(0);
+
+    lineato = streamato.readLine();
+    if (lineato.contains("T") == true)
     {
         ui.molTetherCheckBox->setChecked(true);
         dataLineato = lineato.split(" ",QString::SkipEmptyParts);
+        ui.tolLineEdit->setText(tetherTol);
         QString tetherCoordX = dataLineato.at(4);
         ui.tetherCoordXLineEdit->setText(tetherCoordX);
         QString tetherCoordY = dataLineato.at(5);
@@ -923,19 +1027,23 @@ bool MainWindow::readMolFile()
     else
     {
         ui.molTetherCheckBox->setChecked(false);
+        ui.tolLineEdit->clear();
+        ui.tetherCoordXLineEdit->clear();
+        ui.tetherCoordYLineEdit->clear();
+        ui.tetherCoordZLineEdit->clear();
+        ui.tetherAtomLineEdit->clear();
     }
-/*
-    QRegExp ecoredcorerx("  ([0-9]{1}[.]{1}[0-9]{5}[E+]{2}[0-9]{2})  ([0-9]{1}[.]{1}[0-9]{5}[E+]{2}[0-9]{2})");
 
+    QRegExp ecoredcorerx("  ([0-9]{1}[.]{1}[0-9]{5}[E+]{2}[0-9]{2})  ([0-9]{1}[.]{1}[0-9]{5}[E+]{2}[0-9]{2})");
     do {
         lineato = streamato.readLine();
         if (ecoredcorerx.exactMatch(lineato))
         {
-            dataLineato = lineato.split(" ",QString::SkipEmptyParts);
+            dataLineato = lineato.split("  ",QString::SkipEmptyParts);
             ui.molEcoreDcoreTable->setItem(0,0, new QTableWidgetItem(dataLineato.at(0)));
             ui.molEcoreDcoreTable->setItem(0,1, new QTableWidgetItem(dataLineato.at(1)));
         }
-    } while (!lineato.isNull());*/
+    } while (!lineato.isNull());
     fileato.close();
 
     //number of entries lists
@@ -1048,7 +1156,205 @@ bool MainWindow::readMolFile()
         QTableWidgetItem *item = new QTableWidgetItem(molChargeCalcdStr);
         item->setFlags(item->flags() & ~Qt::ItemIsEditable);
         int row = ui.molFileList->currentRow();
+        ui.atoFileTable->setItem(row,1, new QTableWidgetItem(molChargeCalcdStr));
+    }
+
+    return true;
+}
+
+bool MainWindow::readAtoFile()
+{
+    QFile file(molFileName_);
+    if(!file.open(QFile::ReadOnly | QFile::Text))
+    {
+        QMessageBox msgBox;
+        msgBox.setText("Could not open .ato file (readato())");
+        msgBox.exec();
+        return 0;
+    }
+    QTextStream stream(&file);
+    QString line;
+    QStringList dataLine;
+    dataLine.clear();
+
+    line = stream.readLine();
+    dataLine=line.split(" ",QString::SkipEmptyParts);
+    if (dataLine.count() == 3)       //This is for cubic .ato files
+    {
+        double boxLength = dataLine.at(1).toDouble();
+        QString boxLengthstr;
+        boxLengthstr.sprintf("%.4f", boxLength);
+        ui.molBoxA->setText(boxLengthstr);
+        ui.molBoxB->clear();
+        ui.molBoxC->clear();
+        ui.molBoxPhi->setText("90.0000");
+        ui.molBoxTheta->setText("0.0000");
+        ui.molBoxChi->setText("0.0000");
+    }
+    else                                //this is for non-cubic .ato files
+    {
+        line = stream.readLine();
+        dataLine = line.split("  ", QString::SkipEmptyParts);
+        double boxa = dataLine.at(0).toDouble();
+        double boxb = dataLine.at(1).toDouble();
+        double boxc = dataLine.at(2).toDouble();
+        QString boxastr;
+        boxastr.sprintf("%.4f", boxa);
+        QString boxbstr;
+        boxbstr.sprintf("%.4f", boxb);
+        QString boxcstr;
+        boxcstr.sprintf("%.4f", boxc);
+        ui.molBoxA->setText(boxastr);
+        ui.molBoxB->setText(boxbstr);
+        ui.molBoxC->setText(boxcstr);
+
+        line = stream.readLine();
+        dataLine = line.split(" ", QString::SkipEmptyParts);
+        double boxtb = dataLine.at(0).toDouble();
+        double boxtc = dataLine.at(1).toDouble();
+        double boxpb = dataLine.at(2).toDouble();
+        QString boxtbstr;
+        boxtbstr.sprintf("%.4f", boxtb);
+        QString boxtcstr;
+        boxtcstr.sprintf("%.4f", boxtc);
+        QString boxpbstr;
+        boxpbstr.sprintf("%.4f", boxpb);
+        ui.molBoxPhi->setText(boxtbstr);
+        ui.molBoxTheta->setText(boxtcstr);
+        ui.molBoxChi->setText(boxpbstr);
+    }
+
+    line = stream.readLine();
+    dataLine = line.split("  ", QString::SkipEmptyParts);
+    QString tetherTol = dataLine.at(0);
+
+    line = stream.readLine();
+    if (line.contains("T") == true)
+    {
+        ui.molTetherCheckBox->setChecked(true);
+        dataLine = line.split(" ",QString::SkipEmptyParts);
+        ui.tolLineEdit->setText(tetherTol);
+        ui.tetherCoordXLineEdit->setDisabled(true);
+        ui.tetherCoordYLineEdit->setDisabled(true);
+        ui.tetherCoordZLineEdit->setDisabled(true);
+        QString string = dataLine.at(7);
+        QString tetherAtomStr = string.remove("T");
+        int tetherAtom = tetherAtomStr.toInt();
+        tetherAtomStr = QString::number(tetherAtom);
+        ui.tetherAtomLineEdit->setText(tetherAtomStr);
+    }
+    else
+    {
+        ui.molTetherCheckBox->setChecked(false);
+        ui.tolLineEdit->setText("0.1");
+        ui.tetherCoordXLineEdit->setText("0.000000E+00");
+        ui.tetherCoordYLineEdit->setText("0.000000E+00");
+        ui.tetherCoordZLineEdit->setText("0.000000E+00");
+        ui.tetherAtomLineEdit->setText("0");
+    }
+
+    QStringList atomLabels;
+    QStringList atomTypes;
+    QStringList ljAtoms;
+    QStringList sigmas;
+    QStringList epsilons;
+    QStringList masses;
+    QStringList charges;
+    QStringList ljTypes;
+    atomLabels.clear();
+    atomTypes.clear();
+    ljAtoms.clear();
+    sigmas.clear();
+    epsilons.clear();
+    masses.clear();
+    charges.clear();
+    ljTypes.clear();
+
+    QRegExp atomLabelrx(" ([A-Z][A-Za-z0-9 ]{2}) ([A-Za-z ]{1,2})   ([0-1]{1})");
+    QRegExp ecoredcorerx("  ([0-9]{1}[.]{1}[0-9]{5}[E+]{2}[0-9]{2})  ([0-9]{1}[.]{1}[0-9]{5}[E+]{2}[0-9]{2})");
+
+    do
+    {
+        line = stream.readLine();
+        if (atomLabelrx.exactMatch(line))
+        {
+            dataLine = line.split("  ", QString::SkipEmptyParts);
+            atomTypes.append(dataLine.at(0));
+            ljAtoms.append(dataLine.at(0));
+            ljTypes.append(dataLine.at(1));
+
+            line = stream.readLine();
+            dataLine = line.split(" ", QString::SkipEmptyParts);
+            sigmas.append(dataLine.at(0));
+            epsilons.append(dataLine.at(1));
+            masses.append(dataLine.at(2));
+            charges.append(dataLine.at(3));
+        }
+        if (ecoredcorerx.exactMatch(line))
+        {
+            dataLine = line.split("  ",QString::SkipEmptyParts);
+            ui.molEcoreDcoreTable->setItem(0,0, new QTableWidgetItem(dataLine.at(0)));
+            ui.molEcoreDcoreTable->setItem(0,1, new QTableWidgetItem(dataLine.at(1)));
+        }
+    } while (!line.isNull());
+    file.close();
+
+    //show data in Tables
+    ui.molAtomTable->setRowCount(atomTypes.count());
+    ui.molAtomTable->verticalHeader()->setVisible(false);
+    for (int i = 0; i < atomTypes.count(); ++i)
+    {
+        ui.molAtomTable->setItem(i,1, new QTableWidgetItem(atomTypes.at(i)));
+    }
+
+    ui.molLJTable->setRowCount(ljTypes.count());
+    ui.molLJTable->verticalHeader()->setVisible(false);
+    for (int i = 0; i < ljTypes.count(); ++i)
+    {
+        ui.molLJTable->setItem(i,0, new QTableWidgetItem(ljAtoms.at(i)));
+        ui.molLJTable->setItem(i,1, new QTableWidgetItem(sigmas.at(i)));
+        ui.molLJTable->setItem(i,2, new QTableWidgetItem(epsilons.at(i)));
+        ui.molLJTable->setItem(i,3, new QTableWidgetItem(masses.at(i)));
+        ui.molLJTable->setItem(i,4, new QTableWidgetItem(charges.at(i)));
+        ui.molLJTable->setItem(i,5, new QTableWidgetItem(ljTypes.at(i)));
+    }
+
+    ui.molLJTable->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui.molLJTable->setSelectionMode(QAbstractItemView::SingleSelection);
+
+    //display charge for selected .ato file
+    double molChargeCalcd = 0;
+    for (int i = 0; i < ljAtoms.count(); i++)
+    {
+        int ctr = 0;
+        for (int n = 0; n < atomTypes.count(); n++)
+        {
+            if (atomTypes.at(n) == ljAtoms.at(i))
+            {
+                ctr++;
+            }
+        }
+        QString atomTypeChargeStr = charges.at(i);
+        double atomTypeCharge = QString(atomTypeChargeStr).toDouble();
+        molChargeCalcd = molChargeCalcd+(ctr*atomTypeCharge);
+    }
+    if (ljAtoms.isEmpty())
+    {
+        ui.molChargeLabel->setText("not available");
+        QTableWidgetItem *item = new QTableWidgetItem("n/a");
+        item->setFlags(item->flags() & ~Qt::ItemIsEditable);
+        int row = ui.molFileList->currentRow();
         ui.atoFileTable->setItem(row,1, item);
+    }
+    else
+    {
+        QString molChargeCalcdStr;
+        molChargeCalcdStr.sprintf("%.4f", molChargeCalcd);
+        ui.molChargeLabel->setText(molChargeCalcdStr);
+        QTableWidgetItem *item = new QTableWidgetItem(molChargeCalcdStr);
+        item->setFlags(item->flags() & ~Qt::ItemIsEditable);
+        int row = ui.molFileList->currentRow();
+        ui.atoFileTable->setItem(row,1, new QTableWidgetItem(molChargeCalcdStr));
     }
 
     return true;
@@ -1165,7 +1471,7 @@ bool MainWindow::updateMolFile()
     fileWrite.rename(workingDir_+molFileName_);
     printf("finished updating mol file %s\n", qPrintable(molFileName_));
 
-    //run fmole 0 times to make everything is consistent
+    //run fmole 0 times to make sure everything is consistent
     QDir::setCurrent(workingDir_);
 
     QString molBaseFileName = molFileName_.split(".",QString::SkipEmptyParts).at(0);
@@ -1182,8 +1488,11 @@ bool MainWindow::updateMolFile()
     if (!processFmole.waitForFinished()) return false;
 
     //update molecule .ato file with additional details (not those already changed via .mol file)****FINISH DETAILS TO UPDATE*********************
-    QString atoFile = molFileName_.split(".",QString::SkipEmptyParts).at(0);
-    QFile fileato(workingDir_+atoFile+".ato");
+    QString atoFile;
+    atoFile = molFileName_.split(".",QString::SkipEmptyParts).at(0);
+    atoFile = atoFile+".ato";
+
+    QFile fileato(atoFile);
     if(!fileato.open(QFile::ReadWrite | QFile::Text))
     {
         QMessageBox msgBox;
@@ -1215,13 +1524,14 @@ bool MainWindow::updateMolFile()
     {
         tether = "T";
     } else (tether = "F");
-//    QRegExp ecoredcorerx("  ([0-9]{1}[.]{1}[0-9]{5}[E+]{2}[0-9]{2})  ([0-9]{1}[.]{1}[0-9]{5}[E+]{2}[0-9]{2})");
+
+    QRegExp ecoredcorerx("  ([0-9]{1}[.]{1}[0-9]{5}[E+]{2}[0-9]{2})  ([0-9]{1}[.]{1}[0-9]{5}[E+]{2}[0-9]{2})");
 
     lineato = streamatoR.readLine();
     dataLineato=lineato.split(" ",QString::SkipEmptyParts);
     if (dataLineato.count() == 2)       //this is for non-cubic .ato files
     {
-        streamatoW << lineato << "\n";
+        streamatoW << lineato << "\n";      //cell parameters cannot be changed
         lineato = streamatoR.readLine();
         streamatoW << lineato << "\n";
         lineato = streamatoR.readLine();
@@ -1229,7 +1539,7 @@ bool MainWindow::updateMolFile()
     }
     else                                //this is for cubic .ato files
     {
-        streamatoW << lineato << "\n";
+        streamatoW << lineato << "\n";     //cell parameters cannot be changed
     }
     lineato = streamatoR.readLine();
     dataLineato = lineato.split(" ",QString::SkipEmptyParts);
@@ -1250,6 +1560,11 @@ bool MainWindow::updateMolFile()
     do {
         lineato = streamatoR.readLine();
         originalato.append(lineato+"\n");
+        if (ecoredcorerx.exactMatch(lineato))
+        {
+            originalato.remove(lineato+"\n");
+            originalato.append("  "+ecorestr+"  "+dcorestr+"\n");
+        }
         if (lineato.contains("moltype01"))
         {
             originalato.remove(lineato+"\n");
@@ -1268,9 +1583,134 @@ bool MainWindow::updateMolFile()
     //read mol file back into tables and update charge on mol file
     readMolFile();
 
+    //if boxAtoFile exist, update box charge too
+    if (!atoFileName_.isEmpty())
+    {
+        checkBoxCharge();
+    }
+
     printf("\nfinished updating molecule ato file\n");
 
     ui.messagesLineEdit->setText(".mol file updated");
+
+    return true;
+}
+
+bool MainWindow::updateAtoFile()
+{
+    if (ui.molFileList->count() == 0)
+    {
+        return false;
+    }
+
+    QDir::setCurrent(workingDir_);
+
+    QFile fileRead(workingDir_+molFileName_);
+    QFile fileWrite(workingDir_+"temp.txt");
+
+    if(!fileRead.open(QFile::ReadOnly | QFile::Text))
+    {
+        QMessageBox msgBox;
+        msgBox.setText("Could not open .ato file");
+        msgBox.exec();
+        return false;
+    }
+    if(!fileWrite.open(QFile::WriteOnly | QFile::Text))
+    {
+        QMessageBox msgBox;
+        msgBox.setText("Could not open temporary file");
+        msgBox.exec();
+        return false;
+    }
+
+    QTextStream streamR(&fileRead);
+    QTextStream streamW(&fileWrite);
+    QString line;
+    QStringList dataLine;
+    dataLine.clear();
+    QString original;
+    QString tether;
+    QString ecorestr = ui.molEcoreDcoreTable->item(0,0)->text();
+    QString dcorestr = ui.molEcoreDcoreTable->item(0,1)->text();
+    if (ui.molTetherCheckBox->isChecked() == true)
+    {
+        tether = "T";
+    } else (tether = "F");
+
+    QRegExp atomLabelrx(" ([A-Z][A-Za-z0-9 ]{2}) ([A-Za-z ]{1,2})   ([0-1]{1})");
+    QRegExp ecoredcorerx("  ([0-9]{1}[.]{1}[0-9]{5}[E+]{2}[0-9]{2})  ([0-9]{1}[.]{1}[0-9]{5}[E+]{2}[0-9]{2})");
+
+    line = streamR.readLine();
+    dataLine=line.split(" ",QString::SkipEmptyParts);
+    if (dataLine.count() == 2)       //this is for non-cubic .ato files
+    {
+        streamW << line << "\n";      //cell parameters cannot be changed
+        line = streamR.readLine();
+        streamW << line << "\n";
+        line = streamR.readLine();
+        streamW << line << "\n";
+    }
+    else                                //this is for cubic .ato files
+    {
+        streamW << line << "\n";     //cell parameters cannot be changed
+    }
+
+    line = streamR.readLine();
+    dataLine = line.split(" ",QString::SkipEmptyParts);
+    streamW << "   " << ui.tolLineEdit->text();  //This is the line starting with tol and contains vibtemp etc
+    for (int i = 1; i < dataLine.count(); i++ )
+    {
+        streamW << "  " << dataLine.at(i);
+    }
+    streamW << "\n";
+
+    int atomctr = 0;
+    do
+    {
+        line = streamR.readLine();
+        if (ui.molTetherCheckBox->isChecked() == true && line.contains("T") == false)
+        {
+            line = line.replace(91, 6, "T00000");
+        }
+        if (ui.molTetherCheckBox->isChecked() == false && line.contains("T") == true)
+        {
+            line = line.replace(91, 6, "F     ");
+        }
+        original.append(line+"\n");
+        if (atomLabelrx.exactMatch(line))
+        {
+            line = streamR.readLine();
+            original.remove(line+"\n");
+            original.append("  "+ui.molLJTable->item(atomctr,1)->text()+"  "+ui.molLJTable->item(atomctr,2)->text()+"  "+ui.molLJTable->item(atomctr,3)->text()+" "+ui.molLJTable->item(atomctr,4)->text()+"  0.00000E+00\n");
+            atomctr++;
+        }
+        if (ecoredcorerx.exactMatch(line))
+        {
+            original.remove(line+"\n");
+            original.append("  "+ecorestr+"  "+dcorestr+"\n");
+        }
+    }while(!line.isNull());
+    fileRead.close();
+
+    fileWrite.resize(0);
+    streamW << original;
+    fileWrite.close();
+
+    fileRead.remove();
+    fileWrite.rename(workingDir_+molFileName_);
+
+    //read mol file back into tables and update charge on mol file
+    readAtoFile();
+
+    //if boxAtoFile exist, update box charge too
+    if (!atoFileName_.isEmpty())
+    {
+        checkBoxCharge();
+    }
+
+    printf("\nfinished updating component .ato file\n");
+
+    ui.messagesLineEdit->setText("Component .ato file updated");
 
     return true;
 }
@@ -1417,13 +1857,20 @@ void MainWindow::on_deleteRotAllButton_clicked (bool checked)
 
 void MainWindow::on_updateMolFileButton_clicked(bool checked)
 {
-    updateMolFile();
+    QString extension = molFileName_.split(".",QString::SkipEmptyParts).at(1);
+    if (extension == "ato")
+    {
+        updateAtoFile();
+    }
+    else
+    {
+        updateMolFile();
+    }
 }
 
 void MainWindow::on_molChangeAtobutton_clicked(bool checked)
 {
     QDir::setCurrent(workingDir_);
-
 
     QString atoBaseFileName = molFileName_.split(".",QString::SkipEmptyParts).at(0);
 
@@ -1435,4 +1882,6 @@ void MainWindow::on_molChangeAtobutton_clicked(bool checked)
     processEditAto.startDetached(epsrBinDir_+"changeato", QStringList() << workingDir_ << "changeato" << atoBaseFileName);
 #endif
     ui.messagesLineEdit->setText("Changeato opened in separate window");
+
+    //read .mol and .ato files after changeato finished *************************************************************************************TO DO **********************************
 }
