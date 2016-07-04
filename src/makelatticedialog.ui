@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>730</width>
-    <height>519</height>
+    <width>736</width>
+    <height>735</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,45 +16,8 @@
   <layout class="QHBoxLayout" name="horizontalLayout">
    <item>
     <layout class="QGridLayout" name="gridLayout">
-     <item row="0" column="0" colspan="2">
-      <widget class="QLabel" name="label_14">
-       <property name="text">
-        <string>Open existing .unit file</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="2" colspan="4">
-      <widget class="QLineEdit" name="unitFileLineEdit"/>
-     </item>
-     <item row="0" column="6">
-      <widget class="QPushButton" name="browseButton">
-       <property name="text">
-        <string>Browse</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="label_5">
-       <property name="text">
-        <string>Name</string>
-       </property>
-      </widget>
-     </item>
      <item row="1" column="1">
       <widget class="QLineEdit" name="fileNameLineEdit"/>
-     </item>
-     <item row="2" column="0">
-      <widget class="QLabel" name="label_6">
-       <property name="text">
-        <string>a</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="1">
-      <widget class="QLineEdit" name="aLineEdit"/>
      </item>
      <item row="2" column="2">
       <widget class="QLabel" name="label_7">
@@ -66,21 +29,8 @@
        </property>
       </widget>
      </item>
-     <item row="2" column="3">
-      <widget class="QLineEdit" name="bLineEdit"/>
-     </item>
-     <item row="2" column="4">
-      <widget class="QLabel" name="label_8">
-       <property name="text">
-        <string>c</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="5">
-      <widget class="QLineEdit" name="cLineEdit"/>
+     <item row="12" column="1">
+      <widget class="QLineEdit" name="aLattLineEdit"/>
      </item>
      <item row="3" column="0">
       <widget class="QLabel" name="label_9">
@@ -99,13 +49,36 @@
        </property>
       </widget>
      </item>
-     <item row="3" column="3">
-      <widget class="QLineEdit" name="beLineEdit"/>
-     </item>
      <item row="3" column="4">
       <widget class="QLabel" name="label_11">
        <property name="text">
         <string>gamma</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="2" colspan="2">
+      <widget class="QRadioButton" name="absRadioButton">
+       <property name="text">
+        <string>absolute coordinates</string>
+       </property>
+       <attribute name="buttonGroup">
+        <string notr="true">buttonGroup_2</string>
+       </attribute>
+      </widget>
+     </item>
+     <item row="0" column="2" colspan="4">
+      <widget class="QLineEdit" name="unitFileLineEdit"/>
+     </item>
+     <item row="2" column="5">
+      <widget class="QLineEdit" name="cLineEdit"/>
+     </item>
+     <item row="3" column="3">
+      <widget class="QLineEdit" name="beLineEdit"/>
+     </item>
+     <item row="0" column="7">
+      <widget class="QPushButton" name="browseButton">
+       <property name="text">
+        <string>Browse</string>
        </property>
       </widget>
      </item>
@@ -125,17 +98,84 @@
        </attribute>
       </widget>
      </item>
-     <item row="4" column="2" colspan="2">
-      <widget class="QRadioButton" name="absRadioButton">
+     <item row="10" column="0">
+      <widget class="QLabel" name="label_12">
        <property name="text">
-        <string>absolute coordinates</string>
+        <string>Ecore</string>
        </property>
-       <attribute name="buttonGroup">
-        <string notr="true">buttonGroup_2</string>
-       </attribute>
       </widget>
      </item>
-     <item row="5" column="0" rowspan="2" colspan="5">
+     <item row="9" column="0" colspan="9">
+      <widget class="QTableWidget" name="paramTable">
+       <attribute name="horizontalHeaderDefaultSectionSize">
+        <number>100</number>
+       </attribute>
+       <column>
+        <property name="text">
+         <string>Atom label</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Atom symbol</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Iexchange</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Epsilon (kJ/mole)</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Sigma (A)</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Mass</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Charge</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Charge radius</string>
+        </property>
+       </column>
+      </widget>
+     </item>
+     <item row="10" column="1">
+      <widget class="QLineEdit" name="ecoreLineEdit"/>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="label_5">
+       <property name="text">
+        <string>Name</string>
+       </property>
+      </widget>
+     </item>
+     <item row="12" column="2">
+      <widget class="QLabel" name="label_3">
+       <property name="text">
+        <string>b</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="3">
+      <widget class="QLineEdit" name="bLineEdit"/>
+     </item>
+     <item row="5" column="0" rowspan="4" colspan="5">
       <widget class="QTableWidget" name="coordTable">
        <attribute name="horizontalHeaderDefaultSectionSize">
         <number>80</number>
@@ -162,95 +202,40 @@
        </column>
       </widget>
      </item>
-     <item row="5" column="5">
-      <widget class="QPushButton" name="addRowButton">
-       <property name="text">
-        <string>Add row</string>
-       </property>
-      </widget>
+     <item row="2" column="1">
+      <widget class="QLineEdit" name="aLineEdit"/>
      </item>
-     <item row="6" column="5">
-      <widget class="QPushButton" name="deleteRowButton">
-       <property name="text">
-        <string>Delete row</string>
-       </property>
-      </widget>
-     </item>
-     <item row="7" column="0" colspan="8">
-      <widget class="QTableWidget" name="paramTable">
-       <attribute name="horizontalHeaderDefaultSectionSize">
-        <number>80</number>
-       </attribute>
-       <column>
-        <property name="text">
-         <string>Atom label</string>
-        </property>
-       </column>
-       <column>
-        <property name="text">
-         <string>Atom symbol</string>
-        </property>
-       </column>
-       <column>
-        <property name="text">
-         <string>Iexchange</string>
-        </property>
-       </column>
-       <column>
-        <property name="text">
-         <string>Epsilon</string>
-        </property>
-       </column>
-       <column>
-        <property name="text">
-         <string>Sigma</string>
-        </property>
-       </column>
-       <column>
-        <property name="text">
-         <string>Mass</string>
-        </property>
-       </column>
-       <column>
-        <property name="text">
-         <string>Charge</string>
-        </property>
-       </column>
-       <column>
-        <property name="text">
-         <string>Charge radius</string>
-        </property>
-       </column>
-      </widget>
-     </item>
-     <item row="8" column="0">
-      <widget class="QLabel" name="label_12">
-       <property name="text">
-        <string>Ecore</string>
-       </property>
-      </widget>
-     </item>
-     <item row="8" column="1">
-      <widget class="QLineEdit" name="ecoreLineEdit"/>
-     </item>
-     <item row="8" column="2">
-      <widget class="QLabel" name="label_13">
-       <property name="text">
-        <string>Dcore</string>
-       </property>
-      </widget>
-     </item>
-     <item row="8" column="3">
+     <item row="10" column="3">
       <widget class="QLineEdit" name="dcoreLineEdit"/>
      </item>
-     <item row="9" column="0" colspan="4">
+     <item row="2" column="4">
+      <widget class="QLabel" name="label_8">
+       <property name="text">
+        <string>c</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0" colspan="2">
+      <widget class="QLabel" name="label_14">
+       <property name="text">
+        <string>Open existing .unit file</string>
+       </property>
+      </widget>
+     </item>
+     <item row="11" column="0" colspan="4">
       <widget class="QLabel" name="label">
        <property name="text">
         <string>Number of cells along each axes to form lattice:</string>
        </property>
       </widget>
      </item>
-     <item row="10" column="0">
+     <item row="12" column="3">
+      <widget class="QLineEdit" name="bLattLineEdit"/>
+     </item>
+     <item row="12" column="0">
       <widget class="QLabel" name="label_2">
        <property name="text">
         <string>a</string>
@@ -260,23 +245,24 @@
        </property>
       </widget>
      </item>
-     <item row="10" column="1">
-      <widget class="QLineEdit" name="aLattLineEdit"/>
-     </item>
-     <item row="10" column="2">
-      <widget class="QLabel" name="label_3">
+     <item row="2" column="0">
+      <widget class="QLabel" name="label_6">
        <property name="text">
-        <string>b</string>
+        <string>a</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
        </property>
       </widget>
      </item>
-     <item row="10" column="3">
-      <widget class="QLineEdit" name="bLattLineEdit"/>
+     <item row="10" column="2">
+      <widget class="QLabel" name="label_13">
+       <property name="text">
+        <string>Dcore</string>
+       </property>
+      </widget>
      </item>
-     <item row="10" column="4">
+     <item row="12" column="4">
       <widget class="QLabel" name="label_4">
        <property name="text">
         <string>c</string>
@@ -286,10 +272,10 @@
        </property>
       </widget>
      </item>
-     <item row="10" column="5">
+     <item row="12" column="5">
       <widget class="QLineEdit" name="cLattLineEdit"/>
      </item>
-     <item row="11" column="0" colspan="6">
+     <item row="14" column="0" colspan="6">
       <spacer name="horizontalSpacer">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -302,17 +288,64 @@
        </property>
       </spacer>
      </item>
-     <item row="11" column="6">
+     <item row="14" column="7">
       <widget class="QPushButton" name="okButton">
        <property name="text">
         <string>OK</string>
        </property>
       </widget>
      </item>
-     <item row="11" column="7">
+     <item row="14" column="8">
       <widget class="QPushButton" name="cancelButton">
        <property name="text">
         <string>Cancel</string>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="5">
+      <spacer name="verticalSpacer_3">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>100</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item row="6" column="5">
+      <widget class="QPushButton" name="addRowButton">
+       <property name="text">
+        <string>Add row</string>
+       </property>
+      </widget>
+     </item>
+     <item row="7" column="5">
+      <widget class="QPushButton" name="deleteRowButton">
+       <property name="text">
+        <string>Delete row</string>
+       </property>
+      </widget>
+     </item>
+     <item row="8" column="5">
+      <spacer name="verticalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>100</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item row="13" column="1">
+      <widget class="QCheckBox" name="lattAsBoxCheckBox">
+       <property name="text">
+        <string>use lattice as simulation box</string>
        </property>
       </widget>
      </item>
@@ -323,7 +356,6 @@
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="buttonGroup"/>
   <buttongroup name="buttonGroup_2"/>
  </buttongroups>
 </ui>

@@ -40,6 +40,7 @@ public:
     QString unitFileName();
     QStringList atomTypes();
     QString charge();
+    int useAsBox();
 };
 
 #endif

@@ -14,6 +14,7 @@ class MolOptionsDialog;
 class SettingsDialog;
 class MakeAtomDialog;
 class MakeLatticeDialog;
+class BoxCompositionDialog;
 
 class MainWindow : public QMainWindow
 {
@@ -31,6 +32,7 @@ protected:
 private slots:
     bool save();
     bool saveAs();
+    bool saveCopy();
     void runEPSR();
     void runEPSRcheck();
     void plot();
@@ -43,8 +45,6 @@ private slots:
 private:
     void createActions();
     bool saveFile();
-    bool readMolFile();
-    bool updateMolFile();
     void reset();
     void processStart();
     void processEnd();
@@ -66,6 +66,8 @@ private:
     QString epsrBinDir_;
     QString baseFileName_; //use this for the name of the box and the EPSR inp files.... TO DO!!!
     QString molFileName_;
+//    QString lattAto_;
+//    QStringList lattMols_;
     QString visualiserExe_;
     QString atoFileName_;
     QString dataFileName_;
@@ -82,6 +84,8 @@ public:
     QString atoFileName();
     QDir exeDir();
     QString epsrDir();
+    QStringList atomLabels();
+    QVector<int> numberOfEachAtomLabel();
 
 public slots:
     void createNew();
@@ -136,6 +140,10 @@ public:
 
 private:
     bool runjmol();
+    bool readMolFile();
+    bool updateMolFile();
+    bool readAtoFile();
+    bool updateAtoFile();
 
     // Box Ato File Tab
 private slots:
@@ -147,6 +155,7 @@ private slots:
     void on_fmoleButton_clicked(bool checked);
     void on_atoEPSRButton_clicked(bool checked);
     void on_viewAtoFileButton_clicked(bool checked);
+    void on_boxCompositionButton_clicked(bool checked);
 
 private:
     bool readAtoFileBoxDetails();
@@ -155,6 +164,7 @@ private:
 
 public:
     QStringList atoAtomLabels;
+    QVector<int> numberAtomLabels;
     int nPartials;
     Array2D<int> ij;
 

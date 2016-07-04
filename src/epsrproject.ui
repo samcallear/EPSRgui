@@ -719,15 +719,14 @@
                           </item>
                           <item row="3" column="2">
                            <widget class="QLabel" name="label_50">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>theta</string>
-                            </property>
-                           </widget>
-                          </item>
-                          <item row="3" column="5">
-                           <widget class="QLineEdit" name="lineEdit_6">
-                            <property name="text">
-                             <string/>
                             </property>
                            </widget>
                           </item>
@@ -779,13 +778,6 @@
                             </property>
                            </widget>
                           </item>
-                          <item row="3" column="1">
-                           <widget class="QLineEdit" name="tolcoordLineEdit_3">
-                            <property name="text">
-                             <string/>
-                            </property>
-                           </widget>
-                          </item>
                           <item row="7" column="3">
                            <widget class="QLineEdit" name="tolLineEdit">
                             <property name="text">
@@ -803,7 +795,7 @@
                           <item row="12" column="4" colspan="2">
                            <widget class="QPushButton" name="molChangeAtobutton">
                             <property name="text">
-                             <string>Run changeato for selected .mol file</string>
+                             <string>Run changeato for selected file</string>
                             </property>
                            </widget>
                           </item>
@@ -831,20 +823,6 @@
                            <widget class="QLineEdit" name="tetherCoordYLineEdit">
                             <property name="text">
                              <string>0.000000E+00</string>
-                            </property>
-                           </widget>
-                          </item>
-                          <item row="1" column="3">
-                           <widget class="QLineEdit" name="lineEdit_3">
-                            <property name="text">
-                             <string/>
-                            </property>
-                           </widget>
-                          </item>
-                          <item row="1" column="5">
-                           <widget class="QLineEdit" name="lineEdit_4">
-                            <property name="text">
-                             <string/>
                             </property>
                            </widget>
                           </item>
@@ -901,7 +879,7 @@
                             </property>
                             <property name="maximumSize">
                              <size>
-                              <width>100</width>
+                              <width>180</width>
                               <height>20</height>
                              </size>
                             </property>
@@ -923,6 +901,9 @@
                             <attribute name="horizontalHeaderDefaultSectionSize">
                              <number>50</number>
                             </attribute>
+                            <attribute name="horizontalHeaderMinimumSectionSize">
+                             <number>60</number>
+                            </attribute>
                             <attribute name="verticalHeaderVisible">
                              <bool>false</bool>
                             </attribute>
@@ -931,6 +912,9 @@
                             </attribute>
                             <attribute name="verticalHeaderHighlightSections">
                              <bool>false</bool>
+                            </attribute>
+                            <attribute name="verticalHeaderMinimumSectionSize">
+                             <number>60</number>
                             </attribute>
                             <row/>
                             <column/>
@@ -947,24 +931,16 @@
                             </item>
                            </widget>
                           </item>
-                          <item row="3" column="3">
-                           <widget class="QLineEdit" name="lineEdit_5">
-                            <property name="text">
-                             <string/>
-                            </property>
-                           </widget>
-                          </item>
                           <item row="1" column="2">
                            <widget class="QLabel" name="label_47">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>b</string>
-                            </property>
-                           </widget>
-                          </item>
-                          <item row="1" column="1">
-                           <widget class="QLineEdit" name="tolcoordLineEdit_2">
-                            <property name="text">
-                             <string/>
                             </property>
                            </widget>
                           </item>
@@ -1005,6 +981,48 @@
                            <widget class="QLabel" name="label_51">
                             <property name="text">
                              <string>Number for tethering atom (0 for COM)</string>
+                            </property>
+                           </widget>
+                          </item>
+                          <item row="1" column="1">
+                           <widget class="QLabel" name="molBoxA">
+                            <property name="text">
+                             <string/>
+                            </property>
+                           </widget>
+                          </item>
+                          <item row="1" column="3">
+                           <widget class="QLabel" name="molBoxB">
+                            <property name="text">
+                             <string/>
+                            </property>
+                           </widget>
+                          </item>
+                          <item row="1" column="5">
+                           <widget class="QLabel" name="molBoxC">
+                            <property name="text">
+                             <string/>
+                            </property>
+                           </widget>
+                          </item>
+                          <item row="3" column="1">
+                           <widget class="QLabel" name="molBoxPhi">
+                            <property name="text">
+                             <string/>
+                            </property>
+                           </widget>
+                          </item>
+                          <item row="3" column="3">
+                           <widget class="QLabel" name="molBoxTheta">
+                            <property name="text">
+                             <string/>
+                            </property>
+                           </widget>
+                          </item>
+                          <item row="3" column="5">
+                           <widget class="QLabel" name="molBoxChi">
+                            <property name="text">
+                             <string/>
                             </property>
                            </widget>
                           </item>
@@ -1402,7 +1420,7 @@
                     </widget>
                    </item>
                    <item row="15" column="1">
-                    <widget class="QLineEdit" name="intraTransSSLineEdit_2">
+                    <widget class="QLineEdit" name="intraTransSSLineEdit">
                      <property name="text">
                       <string>0.10000E+00</string>
                      </property>
@@ -1501,9 +1519,15 @@
                    </item>
                    <item row="19" column="1">
                     <widget class="QTableWidget" name="ecoredcoreTable">
+                     <property name="minimumSize">
+                      <size>
+                       <width>150</width>
+                       <height>0</height>
+                      </size>
+                     </property>
                      <property name="maximumSize">
                       <size>
-                       <width>100</width>
+                       <width>200</width>
                        <height>20</height>
                       </size>
                      </property>
@@ -1525,6 +1549,9 @@
                      <attribute name="horizontalHeaderDefaultSectionSize">
                       <number>50</number>
                      </attribute>
+                     <attribute name="horizontalHeaderMinimumSectionSize">
+                      <number>70</number>
+                     </attribute>
                      <attribute name="verticalHeaderVisible">
                       <bool>false</bool>
                      </attribute>
@@ -1533,6 +1560,9 @@
                      </attribute>
                      <attribute name="verticalHeaderHighlightSections">
                       <bool>false</bool>
+                     </attribute>
+                     <attribute name="verticalHeaderMinimumSectionSize">
+                      <number>75</number>
                      </attribute>
                      <row/>
                      <column/>
@@ -1550,7 +1580,7 @@
                     </widget>
                    </item>
                    <item row="17" column="1">
-                    <widget class="QLineEdit" name="molRotSSLineEdit_2">
+                    <widget class="QLineEdit" name="molRotSSLineEdit">
                      <property name="text">
                       <string>0.30000E+00</string>
                      </property>
@@ -1570,14 +1600,14 @@
                     </widget>
                    </item>
                    <item row="16" column="1">
-                    <widget class="QLineEdit" name="grpRotSSLineEdit_2">
+                    <widget class="QLineEdit" name="grpRotSSLineEdit">
                      <property name="text">
                       <string>0.00000E+00</string>
                      </property>
                     </widget>
                    </item>
                    <item row="18" column="1">
-                    <widget class="QLineEdit" name="molTransSSLineEdit_2">
+                    <widget class="QLineEdit" name="molTransSSLineEdit">
                      <property name="text">
                       <string>0.10000E+01</string>
                      </property>
@@ -1781,6 +1811,13 @@
                     <widget class="QLabel" name="label_43">
                      <property name="text">
                       <string>Å&lt;sup&gt;3&lt;/sup&gt;</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="2" column="2">
+                    <widget class="QPushButton" name="boxCompositionButton">
+                     <property name="text">
+                      <string>Composition</string>
                      </property>
                     </widget>
                    </item>
@@ -2789,6 +2826,7 @@
     <addaction name="openAct"/>
     <addaction name="saveAct"/>
     <addaction name="saveAsAct"/>
+    <addaction name="saveCopyAct"/>
     <addaction name="separator"/>
     <addaction name="exitAct"/>
    </widget>
@@ -2848,7 +2886,7 @@
     <string>Create new project...</string>
    </property>
   </action>
-  <action name="saveAsAct">
+  <action name="saveCopyAct">
    <property name="enabled">
     <bool>false</bool>
    </property>
@@ -2952,6 +2990,14 @@
    </property>
    <property name="text">
     <string>Plot using EPSRshell</string>
+   </property>
+  </action>
+  <action name="saveAsAct">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Save as...</string>
    </property>
   </action>
  </widget>

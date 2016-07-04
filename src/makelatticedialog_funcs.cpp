@@ -154,7 +154,6 @@ bool MakeLatticeDialog::readUnitFile()
             atomLabels.append(dataLine.at(0));
         }
     }
-    //need to know how many times to repeat this depending on number of atom types **********************************************
     int numberAtomTypes = ctr;
     ui.paramTable->setRowCount(numberAtomTypes);
     ui.paramTable->verticalHeader()->setVisible(false);
@@ -337,8 +336,33 @@ QStringList MakeLatticeDialog::atomTypes()
 
 QString MakeLatticeDialog::charge()
 {
-    //calculate charge************************************TO DO **********************
-    //convert to a string
-    QString lattCharge = 0;
+//  NOT USED - NOT SURE IF WORKING?**********************************************************
+    double molChargeCalcd = 0;
+    for (int i = 0; i < ui.paramTable->rowCount(); i++)
+    {
+        int ctr = 0;
+        for (int n = 0; n < ui.coordTable->rowCount(); n++)
+        {
+            if (ui.coordTable->item(n,0) == ui.paramTable->item(i,0))
+            {
+                ctr++;
+            }
+        }
+        QString atomTypeChargeStr = ui.paramTable->item(i,6)->text();
+        double atomTypeCharge = QString(atomTypeChargeStr).toDouble();
+        molChargeCalcd = molChargeCalcd+(ctr*atomTypeCharge);
+    }
+    QString lattCharge;
+    lattCharge.sprintf("%.4f", molChargeCalcd);
     return lattCharge;
+}
+
+int MakeLatticeDialog::useAsBox()
+{
+    int useAsBoxChecked = 0;
+    if (ui.lattAsBoxCheckBox->isChecked())
+    {
+        useAsBoxChecked = 1;
+    }
+    return useAsBoxChecked;
 }
