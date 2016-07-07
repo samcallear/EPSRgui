@@ -61,20 +61,18 @@ private:
     QDir exeDir_;
     QDir currentDir;
 //    QDir baseDir;
-    QString projectName_; //folder name in EPSR but doesn't include path
-    QString workingDir_; //includes projectName
-    QString epsrDir_;
-    QString epsrBinDir_;
+    QString projectName_; //folder name in EPSR but doesn't include path or a "/" after it
+    QString workingDir_; //includes projectName and has a "/" after it
+    QString epsrDir_; //has a "/" after it
+    QString epsrBinDir_; //has a "/" after it
     QString baseFileName_; //use this for the name of the box and the EPSR inp files.... TO DO!!!
-    QString molFileName_; //just filename and extension, no path
-//    QString lattAto_;
-//    QStringList lattMols_;
-    QString visualiserExe_;
-    QString atoFileName_; //just filename and extension, no path
-    QString dataFileName_;
-    QString wtsBaseFileName_;
-    QString dataFileExt_;
-    QString epsrInpFileName_;
+    QString molFileName_; //just filename and extension for selected file in molFileList (.mol or .ato), no path
+    QString visualiserExe_; //full path and executable
+    QString atoFileName_; //just filename and extension for box, no path
+    QString dataFileName_; //filename and extension for selected file in dataFileTable, no path
+    QString wtsBaseFileName_; //only base file name, not including extension or path for selected file in dataFileTable
+    QString dataFileExt_; //data file extension
+    QString epsrInpFileName_; //filename and extension for EPSR.inp file
     QFileSystemWatcher epsrFinished_;
     int inpEntries_;
 
@@ -96,7 +94,6 @@ public slots:
     void showPointToolTip2(QMouseEvent *event);
     void plotZoom1(QWheelEvent *event);
     void plotZoom2(QWheelEvent *event);
-    void onCustomContextMenu(const QPoint &point);
     void enableButtons();
 
     // Mol Files Tab

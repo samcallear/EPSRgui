@@ -76,7 +76,11 @@ void SettingsDialog::on_browseEPSRDirButton_clicked(bool checked)
 
 void SettingsDialog::on_browseVisualiserExeButton_clicked(bool checked)
 {
+#ifdef _WIN32
     QString prefVisExe = QFileDialog::getOpenFileName(this, "Choose visualiser exectuable", currentDir.path(), tr(".exe files (*.exe)"));
+#else
+    QString prefVisExe = QFileDialog::getOpenFileName(this, "Choose visualiser exectuable", currentDir.path(), tr("All files (*.*)"));
+#endif
     ui.visualiserLineEdit->setText(prefVisExe);
 }
 

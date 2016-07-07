@@ -31,15 +31,7 @@ MainWindow::MainWindow(QMainWindow *parent) : QMainWindow(parent)
 
     createActions();
 
-//    ui.statusBar->hide();
-
     ui.tabWidget->setEnabled(false);
-    //the following are the formats of the common paths
-//    projectName_ = "AcN";
-//    workingDir_ = "E:/EPSR24/run/AcN/";
-//    epsrBinDir_ = "E:/EPSR24/bin/";
-//    atoFileName_ = "AcNbox.ato";
-//    nPartials = 10;
     ui.plot1Button->setEnabled(false);
     ui.plot2Button->setEnabled(false);
 
@@ -61,9 +53,7 @@ MainWindow::MainWindow(QMainWindow *parent) : QMainWindow(parent)
     ui.ecoredcoreTable->setColumnWidth(1,75);
 
     plotDialog = 0;
-//    createNewDialog = 0;
     molOptionsDialog = 0;
-//    settingsDialog = 0;
     makeAtomDialog = 0;
     makeLatticeDialog = 0;
 
@@ -121,17 +111,6 @@ void MainWindow::createActions()
     connect(ui.deleteBoxAtoFileAct, SIGNAL(triggered()), this, SLOT(deleteBoxAtoFile()));
 }
 
-void MainWindow::onCustomContextMenu(const QPoint &point)
-{
-    QMenu contextMenu(tr("Context menu"), this);
-
-//    QAction action1("Remove Data Point", this);
-//    connect(&action1, SIGNAL(triggered()), this, SLOT(removeDataPoint()));
-//    contextMenu.addAction(&action1);
-
-//    contextMenu.exec(mapToGlobal(pos));
-}
-
 void MainWindow::closeEvent(QCloseEvent *event)
 {
     //stopEPSR();     WANT TO STOP EPSR HERE IF RUNNING BUT THIS IS NOT HOW TO DO IT!!!!!!!!!!
@@ -140,22 +119,22 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
 void MainWindow::processStart()
 {
-    QProgressDialog progress("working...", "Cancel", 0, 100, this);
-    progress.setWindowModality(Qt::WindowModal);
+//    QProgressDialog progress("working...", "Cancel", 0, 100, this);
+//    progress.setWindowModality(Qt::WindowModal);
 
-    for (int i = 0; i < 100; ++i)
-    {
-        progress.setValue(i);
-        QThread::sleep(1);
-        QApplication::processEvents();
-        if(progress.wasCanceled())
-            break;
-    }
+//    for (int i = 0; i < 100; ++i)
+//    {
+//        progress.setValue(i);
+//        QThread::sleep(1);
+//        QApplication::processEvents();
+//        if(progress.wasCanceled())
+//            break;
+//    }
 }
 
 void MainWindow::processEnd()
 {
-//    ui.statusBar->hide();
+
 }
 
 void MainWindow::readSettings()
@@ -476,7 +455,7 @@ void MainWindow::open()
                 }
                 if (dataLine.at(0) == "EPSRinp")
                 {
-                    epsrInpFileName_ = workingDir_+dataLine.at(1)+".EPSR.inp";
+                    epsrInpFileName_ = dataLine.at(1)+".EPSR.inp";
                     printf("EPSR inp filename is %s\n", qPrintable(epsrInpFileName_));
                     ui.epsrInpFileName->setText(epsrInpFileName_);
                     readEPSRinpFile();
@@ -876,7 +855,7 @@ bool MainWindow::saveAs()
         }
         if (!epsrInpFileName_.isEmpty())
         {
-            epsrInpFileName_ = workingDir_+projectName_+"box.EPSR.inp";
+            epsrInpFileName_ = projectName_+"box.EPSR.inp";
         }
 
         //ensure current settings are saved to .pro file
@@ -1383,7 +1362,7 @@ QStringList MainWindow::listAtoFiles()
 
 void MainWindow::deleteEPSRinpFile()
 {
-    QFile file(epsrInpFileName_);
+    QFile file(workingDir_+epsrInpFileName_);
     if(file.exists() == true)
     {
         QMessageBox::StandardButton msgBox;
@@ -1395,7 +1374,7 @@ void MainWindow::deleteEPSRinpFile()
         else
         {
             file.remove();
-            QFile epsrFile(epsrInpFileName_);
+            QFile epsrFile(workingDir_+epsrInpFileName_);
             epsrFile.remove();
             epsrInpFileName_.clear();
             ui.epsrInpFileName->clear();
@@ -1432,6 +1411,19 @@ void MainWindow::deleteBoxAtoFile()
             ui.atoAtomList->clear();
             ui.boxAtoLabel->clear();
             ui.boxAtoCharge->clear();
+            ui.boxAtoAxisA->clear();
+            ui.boxAtoAxisB->clear();
+            ui.boxAtoAxisG->clear();
+            ui.boxAtoLengthA->clear();
+            ui.boxAtoLengthB->clear();
+            ui.boxAtoLengthC->clear();
+            ui.boxAtoMols->clear();
+            ui.boxAtoVol->clear();
+            ui.boxAtoAtoms->clear();
+            ui.atoTetherTable->clearContents();
+            ui.atoTetherTable->setRowCount(0);
+            ui.atoTetherTolLineEdit->setText(0);
+            ui.numberDensityLineEdit->clear();
 
             //remove wts files and clear data and wts tables
             ui.dataFileTable->clearContents();
@@ -1449,7 +1441,7 @@ void MainWindow::deleteBoxAtoFile()
             //remove inp file and clear name if exists
             if (!epsrInpFileName_.isEmpty() == true)
             {
-                QFile epsrFile(epsrInpFileName_);
+                QFile epsrFile(workingDir_+epsrInpFileName_);
                 epsrFile.remove();
                 epsrInpFileName_.clear();
                 ui.epsrInpFileName->clear();

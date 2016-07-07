@@ -54,7 +54,7 @@ void MainWindow::on_dataFileBrowseButton_clicked(bool checked)
             setSelectedDataFile();
         }
     }
-    ui.messagesLineEdit->setText("New datafile added");
+    ui.messagesLineEdit->setText("New data file added");
 }
 
 bool MainWindow::makeNwtsSetup()
@@ -367,14 +367,8 @@ void MainWindow::makeNwts()
     int dataNormType = ui.normalisationComboBox->currentIndex();
     QString dataNormTypeStr = QString::number(dataNormType);
     int row = ui.dataFileTable->currentRow();
-//    printf("current row is %d\n", row);
 
-
-
-//    printf("current normalisation from table at this row is %s\n", qPrintable(ui.dataFileTable->item(row,2)->text()));
     ui.dataFileTable->item(row,2)->setText(dataNormTypeStr);
-//    printf("new normalisation from table at this row is %s\n", qPrintable(ui.dataFileTable->item(row,2)->text()));
-//    printf("old normalisation at this row is %s\n", qPrintable(normalisationList.at(row)));
 
     //make normalisationList consistent with dataFileTable normalisation column
     normalisationList.clear();
@@ -382,7 +376,6 @@ void MainWindow::makeNwts()
     {
         normalisationList.append(ui.dataFileTable->item(i,2)->text());
     }
-//    printf("new normalisation at this row is %s\n", qPrintable(normalisationList.at(row)));
 
     QString istr;
     const int N_components = wtscomponents.count();
@@ -665,7 +658,6 @@ void MainWindow::on_removeDataFileButton_clicked(bool checked)
         normalisationList.takeAt(row);
         setSelectedDataFile();
         refreshDataFileTable();
-//        ui.dataFileTable->QTableWidget::removeRow(row); this doesn't work if delete the 1st row in a table with 2 rows?!?!??
     }
     else
     {

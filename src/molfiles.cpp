@@ -917,9 +917,9 @@ bool MainWindow::readMolFile()
     //read .ato file for .mol to get additional details
     QString atoFile;
     atoFile = molFileName_.split(".",QString::SkipEmptyParts).at(0);
-    atoFile = workingDir_+atoFile+".ato"; //************************************IS THIS CORRECT TO HAVE WOKRINGDIR_ INCLUDED????????*****************************
+    atoFile = atoFile+".ato";
 
-    QFile fileato(atoFile);
+    QFile fileato(workingDir_+atoFile);
     if(!fileato.open(QFile::ReadOnly | QFile::Text))
     {
         QMessageBox msgBox;
@@ -1344,6 +1344,31 @@ bool MainWindow::updateMolFile()
         return false;
     }
 
+    //this doesn't work if the atom labels are the same as the element labels******************************************************************************************
+    for (int i = 0; i < ui.molLJTable->rowCount(); i++)
+    {
+        QList<QTableWidgetItem*> atomTypeItem = ui.molAtomTable->findItems(ui.molLJTable->item(i,0)->text(), Qt::MatchExactly);
+        if (atomTypeItem.isEmpty())
+        {
+            QMessageBox msgBox;
+            msgBox.setText("Mismatch between atom types and those listed in Lennard-Jones parameters");
+            msgBox.exec();
+            return 0;
+        }
+    }
+
+    for (int i = 0; i < ui.molAtomTable->rowCount(); i++)
+    {
+        QList<QTableWidgetItem*> atomTypeItem = ui.molLJTable->findItems(ui.molAtomTable->item(i,1)->text(), Qt::MatchExactly);
+        if (atomTypeItem.isEmpty())
+        {
+            QMessageBox msgBox;
+            msgBox.setText("Mismatch between atom types and those listed in Lennard-Jones parameters");
+            msgBox.exec();
+            return 0;
+        }
+    }
+
     QDir::setCurrent(workingDir_);
 
     QFile fileRead(workingDir_+molFileName_);
@@ -1464,7 +1489,7 @@ bool MainWindow::updateMolFile()
 
     if (!processFmole.waitForFinished()) return false;
 
-    //update molecule .ato file with additional details (not those already changed via .mol file)****FINISH DETAILS TO UPDATE*********************
+    //update molecule .ato file with additional details (not those already changed via .mol file)
     QString atoFile;
     atoFile = molFileName_.split(".",QString::SkipEmptyParts).at(0);
     atoFile = atoFile+".ato";
@@ -1491,6 +1516,7 @@ bool MainWindow::updateMolFile()
     QStringList dataLineato;
     dataLineato.clear();
     QString originalato;
+    QString tetherTol = ui.tolLineEdit->text();
     QString tether;
     int tetherAtom = ui.tetherAtomLineEdit->text().toInt();
     QString tetherAtomStr = QString("%1").arg(tetherAtom, 5, 10, QChar('0'));
@@ -1505,6 +1531,10 @@ bool MainWindow::updateMolFile()
     {
         tether = "F";
         tetherAtomStr = "     ";
+        tetherTol = "0.00000E+00";
+        tetherCoordX = "0.00000E+00";
+        tetherCoordY = "0.00000E+00";
+        tetherCoordZ = "0.00000E+00";
     }
 
     QRegExp ecoredcorerx("  ([0-9]{1}[.]{1}[0-9]{5}[E+]{2}[0-9]{2})  ([0-9]{1}[.]{1}[0-9]{5}[E+]{2}[0-9]{2})");
@@ -1525,7 +1555,7 @@ bool MainWindow::updateMolFile()
     }
     lineato = streamatoR.readLine();
     dataLineato = lineato.split(" ",QString::SkipEmptyParts);
-    streamatoW << "   " << ui.tolLineEdit->text();  //This is the line starting with tol and contains vibtemp etc
+    streamatoW << "   " << tetherTol;  //This is the line starting with tol and contains vibtemp etc
     for (int i = 1; i < dataLineato.count(); i++ )
     {
         streamatoW << "  " << dataLineato.at(i);

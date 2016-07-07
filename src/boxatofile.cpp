@@ -14,111 +14,119 @@
 
 void MainWindow::on_mixatoButton_clicked(bool checked)
 {
-    QString atoFileBaseName = projectName_+"box";
-    atoFileName_ = atoFileBaseName+".ato";
-
-    //make a list of all the .ato files in the working directory in alphabetical order and make
-    //a list of the indexes of each of the .ato files want to mix
-    QDir::setCurrent(workingDir_);
-
-    QDir dir;
-    QStringList atoFilter;
-    atoFilter << "*.ato";
-    QStringList atoFiles = dir.entryList(atoFilter, QDir::Files, QDir::Name|QDir::IgnoreCase);
-    QStringList atoFileIndexes;
-    QStringList numberOfMolecules;
-    for (int i = 0; i < nMolFiles; i++)
+    if (ui.numberDensityLineEdit->text().isEmpty())
     {
-        QString atoFileName = ui.atoFileTable->item(i,0)->text();
-        QString atoFileIndex = QString::number(atoFiles.indexOf(atoFileName));
-        if (atoFileIndex == "-1")
-        {
-            QMessageBox msgBox;
-            msgBox.setText("One of the .ato files could not be found in the working directory.\n Check that all the .ato files listed are present in the working directory and have the same case filename as the .mol files.");
-            msgBox.exec();
-            return;
-        }
-        atoFileIndexes.append(atoFileIndex);
-        printf("%s\n", qPrintable(atoFileIndexes.at(i)));
-        QString numberMol = ui.atoFileTable->item(i,2)->text();
-        numberOfMolecules.append(numberMol);
+        QMessageBox::warning(this, tr("Atomic number density is blank"),
+            tr("Input an atomic number density for the simulation box."));
     }
-
-    int nIndex = atoFileIndexes.count();
-
-    QProcess processMixato;
-    processMixato.setProcessChannelMode(QProcess::ForwardedChannels);
-
-    QString projDir = workingDir_;
-    projDir = QDir::toNativeSeparators(projDir);
-#ifdef _WIN32
-    processMixato.start(epsrBinDir_+"mixato.exe", QStringList() << projDir << "mixato");
-#else
-    processMixato.start(epsrBinDir_+"mixato", QStringList() << workingDir_ << "mixato");
-#endif
-    if (!processMixato.waitForStarted()) return;
-
-    processMixato.write(qPrintable(QString::number(nIndex)+"\n"));
-    QByteArray result = processMixato.readAll();
-    qDebug(result);
-
-    for (int i = 0 ; i < nMolFiles; i++)
+    else
     {
-        int newlines = atoFileIndexes.at(i).toInt();
-        for (int nl = 0; nl < newlines; nl++)
+        QString atoFileBaseName = projectName_+"box";
+        atoFileName_ = atoFileBaseName+".ato";
+
+        //make a list of all the .ato files in the working directory in alphabetical order and make
+        //a list of the indexes of each of the .ato files want to mix
+        QDir::setCurrent(workingDir_);
+
+        QDir dir;
+        QStringList atoFilter;
+        atoFilter << "*.ato";
+        QStringList atoFiles = dir.entryList(atoFilter, QDir::Files, QDir::Name|QDir::IgnoreCase);
+        QStringList atoFileIndexes;
+        QStringList numberOfMolecules;
+        for (int i = 0; i < nMolFiles; i++)
         {
-            processMixato.write("\n");
+            QString atoFileName = ui.atoFileTable->item(i,0)->text();
+            QString atoFileIndex = QString::number(atoFiles.indexOf(atoFileName));
+            if (atoFileIndex == "-1")
+            {
+                QMessageBox msgBox;
+                msgBox.setText("One of the .ato files could not be found in the working directory.\n Check that all the .ato files listed are present in the working directory and have the same case filename as the .mol files.");
+                msgBox.exec();
+                return;
+            }
+            atoFileIndexes.append(atoFileIndex);
+            printf("%s\n", qPrintable(atoFileIndexes.at(i)));
+            QString numberMol = ui.atoFileTable->item(i,2)->text();
+            numberOfMolecules.append(numberMol);
+        }
+
+        int nIndex = atoFileIndexes.count();
+
+        QProcess processMixato;
+        processMixato.setProcessChannelMode(QProcess::ForwardedChannels);
+
+        QString projDir = workingDir_;
+        projDir = QDir::toNativeSeparators(projDir);
+    #ifdef _WIN32
+        processMixato.start(epsrBinDir_+"mixato.exe", QStringList() << projDir << "mixato");
+    #else
+        processMixato.start(epsrBinDir_+"mixato", QStringList() << workingDir_ << "mixato");
+    #endif
+        if (!processMixato.waitForStarted()) return;
+
+        processMixato.write(qPrintable(QString::number(nIndex)+"\n"));
+        QByteArray result = processMixato.readAll();
+        qDebug(result);
+
+        for (int i = 0 ; i < nMolFiles; i++)
+        {
+            int newlines = atoFileIndexes.at(i).toInt();
+            for (int nl = 0; nl < newlines; nl++)
+            {
+                processMixato.write("\n");
+                result = processMixato.readAll();
+                qDebug(result);
+            }
+            processMixato.write("y\n");
+            result = processMixato.readAll();
+            qDebug(result);
+
+            int nMols = numberOfMolecules.at(i).toInt();
+            processMixato.write(qPrintable(QString::number(nMols)+"\n"));
             result = processMixato.readAll();
             qDebug(result);
         }
-        processMixato.write("y\n");
-        result = processMixato.readAll();
-        qDebug(result);
+            double numberDensity = ui.numberDensityLineEdit->text().toDouble();
+            processMixato.write(qPrintable(QString::number(numberDensity)+"\n"));
+            result = processMixato.readAll();
+            qDebug(result);
 
-        int nMols = numberOfMolecules.at(i).toInt();
-        processMixato.write(qPrintable(QString::number(nMols)+"\n"));
-        result = processMixato.readAll();
-        qDebug(result);
+            processMixato.write(qPrintable(atoFileBaseName+"\n"));
+            result = processMixato.readAll();
+            qDebug(result);
+
+        if (!processMixato.waitForFinished(1800000)) return;
+
+        printf("\nfinished writing %s file\n", qPrintable(atoFileName_));
+        ui.messagesLineEdit->setText("Finished writing box .ato file");
+
+        ui.boxAtoLabel->setText(atoFileName_);
+        readAtoFileBoxDetails();
+        readAtoFileAtomPairs();
+        ui.atoAtomList->clear();
+        for (int n=0; n < atoAtomLabels.count(); ++n)
+        {
+            QListWidgetItem* item = new QListWidgetItem(atoAtomLabels.at(n));
+            item->setData(Qt::UserRole, n);
+            ui.atoAtomList->addItem(item);
+        }
+        checkBoxCharge();
+    //    ui.createMolFileButton->setDisabled(true);
+    //    ui.molFileLoadButton->setDisabled(true);
+    //    ui.createAtomButton->setDisabled(true);
+    //    ui.createLatticeButton->setDisabled(true);
+    //    ui.makeMolExtButton->setDisabled(true);
+    //    ui.removeMolFileButton->setDisabled(true);
+    //    ui.addLJRowAboveButton->setDisabled(true);
+    //    ui.addLJRowBelowButton->setDisabled(true);
+    //    ui.deleteLJRowButton->setDisabled(true);
+    //    ui.mixatoButton->setDisabled(true);
+    //    ui.addatoButton->setDisabled(true);
+    //    ui.loadBoxButton->setDisabled(true);
+
+        ui.deleteBoxAtoFileAct->setEnabled(true);
     }
-        double numberDensity = ui.numberDensityLineEdit->text().toDouble();
-        processMixato.write(qPrintable(QString::number(numberDensity)+"\n"));
-        result = processMixato.readAll();
-        qDebug(result);
-
-        processMixato.write(qPrintable(atoFileBaseName+"\n"));
-        result = processMixato.readAll();
-        qDebug(result);
-
-    if (!processMixato.waitForFinished(1800000)) return;
-
-    printf("\nfinished writing %s file\n", qPrintable(atoFileName_));
-    ui.messagesLineEdit->setText("Finished writing box .ato file");
-
-    ui.boxAtoLabel->setText(atoFileName_);
-    readAtoFileBoxDetails();
-    readAtoFileAtomPairs();
-    ui.atoAtomList->clear();
-    for (int n=0; n < atoAtomLabels.count(); ++n)
-    {
-        QListWidgetItem* item = new QListWidgetItem(atoAtomLabels.at(n));
-        item->setData(Qt::UserRole, n);
-        ui.atoAtomList->addItem(item);
-    }
-    checkBoxCharge();
-//    ui.createMolFileButton->setDisabled(true);
-//    ui.molFileLoadButton->setDisabled(true);
-//    ui.createAtomButton->setDisabled(true);
-//    ui.createLatticeButton->setDisabled(true);
-//    ui.makeMolExtButton->setDisabled(true);
-//    ui.removeMolFileButton->setDisabled(true);
-//    ui.addLJRowAboveButton->setDisabled(true);
-//    ui.addLJRowBelowButton->setDisabled(true);
-//    ui.deleteLJRowButton->setDisabled(true);
-//    ui.mixatoButton->setDisabled(true);
-//    ui.addatoButton->setDisabled(true);
-//    ui.loadBoxButton->setDisabled(true);
-
-    ui.deleteBoxAtoFileAct->setEnabled(true);
 }
 
 void MainWindow::on_addatoButton_clicked(bool checked)

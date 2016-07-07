@@ -11,10 +11,10 @@ void MainWindow::on_setupEPSRButton_clicked(bool checked)
 {
     QDir::setCurrent(workingDir_);
     QString atoBaseFileName = atoFileName_.split(".",QString::SkipEmptyParts).at(0);
-    epsrInpFileName_ = workingDir_+atoBaseFileName+".EPSR.inp";
+    epsrInpFileName_ = atoBaseFileName+".EPSR.inp";
 
     //search folder to see if a .EPSR.inp of same name as box already exists
-    if (!QFileInfo(epsrInpFileName_).exists())
+    if (!QFileInfo(workingDir_+epsrInpFileName_).exists())
     {
         QProcess processEpsrSetup;
         processEpsrSetup.setProcessChannelMode(QProcess::ForwardedChannels);
@@ -111,7 +111,7 @@ void MainWindow::on_reloadEPSRinpButton_clicked(bool checked)
 
 void MainWindow::readEPSRinpFile()
 {
-    QFile file(epsrInpFileName_);
+    QFile file(workingDir_+epsrInpFileName_);
     if(!file.open(QFile::ReadOnly | QFile::Text))
     {
         QMessageBox msgBox;
@@ -448,9 +448,9 @@ void MainWindow::updateInpFile()
     streamWrite << "q\n";
     fileWrite.close();
 
-    QFile fileRead(epsrInpFileName_);
+    QFile fileRead(workingDir_+epsrInpFileName_);
     fileRead.remove();
-    fileWrite.rename(epsrInpFileName_);
+    fileWrite.rename(workingDir_+epsrInpFileName_);
 
     //now format the file correctly by opening in setup epsr and then exiting and saving
     QProcess processEpsrSetup;
@@ -475,8 +475,6 @@ void MainWindow::updateInpFile()
     qDebug(result);
 
     if (!processEpsrSetup.waitForFinished(60000)) return;
-
-//    printf("\nfinished updating EPSR setup file %s\n", qPrintable(epsrInpFileName_));
 
     updateInpFileTables();
 }
@@ -591,8 +589,6 @@ void MainWindow::updatePcofFile()
 
     if (!processEpsrSetup.waitForFinished(60000)) return;
 
-//    printf("\nfinished updating EPSR setup file %s\n", qPrintable(epsrInpFileName_));
-
     updatePcofFileTables();
 }
 
@@ -600,4 +596,7 @@ void MainWindow::on_updateInpPcofFilesButton_clicked(bool checked)
 {
     updateInpFile();
     updatePcofFile();
+
+    printf("\nfinished updating EPSR setup file %s\n", qPrintable(epsrInpFileName_));
+    ui.messagesLineEdit->setText("Finished updating EPSR setup files");
 }
