@@ -10,6 +10,7 @@
 #include "molfiles.h"
 #include "moloptionsdialog.h"
 #include "boxcompositiondialog.h"
+#include "addatodialog.h"
 
 void MainWindow::on_mixatoButton_clicked(bool checked)
 {
@@ -97,7 +98,6 @@ void MainWindow::on_mixatoButton_clicked(bool checked)
     readAtoFileBoxDetails();
     readAtoFileAtomPairs();
     ui.atoAtomList->clear();
-
     for (int n=0; n < atoAtomLabels.count(); ++n)
     {
         QListWidgetItem* item = new QListWidgetItem(atoAtomLabels.at(n));
@@ -105,83 +105,122 @@ void MainWindow::on_mixatoButton_clicked(bool checked)
         ui.atoAtomList->addItem(item);
     }
     checkBoxCharge();
-    ui.createMolFileButton->setDisabled(true);
-    ui.molFileLoadButton->setDisabled(true);
-    ui.createAtomButton->setDisabled(true);
-    ui.createLatticeButton->setDisabled(true);
-    ui.makeMolExtButton->setDisabled(true);
-    ui.removeMolFileButton->setDisabled(true);
-    ui.addLJRowAboveButton->setDisabled(true);
-    ui.addLJRowBelowButton->setDisabled(true);
-    ui.deleteLJRowButton->setDisabled(true);
-    ui.mixatoButton->setDisabled(true);
-    ui.addatoButton->setDisabled(true);
-    ui.atoAsBoxButton->setDisabled(true);
+//    ui.createMolFileButton->setDisabled(true);
+//    ui.molFileLoadButton->setDisabled(true);
+//    ui.createAtomButton->setDisabled(true);
+//    ui.createLatticeButton->setDisabled(true);
+//    ui.makeMolExtButton->setDisabled(true);
+//    ui.removeMolFileButton->setDisabled(true);
+//    ui.addLJRowAboveButton->setDisabled(true);
+//    ui.addLJRowBelowButton->setDisabled(true);
+//    ui.deleteLJRowButton->setDisabled(true);
+//    ui.mixatoButton->setDisabled(true);
+//    ui.addatoButton->setDisabled(true);
+//    ui.loadBoxButton->setDisabled(true);
+
+    ui.deleteBoxAtoFileAct->setEnabled(true);
 }
 
 void MainWindow::on_addatoButton_clicked(bool checked)
 {
     //*****************
     //NOTE
-    //This is dependent on order of ato files in the table - the first ato file is the one all subsequent ato files will be added to
     //There are limitations to what will be read during the process - see addato.f for details
-    //the atomic number density is irrelevant as the siez opf the box in the first ato file determines the size of the final box.
-    //the ecoredcore values at the bottom of the .mol files are important as they determine the overlap during addato
+    //the atomic number density is irrelevant as the size of the container determines the size of the final box.
+    //the ecoredcore values at the bottom of the .mol files are important as they determine the atomic overlap during addato
     //tethering of molecules is also important prior to pressing addato.
 
-    QString atoFileBaseName = projectName_+"box";
-    atoFileName_ = atoFileBaseName+".ato";
+    AddAtoDialog addAtoDialog(this);
 
-    //make a list of all the .ato files in the working directory in alphabetical order and make
-    //a list of the indexes of each of the .ato files want to mix
-    QDir::setCurrent(workingDir_);
+    addAtoDialog.show();
 
-    QDir dir;
-    QStringList atoFilter;
-    atoFilter << "*.ato";
-    QStringList atoFiles = dir.entryList(atoFilter, QDir::Files, QDir::Name|QDir::IgnoreCase);
-    QStringList atoFileIndexes;
-    QStringList numberOfMolecules;
-    for (int i = 0; i < nMolFiles; i++)
+    addAtoDialog.raise();
+    addAtoDialog.activateWindow();
+
+    atoaddDialog = addAtoDialog.exec();
+
+    if (atoaddDialog == AddAtoDialog::Accepted)
     {
-        QString atoFileName = ui.atoFileTable->item(i,0)->text();
-        QString atoFileIndex = QString::number(atoFiles.indexOf(atoFileName));
-        if (atoFileIndex == "-1")
+        QString container = addAtoDialog.getContainer();
+        QStringList atoFilesToAdd = addAtoDialog.getAtoFiles();
+        QStringList numberOfMolecules = addAtoDialog.getNumberMols();
+
+        QString atoFileBaseName = projectName_+"box";
+        atoFileName_ = atoFileBaseName+".ato";
+
+        //make a list of all the .ato files in the working directory in alphabetical order and make
+        //a list of the indexes of each of the .ato files want to mix
+        QDir::setCurrent(workingDir_);
+
+        QDir dir;
+        QStringList atoFilter;
+        atoFilter << "*.ato";
+        QStringList atoFiles = dir.entryList(atoFilter, QDir::Files, QDir::Name|QDir::IgnoreCase);
+        QStringList atoFileIndexes;
+        atoFileIndexes.clear();
+
+        int containerIndex = atoFiles.indexOf(container);
+        if (containerIndex == -1)
         {
             QMessageBox msgBox;
-            msgBox.setText("One of the .ato files could not be found in the working directory.\n Check that all the .ato files listed are present in the working directory and have the same case filename as the .mol files.");
+            msgBox.setText("The container .ato file could not be found in the working directory.\n Check that all the .ato files listed are present in the working directory.");
             msgBox.exec();
             return;
         }
-        atoFileIndexes.append(atoFileIndex);
-//        printf("%s\n", qPrintable(atoFileIndexes.at(i)));
-        QString numberMol = ui.atoFileTable->item(i,2)->text();
-        numberOfMolecules.append(numberMol);
-    }
 
-    int nIndex = atoFileIndexes.count()-1; //this is the number of files to be added to the first file listed in the table
+        for (int i = 0; i < atoFilesToAdd.count(); i++)
+        {
+            QString atoFileName = atoFilesToAdd.at(i);
+            QString atoFileIndex = QString::number(atoFiles.indexOf(atoFileName));
+            if (atoFileIndex == "-1")
+            {
+                QMessageBox msgBox;
+                msgBox.setText("One of the .ato files could not be found in the working directory.\n Check that all the .ato files listed are present in the working directory.");
+                msgBox.exec();
+                return;
+            }
+            atoFileIndexes.append(atoFileIndex);
+        }
 
-    QProcess processAddato;
-    processAddato.setProcessChannelMode(QProcess::ForwardedChannels);
+        int nIndex = atoFilesToAdd.count(); //this is the number of files to be added to the container
 
-    QString projDir = workingDir_;
-    projDir = QDir::toNativeSeparators(projDir);
-#ifdef _WIN32
-    processAddato.start(epsrBinDir_+"addato.exe", QStringList() << projDir << "addato");
-#else
-    processAddato.start(epsrBinDir_+"addato", QStringList() << projDir << "addato");
-#endif
-    if (!processAddato.waitForStarted()) return;
+        QProcess processAddato;
+        processAddato.setProcessChannelMode(QProcess::ForwardedChannels);
 
-    processAddato.write(qPrintable(QString::number(nIndex)+"\n"));
-    QByteArray result = processAddato.readAll();
-    qDebug(result);
+        QString projDir = workingDir_;
+        projDir = QDir::toNativeSeparators(projDir);
+    #ifdef _WIN32
+        processAddato.start(epsrBinDir_+"addato.exe", QStringList() << projDir << "addato");
+    #else
+        processAddato.start(epsrBinDir_+"addato", QStringList() << projDir << "addato");
+    #endif
+        if (!processAddato.waitForStarted()) return;
 
-    // press enter to get to each ato file listed in the table that will be added to the first ato file in the table
-    for (int i = 1 ; i < nMolFiles; i++)
-    {
-        int newlines = atoFileIndexes.at(i).toInt();
-        for (int nl = 0; nl < newlines; nl++)
+        processAddato.write(qPrintable(QString::number(nIndex)+"\n"));
+        QByteArray result = processAddato.readAll();
+        qDebug(result);
+
+        // press enter to get to each ato file listed in the table that will be added to the container
+        for (int i = 0 ; i < atoFilesToAdd.count(); i++)
+        {
+            int newlines = atoFileIndexes.at(i).toInt();
+            for (int nl = 0; nl < newlines; nl++)
+            {
+                processAddato.write("\n");
+                result = processAddato.readAll();
+                qDebug(result);
+            }
+            processAddato.write("y\n");
+            result = processAddato.readAll();
+            qDebug(result);
+
+            processAddato.write(qPrintable(numberOfMolecules.at(i)+"\n"));
+            result = processAddato.readAll();
+            qDebug(result);
+        }
+
+        // press enter to get to the ato file that is the container
+        for (int nl = 0; nl < containerIndex; nl++)
         {
             processAddato.write("\n");
             result = processAddato.readAll();
@@ -191,65 +230,104 @@ void MainWindow::on_addatoButton_clicked(bool checked)
         result = processAddato.readAll();
         qDebug(result);
 
-        int nMols = numberOfMolecules.at(i).toInt();
-        processAddato.write(qPrintable(QString::number(nMols)+"\n"));
+        processAddato.write(qPrintable(atoFileBaseName+"\n"));
         result = processAddato.readAll();
         qDebug(result);
+
+        if (!processAddato.waitForFinished(1800000)) return;
+
+        printf("\nfinished writing %s file\n", qPrintable(atoFileName_));
+        ui.messagesLineEdit->setText("Finished writing box .ato file");
+
+        //update ui.atoFileTable to include number of mols added for relevant .ato files
+        if (container != atoFileName_)
+        {
+            for (int i = 0; i < ui.atoFileTable->rowCount(); i++)
+            {
+                if (ui.atoFileTable->item(i,0)->text() == container)
+                {
+                    ui.atoFileTable->item(i,2)->setText("1");
+                }
+            }
+        }
+
+        for (int i = 0; i < ui.atoFileTable->rowCount(); i++)
+        {
+            for (int j = 0; j < atoFilesToAdd.count(); j++)
+            {
+                if (atoFilesToAdd.at(j) == ui.atoFileTable->item(i,0)->text())
+                {
+                    ui.atoFileTable->item(i,2)->setText(numberOfMolecules.at(j));
+                }
+            }
+        }
+
+        ui.boxAtoLabel->setText(atoFileName_);
+        readAtoFileAtomPairs();
+        readAtoFileBoxDetails();
+        ui.atoAtomList->clear();
+
+        for (int n=0; n < atoAtomLabels.count(); ++n)
+        {
+            QListWidgetItem* item = new QListWidgetItem(atoAtomLabels.at(n));
+            item->setData(Qt::UserRole, n);
+            ui.atoAtomList->addItem(item);
+        }
+
+        checkBoxCharge();
+//        ui.createMolFileButton->setDisabled(true);
+//        ui.molFileLoadButton->setDisabled(true);
+//        ui.createAtomButton->setDisabled(true);
+//        ui.createLatticeButton->setDisabled(true);
+//        ui.makeMolExtButton->setDisabled(true);
+//        ui.removeMolFileButton->setDisabled(true);
+//        ui.addLJRowAboveButton->setDisabled(true);
+//        ui.addLJRowBelowButton->setDisabled(true);
+//        ui.deleteLJRowButton->setDisabled(true);
+//        ui.mixatoButton->setDisabled(true);
+//        ui.addatoButton->setDisabled(true);
+//        ui.loadBoxButton->setDisabled(true);
+
+        ui.deleteBoxAtoFileAct->setEnabled(true);
     }
-
-    // press enter to get to the ato file that the other files will be added to (this is the first file listed in the table)
-    int newlines = atoFileIndexes.at(0).toInt();
-    for (int nl = 0; nl < newlines; nl++)
-    {
-        processAddato.write("\n");
-        result = processAddato.readAll();
-        qDebug(result);
-    }
-    processAddato.write("y\n");
-    result = processAddato.readAll();
-    qDebug(result);
-
-    processAddato.write(qPrintable(atoFileBaseName+"\n"));
-    result = processAddato.readAll();
-    qDebug(result);
-
-    if (!processAddato.waitForFinished(1800000)) return;
-
-    printf("\nfinished writing %s file\n", qPrintable(atoFileName_));
-    ui.messagesLineEdit->setText("Finished writing box .ato file");
-
-    ui.boxAtoLabel->setText(atoFileName_);
-    readAtoFileAtomPairs();
-    readAtoFileBoxDetails();
-    ui.atoAtomList->clear();
-
-    for (int n=0; n < atoAtomLabels.count(); ++n)
-    {
-        QListWidgetItem* item = new QListWidgetItem(atoAtomLabels.at(n));
-        item->setData(Qt::UserRole, n);
-        ui.atoAtomList->addItem(item);
-    }
-    checkBoxCharge();
-    ui.createMolFileButton->setDisabled(true);
-    ui.molFileLoadButton->setDisabled(true);
-    ui.createAtomButton->setDisabled(true);
-    ui.createLatticeButton->setDisabled(true);
-    ui.makeMolExtButton->setDisabled(true);
-    ui.removeMolFileButton->setDisabled(true);
-    ui.addLJRowAboveButton->setDisabled(true);
-    ui.addLJRowBelowButton->setDisabled(true);
-    ui.deleteLJRowButton->setDisabled(true);
-    ui.mixatoButton->setDisabled(true);
-    ui.addatoButton->setDisabled(true);
-    ui.atoAsBoxButton->setDisabled(true);
 }
 
-void MainWindow::on_atoAsBoxButton_clicked (bool checked)
+void MainWindow::on_loadBoxButton_clicked (bool checked)
 {
-    QMessageBox msgBox;
-    msgBox.setText("This is not currently implemented.\n");
-    msgBox.exec();
-    return;
+    //note in manual that need to manually change moltypeXX to the name of the associated .mol file
+    QString atoFile = QFileDialog::getOpenFileName(this, "Choose EPSR box .ato file", workingDir_, tr(".ato files (*.ato)"));
+    if (!atoFile.isEmpty())
+    {
+        QFileInfo fi(atoFile);
+        atoFileName_ = fi.fileName();
+
+        ui.boxAtoLabel->setText(atoFileName_);
+        readAtoFileBoxDetails();
+        readAtoFileAtomPairs();
+        ui.atoAtomList->clear();
+        for (int n=0; n < atoAtomLabels.count(); ++n)
+        {
+            QListWidgetItem* item = new QListWidgetItem(atoAtomLabels.at(n));
+            item->setData(Qt::UserRole, n);
+            ui.atoAtomList->addItem(item);
+        }
+        checkBoxCharge();
+//        ui.createMolFileButton->setDisabled(true);
+//        ui.molFileLoadButton->setDisabled(true);
+//        ui.createAtomButton->setDisabled(true);
+//        ui.createLatticeButton->setDisabled(true);
+//        ui.makeMolExtButton->setDisabled(true);
+//        ui.removeMolFileButton->setDisabled(true);
+//        ui.addLJRowAboveButton->setDisabled(true);
+//        ui.addLJRowBelowButton->setDisabled(true);
+//        ui.deleteLJRowButton->setDisabled(true);
+//        ui.mixatoButton->setDisabled(true);
+//        ui.addatoButton->setDisabled(true);
+//        ui.loadBoxButton->setDisabled(true);
+
+        ui.deleteBoxAtoFileAct->setEnabled(true);
+
+    }
 }
 
 bool MainWindow::readAtoFileBoxDetails()
@@ -269,7 +347,7 @@ bool MainWindow::readAtoFileBoxDetails()
     dataLine.clear();
 
     line = stream.readLine();
-    dataLine = line.split("  ", QString::SkipEmptyParts);
+    dataLine = line.split(" ", QString::SkipEmptyParts);
     QString numberMol = dataLine.at(0);
     if (dataLine.count() == 3)
     {
@@ -293,7 +371,7 @@ bool MainWindow::readAtoFileBoxDetails()
         ui.temperatureLineEdit->setText(dataLine.at(1));
 
         line = stream.readLine();
-        dataLine = line.split("  ", QString::SkipEmptyParts);
+        dataLine = line.split(" ", QString::SkipEmptyParts);
         double boxa = dataLine.at(0).toDouble();
         double boxb = dataLine.at(1).toDouble();
         double boxc = dataLine.at(2).toDouble();
@@ -329,6 +407,7 @@ bool MainWindow::readAtoFileBoxDetails()
 
     line = stream.readLine();
     dataLine = line.split("  ", QString::SkipEmptyParts);
+    ui.atoTetherTolLineEdit->setText(dataLine.at(0));
     ui.intraTransSSLineEdit->setText(dataLine.at(1));
     ui.grpRotSSLineEdit->setText(dataLine.at(2));
     ui.molRotSSLineEdit->setText(dataLine.at(3));
@@ -337,6 +416,12 @@ bool MainWindow::readAtoFileBoxDetails()
     ui.angtempLineEdit->setText(dataLine.at(6));
     ui.dihtempLineEdit->setText(dataLine.at(7));
 
+    QStringList tetherMolAtoms;
+    QStringList tetherAtoms;
+    QStringList tetherList;
+    tetherMolAtoms.clear();
+    tetherAtoms.clear();
+    tetherList.clear();
     int atomctr = 0;
     numberAtomLabels.clear();
     numberAtomLabels.resize(atoAtomLabels.count());
@@ -344,6 +429,42 @@ bool MainWindow::readAtoFileBoxDetails()
     QRegExp ecoredcorerx("  ([0-9]{1}[.]{1}[0-9]{5}[E+]{2}[0-9]{2})  ([0-9]{1}[.]{1}[0-9]{5}[E+]{2}[0-9]{2})");
     do {
         line = stream.readLine();
+        dataLine = line.split(" ",QString::SkipEmptyParts);
+        if (dataLine.count() > 9)
+        {
+            if (line.contains("T") == true || line.contains("F") == true)
+            {
+                if (line.contains("T") == true)
+                {
+                    tetherList.append("T");     //append to list that this is tethered
+                    dataLine = line.split(" ",QString::SkipEmptyParts);
+                    QString string = dataLine.at(7);
+                    QString tetherAtomStr = string.remove("T");
+                    int tetherAtom = tetherAtomStr.toInt();
+                    tetherAtomStr = QString::number(tetherAtom);
+                    tetherAtoms.append(tetherAtomStr);      //append to list which atom/COM tethering is from
+                }
+                else
+                {
+                    tetherList.append("F");     //append to list that this is tethered)
+                    tetherAtoms.append(" ");
+                }
+
+                line = stream.readLine();   //move to next line to check what the first atom of the molecule is
+                dataLine = line.split(" ",QString::SkipEmptyParts);
+                QString tetherMol = dataLine.at(0);
+                if (tetherMolAtoms.contains(tetherMol) == true) //check if atom is already listed
+                {
+                    tetherList.removeLast();    //if it is, remove T/F and 0000X entries in lists
+                    tetherAtoms.removeLast();
+                }
+                else
+                {
+                    tetherMolAtoms.append(tetherMol);   //if not, add to list
+                }
+            }
+        }
+
         if (atomLabelrx.exactMatch(line))
         {
             atomctr++;
@@ -353,7 +474,7 @@ bool MainWindow::readAtoFileBoxDetails()
             {
                 if (data == atoAtomLabels.at(i))
                 {
-                    numberAtomLabels.operator [](i)++;
+                    numberAtomLabels.operator [](i)++; //add 1 to label 'counter' each time find each label
                 }
             }
         }
@@ -368,6 +489,14 @@ bool MainWindow::readAtoFileBoxDetails()
     QString numberAtom = QString::number(atomctr);
     ui.boxAtoMols->setText(numberMol);
     ui.boxAtoAtoms->setText(numberAtom);
+
+    ui.atoTetherTable->setRowCount(tetherMolAtoms.count());
+    for (int i = 0; i < tetherMolAtoms.count(); i++)
+    {
+        ui.atoTetherTable->setItem(i,0, new QTableWidgetItem(tetherMolAtoms.at(i)));
+        ui.atoTetherTable->setItem(i,1, new QTableWidgetItem(tetherList.at(i)));
+        ui.atoTetherTable->setItem(i,2, new QTableWidgetItem(tetherAtoms.at(i)));
+    }
 
     //calculate atomic number density and input into box
     double totalNumberAtoms = ui.boxAtoAtoms->text().toDouble();
@@ -462,14 +591,35 @@ void MainWindow::on_updateAtoFileButton_clicked(bool checked)
     double vibTemp = ui.vibtempLineEdit->text().toDouble();
     double angTemp = ui.angtempLineEdit->text().toDouble();
     double dihTemp = ui.dihtempLineEdit->text().toDouble();
+    double intraTransSS = ui.intraTransSSLineEdit->text().toDouble();
+    double grpRotSS = ui.grpRotSSLineEdit->text().toDouble();
+    double molRotSS = ui.molRotSSLineEdit->text().toDouble();
+    double molTransSS = ui.molTransSSLineEdit->text().toDouble();
     double ecore = ui.ecoredcoreTable->item(0,0)->text().toDouble();
     double dcore = ui.ecoredcoreTable->item(0,1)->text().toDouble();
+    double tetherTol = ui.atoTetherTolLineEdit->text().toDouble();
     QString atoTempstr;
     QString vibTempstr;
     QString angTempstr;
     QString dihTempstr;
+    QString intraTransSSstr;
+    QString grpRotSSstr;
+    QString molRotSSstr;
+    QString molTransSSstr;
     QString ecorestr;
     QString dcorestr;
+    QString tetherTolstr;
+    QStringList tetherMolAtoms;
+    QStringList tetherAtoms;
+    QStringList tetherList;
+
+    for (int i = 0; i < ui.atoTetherTable->rowCount(); i++)
+    {
+        tetherMolAtoms.append(ui.atoTetherTable->item(i,0)->text());
+        tetherList.append(ui.atoTetherTable->item(i,1)->text());
+        int tetherAtom = ui.atoTetherTable->item(i,2)->text().toInt();
+        tetherAtoms.append(QString("%1").arg(tetherAtom, 5, 10, QChar('0')));
+    }
 
     QDir::setCurrent(workingDir_);
 
@@ -523,11 +673,11 @@ void MainWindow::on_updateAtoFileButton_clicked(bool checked)
     //vibtemp etc line
     line = streamRead.readLine();
     dataLine = line.split(" ", QString::SkipEmptyParts);
-    streamWrite << "   " << dataLine.at(0)
-           << "  " << dataLine.at(1)
-           << "  " << dataLine.at(2)
-           << "  " << dataLine.at(3)
-           << "  " << dataLine.at(4)
+    streamWrite << "   " << tetherTolstr.setNum(tetherTol,'E',5)
+           << "  " << intraTransSSstr.setNum(intraTransSS,'E',5)
+           << "  " << grpRotSSstr.setNum(grpRotSS,'E',5)
+           << "  " << molRotSSstr.setNum(molRotSS,'E',5)
+           << "  " << molTransSSstr.setNum(molTransSS,'E',5)
            << "  " << vibTempstr.setNum(vibTemp,'E',5)
            << "  " << angTempstr.setNum(angTemp,'E',5)
            << "  " << dihTempstr.setNum(dihTemp,'E',5)
@@ -538,12 +688,25 @@ void MainWindow::on_updateAtoFileButton_clicked(bool checked)
     while (!streamRead.atEnd())
     {
         line = streamRead.readLine();
+        dataLine = line.split(" ",QString::SkipEmptyParts);
+        //if a tether line, change tethering in accordance with the atoTetherTable (so first atom matches too) **********************TO DO ***************************
+        if (dataLine.count() > 9)
+        {
+            if (ui.atoTetherTable->item(0,1)->text() == "T" && line.contains("F") == true)
+            {
+                line = line.replace(91, 6, "T"+tetherAtoms.at(0));
+            }
+            if (ui.atoTetherTable->item(0,1)->text() == "F" && line.contains("T0") == true)
+            {
+                line = line.replace(91, 6, "F     ");
+            }
+        }
         original.append(line+"\n");
+
         if (ecoredcorerx.exactMatch(line))
         {
             original.remove(line+"\n");
             original.append("  "+ecorestr.setNum(ecore,'E',5)+"  "+dcorestr.setNum(dcore,'E',5)+"\n");
-//            printf("rx match");
         }
     }
     fileWrite.resize(0);

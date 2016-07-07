@@ -15,6 +15,7 @@ class SettingsDialog;
 class MakeAtomDialog;
 class MakeLatticeDialog;
 class BoxCompositionDialog;
+class AddAtoDialog;
 
 class MainWindow : public QMainWindow
 {
@@ -65,11 +66,11 @@ private:
     QString epsrDir_;
     QString epsrBinDir_;
     QString baseFileName_; //use this for the name of the box and the EPSR inp files.... TO DO!!!
-    QString molFileName_;
+    QString molFileName_; //just filename and extension, no path
 //    QString lattAto_;
 //    QStringList lattMols_;
     QString visualiserExe_;
-    QString atoFileName_;
+    QString atoFileName_; //just filename and extension, no path
     QString dataFileName_;
     QString wtsBaseFileName_;
     QString dataFileExt_;
@@ -86,6 +87,7 @@ public:
     QString epsrDir();
     QStringList atomLabels();
     QVector<int> numberOfEachAtomLabel();
+    QStringList listAtoFiles();
 
 public slots:
     void createNew();
@@ -149,7 +151,7 @@ private:
 private slots:
     void on_mixatoButton_clicked(bool checked);
     void on_addatoButton_clicked(bool checked);
-    void on_atoAsBoxButton_clicked (bool checked);
+    void on_loadBoxButton_clicked (bool checked);
     void on_randomiseButton_clicked(bool checked);
     void on_updateAtoFileButton_clicked(bool checked);
     void on_fmoleButton_clicked(bool checked);
@@ -163,10 +165,12 @@ private:
     bool checkBoxCharge();
 
 public:
+    int atoaddDialog;
     QStringList atoAtomLabels;
     QVector<int> numberAtomLabels;
     int nPartials;
     Array2D<int> ij;
+    QStringList atoFileList;
 
     // Wts Files Tab
 private slots:

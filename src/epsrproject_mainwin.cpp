@@ -7,6 +7,7 @@
 #include "makeatomdialog.h"
 #include "makelatticedialog.h"
 #include "boxcompositiondialog.h"
+#include "addatodialog.h"
 
 #include <QtGui>
 #include <QMainWindow>
@@ -341,7 +342,7 @@ void MainWindow::reset()
     ui.deleteLJRowButton->setEnabled(true);
     ui.mixatoButton->setEnabled(true);
     ui.addatoButton->setEnabled(true);
-    ui.atoAsBoxButton->setEnabled(true);
+    ui.loadBoxButton->setEnabled(true);
     ui.dataFileBrowseButton->setEnabled(true);
     ui.removeDataFileButton->setEnabled(true);
 
@@ -427,7 +428,7 @@ void MainWindow::open()
                     if (filename.at(1) == "ato")
                     {
                         ui.mixatoButton->setDisabled(true);
-                        ui.atoAsBoxButton->setDisabled(true);
+                        ui.loadBoxButton->setDisabled(true);
                     }
                     QTableWidgetItem *item = new QTableWidgetItem(filename.at(0)+".ato");
                     item->setFlags(item->flags() & ~Qt::ItemIsEditable);
@@ -449,18 +450,18 @@ void MainWindow::open()
                         ui.atoAtomList->addItem(item);
                     }
                     checkBoxCharge();
-                    ui.createMolFileButton->setDisabled(true);
-                    ui.molFileLoadButton->setDisabled(true);
-                    ui.createAtomButton->setDisabled(true);
-                    ui.createLatticeButton->setDisabled(true);
-                    ui.makeMolExtButton->setDisabled(true);
-                    ui.removeMolFileButton->setDisabled(true);
-                    ui.addLJRowAboveButton->setDisabled(true);
-                    ui.addLJRowBelowButton->setDisabled(true);
-                    ui.deleteLJRowButton->setDisabled(true);
-                    ui.mixatoButton->setDisabled(true);
-                    ui.addatoButton->setDisabled(true);
-                    ui.atoAsBoxButton->setDisabled(true);
+//                    ui.createMolFileButton->setDisabled(true);
+//                    ui.molFileLoadButton->setDisabled(true);
+//                    ui.createAtomButton->setDisabled(true);
+//                    ui.createLatticeButton->setDisabled(true);
+//                    ui.makeMolExtButton->setDisabled(true);
+//                    ui.removeMolFileButton->setDisabled(true);
+//                    ui.addLJRowAboveButton->setDisabled(true);
+//                    ui.addLJRowBelowButton->setDisabled(true);
+//                    ui.deleteLJRowButton->setDisabled(true);
+//                    ui.mixatoButton->setDisabled(true);
+//                    ui.addatoButton->setDisabled(true);
+//                    ui.loadBoxButton->setDisabled(true);
                     ui.deleteBoxAtoFileAct->setEnabled(true);
                 }
                 if (dataLine.at(0) == "data")
@@ -1309,16 +1310,17 @@ void MainWindow::plotEPSRshell()
     QDir::setCurrent(workingDir_);
 
     QString atoBaseFileName = atoFileName_.split(".",QString::SkipEmptyParts).at(0);
-    //Error: "system cannot find the path specified"*?!?!??!?!?**************************************************************************************
+    //for both plot or epsrshell get error: "system cannot find the path specified"*?!?!??!?!?**************************************************************************************
     QProcess processrunEPSRplot;
     processrunEPSRplot.setProcessChannelMode(QProcess::ForwardedChannels);
 //#ifdef _WIN32
-    processrunEPSRplot.startDetached(epsrBinDir_+"epsrshell.exe");
+    processrunEPSRplot.startDetached(epsrBinDir_+"epsrshell.exe", QStringList() << workingDir_ << "epsrshell");
+//    processrunEPSRplot.startDetached(epsrBinDir_+"plot.exe", QStringList() << workingDir_ << "plot");
 //#else
     processrunEPSRplot.startDetached(epsrBinDir_+"epsrshell");
 //#endif
 
-    ui.messagesLineEdit->setText("started EPSRshell for external plotting options");
+    ui.messagesLineEdit->setText("started plot routine within EPSRshell");
 }
 
 void MainWindow::settings()
@@ -1369,6 +1371,15 @@ QVector<int> MainWindow::numberOfEachAtomLabel()
     return numberAtomLabels;
 }
 
+QStringList MainWindow::listAtoFiles()
+{
+    atoFileList.clear();
+    for (int i = 0; i < ui.atoFileTable->rowCount(); i++)
+    {
+        atoFileList.append(ui.atoFileTable->item(i,0)->text());
+    }
+    return atoFileList;
+}
 
 void MainWindow::deleteEPSRinpFile()
 {

@@ -26,7 +26,6 @@ public:
     QString getCharge();
     QString getSymbol();
     QString getTemp();
-    QString getDensity();
 };
 
 #endif
