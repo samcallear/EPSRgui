@@ -2592,56 +2592,327 @@
              <string>Output for dlputils</string>
             </property>
            </widget>
-           <widget class="QCheckBox" name="sharmOutCheckBox">
+           <widget class="QPushButton" name="pushButton">
             <property name="geometry">
              <rect>
-              <x>20</x>
-              <y>50</y>
-              <width>111</width>
-              <height>17</height>
+              <x>260</x>
+              <y>60</y>
+              <width>75</width>
+              <height>23</height>
              </rect>
             </property>
             <property name="text">
-             <string>sharm</string>
+             <string>Setup</string>
             </property>
            </widget>
-           <widget class="QCheckBox" name="chainsOutCheckBox">
+           <widget class="QPushButton" name="pushButton_2">
             <property name="geometry">
              <rect>
-              <x>20</x>
-              <y>80</y>
-              <width>111</width>
-              <height>17</height>
+              <x>260</x>
+              <y>100</y>
+              <width>75</width>
+              <height>23</height>
              </rect>
             </property>
             <property name="text">
-             <string>chains</string>
+             <string>Setup</string>
             </property>
            </widget>
-           <widget class="QCheckBox" name="trianglesOutCheckBox">
+           <widget class="QLabel" name="label_38">
             <property name="geometry">
              <rect>
               <x>20</x>
-              <y>110</y>
-              <width>111</width>
-              <height>17</height>
+              <y>800</y>
+              <width>211</width>
+              <height>16</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>text to include in epsr script file</string>
+            </property>
+           </widget>
+           <widget class="QLineEdit" name="lineEdit">
+            <property name="geometry">
+             <rect>
+              <x>20</x>
+              <y>830</y>
+              <width>701</width>
+              <height>111</height>
+             </rect>
+            </property>
+           </widget>
+           <widget class="QPushButton" name="pushButton_3">
+            <property name="geometry">
+             <rect>
+              <x>360</x>
+              <y>60</y>
+              <width>75</width>
+              <height>23</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>Run</string>
+            </property>
+           </widget>
+           <widget class="QPushButton" name="pushButton_4">
+            <property name="geometry">
+             <rect>
+              <x>350</x>
+              <y>100</y>
+              <width>75</width>
+              <height>23</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>Run</string>
+            </property>
+           </widget>
+           <widget class="QPushButton" name="pushButton_5">
+            <property name="geometry">
+             <rect>
+              <x>360</x>
+              <y>140</y>
+              <width>75</width>
+              <height>23</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>Run</string>
+            </property>
+           </widget>
+           <widget class="QPushButton" name="pushButton_6">
+            <property name="geometry">
+             <rect>
+              <x>260</x>
+              <y>140</y>
+              <width>75</width>
+              <height>23</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>Setup</string>
+            </property>
+           </widget>
+           <widget class="QPushButton" name="pushButton_7">
+            <property name="geometry">
+             <rect>
+              <x>30</x>
+              <y>260</y>
+              <width>75</width>
+              <height>23</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>coord</string>
+            </property>
+           </widget>
+           <widget class="QPushButton" name="pushButton_8">
+            <property name="geometry">
+             <rect>
+              <x>30</x>
+              <y>310</y>
+              <width>75</width>
+              <height>23</height>
              </rect>
             </property>
             <property name="text">
              <string>triangles</string>
             </property>
            </widget>
-           <widget class="QCheckBox" name="optionsOutCheckBox">
+           <widget class="QPushButton" name="pushButton_9">
             <property name="geometry">
              <rect>
-              <x>20</x>
-              <y>140</y>
-              <width>111</width>
-              <height>17</height>
+              <x>30</x>
+              <y>350</y>
+              <width>75</width>
+              <height>23</height>
              </rect>
             </property>
             <property name="text">
-             <string>other options...</string>
+             <string>torangles</string>
+            </property>
+           </widget>
+           <widget class="QPushButton" name="pushButton_10">
+            <property name="geometry">
+             <rect>
+              <x>30</x>
+              <y>410</y>
+              <width>75</width>
+              <height>23</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>clusters</string>
+            </property>
+           </widget>
+           <widget class="QPushButton" name="pushButton_11">
+            <property name="geometry">
+             <rect>
+              <x>30</x>
+              <y>460</y>
+              <width>75</width>
+              <height>23</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>chains</string>
+            </property>
+           </widget>
+           <widget class="QPushButton" name="pushButton_12">
+            <property name="geometry">
+             <rect>
+              <x>30</x>
+              <y>510</y>
+              <width>75</width>
+              <height>23</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>rings</string>
+            </property>
+           </widget>
+           <widget class="QPushButton" name="pushButton_13">
+            <property name="geometry">
+             <rect>
+              <x>30</x>
+              <y>550</y>
+              <width>75</width>
+              <height>23</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>voids</string>
+            </property>
+           </widget>
+           <widget class="QPushButton" name="pushButton_14">
+            <property name="geometry">
+             <rect>
+              <x>30</x>
+              <y>610</y>
+              <width>75</width>
+              <height>23</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>fluctuations</string>
+            </property>
+           </widget>
+           <widget class="QPushButton" name="pushButton_15">
+            <property name="geometry">
+             <rect>
+              <x>260</x>
+              <y>190</y>
+              <width>75</width>
+              <height>23</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>Setup</string>
+            </property>
+           </widget>
+           <widget class="QPushButton" name="pushButton_16">
+            <property name="geometry">
+             <rect>
+              <x>360</x>
+              <y>190</y>
+              <width>75</width>
+              <height>23</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>Run</string>
+            </property>
+           </widget>
+           <widget class="QLineEdit" name="lineEdit_2">
+            <property name="geometry">
+             <rect>
+              <x>110</x>
+              <y>70</y>
+              <width>113</width>
+              <height>20</height>
+             </rect>
+            </property>
+           </widget>
+           <widget class="QLineEdit" name="lineEdit_3">
+            <property name="geometry">
+             <rect>
+              <x>110</x>
+              <y>110</y>
+              <width>113</width>
+              <height>20</height>
+             </rect>
+            </property>
+           </widget>
+           <widget class="QLineEdit" name="lineEdit_4">
+            <property name="geometry">
+             <rect>
+              <x>110</x>
+              <y>150</y>
+              <width>113</width>
+              <height>20</height>
+             </rect>
+            </property>
+           </widget>
+           <widget class="QLineEdit" name="lineEdit_5">
+            <property name="geometry">
+             <rect>
+              <x>100</x>
+              <y>190</y>
+              <width>113</width>
+              <height>20</height>
+             </rect>
+            </property>
+           </widget>
+           <widget class="QLabel" name="label_39">
+            <property name="geometry">
+             <rect>
+              <x>20</x>
+              <y>70</y>
+              <width>47</width>
+              <height>13</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>sharm</string>
+            </property>
+           </widget>
+           <widget class="QLabel" name="label_40">
+            <property name="geometry">
+             <rect>
+              <x>20</x>
+              <y>120</y>
+              <width>47</width>
+              <height>13</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>sdf</string>
+            </property>
+           </widget>
+           <widget class="QLabel" name="label_41">
+            <property name="geometry">
+             <rect>
+              <x>20</x>
+              <y>160</y>
+              <width>47</width>
+              <height>13</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>PLOT3D</string>
+            </property>
+           </widget>
+           <widget class="QLabel" name="label_46">
+            <property name="geometry">
+             <rect>
+              <x>20</x>
+              <y>190</y>
+              <width>47</width>
+              <height>13</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>PLOT2D</string>
             </property>
            </widget>
           </widget>
@@ -2803,6 +3074,7 @@
               <height>0</height>
              </size>
             </property>
+            <zorder>tabWidget</zorder>
            </widget>
           </item>
           <item row="4" column="0" colspan="5">
@@ -2819,6 +3091,7 @@
               <height>0</height>
              </size>
             </property>
+            <zorder>tabWidget</zorder>
            </widget>
           </item>
          </layout>

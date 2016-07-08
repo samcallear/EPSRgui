@@ -1287,17 +1287,56 @@ void MainWindow::plot()
 void MainWindow::plotEPSRshell()
 {
     QDir::setCurrent(workingDir_);
-
     QString atoBaseFileName = atoFileName_.split(".",QString::SkipEmptyParts).at(0);
-    //for both plot or epsrshell get error: "system cannot find the path specified"*?!?!??!?!?**************************************************************************************
-    QProcess processrunEPSRplot;
-    processrunEPSRplot.setProcessChannelMode(QProcess::ForwardedChannels);
-//#ifdef _WIN32
-    processrunEPSRplot.startDetached(epsrBinDir_+"epsrshell.exe", QStringList() << workingDir_ << "epsrshell");
+
+#ifdef _WIN32
+    QFile batFile(workingDir_+"gnuplot"+atoBaseFileName+".bat");
+#else
+    QFile batFile(workingDir_+"gnuplot"+atoBaseFileName+".sh");
+#endif
+    if(!batFile.open(QFile::WriteOnly | QFile::Text))
+    {
+        QMessageBox msgBox;
+        msgBox.setText("Could not open script file.");
+        msgBox.exec();;
+    }
+
+    QString gnuBinDir = epsrBinDir_+"gnuplot/bin";      //note this is without the last "/"
+    gnuBinDir = QDir::toNativeSeparators(gnuBinDir);
+
+    QTextStream stream(&batFile);
+#ifdef _WIN32
+    stream << "set EPSRbin=" << epsrBinDir_ << "\n"
+            << "set EPSRrun=" << workingDir_ << "\n"
+            << "set EPSRgnu=" << gnuBinDir << "\n"
+            << "%EPSRbin%plot.exe " << workingDir_ << " plot\n";
+#else
+    stream << "export EPSRbin=" << epsrBinDir_ << "\n"
+            << "export EPSRrun=" << workingDir_ << "\n"
+            << "export EPSRgnu=" << gnuBinDir << "\n"
+            << "  \"$EPSRbin\"'plot' " << workingDir_ << " plot\n";
+  #endif
+    batFile.close();
+
+    QDir::setCurrent(workingDir_);
+
+    QProcess processrunEPSRscript;
+    processrunEPSRscript.setProcessChannelMode(QProcess::ForwardedChannels);
+#ifdef _WIN32
+    processrunEPSRscript.startDetached("gnuplot"+atoBaseFileName+".bat");
+#else
+    processrunEPSRscript.startDetached("sh gnuplot"+atoBaseFileName+".sh");
+#endif
+
+//    //for both plot or epsrshell get error: "system cannot find the path specified"*?!?!??!?!?**************************************************************************************
+//    QProcess processrunEPSRplot;
+//    processrunEPSRplot.setProcessChannelMode(QProcess::ForwardedChannels);
+////#ifdef _WIN32
+////    processrunEPSRplot.startDetached(epsrBinDir_+"epsrshell.exe", QStringList() << workingDir_ << "epsrshell");
 //    processrunEPSRplot.startDetached(epsrBinDir_+"plot.exe", QStringList() << workingDir_ << "plot");
-//#else
-    processrunEPSRplot.startDetached(epsrBinDir_+"epsrshell");
-//#endif
+////#else
+//    processrunEPSRplot.startDetached(epsrBinDir_+"epsrshell");
+////#endif
 
     ui.messagesLineEdit->setText("started plot routine within EPSRshell");
 }
