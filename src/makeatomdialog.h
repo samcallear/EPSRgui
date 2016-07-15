@@ -25,7 +25,6 @@ public:
     QString getMass();
     QString getCharge();
     QString getSymbol();
-    QString getTemp();
 };
 
 #endif

@@ -9,6 +9,16 @@
 
 void MainWindow::on_setupEPSRButton_clicked(bool checked)
 {
+    //check the number of wts files is the same as the number of datafiles
+    if (wtsFileList.contains(" ") == true)
+    {
+        QMessageBox msgBox;
+        msgBox.setText("Check that weights files have been created for each data file.");
+        msgBox.exec();
+        return;
+    }
+
+    //set epsrInFileName_
     QDir::setCurrent(workingDir_);
     QString atoBaseFileName = atoFileName_.split(".",QString::SkipEmptyParts).at(0);
     epsrInpFileName_ = atoBaseFileName+".EPSR.inp";
@@ -63,7 +73,7 @@ void MainWindow::on_setupEPSRButton_clicked(bool checked)
             qDebug(result);
 
     //        QString dataType = dataFileTypeList.at(dataFile);
-            processEpsrSetup.write(qPrintable("5\n\n"));            //NEED TO CHANGE THIS FOR OTHER DATA FORMATS
+            processEpsrSetup.write(qPrintable("5\n\n"));            //NEED TO CHANGE THIS FOR OTHER DATA FORMATS************************************************************************
             result = processEpsrSetup.readAll();
             qDebug(result);
 
@@ -90,8 +100,8 @@ void MainWindow::on_setupEPSRButton_clicked(bool checked)
     readEPSRpcofFile();
     updatePcofFileTables();
     ui.epsrInpFileName->setText(epsrInpFileName_);
-    ui.dataFileBrowseButton->setDisabled(true);
-    ui.removeDataFileButton->setDisabled(true);
+//    ui.dataFileBrowseButton->setDisabled(true);
+//    ui.removeDataFileButton->setDisabled(true);
     ui.checkAct->setEnabled(true);
     ui.runAct->setEnabled(true);
     ui.stopAct->setEnabled(true);
@@ -176,13 +186,11 @@ void MainWindow::readEPSRinpFile()
     }
     file.close();
 
-    const int N_InpEntries = inpDescriptions.count();
-
     QRegExp inpFilerx("^.{12}");
     QString inpKeyword;
     QString inpValue;
 
-    for (int i = 0; i < N_InpEntries; i++)
+    for (int i = 0; i < inpEntries_; i++)
     {
         inpKeyword = inp1stcolumns.at(i).split(" ", QString::SkipEmptyParts).at(0);
         inpKeywords.append(inpKeyword);
@@ -259,7 +267,6 @@ void MainWindow::updateInpFileTables()
 
     ui.dataFileSettingsTable->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui.dataFileSettingsTable->setSelectionMode(QAbstractItemView::SingleSelection);
-//    ui.dataFileSettingsTable->setEditTriggers(QAbstractItemView::NoEditTriggers); full read only table
     ui.dataFileSettingsTable->setCurrentCell(nDatasets*8-1,0);
 }
 

@@ -102,8 +102,8 @@ void MainWindow::on_mixatoButton_clicked(bool checked)
         ui.messagesLineEdit->setText("Finished writing box .ato file");
 
         ui.boxAtoLabel->setText(atoFileName_);
-        readAtoFileBoxDetails();
         readAtoFileAtomPairs();
+        readAtoFileBoxDetails();
         ui.atoAtomList->clear();
         for (int n=0; n < atoAtomLabels.count(); ++n)
         {
@@ -310,8 +310,8 @@ void MainWindow::on_loadBoxButton_clicked (bool checked)
         atoFileName_ = fi.fileName();
 
         ui.boxAtoLabel->setText(atoFileName_);
-        readAtoFileBoxDetails();
         readAtoFileAtomPairs();
+        readAtoFileBoxDetails();
         ui.atoAtomList->clear();
         for (int n=0; n < atoAtomLabels.count(); ++n)
         {
@@ -365,9 +365,10 @@ bool MainWindow::readAtoFileBoxDetails()
         ui.boxAtoLengthA->setText(boxLengthstr);
         ui.boxAtoLengthB->clear();
         ui.boxAtoLengthC->clear();
-        ui.boxAtoAxisA->setText("90.0000");
+        ui.boxAtoAxisA->setText("90.0000"); //polar angles in degrees
         ui.boxAtoAxisB->setText("0.0000");
         ui.boxAtoAxisG->setText("0.0000");
+//        cryst angles therefore 90,90,90 deg
         double boxVol = boxLength*boxLength*boxLength;
         QString boxVolstr;
         boxVolstr.sprintf("%.2f", boxVol);
@@ -395,19 +396,29 @@ bool MainWindow::readAtoFileBoxDetails()
 
         line = stream.readLine();
         dataLine = line.split(" ", QString::SkipEmptyParts);
-        double boxtb = dataLine.at(0).toDouble();
+        double boxpb = dataLine.at(0).toDouble();
         double boxtc = dataLine.at(1).toDouble();
-        double boxpb = dataLine.at(2).toDouble();
-        QString boxtbstr;
-        boxtbstr.sprintf("%.4f", boxtb);
-        QString boxtcstr;
-        boxtcstr.sprintf("%.4f", boxtc);
+        double boxpc = dataLine.at(2).toDouble();
         QString boxpbstr;
         boxpbstr.sprintf("%.4f", boxpb);
-        ui.boxAtoAxisA->setText(boxtbstr);
+        QString boxtcstr;
+        boxtcstr.sprintf("%.4f", boxtc);
+        QString boxpcstr;
+        boxpcstr.sprintf("%.4f", boxpc);
+        ui.boxAtoAxisA->setText(boxpbstr);  //polar angles in degrees
         ui.boxAtoAxisB->setText(boxtcstr);
-        ui.boxAtoAxisG->setText(boxpbstr);
-        double boxVol = boxa*boxb*sin(boxtb*3.14159265/180)*boxc*cos(boxtc*3.14159265/180);
+        ui.boxAtoAxisG->setText(boxpcstr);
+        //cryst angles therefore:
+        // gamma = phib (boxpb)
+        // convert all angles to radians
+        // bx = cos gammar
+        // by = sin gammar
+        // phicr = tan-1<2??>(cy,cx)
+        // betar = cos-1 cx
+        // thetacr = sin-1 (sqrt(cx^2+cy^2))
+        // alphar = bos-1 (bc)
+        // more maths... need to know what atan2 means in fortran (arc tan in rad but what is the 2??)
+        double boxVol = boxa*boxb*sin(boxpb*3.14159265/180)*boxc*cos(boxtc*3.14159265/180);
         QString boxVolstr;
         boxVolstr.sprintf("%.2f", boxVol);
         ui.boxAtoVol->setText(boxVolstr);

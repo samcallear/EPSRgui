@@ -301,7 +301,6 @@ void MainWindow::on_createAtomButton_clicked(bool checked)
         QString atomMass = makeAtomDialog->getMass();
         QString atomCharge = makeAtomDialog->getCharge();
         QString atomSymbol = makeAtomDialog->getSymbol();
-        QString atomTemp = makeAtomDialog->getTemp();
 
         QProcess processMakeAto;
         processMakeAto.setProcessChannelMode(QProcess::ForwardedChannels);
@@ -339,7 +338,7 @@ void MainWindow::on_createAtomButton_clicked(bool checked)
         result = processMakeAto.readAll();
         qDebug(result);
 
-        processMakeAto.write(qPrintable(atomTemp+"\n"));
+        processMakeAto.write(qPrintable("300\n"));
         result = processMakeAto.readAll();
         qDebug(result);
 
@@ -398,7 +397,7 @@ void MainWindow::on_createAtomButton_clicked(bool checked)
         if (dataLineRead.count() == 0) return;
 
         streamWrite << "potential " << atomName << " " << dataLineRead.at(0) << "  " << dataLineRead.at(1) << "  " << dataLineRead.at(2) << "  " << dataLineRead.at(3) << " " << atomSymbol << "\n"
-                    << "temperature " << atomTemp << "\n"
+                    << "temperature 0.300000E+03\n"
                     << "vibtemp  0.650000E+02\n"
                     << "angtemp  0.100000E+01\n"
                     << "dihtemp  0.100000E+02\n"
@@ -638,18 +637,18 @@ void MainWindow::on_createLatticeButton_clicked(bool checked)
             }
             checkBoxCharge();
 
-            ui.createMolFileButton->setDisabled(true);
-            ui.molFileLoadButton->setDisabled(true);
-            ui.createAtomButton->setDisabled(true);
-            ui.createLatticeButton->setDisabled(true);
-            ui.makeMolExtButton->setDisabled(true);
-            ui.removeMolFileButton->setDisabled(true);
-            ui.addLJRowAboveButton->setDisabled(true);
-            ui.addLJRowBelowButton->setDisabled(true);
-            ui.deleteLJRowButton->setDisabled(true);
-            ui.mixatoButton->setDisabled(true);
-            ui.addatoButton->setDisabled(true);
-            ui.loadBoxButton->setDisabled(true);
+//            ui.createMolFileButton->setDisabled(true);
+//            ui.molFileLoadButton->setDisabled(true);
+//            ui.createAtomButton->setDisabled(true);
+//            ui.createLatticeButton->setDisabled(true);
+//            ui.makeMolExtButton->setDisabled(true);
+//            ui.removeMolFileButton->setDisabled(true);
+//            ui.addLJRowAboveButton->setDisabled(true);
+//            ui.addLJRowBelowButton->setDisabled(true);
+//            ui.deleteLJRowButton->setDisabled(true);
+//            ui.mixatoButton->setDisabled(true);
+//            ui.addatoButton->setDisabled(true);
+//            ui.loadBoxButton->setDisabled(true);
         }
 
         // otherwise use lattice as a component **NB** This is the only workflow that doesn't use a .mol file.

@@ -65,7 +65,7 @@ private:
     QString workingDir_; //includes projectName and has a "/" after it
     QString epsrDir_; //has a "/" after it
     QString epsrBinDir_; //has a "/" after it
-    QString baseFileName_; //use this for the name of the box and the EPSR inp files.... TO DO!!!
+    QString baseFileName_; //use this for the name of the box and the EPSR inp files with the path and without any extensions
     QString molFileName_; //just filename and extension for selected file in molFileList (.mol or .ato), no path
     QString visualiserExe_; //full path and executable
     QString atoFileName_; //just filename and extension for box, no path
@@ -218,6 +218,22 @@ public:
     QStringList pcofValues;
     QStringList atomPairs;
     QStringList minDistances;
+
+    //epsr outputs
+private:
+    void setupOutput();
+    QString outputFileName_;
+    QString outputSetupFileType_;
+    QString outputRunFileType_;
+    void showAvailableFiles();
+
+private slots:
+    void on_setupOutButton_clicked(bool checked);
+    void getOutputType();
+    void on_addOutputButton_clicked(bool checked);
+    void on_removeOutputButton_clicked(bool checked);
+    void on_applyOutputsButton_clicked(bool checked);
+    void outputDlputils();
 
     //main window embedded plots
 private:

@@ -353,6 +353,31 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>unitFileLineEdit</tabstop>
+  <tabstop>browseButton</tabstop>
+  <tabstop>fileNameLineEdit</tabstop>
+  <tabstop>aLineEdit</tabstop>
+  <tabstop>bLineEdit</tabstop>
+  <tabstop>cLineEdit</tabstop>
+  <tabstop>alLineEdit</tabstop>
+  <tabstop>beLineEdit</tabstop>
+  <tabstop>gaLineEdit</tabstop>
+  <tabstop>fracRadioButton</tabstop>
+  <tabstop>absRadioButton</tabstop>
+  <tabstop>coordTable</tabstop>
+  <tabstop>addRowButton</tabstop>
+  <tabstop>deleteRowButton</tabstop>
+  <tabstop>paramTable</tabstop>
+  <tabstop>ecoreLineEdit</tabstop>
+  <tabstop>dcoreLineEdit</tabstop>
+  <tabstop>aLattLineEdit</tabstop>
+  <tabstop>bLattLineEdit</tabstop>
+  <tabstop>cLattLineEdit</tabstop>
+  <tabstop>lattAsBoxCheckBox</tabstop>
+  <tabstop>okButton</tabstop>
+  <tabstop>cancelButton</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
  <buttongroups>

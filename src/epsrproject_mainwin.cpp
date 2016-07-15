@@ -64,6 +64,8 @@ MainWindow::MainWindow(QMainWindow *parent) : QMainWindow(parent)
     connect(ui.plot1, SIGNAL(mouseWheel(QWheelEvent*)), this, SLOT(plotZoom1(QWheelEvent*)));
     connect(ui.plot2, SIGNAL(mouseWheel(QWheelEvent*)), this, SLOT(plotZoom2(QWheelEvent*)));
 
+    connect(ui.setupOutTypeComboBox, SIGNAL(currentIndexChanged(QString)), this, SLOT(getOutputType()));
+    connect(ui.dlputilsOutCheckBox, SIGNAL(stateChanged(int)), this, SLOT(outputDlputils()));
 }
 
 void MainWindow::createActions()
@@ -250,6 +252,9 @@ void MainWindow::createNew()
         ui.addatoButton->setEnabled(true);
         ui.dataFileBrowseButton->setEnabled(true);
         ui.removeDataFileButton->setEnabled(true);
+
+        //Activate available outputs list
+        getOutputType();
 
         //change window title to contain projectName
         this->setWindowTitle("EPSRgui: "+projectName_);
@@ -530,6 +535,9 @@ void MainWindow::open()
         ui.copyAct->setEnabled(true);
         ui.cutAct->setEnabled(true);
         ui.pasteAct->setEnabled(true);
+
+        //Activate available outputs list
+        getOutputType();
 
         //change window title to contain projectName
         this->setWindowTitle("EPSRProject: "+projectName_);
@@ -1130,12 +1138,50 @@ void MainWindow::runEPSR()
 #else
     QFile batFile(workingDir_+"run"+atoBaseFileName+".sh");
 #endif
-    if(!batFile.open(QFile::WriteOnly | QFile::Text))
+
+    // if script file already exists, don't overwrite it
+    if (!batFile.exists())
     {
-        QMessageBox msgBox;
-        msgBox.setText("Could not open script file.");
-        msgBox.exec();;
+        if(!batFile.open(QFile::WriteOnly | QFile::Text))
+        {
+            QMessageBox msgBox;
+            msgBox.setText("Could not open script file.");
+            msgBox.exec();
+        }
+
+        //write script file to run epsr
+        QTextStream stream(&batFile);
+    #ifdef _WIN32
+        stream << "set EPSRbin=" << epsrBinDir_ << "\n"
+                << "set EPSRrun=" << workingDir_ << "\n"
+                << ":loop\n"
+                << "%EPSRbin%epsr.exe " << workingDir_ << " epsr " << atoBaseFileName << "\n"
+                << "if not exist %EPSRrun%killepsr ( goto loop ) else del %EPSRrun%killepsr\n";
+    #else
+            stream << "export EPSRbin=" << epsrBinDir_ << "\n"
+                    << "export EPSRrun=" << workingDir_ << "\n"
+                    << "while :\n"
+                    << "do\n"
+                    << "  \"$EPSRbin\"'epsr' " << workingDir_ << " epsr " << atoBaseFileName << "\n"
+                    << "  if ([ -e " << workingDir_ << "killepsr ])\n"
+                    << "  then break\n"
+                    << "  fi\n"
+                    << "done\n"
+                    << "rm -r " << workingDir_ << "killepsr\n";
+    #endif
+        batFile.close();
     }
+
+    //run EPSR on loop
+    QDir::setCurrent(workingDir_);
+
+    QProcess processrunEPSRscript;
+    processrunEPSRscript.setProcessChannelMode(QProcess::ForwardedChannels);
+#ifdef _WIN32
+    processrunEPSRscript.startDetached("run"+atoBaseFileName+".bat");
+#else
+    processrunEPSRscript.startDetached("sh run"+atoBaseFileName+".sh");
+#endif
 
     //show EPSR is running
     ui.epsrRunningSign->setEnabled(true);
@@ -1148,80 +1194,27 @@ void MainWindow::runEPSR()
     ui.atoEPSRButton->setDisabled(true);
     ui.makeWtsButton->setDisabled(true);
 
-    if (ui.dlputilsOutCheckBox->isChecked())
-    {
-        //get box side length and divide by 2 to get value for bat file ****only works for cubic!***************************************************************************
-        double boxLength = ui.boxAtoLengthA->text().toDouble();
-        double halfboxLength = boxLength/2;
-        QString halfboxLengthStr = QString::number(halfboxLength);
-
-        //run EPSR on loop with dlputils output line
-        QTextStream stream(&batFile);
-#ifdef _WIN32
-        stream << "set EPSRbin=" << epsrBinDir_ << "\n"
-                << "set EPSRrun=" << workingDir_ << "\n"
-                << ":loop\n"
-                << "%EPSRbin%epsr.exe " << workingDir_ << " epsr " << atoBaseFileName << "\n"
-                << "%EPSRbin%writexyz.exe " << workingDir_ << " writexyz " << atoBaseFileName << " y 0 " << halfboxLengthStr << " " << halfboxLengthStr << " -" << halfboxLengthStr << " " << halfboxLengthStr << " 0 0 0 0" << "\n"
-                << "if not exist %EPSRrun%killepsr ( goto loop ) else del %EPSRrun%killepsr\n";
-#else
-        stream << "export EPSRbin=" << epsrBinDir_ << "\n"
-                << "export EPSRrun=" << workingDir_ << "\n"
-                << "while :\n"
-                << "do\n"
-                << "  \"$EPSRbin\"'epsr' " << workingDir_ << " epsr " << atoBaseFileName << "\n"
-                << "%\"$EPSRbin\"'writexyz' " << workingDir_ << " writexyz " << atoBaseFileName << " y 0 " << halfboxLengthStr << " " << halfboxLengthStr << " -" << halfboxLengthStr << " " << halfboxLengthStr << " 0 0 0 0" << "\n"
-                << "  if ([ -e " << workingDir_ << " ])\n"
-                << "  then break\n"
-                << "  fi\n"
-                << "done\n"
-                << "rm -r " << workingDir_ << "killepsr\n";
-#endif
-        batFile.close();
-    }
-
-    else
-    {
-    //run EPSR on loop
-    QTextStream stream(&batFile);
-#ifdef _WIN32
-    stream << "set EPSRbin=" << epsrBinDir_ << "\n"
-            << "set EPSRrun=" << workingDir_ << "\n"
-            << ":loop\n"
-            << "%EPSRbin%epsr.exe " << workingDir_ << " epsr " << atoBaseFileName << "\n"
-            << "if not exist %EPSRrun%killepsr ( goto loop ) else del %EPSRrun%killepsr\n";
-#else
-        stream << "export EPSRbin=" << epsrBinDir_ << "\n"
-                << "export EPSRrun=" << workingDir_ << "\n"
-                << "while :\n"
-                << "do\n"
-                << "  \"$EPSRbin\"'epsr' " << workingDir_ << " epsr " << atoBaseFileName << "\n"
-                << "  if ([ -e " << workingDir_ << " ])\n"
-                << "  then break\n"
-                << "  fi\n"
-                << "done\n"
-                << "rm -r " << workingDir_ << "killepsr\n";
-#endif
-    batFile.close();
-    }
-
-    QDir::setCurrent(workingDir_);
-
-    QProcess processrunEPSRscript;
-    processrunEPSRscript.setProcessChannelMode(QProcess::ForwardedChannels);
-#ifdef _WIN32
-    processrunEPSRscript.startDetached("run"+atoBaseFileName+".bat");
-#else
-    processrunEPSRscript.startDetached("sh run"+atoBaseFileName+".sh");
-#endif
+    ui.createMolFileButton->setEnabled(false);
+    ui.molFileLoadButton->setEnabled(false);
+    ui.createAtomButton->setEnabled(false);
+    ui.createLatticeButton->setEnabled(false);
+    ui.makeMolExtButton->setEnabled(false);
+    ui.removeMolFileButton->setEnabled(false);
+    ui.addLJRowAboveButton->setEnabled(false);
+    ui.addLJRowBelowButton->setEnabled(false);
+    ui.deleteLJRowButton->setEnabled(false);
+    ui.mixatoButton->setEnabled(false);
+    ui.addatoButton->setEnabled(false);
+    ui.dataFileBrowseButton->setEnabled(false);
+    ui.removeDataFileButton->setEnabled(false);
 
     ui.messagesLineEdit->setText("EPSR is running in a separate window");
 
     //enable plotting as data files should now exist ************if this is clicked before files exist does program crash?
-    ui.inpSettingsTable->setDisabled(true);
-    ui.dataFileSettingsTable->setDisabled(true);
-    ui.pcofSettingsTable->setDisabled(true);
-    ui.minDistanceTable->setDisabled(true);
+    ui.inpSettingsTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    ui.dataFileSettingsTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    ui.pcofSettingsTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    ui.minDistanceTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
     ui.plot1Button->setEnabled(true);
     ui.plot2Button->setEnabled(true);
 }
@@ -1240,12 +1233,6 @@ void MainWindow::stopEPSR()
 
     connect(&epsrFinished_, SIGNAL(fileChanged(const QString &)), this, SLOT(enableButtons()));
     epsrFinished_.addPath(workingDir_+"killepsr");
-
-    //preferably only enable once finished iteration *********************************************************************
-    ui.inpSettingsTable->setDisabled(false);
-    ui.dataFileSettingsTable->setDisabled(false);
-    ui.pcofSettingsTable->setDisabled(false);
-    ui.minDistanceTable->setDisabled(false);
 }
 
 void MainWindow::enableButtons()
@@ -1260,6 +1247,25 @@ void MainWindow::enableButtons()
     ui.fmoleButton->setEnabled(true);
     ui.atoEPSRButton->setEnabled(true);
     ui.makeWtsButton->setEnabled(true);
+
+    ui.createMolFileButton->setEnabled(true);
+    ui.molFileLoadButton->setEnabled(true);
+    ui.createAtomButton->setEnabled(true);
+    ui.createLatticeButton->setEnabled(true);
+    ui.makeMolExtButton->setEnabled(true);
+    ui.removeMolFileButton->setEnabled(true);
+    ui.addLJRowAboveButton->setEnabled(true);
+    ui.addLJRowBelowButton->setEnabled(true);
+    ui.deleteLJRowButton->setEnabled(true);
+    ui.mixatoButton->setEnabled(true);
+    ui.addatoButton->setEnabled(true);
+    ui.dataFileBrowseButton->setEnabled(true);
+    ui.removeDataFileButton->setEnabled(true);
+
+    ui.inpSettingsTable->setEditTriggers(QAbstractItemView::AllEditTriggers);
+    ui.dataFileSettingsTable->setEditTriggers(QAbstractItemView::AllEditTriggers);
+    ui.pcofSettingsTable->setEditTriggers(QAbstractItemView::AllEditTriggers);
+    ui.minDistanceTable->setEditTriggers(QAbstractItemView::AllEditTriggers);
 
     ui.messagesLineEdit->setText("EPSR stopped");
 
@@ -1327,16 +1333,6 @@ void MainWindow::plotEPSRshell()
 #else
     processrunEPSRscript.startDetached("sh gnuplot"+atoBaseFileName+".sh");
 #endif
-
-//    //for both plot or epsrshell get error: "system cannot find the path specified"*?!?!??!?!?**************************************************************************************
-//    QProcess processrunEPSRplot;
-//    processrunEPSRplot.setProcessChannelMode(QProcess::ForwardedChannels);
-////#ifdef _WIN32
-////    processrunEPSRplot.startDetached(epsrBinDir_+"epsrshell.exe", QStringList() << workingDir_ << "epsrshell");
-//    processrunEPSRplot.startDetached(epsrBinDir_+"plot.exe", QStringList() << workingDir_ << "plot");
-////#else
-//    processrunEPSRplot.startDetached(epsrBinDir_+"epsrshell");
-////#endif
 
     ui.messagesLineEdit->setText("started plot routine within EPSRshell");
 }
@@ -1423,9 +1419,13 @@ void MainWindow::deleteEPSRinpFile()
             ui.minDistanceTable->clearContents();
             epsrInpFileName_.clear();
 
-            //re-enable buttons
-            ui.dataFileBrowseButton->setEnabled(true);
-            ui.removeDataFileButton->setEnabled(true);
+            //clear plots
+            ui.plot1->clearGraphs();
+            ui.plot1->clearItems();
+            ui.plot1->replot();
+            ui.plot2->clearGraphs();
+            ui.plot2->clearItems();
+            ui.plot2->replot();
         }
     }
     return;
@@ -1490,20 +1490,20 @@ void MainWindow::deleteBoxAtoFile()
                 ui.minDistanceTable->clearContents();
             }
 
-            //re-enable buttons
-            ui.createMolFileButton->setEnabled(true);
-            ui.molFileLoadButton->setEnabled(true);
-            ui.createAtomButton->setEnabled(true);
-            ui.createLatticeButton->setEnabled(true);
-            ui.makeMolExtButton->setEnabled(true);
-            ui.removeMolFileButton->setEnabled(true);
-            ui.addLJRowAboveButton->setEnabled(true);
-            ui.addLJRowBelowButton->setEnabled(true);
-            ui.deleteLJRowButton->setEnabled(true);
-            ui.mixatoButton->setEnabled(true);
-            ui.addatoButton->setEnabled(true);
-            ui.dataFileBrowseButton->setEnabled(true);
-            ui.removeDataFileButton->setEnabled(true);
+//            //re-enable buttons
+//            ui.createMolFileButton->setEnabled(true);
+//            ui.molFileLoadButton->setEnabled(true);
+//            ui.createAtomButton->setEnabled(true);
+//            ui.createLatticeButton->setEnabled(true);
+//            ui.makeMolExtButton->setEnabled(true);
+//            ui.removeMolFileButton->setEnabled(true);
+//            ui.addLJRowAboveButton->setEnabled(true);
+//            ui.addLJRowBelowButton->setEnabled(true);
+//            ui.deleteLJRowButton->setEnabled(true);
+//            ui.mixatoButton->setEnabled(true);
+//            ui.addatoButton->setEnabled(true);
+//            ui.dataFileBrowseButton->setEnabled(true);
+//            ui.removeDataFileButton->setEnabled(true);
 
             //clear plots
             ui.plot1->clearGraphs();

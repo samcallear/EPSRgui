@@ -33,7 +33,10 @@ void CreateNewDialog::on_okButton_clicked(bool checked)
 void CreateNewDialog::checkProjectName()
 {
     projectName_ = ui.lineEditEPSRname->text();
-    if (QDir(workingDir_+"/"+projectName_).exists())
+    QString newDir = workingDir_+"/"+projectName_;
+    newDir = QDir::toNativeSeparators(newDir);
+
+    if (QDir(newDir).exists())
     {
         QMessageBox::warning(this, tr("Error creating new EPSR project"),
                              tr("A project with this name already exists, please choose another"));

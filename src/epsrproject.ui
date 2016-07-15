@@ -2473,6 +2473,12 @@
                <layout class="QHBoxLayout" name="horizontalLayout_12">
                 <item>
                  <widget class="QTableWidget" name="inpSettingsTable">
+                  <attribute name="horizontalHeaderDefaultSectionSize">
+                   <number>150</number>
+                  </attribute>
+                  <attribute name="horizontalHeaderHighlightSections">
+                   <bool>false</bool>
+                  </attribute>
                   <column>
                    <property name="text">
                     <string>EPSR keyword</string>
@@ -2575,346 +2581,233 @@
             </item>
            </layout>
           </widget>
-          <widget class="QWidget" name="optTab">
+          <widget class="QWidget" name="outTab">
            <attribute name="title">
-            <string>Options</string>
+            <string>Outputs</string>
            </attribute>
-           <widget class="QCheckBox" name="dlputilsOutCheckBox">
-            <property name="geometry">
-             <rect>
-              <x>20</x>
-              <y>20</y>
-              <width>201</width>
-              <height>17</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string>Output for dlputils</string>
-            </property>
-           </widget>
-           <widget class="QPushButton" name="pushButton">
-            <property name="geometry">
-             <rect>
-              <x>260</x>
-              <y>60</y>
-              <width>75</width>
-              <height>23</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string>Setup</string>
-            </property>
-           </widget>
-           <widget class="QPushButton" name="pushButton_2">
-            <property name="geometry">
-             <rect>
-              <x>260</x>
-              <y>100</y>
-              <width>75</width>
-              <height>23</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string>Setup</string>
-            </property>
-           </widget>
-           <widget class="QLabel" name="label_38">
-            <property name="geometry">
-             <rect>
-              <x>20</x>
-              <y>800</y>
-              <width>211</width>
-              <height>16</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string>text to include in epsr script file</string>
-            </property>
-           </widget>
-           <widget class="QLineEdit" name="lineEdit">
-            <property name="geometry">
-             <rect>
-              <x>20</x>
-              <y>830</y>
-              <width>701</width>
-              <height>111</height>
-             </rect>
-            </property>
-           </widget>
-           <widget class="QPushButton" name="pushButton_3">
-            <property name="geometry">
-             <rect>
-              <x>360</x>
-              <y>60</y>
-              <width>75</width>
-              <height>23</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string>Run</string>
-            </property>
-           </widget>
-           <widget class="QPushButton" name="pushButton_4">
-            <property name="geometry">
-             <rect>
-              <x>350</x>
-              <y>100</y>
-              <width>75</width>
-              <height>23</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string>Run</string>
-            </property>
-           </widget>
-           <widget class="QPushButton" name="pushButton_5">
-            <property name="geometry">
-             <rect>
-              <x>360</x>
-              <y>140</y>
-              <width>75</width>
-              <height>23</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string>Run</string>
-            </property>
-           </widget>
-           <widget class="QPushButton" name="pushButton_6">
-            <property name="geometry">
-             <rect>
-              <x>260</x>
-              <y>140</y>
-              <width>75</width>
-              <height>23</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string>Setup</string>
-            </property>
-           </widget>
-           <widget class="QPushButton" name="pushButton_7">
-            <property name="geometry">
-             <rect>
-              <x>30</x>
-              <y>260</y>
-              <width>75</width>
-              <height>23</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string>coord</string>
-            </property>
-           </widget>
-           <widget class="QPushButton" name="pushButton_8">
-            <property name="geometry">
-             <rect>
-              <x>30</x>
-              <y>310</y>
-              <width>75</width>
-              <height>23</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string>triangles</string>
-            </property>
-           </widget>
-           <widget class="QPushButton" name="pushButton_9">
-            <property name="geometry">
-             <rect>
-              <x>30</x>
-              <y>350</y>
-              <width>75</width>
-              <height>23</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string>torangles</string>
-            </property>
-           </widget>
-           <widget class="QPushButton" name="pushButton_10">
-            <property name="geometry">
-             <rect>
-              <x>30</x>
-              <y>410</y>
-              <width>75</width>
-              <height>23</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string>clusters</string>
-            </property>
-           </widget>
-           <widget class="QPushButton" name="pushButton_11">
-            <property name="geometry">
-             <rect>
-              <x>30</x>
-              <y>460</y>
-              <width>75</width>
-              <height>23</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string>chains</string>
-            </property>
-           </widget>
-           <widget class="QPushButton" name="pushButton_12">
-            <property name="geometry">
-             <rect>
-              <x>30</x>
-              <y>510</y>
-              <width>75</width>
-              <height>23</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string>rings</string>
-            </property>
-           </widget>
-           <widget class="QPushButton" name="pushButton_13">
-            <property name="geometry">
-             <rect>
-              <x>30</x>
-              <y>550</y>
-              <width>75</width>
-              <height>23</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string>voids</string>
-            </property>
-           </widget>
-           <widget class="QPushButton" name="pushButton_14">
-            <property name="geometry">
-             <rect>
-              <x>30</x>
-              <y>610</y>
-              <width>75</width>
-              <height>23</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string>fluctuations</string>
-            </property>
-           </widget>
-           <widget class="QPushButton" name="pushButton_15">
-            <property name="geometry">
-             <rect>
-              <x>260</x>
-              <y>190</y>
-              <width>75</width>
-              <height>23</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string>Setup</string>
-            </property>
-           </widget>
-           <widget class="QPushButton" name="pushButton_16">
-            <property name="geometry">
-             <rect>
-              <x>360</x>
-              <y>190</y>
-              <width>75</width>
-              <height>23</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string>Run</string>
-            </property>
-           </widget>
-           <widget class="QLineEdit" name="lineEdit_2">
-            <property name="geometry">
-             <rect>
-              <x>110</x>
-              <y>70</y>
-              <width>113</width>
-              <height>20</height>
-             </rect>
-            </property>
-           </widget>
-           <widget class="QLineEdit" name="lineEdit_3">
-            <property name="geometry">
-             <rect>
-              <x>110</x>
-              <y>110</y>
-              <width>113</width>
-              <height>20</height>
-             </rect>
-            </property>
-           </widget>
-           <widget class="QLineEdit" name="lineEdit_4">
-            <property name="geometry">
-             <rect>
-              <x>110</x>
-              <y>150</y>
-              <width>113</width>
-              <height>20</height>
-             </rect>
-            </property>
-           </widget>
-           <widget class="QLineEdit" name="lineEdit_5">
-            <property name="geometry">
-             <rect>
-              <x>100</x>
-              <y>190</y>
-              <width>113</width>
-              <height>20</height>
-             </rect>
-            </property>
-           </widget>
-           <widget class="QLabel" name="label_39">
-            <property name="geometry">
-             <rect>
-              <x>20</x>
-              <y>70</y>
-              <width>47</width>
-              <height>13</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string>sharm</string>
-            </property>
-           </widget>
-           <widget class="QLabel" name="label_40">
-            <property name="geometry">
-             <rect>
-              <x>20</x>
-              <y>120</y>
-              <width>47</width>
-              <height>13</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string>sdf</string>
-            </property>
-           </widget>
-           <widget class="QLabel" name="label_41">
-            <property name="geometry">
-             <rect>
-              <x>20</x>
-              <y>160</y>
-              <width>47</width>
-              <height>13</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string>PLOT3D</string>
-            </property>
-           </widget>
-           <widget class="QLabel" name="label_46">
-            <property name="geometry">
-             <rect>
-              <x>20</x>
-              <y>190</y>
-              <width>47</width>
-              <height>13</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string>PLOT2D</string>
-            </property>
-           </widget>
+           <layout class="QVBoxLayout" name="verticalLayout_16">
+            <item>
+             <widget class="QGroupBox" name="groupBox_3">
+              <property name="title">
+               <string>EPSR output routines</string>
+              </property>
+              <layout class="QHBoxLayout" name="horizontalLayout_24">
+               <item>
+                <layout class="QGridLayout" name="gridLayout_7">
+                 <item row="7" column="2">
+                  <widget class="QPushButton" name="setupOutButton">
+                   <property name="text">
+                    <string>Setup</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="7" column="5">
+                  <widget class="QPushButton" name="applyOutputsButton">
+                   <property name="text">
+                    <string>Apply</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="5" column="3">
+                  <spacer name="verticalSpacer_10">
+                   <property name="orientation">
+                    <enum>Qt::Vertical</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>20</width>
+                     <height>40</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                 <item row="4" column="3">
+                  <widget class="QPushButton" name="removeOutputButton">
+                   <property name="text">
+                    <string>&lt;&lt;</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="1" rowspan="6" colspan="2">
+                  <widget class="QListWidget" name="outputAvailableList"/>
+                 </item>
+                 <item row="0" column="1">
+                  <widget class="QComboBox" name="setupOutTypeComboBox">
+                   <item>
+                    <property name="text">
+                     <string>Chains</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>Clusters</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>Coord</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>Fluctuations</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>Plot2D</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>Plot3D</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>Plot3Djmol</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>Rings</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>Sdf</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>Sdfcube</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>Sharm</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>Splot2D</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>Torangles</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>Triangles</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>Voids</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </item>
+                  </widget>
+                 </item>
+                 <item row="7" column="0">
+                  <widget class="QLabel" name="label_55">
+                   <property name="text">
+                    <string>New output name</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="4">
+                  <widget class="QLabel" name="label_59">
+                   <property name="text">
+                    <string>Running in EPSR</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="0">
+                  <widget class="QLabel" name="label_54">
+                   <property name="text">
+                    <string>Output type</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="7" column="1">
+                  <widget class="QLineEdit" name="setupOutNameNew"/>
+                 </item>
+                 <item row="2" column="3">
+                  <spacer name="verticalSpacer_9">
+                   <property name="orientation">
+                    <enum>Qt::Vertical</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>20</width>
+                     <height>40</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                 <item row="1" column="4" rowspan="6" colspan="2">
+                  <widget class="QListWidget" name="runOutEPSRList"/>
+                 </item>
+                 <item row="3" column="3">
+                  <widget class="QPushButton" name="addOutputButton">
+                   <property name="text">
+                    <string>&gt;&gt;</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="2" column="0">
+                  <widget class="QLabel" name="label_56">
+                   <property name="text">
+                    <string>Existing outputs</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <spacer name="horizontalSpacer_19">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>318</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="dlputilsOutCheckBox">
+              <property name="text">
+               <string>Output for dlputils</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="verticalSpacer_7">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>454</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
           </widget>
          </widget>
         </item>
@@ -3074,7 +2967,6 @@
               <height>0</height>
              </size>
             </property>
-            <zorder>tabWidget</zorder>
            </widget>
           </item>
           <item row="4" column="0" colspan="5">
@@ -3091,7 +2983,6 @@
               <height>0</height>
              </size>
             </property>
-            <zorder>tabWidget</zorder>
            </widget>
           </item>
          </layout>
@@ -3303,6 +3194,116 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>scrollArea</tabstop>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>createMolFileButton</tabstop>
+  <tabstop>molFileLoadButton</tabstop>
+  <tabstop>createAtomButton</tabstop>
+  <tabstop>createLatticeButton</tabstop>
+  <tabstop>molFileList</tabstop>
+  <tabstop>viewMolFileButton</tabstop>
+  <tabstop>removeMolFileButton</tabstop>
+  <tabstop>makeMolExtButton</tabstop>
+  <tabstop>molAtomTable</tabstop>
+  <tabstop>molFileTabWidget</tabstop>
+  <tabstop>molLJTable</tabstop>
+  <tabstop>addLJRowAboveButton</tabstop>
+  <tabstop>addLJRowBelowButton</tabstop>
+  <tabstop>deleteLJRowButton</tabstop>
+  <tabstop>molBondTable</tabstop>
+  <tabstop>addDistRowAboveButton</tabstop>
+  <tabstop>addDistRowBelowButton</tabstop>
+  <tabstop>deleteDistRowButton</tabstop>
+  <tabstop>molAngleTable</tabstop>
+  <tabstop>addAngRowAboveButton</tabstop>
+  <tabstop>addAngRowBelowButton</tabstop>
+  <tabstop>deleteAngRowButton</tabstop>
+  <tabstop>molDihedralTable</tabstop>
+  <tabstop>addDihRowAboveButton</tabstop>
+  <tabstop>addDihRowBelowButton</tabstop>
+  <tabstop>deleteDihRowButton</tabstop>
+  <tabstop>deleteDihAllButton</tabstop>
+  <tabstop>molRotTable</tabstop>
+  <tabstop>addRotRowAboveButton</tabstop>
+  <tabstop>addRotRowBelowButton</tabstop>
+  <tabstop>deleteRotRowButton</tabstop>
+  <tabstop>deleteRotAllButton</tabstop>
+  <tabstop>molTetherCheckBox</tabstop>
+  <tabstop>tetherAtomLineEdit</tabstop>
+  <tabstop>tolLineEdit</tabstop>
+  <tabstop>tetherCoordXLineEdit</tabstop>
+  <tabstop>tetherCoordYLineEdit</tabstop>
+  <tabstop>tetherCoordZLineEdit</tabstop>
+  <tabstop>molEcoreDcoreTable</tabstop>
+  <tabstop>molChangeAtobutton</tabstop>
+  <tabstop>updateMolFileButton</tabstop>
+  <tabstop>atoFileTable</tabstop>
+  <tabstop>numberDensityLineEdit</tabstop>
+  <tabstop>mixatoButton</tabstop>
+  <tabstop>addatoButton</tabstop>
+  <tabstop>loadBoxButton</tabstop>
+  <tabstop>randomiseButton</tabstop>
+  <tabstop>boxCompositionButton</tabstop>
+  <tabstop>temperatureLineEdit</tabstop>
+  <tabstop>vibtempLineEdit</tabstop>
+  <tabstop>angtempLineEdit</tabstop>
+  <tabstop>dihtempLineEdit</tabstop>
+  <tabstop>intraTransSSLineEdit</tabstop>
+  <tabstop>grpRotSSLineEdit</tabstop>
+  <tabstop>molRotSSLineEdit</tabstop>
+  <tabstop>molTransSSLineEdit</tabstop>
+  <tabstop>ecoredcoreTable</tabstop>
+  <tabstop>atoTetherTable</tabstop>
+  <tabstop>atoTetherTolLineEdit</tabstop>
+  <tabstop>updateAtoFileButton</tabstop>
+  <tabstop>fmoleLineEdit</tabstop>
+  <tabstop>fmoleButton</tabstop>
+  <tabstop>atoEPSRButton</tabstop>
+  <tabstop>atoAtomList</tabstop>
+  <tabstop>viewAtoFileButton</tabstop>
+  <tabstop>plotAtoCentreLineEdit</tabstop>
+  <tabstop>plotAtoMaxXLineEdit</tabstop>
+  <tabstop>plotAtoMaxYLineEdit</tabstop>
+  <tabstop>plotAtoMinZLineEdit</tabstop>
+  <tabstop>plotAtoMaxZLineEdit</tabstop>
+  <tabstop>plotAtoRotLineEdit</tabstop>
+  <tabstop>neutronDataRB</tabstop>
+  <tabstop>xrayDataRB</tabstop>
+  <tabstop>dataFileLineEdit</tabstop>
+  <tabstop>dataFileBrowseButton</tabstop>
+  <tabstop>dataFileTable</tabstop>
+  <tabstop>removeDataFileButton</tabstop>
+  <tabstop>normalisationComboBox</tabstop>
+  <tabstop>atomWtsTable</tabstop>
+  <tabstop>makeWtsButton</tabstop>
+  <tabstop>setupEPSRButton</tabstop>
+  <tabstop>ESPRtabWidget</tabstop>
+  <tabstop>inpSettingsTable</tabstop>
+  <tabstop>dataFileSettingsTable</tabstop>
+  <tabstop>pcofSettingsTable</tabstop>
+  <tabstop>minDistanceTable</tabstop>
+  <tabstop>updateInpPcofFilesButton</tabstop>
+  <tabstop>reloadEPSRinpButton</tabstop>
+  <tabstop>setupOutTypeComboBox</tabstop>
+  <tabstop>outputAvailableList</tabstop>
+  <tabstop>setupOutNameNew</tabstop>
+  <tabstop>setupOutButton</tabstop>
+  <tabstop>addOutputButton</tabstop>
+  <tabstop>removeOutputButton</tabstop>
+  <tabstop>runOutEPSRList</tabstop>
+  <tabstop>applyOutputsButton</tabstop>
+  <tabstop>plotComboBox1</tabstop>
+  <tabstop>plot1Button</tabstop>
+  <tabstop>plot1LogX</tabstop>
+  <tabstop>plot1LogY</tabstop>
+  <tabstop>plotComboBox2</tabstop>
+  <tabstop>plot2Button</tabstop>
+  <tabstop>plot2LogX</tabstop>
+  <tabstop>plot2LogY</tabstop>
+  <tabstop>messagesLineEdit</tabstop>
+  <tabstop>epsrRunningSign</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

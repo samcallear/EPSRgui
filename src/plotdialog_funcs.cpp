@@ -27,8 +27,9 @@ PlotDialog::PlotDialog(MainWindow *parent) : QDialog(parent)
     connect(ui.customPlot, SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(showPointToolTip(QMouseEvent*)));
     connect(ui.customPlot, SIGNAL(mouseWheel(QWheelEvent*)), this, SLOT(plotZoom(QWheelEvent*)));
 
-    QString atoFileName = mainWindow_->workingDir()+mainWindow_->atoFileName();
-    baseFileName_ = atoFileName.split(".").at(0);
+    workingDir_ = mainWindow_->workingDir();
+    atoFileName_ = mainWindow_->atoFileName();
+    baseFileName_ = workingDir_+atoFileName_.split(".").at(0);
 }
 
 void PlotDialog::on_plotButton_clicked(bool checked)
@@ -79,11 +80,7 @@ void PlotDialog::on_closeButton_clicked(bool checked)
 //read ato file and construct atom pair array for plot
 bool PlotDialog::readatofile()
 {
-//    QString atoFileName = "E:/EPSR24/run/AcN2/AcN2box.ato";
-    QString atoFileName = mainWindow_->workingDir()+mainWindow_->atoFileName();
-    baseFileName_ = atoFileName.split(".").at(0);
-//    printf("%s\n", qPrintable(atoFileName));
-    QFile file(atoFileName);
+    QFile file(workingDir_+atoFileName_);
     if(!file.open(QFile::ReadOnly | QFile::Text))
     {
         QMessageBox msgBox;
@@ -102,7 +99,6 @@ bool PlotDialog::readatofile()
         if (atomlabelrx.exactMatch(line))
         {
             atomLabels << atomlabelrx.cap(1);
-//            printf("Exact match: [%s]\n", qPrintable(ecoredcorerx.cap(1)));
         }
 
     } while (!line.isNull());
@@ -112,7 +108,6 @@ bool PlotDialog::readatofile()
 
     //number of entries in atomLabels list
     const int N_atomLabels = atomLabels.count();
-//    printf("atom list has %d entries\n", N_atomLabels);
 
     //show atomLabels in dialog
     ui.listWidget->clear();
@@ -137,13 +132,6 @@ bool PlotDialog::readatofile()
         }
     }
     nPartials = count;
-
-//    // Print it out for sanity
-//    for (int i=0; i<N_atomLabels; ++i)
-//    {
-//        for (int j=0; j<N_atomLabels; ++j) printf("%4i ", ij.ref(i,j));
-//        printf("\n");
-//    }
 
     return 0;
 }

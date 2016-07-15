@@ -1,4 +1,4 @@
-#include "qcustomplot.h"
+#include "src\qcustomplot.h"
 #include "epsrproject.h"
 
 #include <QVector>

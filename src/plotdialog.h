@@ -16,6 +16,8 @@ class PlotDialog : public QDialog
 
 private:
     QDir currentDir;
+    QString workingDir_;
+    QString atoFileName_;
     QString baseFileName_;
     MainWindow *mainWindow_;
 

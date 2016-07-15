@@ -20,8 +20,6 @@ MakeAtomDialog::MakeAtomDialog(QWidget *parent) : QDialog(parent)
     ui.chargeLineEdit->setValidator(new QRegExpValidator(chargerx, this));
     QRegExp symbolrx("[A-Z]{1}[a-z]?");
     ui.symbolLineEdit->setValidator(new QRegExpValidator(symbolrx, this));
-    QRegExp temprx("^[0-9]{5}");
-    ui.tempLineEdit->setValidator(new QRegExpValidator(temprx, this));
 
     connect(ui.okButton, SIGNAL(clicked()), this, SLOT(accept()));
     connect(ui.cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
@@ -66,9 +64,3 @@ QString MakeAtomDialog::getSymbol()
 {
     return ui.symbolLineEdit->text();
 }
-
-QString MakeAtomDialog::getTemp()
-{
-    return ui.tempLineEdit->text();
-}
-
