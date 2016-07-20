@@ -461,25 +461,28 @@ void MainWindow::updateInpFile()
 
     //now format the file correctly by opening in setup epsr and then exiting and saving
     QProcess processEpsrSetup;
-    processEpsrSetup.setProcessChannelMode(QProcess::ForwardedChannels);
+//    processEpsrSetup.setProcessChannelMode(QProcess::ForwardedChannels);
 #ifdef _WIN32
     processEpsrSetup.start(epsrBinDir_+"upset.exe", QStringList() << workingDir_ << "upset" << "epsr" << atoBaseFileName);
 #else
     processEpsrSetup.start(epsrBinDir_+"upset", QStringList() << workingDir_ << "upset" << "epsr" << atoBaseFileName);
 #endif
     if (!processEpsrSetup.waitForStarted()) return;
+    while (processEpsrSetup.waitForReadyRead(-1))
+    {
+        processEpsrSetup.write("e\n");
+        messageText_ += processEpsrSetup.readAllStandardOutput();
+    //    qDebug(result);
 
-    processEpsrSetup.write("e\n");
-    QByteArray result = processEpsrSetup.readAll();
-    qDebug(result);
+        processEpsrSetup.write("\n");
+        messageText_ += processEpsrSetup.readAllStandardOutput();
+    //    qDebug(result);
 
-    processEpsrSetup.write("\n");
-    result = processEpsrSetup.readAll();
-    qDebug(result);
+        processEpsrSetup.write("y\n");
+        messageText_ += processEpsrSetup.readAllStandardOutput();;
+    //    qDebug(result);
+    }
 
-    processEpsrSetup.write("y\n");
-    result = processEpsrSetup.readAll();
-    qDebug(result);
 
     if (!processEpsrSetup.waitForFinished(60000)) return;
 

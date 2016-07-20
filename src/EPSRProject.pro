@@ -20,14 +20,20 @@ HEADERS += array.h \
            settingsdialog.h \
            wtscomponent.h \
     makeatomdialog.h \
-    makelatticedialog.h
+    makelatticedialog.h \
+    boxcompositiondialog.h \
+    addatodialog.h \
+    messagesdialog.h
 FORMS += createnewdialog.ui \
          epsrproject.ui \
          moloptionsdialog.ui \
          plotdialog.ui \
          settingsdialog.ui \
     makeatomdialog.ui \
-    makelatticedialog.ui
+    makelatticedialog.ui \
+    boxcompositiondialog.ui \
+    addatodialog.ui \
+    messagesdialog.ui
 SOURCES += boxatofile.cpp \
            createnewdialog_funcs.cpp \
            datafilesettings.cpp \
@@ -44,5 +50,10 @@ SOURCES += boxatofile.cpp \
     plot1_mainwin.cpp \
     plot2_mainwin.cpp \
     makeatomdialog_funcs.cpp \
-    makelatticedialog_funcs.cpp
+    makelatticedialog_funcs.cpp \
+    boxcompositiondialog_funcs.cpp \
+    addatodialog_funcs.cpp \
+    runepsroptions.cpp \
+    messagesdialog_funcs.cpp
 RESOURCES += EPSRProject.qrc
+WIN32:RC_ICONS += guimainicon.ico

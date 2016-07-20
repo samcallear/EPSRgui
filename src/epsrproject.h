@@ -16,6 +16,7 @@ class MakeAtomDialog;
 class MakeLatticeDialog;
 class BoxCompositionDialog;
 class AddAtoDialog;
+class MessagesDialog;
 
 class MainWindow : public QMainWindow
 {
@@ -42,6 +43,7 @@ private slots:
     void stopEPSR();
     void deleteEPSRinpFile();
     void deleteBoxAtoFile();
+    void showMessages();
 
 private:
     void createActions();
@@ -57,6 +59,7 @@ private:
 //    SettingsDialog *settingsDialog;
     MakeAtomDialog *makeAtomDialog;
     MakeLatticeDialog *makeLatticeDialog;
+    MessagesDialog *messagesDialog;
 
     QDir exeDir_;
     QDir currentDir;
@@ -75,6 +78,7 @@ private:
     QString epsrInpFileName_; //filename and extension for EPSR.inp file
     QFileSystemWatcher epsrFinished_;
     int inpEntries_;
+    QByteArray messageText_;
 
     int endscript;
 
@@ -86,6 +90,7 @@ public:
     QStringList atomLabels();
     QVector<int> numberOfEachAtomLabel();
     QStringList listAtoFiles();
+    QByteArray messageText();
 
 public slots:
     void createNew();

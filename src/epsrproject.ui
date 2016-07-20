@@ -3045,6 +3045,7 @@
      <string>Settings</string>
     </property>
     <addaction name="settingsAct"/>
+    <addaction name="showMessagesAct"/>
    </widget>
    <addaction name="fileMenu"/>
    <addaction name="editMenu"/>
@@ -3182,6 +3183,11 @@
    </property>
    <property name="text">
     <string>Save as...</string>
+   </property>
+  </action>
+  <action name="showMessagesAct">
+   <property name="text">
+    <string>Show messages</string>
    </property>
   </action>
  </widget>

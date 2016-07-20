@@ -8,6 +8,7 @@
 #include "makelatticedialog.h"
 #include "boxcompositiondialog.h"
 #include "addatodialog.h"
+#include "messagesdialog.h"
 
 #include <QtGui>
 #include <QMainWindow>
@@ -111,6 +112,9 @@ void MainWindow::createActions()
 
     ui.deleteBoxAtoFileAct->setStatusTip(tr("Delete the existing box .ato file"));
     connect(ui.deleteBoxAtoFileAct, SIGNAL(triggered()), this, SLOT(deleteBoxAtoFile()));
+
+    ui.showMessagesAct->setStatusTip(tr("Show messages from EPSR"));
+    connect(ui.showMessagesAct, SIGNAL(triggered()), this, SLOT(showMessages()));
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
@@ -368,6 +372,7 @@ void MainWindow::open()
         // set file directories
         projectName_ = QFileInfo(newFileName).baseName();
         printf("Current EPSR project name is %s\n", qPrintable(projectName_));
+        messageText_ += "Current EPSR project name is "+projectName_+"\n";
         workingDir_ = QFileInfo(newFileName).path()+"/";
         workingDir_ = QDir::toNativeSeparators(workingDir_);
         printf("Current working directory is %s\n", qPrintable(workingDir_));
@@ -1176,11 +1181,20 @@ void MainWindow::runEPSR()
     QDir::setCurrent(workingDir_);
 
     QProcess processrunEPSRscript;
-    processrunEPSRscript.setProcessChannelMode(QProcess::ForwardedChannels);
+//    processrunEPSRscript.setProcessChannelMode(QProcess::ForwardedChannels);
 #ifdef _WIN32
+    processrunEPSRscript.setProcessChannelMode(QProcess::ForwardedChannels);
     processrunEPSRscript.startDetached("run"+atoBaseFileName+".bat");
 #else
-    processrunEPSRscript.startDetached("sh run"+atoBaseFileName+".sh");
+//    processrunEPSRscript.startDetached("gnome-terminal -e \"bash -c \\\"sh "+workingDir_+"run"+atoBaseFileName+".sh"; exec bash\\\"\"");
+    processrunEPSRscript.start("sh run"+atoBaseFileName+".sh");
+    if (processrunEPSRscript.waitForStarted(-1))
+    {
+        while (processrunEPSRscript.waitForReadyRead(-1))
+        {
+            messageText_ +=processrunEPSRscript.readAllStandardOutput();
+        }
+    }
 #endif
 
     //show EPSR is running
@@ -1395,6 +1409,13 @@ QStringList MainWindow::listAtoFiles()
     return atoFileList;
 }
 
+QByteArray MainWindow::messageText()
+{
+    return messageText_;
+}
+
+
+
 void MainWindow::deleteEPSRinpFile()
 {
     QFile file(workingDir_+epsrInpFileName_);
@@ -1517,4 +1538,14 @@ void MainWindow::deleteBoxAtoFile()
         }
     }
     return;
+}
+
+void MainWindow::showMessages()
+{
+    MessagesDialog messagesDialog(this);
+
+    messagesDialog.show();
+    messagesDialog.raise();
+    messagesDialog.activateWindow();
+    messagesDialog.exec();
 }

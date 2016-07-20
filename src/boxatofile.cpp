@@ -755,6 +755,7 @@ void MainWindow::on_fmoleButton_clicked(bool checked)
     processFmole.startDetached(epsrBinDir_+"fmole.exe", QStringList() << workingDir_ << "fmole" << atoBaseFileName << qPrintable(QString::number(fmoleIter)) << "0");
 #else
     processFmole.startDetached(epsrBinDir_+"fmole", QStringList() << workingDir_ << "fmole" << atoBaseFileName << qPrintable(QString::number(fmoleIter)) << "0");
+//    processFmole.startDetached("gnome-terminal -e \"bash -c \""+epsrBinDir_+"fmole "+workingDir_+" fmole "+atoBaseFileName+" "+qPrintable(QString::number(fmoleIter))+" 0; exec bash\\\"\"");
 #endif
 //    if (!processFmole.waitForStarted()) return;
 
