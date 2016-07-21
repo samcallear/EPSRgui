@@ -120,12 +120,14 @@ void MainWindow::setupOutput()
 
 void MainWindow::on_addOutputButton_clicked(bool checked)
 {
+    if (ui.outputAvailableList->count() == 0) return;
     QString fileToAdd = ui.outputAvailableList->currentItem()->text();
     ui.runOutEPSRList->addItem(fileToAdd);
 }
 
 void MainWindow::on_removeOutputButton_clicked(bool checked)
 {
+    if (ui.runOutEPSRList->count() == 0) return;
     int rowToRemove = ui.runOutEPSRList->currentRow();
     ui.runOutEPSRList->takeItem(rowToRemove);
 }

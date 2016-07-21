@@ -16,6 +16,10 @@
   <property name="windowTitle">
    <string>EPSRgui</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="EPSRProject.qrc">
+    <normaloff>:/mainicon/guimainicon.png</normaloff>:/mainicon/guimainicon.png</iconset>
+  </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayout_5">
     <item row="0" column="0">
@@ -696,7 +700,7 @@
                        </attribute>
                        <layout class="QVBoxLayout" name="verticalLayout_14">
                         <item>
-                         <layout class="QGridLayout" name="gridLayout_8">
+                         <layout class="QGridLayout" name="gridLayout_8" columnstretch="0,4,0,2,2,0,4">
                           <item row="0" column="0" colspan="2">
                            <widget class="QLabel" name="label_32">
                             <property name="minimumSize">
@@ -710,10 +714,78 @@
                             </property>
                            </widget>
                           </item>
-                          <item row="9" column="4">
-                           <widget class="QLabel" name="label_26">
+                          <item row="1" column="0">
+                           <widget class="QLabel" name="label_27">
                             <property name="text">
-                             <string>z</string>
+                             <string>a</string>
+                            </property>
+                           </widget>
+                          </item>
+                          <item row="1" column="1">
+                           <widget class="QLabel" name="molBoxA">
+                            <property name="text">
+                             <string/>
+                            </property>
+                           </widget>
+                          </item>
+                          <item row="1" column="2">
+                           <widget class="QLabel" name="label_47">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
+                            <property name="text">
+                             <string>b</string>
+                            </property>
+                           </widget>
+                          </item>
+                          <item row="1" column="3" colspan="2">
+                           <widget class="QLabel" name="molBoxB">
+                            <property name="text">
+                             <string/>
+                            </property>
+                           </widget>
+                          </item>
+                          <item row="1" column="5">
+                           <widget class="QLabel" name="label_34">
+                            <property name="text">
+                             <string>c</string>
+                            </property>
+                           </widget>
+                          </item>
+                          <item row="1" column="6">
+                           <widget class="QLabel" name="molBoxC">
+                            <property name="text">
+                             <string/>
+                            </property>
+                           </widget>
+                          </item>
+                          <item row="2" column="0" colspan="2">
+                           <widget class="QLabel" name="label_33">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
+                            <property name="text">
+                             <string>Component box spherical polar angles (°)</string>
+                            </property>
+                           </widget>
+                          </item>
+                          <item row="3" column="0">
+                           <widget class="QLabel" name="label_48">
+                            <property name="text">
+                             <string>phi</string>
+                            </property>
+                           </widget>
+                          </item>
+                          <item row="3" column="1">
+                           <widget class="QLabel" name="molBoxPhi">
+                            <property name="text">
+                             <string/>
                             </property>
                            </widget>
                           </item>
@@ -730,72 +802,24 @@
                             </property>
                            </widget>
                           </item>
-                          <item row="6" column="3">
-                           <widget class="QLineEdit" name="tetherAtomLineEdit">
+                          <item row="3" column="3" colspan="2">
+                           <widget class="QLabel" name="molBoxTheta">
                             <property name="text">
-                             <string>0</string>
+                             <string/>
                             </property>
                            </widget>
                           </item>
-                          <item row="9" column="5">
-                           <widget class="QLineEdit" name="tetherCoordZLineEdit">
-                            <property name="text">
-                             <string>0.000000E+00</string>
-                            </property>
-                           </widget>
-                          </item>
-                          <item row="3" column="4">
+                          <item row="3" column="5">
                            <widget class="QLabel" name="label_49">
                             <property name="text">
                              <string>chi</string>
                             </property>
                            </widget>
                           </item>
-                          <item row="1" column="4">
-                           <widget class="QLabel" name="label_34">
+                          <item row="3" column="6">
+                           <widget class="QLabel" name="molBoxChi">
                             <property name="text">
-                             <string>c</string>
-                            </property>
-                           </widget>
-                          </item>
-                          <item row="3" column="0">
-                           <widget class="QLabel" name="label_48">
-                            <property name="text">
-                             <string>phi</string>
-                            </property>
-                           </widget>
-                          </item>
-                          <item row="11" column="0" colspan="2">
-                           <widget class="QLabel" name="label_23">
-                            <property name="sizePolicy">
-                             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                              <horstretch>0</horstretch>
-                              <verstretch>1</verstretch>
-                             </sizepolicy>
-                            </property>
-                            <property name="text">
-                             <string>ecoredcore</string>
-                            </property>
-                           </widget>
-                          </item>
-                          <item row="7" column="3">
-                           <widget class="QLineEdit" name="tolLineEdit">
-                            <property name="text">
-                             <string>0.000000E+00</string>
-                            </property>
-                           </widget>
-                          </item>
-                          <item row="9" column="2">
-                           <widget class="QLabel" name="label_25">
-                            <property name="text">
-                             <string>y</string>
-                            </property>
-                           </widget>
-                          </item>
-                          <item row="12" column="4" colspan="2">
-                           <widget class="QPushButton" name="molChangeAtobutton">
-                            <property name="text">
-                             <string>Run changeato for selected file</string>
+                             <string/>
                             </property>
                            </widget>
                           </item>
@@ -811,27 +835,6 @@
                              </size>
                             </property>
                            </spacer>
-                          </item>
-                          <item row="9" column="0">
-                           <widget class="QLabel" name="label_24">
-                            <property name="text">
-                             <string>x</string>
-                            </property>
-                           </widget>
-                          </item>
-                          <item row="9" column="3">
-                           <widget class="QLineEdit" name="tetherCoordYLineEdit">
-                            <property name="text">
-                             <string>0.000000E+00</string>
-                            </property>
-                           </widget>
-                          </item>
-                          <item row="7" column="1">
-                           <widget class="QLabel" name="label_28">
-                            <property name="text">
-                             <string>Tethering tolerance</string>
-                            </property>
-                           </widget>
                           </item>
                           <item row="5" column="0" colspan="2">
                            <widget class="QCheckBox" name="molTetherCheckBox">
@@ -849,8 +852,36 @@
                             </property>
                            </widget>
                           </item>
-                          <item row="2" column="0" colspan="2">
-                           <widget class="QLabel" name="label_33">
+                          <item row="6" column="1">
+                           <widget class="QLabel" name="label_51">
+                            <property name="text">
+                             <string>Number for tethering atom (0 for COM)</string>
+                            </property>
+                           </widget>
+                          </item>
+                          <item row="6" column="3" colspan="2">
+                           <widget class="QLineEdit" name="tetherAtomLineEdit">
+                            <property name="text">
+                             <string>0</string>
+                            </property>
+                           </widget>
+                          </item>
+                          <item row="7" column="1">
+                           <widget class="QLabel" name="label_28">
+                            <property name="text">
+                             <string>Tethering tolerance</string>
+                            </property>
+                           </widget>
+                          </item>
+                          <item row="7" column="3" colspan="2">
+                           <widget class="QLineEdit" name="tolLineEdit">
+                            <property name="text">
+                             <string>0.000000E+00</string>
+                            </property>
+                           </widget>
+                          </item>
+                          <item row="8" column="1">
+                           <widget class="QLabel" name="label_4">
                             <property name="minimumSize">
                              <size>
                               <width>0</width>
@@ -858,7 +889,14 @@
                              </size>
                             </property>
                             <property name="text">
-                             <string>Component box spherical polar angles (°)</string>
+                             <string>Tethering origin coordinates</string>
+                            </property>
+                           </widget>
+                          </item>
+                          <item row="9" column="0">
+                           <widget class="QLabel" name="label_24">
+                            <property name="text">
+                             <string>x</string>
                             </property>
                            </widget>
                           </item>
@@ -869,85 +907,31 @@
                             </property>
                            </widget>
                           </item>
-                          <item row="11" column="3">
-                           <widget class="QTableWidget" name="molEcoreDcoreTable">
-                            <property name="minimumSize">
-                             <size>
-                              <width>0</width>
-                              <height>0</height>
-                             </size>
-                            </property>
-                            <property name="maximumSize">
-                             <size>
-                              <width>180</width>
-                              <height>20</height>
-                             </size>
-                            </property>
-                            <property name="verticalScrollBarPolicy">
-                             <enum>Qt::ScrollBarAlwaysOff</enum>
-                            </property>
-                            <property name="horizontalScrollBarPolicy">
-                             <enum>Qt::ScrollBarAlwaysOff</enum>
-                            </property>
-                            <property name="rowCount">
-                             <number>1</number>
-                            </property>
-                            <property name="columnCount">
-                             <number>2</number>
-                            </property>
-                            <attribute name="horizontalHeaderVisible">
-                             <bool>false</bool>
-                            </attribute>
-                            <attribute name="horizontalHeaderDefaultSectionSize">
-                             <number>50</number>
-                            </attribute>
-                            <attribute name="horizontalHeaderMinimumSectionSize">
-                             <number>60</number>
-                            </attribute>
-                            <attribute name="verticalHeaderVisible">
-                             <bool>false</bool>
-                            </attribute>
-                            <attribute name="verticalHeaderDefaultSectionSize">
-                             <number>20</number>
-                            </attribute>
-                            <attribute name="verticalHeaderHighlightSections">
-                             <bool>false</bool>
-                            </attribute>
-                            <attribute name="verticalHeaderMinimumSectionSize">
-                             <number>60</number>
-                            </attribute>
-                            <row/>
-                            <column/>
-                            <column/>
-                            <item row="0" column="0">
-                             <property name="text">
-                              <string>0</string>
-                             </property>
-                            </item>
-                            <item row="0" column="1">
-                             <property name="text">
-                              <string>1</string>
-                             </property>
-                            </item>
-                           </widget>
-                          </item>
-                          <item row="1" column="2">
-                           <widget class="QLabel" name="label_47">
-                            <property name="minimumSize">
-                             <size>
-                              <width>0</width>
-                              <height>20</height>
-                             </size>
-                            </property>
+                          <item row="9" column="2">
+                           <widget class="QLabel" name="label_25">
                             <property name="text">
-                             <string>b</string>
+                             <string>y</string>
                             </property>
                            </widget>
                           </item>
-                          <item row="1" column="0">
-                           <widget class="QLabel" name="label_27">
+                          <item row="9" column="3" colspan="2">
+                           <widget class="QLineEdit" name="tetherCoordYLineEdit">
                             <property name="text">
-                             <string>a</string>
+                             <string>0.000000E+00</string>
+                            </property>
+                           </widget>
+                          </item>
+                          <item row="9" column="5">
+                           <widget class="QLabel" name="label_26">
+                            <property name="text">
+                             <string>z</string>
+                            </property>
+                           </widget>
+                          </item>
+                          <item row="9" column="6">
+                           <widget class="QLineEdit" name="tetherCoordZLineEdit">
+                            <property name="text">
+                             <string>0.000000E+00</string>
                             </property>
                            </widget>
                           </item>
@@ -964,65 +948,29 @@
                             </property>
                            </spacer>
                           </item>
-                          <item row="8" column="1">
-                           <widget class="QLabel" name="label_4">
-                            <property name="minimumSize">
-                             <size>
-                              <width>0</width>
-                              <height>20</height>
-                             </size>
+                          <item row="11" column="0" colspan="2">
+                           <widget class="QLabel" name="label_23">
+                            <property name="sizePolicy">
+                             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                              <horstretch>0</horstretch>
+                              <verstretch>1</verstretch>
+                             </sizepolicy>
                             </property>
                             <property name="text">
-                             <string>Tethering origin coordinates</string>
-                            </property>
-                           </widget>
-                          </item>
-                          <item row="6" column="1">
-                           <widget class="QLabel" name="label_51">
-                            <property name="text">
-                             <string>Number for tethering atom (0 for COM)</string>
+                             <string>ecoredcore</string>
                             </property>
                            </widget>
                           </item>
-                          <item row="1" column="1">
-                           <widget class="QLabel" name="molBoxA">
-                            <property name="text">
-                             <string/>
-                            </property>
-                           </widget>
+                          <item row="11" column="3">
+                           <widget class="QLineEdit" name="molEcoreLineEdit"/>
                           </item>
-                          <item row="1" column="3">
-                           <widget class="QLabel" name="molBoxB">
-                            <property name="text">
-                             <string/>
-                            </property>
-                           </widget>
+                          <item row="11" column="4">
+                           <widget class="QLineEdit" name="molDcoreLineEdit"/>
                           </item>
-                          <item row="1" column="5">
-                           <widget class="QLabel" name="molBoxC">
+                          <item row="12" column="5" colspan="2">
+                           <widget class="QPushButton" name="molChangeAtobutton">
                             <property name="text">
-                             <string/>
-                            </property>
-                           </widget>
-                          </item>
-                          <item row="3" column="1">
-                           <widget class="QLabel" name="molBoxPhi">
-                            <property name="text">
-                             <string/>
-                            </property>
-                           </widget>
-                          </item>
-                          <item row="3" column="3">
-                           <widget class="QLabel" name="molBoxTheta">
-                            <property name="text">
-                             <string/>
-                            </property>
-                           </widget>
-                          </item>
-                          <item row="3" column="5">
-                           <widget class="QLabel" name="molBoxChi">
-                            <property name="text">
-                             <string/>
+                             <string>Run changeato for selected file</string>
                             </property>
                            </widget>
                           </item>
@@ -1178,196 +1126,9 @@
            <attribute name="title">
             <string>Simulation box</string>
            </attribute>
-           <layout class="QHBoxLayout" name="horizontalLayout_23">
+           <layout class="QHBoxLayout" name="horizontalLayout_25">
             <item>
              <layout class="QGridLayout" name="gridLayout_4" rowstretch="1,2">
-              <item row="0" column="0">
-               <widget class="QGroupBox" name="groupBox_11">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                  <horstretch>0</horstretch>
-                  <verstretch>1</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="title">
-                 <string>Create simulation box</string>
-                </property>
-                <layout class="QVBoxLayout" name="verticalLayout_7">
-                 <item>
-                  <widget class="QTableWidget" name="atoFileTable">
-                   <property name="maximumSize">
-                    <size>
-                     <width>16777215</width>
-                     <height>2000</height>
-                    </size>
-                   </property>
-                   <property name="horizontalScrollBarPolicy">
-                    <enum>Qt::ScrollBarAlwaysOff</enum>
-                   </property>
-                   <property name="sizeAdjustPolicy">
-                    <enum>QAbstractScrollArea::AdjustIgnored</enum>
-                   </property>
-                   <property name="columnCount">
-                    <number>3</number>
-                   </property>
-                   <attribute name="horizontalHeaderVisible">
-                    <bool>false</bool>
-                   </attribute>
-                   <attribute name="horizontalHeaderDefaultSectionSize">
-                    <number>120</number>
-                   </attribute>
-                   <attribute name="verticalHeaderVisible">
-                    <bool>false</bool>
-                   </attribute>
-                   <attribute name="verticalHeaderDefaultSectionSize">
-                    <number>25</number>
-                   </attribute>
-                   <column>
-                    <property name="text">
-                     <string>Component</string>
-                    </property>
-                   </column>
-                   <column>
-                    <property name="text">
-                     <string>Charge</string>
-                    </property>
-                   </column>
-                   <column>
-                    <property name="text">
-                     <string># in box</string>
-                    </property>
-                   </column>
-                  </widget>
-                 </item>
-                 <item>
-                  <layout class="QHBoxLayout" name="horizontalLayout_16">
-                   <item>
-                    <widget class="QLabel" name="label_5">
-                     <property name="text">
-                      <string>Atomic Number Density</string>
-                     </property>
-                     <property name="buddy">
-                      <cstring>numberDensityLineEdit</cstring>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QLineEdit" name="numberDensityLineEdit">
-                     <property name="inputMethodHints">
-                      <set>Qt::ImhNone</set>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QLabel" name="label">
-                     <property name="text">
-                      <string>atoms / Å&lt;sup&gt;3&lt;/sup&gt;</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <spacer name="horizontalSpacer_11">
-                     <property name="orientation">
-                      <enum>Qt::Horizontal</enum>
-                     </property>
-                     <property name="sizeHint" stdset="0">
-                      <size>
-                       <width>40</width>
-                       <height>20</height>
-                      </size>
-                     </property>
-                    </spacer>
-                   </item>
-                  </layout>
-                 </item>
-                 <item>
-                  <layout class="QHBoxLayout" name="horizontalLayout_17">
-                   <item>
-                    <widget class="QLabel" name="label_2">
-                     <property name="text">
-                      <string>Create simulation box   </string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QPushButton" name="mixatoButton">
-                     <property name="text">
-                      <string>Mixato</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QLabel" name="label_3">
-                     <property name="text">
-                      <string>  or  </string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QPushButton" name="addatoButton">
-                     <property name="text">
-                      <string>Addato</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QLabel" name="label_52">
-                     <property name="text">
-                      <string>  or  </string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QPushButton" name="loadBoxButton">
-                     <property name="text">
-                      <string>Load box</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <spacer name="horizontalSpacer_9">
-                     <property name="orientation">
-                      <enum>Qt::Horizontal</enum>
-                     </property>
-                     <property name="sizeHint" stdset="0">
-                      <size>
-                       <width>40</width>
-                       <height>20</height>
-                      </size>
-                     </property>
-                    </spacer>
-                   </item>
-                  </layout>
-                 </item>
-                 <item>
-                  <layout class="QHBoxLayout" name="horizontalLayout_18">
-                   <item>
-                    <widget class="QPushButton" name="randomiseButton">
-                     <property name="text">
-                      <string>Randomise</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <spacer name="horizontalSpacer_10">
-                     <property name="orientation">
-                      <enum>Qt::Horizontal</enum>
-                     </property>
-                     <property name="sizeHint" stdset="0">
-                      <size>
-                       <width>40</width>
-                       <height>20</height>
-                      </size>
-                     </property>
-                    </spacer>
-                   </item>
-                  </layout>
-                 </item>
-                </layout>
-                <zorder>atoFileTable</zorder>
-                <zorder></zorder>
-               </widget>
-              </item>
               <item row="0" column="1" rowspan="2">
                <widget class="QGroupBox" name="groupBox_12">
                 <property name="sizePolicy">
@@ -1379,9 +1140,9 @@
                 <property name="title">
                  <string>Simulation box details</string>
                 </property>
-                <layout class="QVBoxLayout" name="verticalLayout_15">
+                <layout class="QHBoxLayout" name="horizontalLayout_23">
                  <item>
-                  <layout class="QGridLayout" name="gridLayout_2">
+                  <layout class="QGridLayout" name="gridLayout_2" columnstretch="3,1,1,2">
                    <item row="0" column="0">
                     <widget class="QLabel" name="boxAtoNameLabel">
                      <property name="sizePolicy">
@@ -1401,7 +1162,7 @@
                      </property>
                     </widget>
                    </item>
-                   <item row="0" column="1">
+                   <item row="0" column="1" colspan="2">
                     <widget class="QLabel" name="boxAtoLabel">
                      <property name="sizePolicy">
                       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -1433,7 +1194,7 @@
                      </property>
                     </widget>
                    </item>
-                   <item row="1" column="1">
+                   <item row="1" column="1" colspan="2">
                     <widget class="QLabel" name="boxAtoMols">
                      <property name="sizePolicy">
                       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -1459,14 +1220,14 @@
                      </property>
                     </widget>
                    </item>
-                   <item row="2" column="1">
+                   <item row="2" column="1" colspan="2">
                     <widget class="QLabel" name="boxAtoAtoms">
                      <property name="text">
                       <string/>
                      </property>
                     </widget>
                    </item>
-                   <item row="2" column="2">
+                   <item row="2" column="3">
                     <widget class="QPushButton" name="boxCompositionButton">
                      <property name="text">
                       <string>Composition</string>
@@ -1492,7 +1253,7 @@
                      </property>
                     </widget>
                    </item>
-                   <item row="3" column="1">
+                   <item row="3" column="1" colspan="2">
                     <widget class="QLabel" name="boxAtoCharge">
                      <property name="sizePolicy">
                       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -1524,7 +1285,7 @@
                      </property>
                     </widget>
                    </item>
-                   <item row="4" column="1">
+                   <item row="4" column="1" colspan="2">
                     <widget class="QLabel" name="boxAtoLengthA">
                      <property name="sizePolicy">
                       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -1537,14 +1298,14 @@
                      </property>
                     </widget>
                    </item>
-                   <item row="4" column="2">
+                   <item row="4" column="3">
                     <widget class="QLabel" name="label_18">
                      <property name="text">
                       <string>Å</string>
                      </property>
                     </widget>
                    </item>
-                   <item row="5" column="1">
+                   <item row="5" column="1" colspan="2">
                     <widget class="QLabel" name="boxAtoLengthB">
                      <property name="minimumSize">
                       <size>
@@ -1557,7 +1318,7 @@
                      </property>
                     </widget>
                    </item>
-                   <item row="6" column="1">
+                   <item row="6" column="1" colspan="2">
                     <widget class="QLabel" name="boxAtoLengthC">
                      <property name="minimumSize">
                       <size>
@@ -1577,7 +1338,7 @@
                      </property>
                     </widget>
                    </item>
-                   <item row="7" column="1">
+                   <item row="7" column="1" colspan="2">
                     <widget class="QLabel" name="boxAtoAxisA">
                      <property name="minimumSize">
                       <size>
@@ -1590,14 +1351,14 @@
                      </property>
                     </widget>
                    </item>
-                   <item row="7" column="2">
+                   <item row="7" column="3">
                     <widget class="QLabel" name="label_37">
                      <property name="text">
                       <string>°</string>
                      </property>
                     </widget>
                    </item>
-                   <item row="8" column="1">
+                   <item row="8" column="1" colspan="2">
                     <widget class="QLabel" name="boxAtoAxisB">
                      <property name="minimumSize">
                       <size>
@@ -1610,7 +1371,7 @@
                      </property>
                     </widget>
                    </item>
-                   <item row="9" column="1">
+                   <item row="9" column="1" colspan="2">
                     <widget class="QLabel" name="boxAtoAxisG">
                      <property name="minimumSize">
                       <size>
@@ -1630,7 +1391,7 @@
                      </property>
                     </widget>
                    </item>
-                   <item row="10" column="1">
+                   <item row="10" column="1" colspan="2">
                     <widget class="QLabel" name="boxAtoVol">
                      <property name="minimumSize">
                       <size>
@@ -1643,7 +1404,7 @@
                      </property>
                     </widget>
                    </item>
-                   <item row="10" column="2">
+                   <item row="10" column="3">
                     <widget class="QLabel" name="label_43">
                      <property name="text">
                       <string>Å&lt;sup&gt;3&lt;/sup&gt;</string>
@@ -1663,14 +1424,14 @@
                      </property>
                     </widget>
                    </item>
-                   <item row="11" column="1">
+                   <item row="11" column="1" colspan="2">
                     <widget class="QLineEdit" name="temperatureLineEdit">
                      <property name="text">
                       <string>300</string>
                      </property>
                     </widget>
                    </item>
-                   <item row="11" column="2">
+                   <item row="11" column="3">
                     <widget class="QLabel" name="label_17">
                      <property name="text">
                       <string>K</string>
@@ -1690,7 +1451,7 @@
                      </property>
                     </widget>
                    </item>
-                   <item row="12" column="1">
+                   <item row="12" column="1" colspan="2">
                     <widget class="QLineEdit" name="vibtempLineEdit">
                      <property name="text">
                       <string>65</string>
@@ -1710,7 +1471,7 @@
                      </property>
                     </widget>
                    </item>
-                   <item row="13" column="1">
+                   <item row="13" column="1" colspan="2">
                     <widget class="QLineEdit" name="angtempLineEdit">
                      <property name="text">
                       <string>1</string>
@@ -1730,7 +1491,7 @@
                      </property>
                     </widget>
                    </item>
-                   <item row="14" column="1">
+                   <item row="14" column="1" colspan="2">
                     <widget class="QLineEdit" name="dihtempLineEdit">
                      <property name="text">
                       <string>1</string>
@@ -1744,7 +1505,7 @@
                      </property>
                     </widget>
                    </item>
-                   <item row="15" column="1">
+                   <item row="15" column="1" colspan="2">
                     <widget class="QLineEdit" name="intraTransSSLineEdit">
                      <property name="text">
                       <string>0.1</string>
@@ -1758,7 +1519,7 @@
                      </property>
                     </widget>
                    </item>
-                   <item row="16" column="1">
+                   <item row="16" column="1" colspan="2">
                     <widget class="QLineEdit" name="grpRotSSLineEdit">
                      <property name="text">
                       <string>0.3</string>
@@ -1772,7 +1533,7 @@
                      </property>
                     </widget>
                    </item>
-                   <item row="17" column="1">
+                   <item row="17" column="1" colspan="2">
                     <widget class="QLineEdit" name="molRotSSLineEdit">
                      <property name="text">
                       <string>0.3</string>
@@ -1786,7 +1547,7 @@
                      </property>
                     </widget>
                    </item>
-                   <item row="18" column="1">
+                   <item row="18" column="1" colspan="2">
                     <widget class="QLineEdit" name="molTransSSLineEdit">
                      <property name="text">
                       <string>1</string>
@@ -1807,66 +1568,10 @@
                     </widget>
                    </item>
                    <item row="19" column="1">
-                    <widget class="QTableWidget" name="ecoredcoreTable">
-                     <property name="minimumSize">
-                      <size>
-                       <width>150</width>
-                       <height>0</height>
-                      </size>
-                     </property>
-                     <property name="maximumSize">
-                      <size>
-                       <width>200</width>
-                       <height>20</height>
-                      </size>
-                     </property>
-                     <property name="verticalScrollBarPolicy">
-                      <enum>Qt::ScrollBarAlwaysOff</enum>
-                     </property>
-                     <property name="horizontalScrollBarPolicy">
-                      <enum>Qt::ScrollBarAlwaysOff</enum>
-                     </property>
-                     <property name="rowCount">
-                      <number>1</number>
-                     </property>
-                     <property name="columnCount">
-                      <number>2</number>
-                     </property>
-                     <attribute name="horizontalHeaderVisible">
-                      <bool>false</bool>
-                     </attribute>
-                     <attribute name="horizontalHeaderDefaultSectionSize">
-                      <number>80</number>
-                     </attribute>
-                     <attribute name="horizontalHeaderMinimumSectionSize">
-                      <number>70</number>
-                     </attribute>
-                     <attribute name="verticalHeaderVisible">
-                      <bool>false</bool>
-                     </attribute>
-                     <attribute name="verticalHeaderDefaultSectionSize">
-                      <number>20</number>
-                     </attribute>
-                     <attribute name="verticalHeaderHighlightSections">
-                      <bool>false</bool>
-                     </attribute>
-                     <attribute name="verticalHeaderMinimumSectionSize">
-                      <number>75</number>
-                     </attribute>
-                     <row/>
-                     <column/>
-                     <column/>
-                     <item row="0" column="0">
-                      <property name="text">
-                       <string>0</string>
-                      </property>
-                     </item>
-                     <item row="0" column="1">
-                      <property name="text">
-                       <string>1</string>
-                      </property>
-                     </item>
-                    </widget>
+                    <widget class="QLineEdit" name="ecoreLineEdit"/>
+                   </item>
+                   <item row="19" column="2">
+                    <widget class="QLineEdit" name="dcoreLineEdit"/>
                    </item>
                    <item row="20" column="0">
                     <widget class="QLabel" name="label_44">
@@ -1875,7 +1580,7 @@
                      </property>
                     </widget>
                    </item>
-                   <item row="20" column="1" colspan="2">
+                   <item row="20" column="1" colspan="3">
                     <widget class="QTableWidget" name="atoTetherTable">
                      <property name="minimumSize">
                       <size>
@@ -1913,7 +1618,7 @@
                      </property>
                     </widget>
                    </item>
-                   <item row="21" column="1">
+                   <item row="21" column="1" colspan="2">
                     <widget class="QLineEdit" name="atoTetherTolLineEdit"/>
                    </item>
                    <item row="22" column="0">
@@ -1929,7 +1634,7 @@
                      </property>
                     </spacer>
                    </item>
-                   <item row="22" column="1">
+                   <item row="22" column="1" colspan="2">
                     <widget class="QPushButton" name="updateAtoFileButton">
                      <property name="sizePolicy">
                       <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -1961,7 +1666,7 @@
                      </property>
                     </widget>
                    </item>
-                   <item row="23" column="1">
+                   <item row="23" column="1" colspan="2">
                     <widget class="QLineEdit" name="fmoleLineEdit">
                      <property name="sizePolicy">
                       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
@@ -1980,7 +1685,7 @@
                      </property>
                     </widget>
                    </item>
-                   <item row="23" column="2">
+                   <item row="23" column="3">
                     <widget class="QPushButton" name="fmoleButton">
                      <property name="sizePolicy">
                       <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -2187,6 +1892,193 @@
                   </widget>
                  </item>
                 </layout>
+               </widget>
+              </item>
+              <item row="0" column="0">
+               <widget class="QGroupBox" name="groupBox_11">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>1</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="title">
+                 <string>Create simulation box</string>
+                </property>
+                <layout class="QVBoxLayout" name="verticalLayout_7">
+                 <item>
+                  <widget class="QTableWidget" name="atoFileTable">
+                   <property name="maximumSize">
+                    <size>
+                     <width>16777215</width>
+                     <height>2000</height>
+                    </size>
+                   </property>
+                   <property name="horizontalScrollBarPolicy">
+                    <enum>Qt::ScrollBarAlwaysOff</enum>
+                   </property>
+                   <property name="sizeAdjustPolicy">
+                    <enum>QAbstractScrollArea::AdjustIgnored</enum>
+                   </property>
+                   <property name="columnCount">
+                    <number>3</number>
+                   </property>
+                   <attribute name="horizontalHeaderVisible">
+                    <bool>false</bool>
+                   </attribute>
+                   <attribute name="horizontalHeaderDefaultSectionSize">
+                    <number>120</number>
+                   </attribute>
+                   <attribute name="verticalHeaderVisible">
+                    <bool>false</bool>
+                   </attribute>
+                   <attribute name="verticalHeaderDefaultSectionSize">
+                    <number>25</number>
+                   </attribute>
+                   <column>
+                    <property name="text">
+                     <string>Component</string>
+                    </property>
+                   </column>
+                   <column>
+                    <property name="text">
+                     <string>Charge</string>
+                    </property>
+                   </column>
+                   <column>
+                    <property name="text">
+                     <string># in box</string>
+                    </property>
+                   </column>
+                  </widget>
+                 </item>
+                 <item>
+                  <layout class="QHBoxLayout" name="horizontalLayout_16">
+                   <item>
+                    <widget class="QLabel" name="label_5">
+                     <property name="text">
+                      <string>Atomic Number Density</string>
+                     </property>
+                     <property name="buddy">
+                      <cstring>numberDensityLineEdit</cstring>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLineEdit" name="numberDensityLineEdit">
+                     <property name="inputMethodHints">
+                      <set>Qt::ImhNone</set>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLabel" name="label">
+                     <property name="text">
+                      <string>atoms / Å&lt;sup&gt;3&lt;/sup&gt;</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <spacer name="horizontalSpacer_11">
+                     <property name="orientation">
+                      <enum>Qt::Horizontal</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>40</width>
+                       <height>20</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
+                  </layout>
+                 </item>
+                 <item>
+                  <layout class="QHBoxLayout" name="horizontalLayout_17">
+                   <item>
+                    <widget class="QLabel" name="label_2">
+                     <property name="text">
+                      <string>Create simulation box   </string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="mixatoButton">
+                     <property name="text">
+                      <string>Mixato</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLabel" name="label_3">
+                     <property name="text">
+                      <string>  or  </string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="addatoButton">
+                     <property name="text">
+                      <string>Addato</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLabel" name="label_52">
+                     <property name="text">
+                      <string>  or  </string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="loadBoxButton">
+                     <property name="text">
+                      <string>Load box</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <spacer name="horizontalSpacer_9">
+                     <property name="orientation">
+                      <enum>Qt::Horizontal</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>40</width>
+                       <height>20</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
+                  </layout>
+                 </item>
+                 <item>
+                  <layout class="QHBoxLayout" name="horizontalLayout_18">
+                   <item>
+                    <widget class="QPushButton" name="randomiseButton">
+                     <property name="text">
+                      <string>Randomise</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <spacer name="horizontalSpacer_10">
+                     <property name="orientation">
+                      <enum>Qt::Horizontal</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>40</width>
+                       <height>20</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
+                  </layout>
+                 </item>
+                </layout>
+                <zorder>atoFileTable</zorder>
+                <zorder></zorder>
                </widget>
               </item>
              </layout>
@@ -3241,7 +3133,6 @@
   <tabstop>tetherCoordXLineEdit</tabstop>
   <tabstop>tetherCoordYLineEdit</tabstop>
   <tabstop>tetherCoordZLineEdit</tabstop>
-  <tabstop>molEcoreDcoreTable</tabstop>
   <tabstop>molChangeAtobutton</tabstop>
   <tabstop>updateMolFileButton</tabstop>
   <tabstop>atoFileTable</tabstop>
@@ -3259,7 +3150,6 @@
   <tabstop>grpRotSSLineEdit</tabstop>
   <tabstop>molRotSSLineEdit</tabstop>
   <tabstop>molTransSSLineEdit</tabstop>
-  <tabstop>ecoredcoreTable</tabstop>
   <tabstop>atoTetherTable</tabstop>
   <tabstop>atoTetherTolLineEdit</tabstop>
   <tabstop>updateAtoFileButton</tabstop>
@@ -3310,7 +3200,9 @@
   <tabstop>messagesLineEdit</tabstop>
   <tabstop>epsrRunningSign</tabstop>
  </tabstops>
- <resources/>
+ <resources>
+  <include location="EPSRProject.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>molFileList</sender>

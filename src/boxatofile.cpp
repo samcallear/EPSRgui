@@ -46,59 +46,52 @@ void MainWindow::on_mixatoButton_clicked(bool checked)
                 return;
             }
             atoFileIndexes.append(atoFileIndex);
-            printf("%s\n", qPrintable(atoFileIndexes.at(i)));
             QString numberMol = ui.atoFileTable->item(i,2)->text();
             numberOfMolecules.append(numberMol);
         }
 
         int nIndex = atoFileIndexes.count();
 
-        QProcess processMixato;
-        processMixato.setProcessChannelMode(QProcess::ForwardedChannels);
+//        processEPSR_.setProcessChannelMode(QProcess::ForwardedChannels);
 
         QString projDir = workingDir_;
         projDir = QDir::toNativeSeparators(projDir);
     #ifdef _WIN32
-        processMixato.start(epsrBinDir_+"mixato.exe", QStringList() << projDir << "mixato");
+        processEPSR_.start(epsrBinDir_+"mixato.exe", QStringList() << projDir << "mixato");
     #else
-        processMixato.start(epsrBinDir_+"mixato", QStringList() << workingDir_ << "mixato");
+        processEPSR_.start(epsrBinDir_+"mixato", QStringList() << workingDir_ << "mixato");
     #endif
-        if (!processMixato.waitForStarted()) return;
+        if (!processEPSR_.waitForStarted()) return;
 
-        processMixato.write(qPrintable(QString::number(nIndex)+"\n"));
-        QByteArray result = processMixato.readAll();
-        qDebug(result);
+        processEPSR_.write(qPrintable(QString::number(nIndex)+"\n"));
+
 
         for (int i = 0 ; i < nMolFiles; i++)
         {
             int newlines = atoFileIndexes.at(i).toInt();
             for (int nl = 0; nl < newlines; nl++)
             {
-                processMixato.write("\n");
-                result = processMixato.readAll();
-                qDebug(result);
+                processEPSR_.write("\n");
+
             }
-            processMixato.write("y\n");
-            result = processMixato.readAll();
-            qDebug(result);
+            processEPSR_.write("y\n");
+
 
             int nMols = numberOfMolecules.at(i).toInt();
-            processMixato.write(qPrintable(QString::number(nMols)+"\n"));
-            result = processMixato.readAll();
-            qDebug(result);
+            processEPSR_.write(qPrintable(QString::number(nMols)+"\n"));
+
         }
             double numberDensity = ui.numberDensityLineEdit->text().toDouble();
-            processMixato.write(qPrintable(QString::number(numberDensity)+"\n"));
-            result = processMixato.readAll();
-            qDebug(result);
+            processEPSR_.write(qPrintable(QString::number(numberDensity)+"\n"));
 
-            processMixato.write(qPrintable(atoFileBaseName+"\n"));
-            result = processMixato.readAll();
-            qDebug(result);
 
-        if (!processMixato.waitForFinished(1800000)) return;
+            processEPSR_.write(qPrintable(atoFileBaseName+"\n"));
 
-        printf("\nfinished writing %s file\n", qPrintable(atoFileName_));
+
+        if (!processEPSR_.waitForFinished(1800000)) return;
+
+        messageText_ += "\nfinished writing "+atoFileName_+" file\n";
+        messagesDialog.refreshMessages();
         ui.messagesLineEdit->setText("Finished writing box .ato file");
 
         ui.boxAtoLabel->setText(atoFileName_);
@@ -112,18 +105,14 @@ void MainWindow::on_mixatoButton_clicked(bool checked)
             ui.atoAtomList->addItem(item);
         }
         checkBoxCharge();
-    //    ui.createMolFileButton->setDisabled(true);
-    //    ui.molFileLoadButton->setDisabled(true);
-    //    ui.createAtomButton->setDisabled(true);
-    //    ui.createLatticeButton->setDisabled(true);
-    //    ui.makeMolExtButton->setDisabled(true);
-    //    ui.removeMolFileButton->setDisabled(true);
-    //    ui.addLJRowAboveButton->setDisabled(true);
-    //    ui.addLJRowBelowButton->setDisabled(true);
-    //    ui.deleteLJRowButton->setDisabled(true);
-    //    ui.mixatoButton->setDisabled(true);
-    //    ui.addatoButton->setDisabled(true);
-    //    ui.loadBoxButton->setDisabled(true);
+        ui.randomiseButton->setEnabled(true);
+        ui.viewAtoFileButton->setEnabled(true);
+        ui.boxCompositionButton->setEnabled(true);
+        ui.updateAtoFileButton->setEnabled(true);
+        ui.fmoleButton->setEnabled(true);
+        ui.atoEPSRButton->setEnabled(true);
+        ui.dataFileBrowseButton->setEnabled(true);
+        ui.removeDataFileButton->setEnabled(true);
 
         ui.deleteBoxAtoFileAct->setEnabled(true);
     }
@@ -192,21 +181,19 @@ void MainWindow::on_addatoButton_clicked(bool checked)
 
         int nIndex = atoFilesToAdd.count(); //this is the number of files to be added to the container
 
-        QProcess processAddato;
-        processAddato.setProcessChannelMode(QProcess::ForwardedChannels);
+//        processEPSR_.setProcessChannelMode(QProcess::ForwardedChannels);
 
         QString projDir = workingDir_;
         projDir = QDir::toNativeSeparators(projDir);
     #ifdef _WIN32
-        processAddato.start(epsrBinDir_+"addato.exe", QStringList() << projDir << "addato");
+        processEPSR_.start(epsrBinDir_+"addato.exe", QStringList() << projDir << "addato");
     #else
-        processAddato.start(epsrBinDir_+"addato", QStringList() << projDir << "addato");
+        processEPSR_.start(epsrBinDir_+"addato", QStringList() << projDir << "addato");
     #endif
-        if (!processAddato.waitForStarted()) return;
+        if (!processEPSR_.waitForStarted()) return;
 
-        processAddato.write(qPrintable(QString::number(nIndex)+"\n"));
-        QByteArray result = processAddato.readAll();
-        qDebug(result);
+        processEPSR_.write(qPrintable(QString::number(nIndex)+"\n"));
+
 
         // press enter to get to each ato file listed in the table that will be added to the container
         for (int i = 0 ; i < atoFilesToAdd.count(); i++)
@@ -214,37 +201,32 @@ void MainWindow::on_addatoButton_clicked(bool checked)
             int newlines = atoFileIndexes.at(i).toInt();
             for (int nl = 0; nl < newlines; nl++)
             {
-                processAddato.write("\n");
-                result = processAddato.readAll();
-                qDebug(result);
-            }
-            processAddato.write("y\n");
-            result = processAddato.readAll();
-            qDebug(result);
+                processEPSR_.write("\n");
 
-            processAddato.write(qPrintable(numberOfMolecules.at(i)+"\n"));
-            result = processAddato.readAll();
-            qDebug(result);
+            }
+            processEPSR_.write("y\n");
+
+
+            processEPSR_.write(qPrintable(numberOfMolecules.at(i)+"\n"));
+
         }
 
         // press enter to get to the ato file that is the container
         for (int nl = 0; nl < containerIndex; nl++)
         {
-            processAddato.write("\n");
-            result = processAddato.readAll();
-            qDebug(result);
+            processEPSR_.write("\n");
+
         }
-        processAddato.write("y\n");
-        result = processAddato.readAll();
-        qDebug(result);
+        processEPSR_.write("y\n");
 
-        processAddato.write(qPrintable(atoFileBaseName+"\n"));
-        result = processAddato.readAll();
-        qDebug(result);
 
-        if (!processAddato.waitForFinished(1800000)) return;
+        processEPSR_.write(qPrintable(atoFileBaseName+"\n"));
 
-        printf("\nfinished writing %s file\n", qPrintable(atoFileName_));
+
+        if (!processEPSR_.waitForFinished(1800000)) return;
+
+        messageText_ += "\nfinished writing "+atoFileName_+" file\n";
+        messagesDialog.refreshMessages();
         ui.messagesLineEdit->setText("Finished writing box .ato file");
 
         //update ui.atoFileTable to include number of mols added for relevant .ato files
@@ -283,18 +265,14 @@ void MainWindow::on_addatoButton_clicked(bool checked)
         }
 
         checkBoxCharge();
-//        ui.createMolFileButton->setDisabled(true);
-//        ui.molFileLoadButton->setDisabled(true);
-//        ui.createAtomButton->setDisabled(true);
-//        ui.createLatticeButton->setDisabled(true);
-//        ui.makeMolExtButton->setDisabled(true);
-//        ui.removeMolFileButton->setDisabled(true);
-//        ui.addLJRowAboveButton->setDisabled(true);
-//        ui.addLJRowBelowButton->setDisabled(true);
-//        ui.deleteLJRowButton->setDisabled(true);
-//        ui.mixatoButton->setDisabled(true);
-//        ui.addatoButton->setDisabled(true);
-//        ui.loadBoxButton->setDisabled(true);
+        ui.randomiseButton->setEnabled(true);
+        ui.viewAtoFileButton->setEnabled(true);
+        ui.boxCompositionButton->setEnabled(true);
+        ui.updateAtoFileButton->setEnabled(true);
+        ui.fmoleButton->setEnabled(true);
+        ui.atoEPSRButton->setEnabled(true);
+        ui.dataFileBrowseButton->setEnabled(true);
+        ui.removeDataFileButton->setEnabled(true);
 
         ui.deleteBoxAtoFileAct->setEnabled(true);
     }
@@ -320,21 +298,16 @@ void MainWindow::on_loadBoxButton_clicked (bool checked)
             ui.atoAtomList->addItem(item);
         }
         checkBoxCharge();
-//        ui.createMolFileButton->setDisabled(true);
-//        ui.molFileLoadButton->setDisabled(true);
-//        ui.createAtomButton->setDisabled(true);
-//        ui.createLatticeButton->setDisabled(true);
-//        ui.makeMolExtButton->setDisabled(true);
-//        ui.removeMolFileButton->setDisabled(true);
-//        ui.addLJRowAboveButton->setDisabled(true);
-//        ui.addLJRowBelowButton->setDisabled(true);
-//        ui.deleteLJRowButton->setDisabled(true);
-//        ui.mixatoButton->setDisabled(true);
-//        ui.addatoButton->setDisabled(true);
-//        ui.loadBoxButton->setDisabled(true);
+        ui.randomiseButton->setEnabled(true);
+        ui.viewAtoFileButton->setEnabled(true);
+        ui.boxCompositionButton->setEnabled(true);
+        ui.updateAtoFileButton->setEnabled(true);
+        ui.fmoleButton->setEnabled(true);
+        ui.atoEPSRButton->setEnabled(true);
+        ui.dataFileBrowseButton->setEnabled(true);
+        ui.removeDataFileButton->setEnabled(true);
 
         ui.deleteBoxAtoFileAct->setEnabled(true);
-
     }
 }
 
@@ -500,8 +473,8 @@ bool MainWindow::readAtoFileBoxDetails()
         if (ecoredcorerx.exactMatch(line))
         {
             dataLine = line.split("  ", QString::SkipEmptyParts);
-            ui.ecoredcoreTable->setItem(0,0, new QTableWidgetItem(dataLine.at(0)));
-            ui.ecoredcoreTable->setItem(0,1, new QTableWidgetItem(dataLine.at(1)));
+            ui.ecoreLineEdit->setText(dataLine.at(0));
+            ui.dcoreLineEdit->setText(dataLine.at(1));
         }
     } while (!line.isNull());
     file.close();
@@ -539,7 +512,6 @@ bool MainWindow::readAtoFileAtomPairs()
     QTextStream stream(&file);
     QString line;
     QRegExp atomPairrx(" ([A-Z][A-Za-z0-9 ]{2}) ([A-Za-z ]{1,2})   ([0-1]{1})");
-//    if (!atomPairrx.isValid()) printf("Could not find atom pairs in ato file.\n");
     atoAtomLabels.clear();
 
     do {
@@ -590,17 +562,17 @@ void MainWindow::on_randomiseButton_clicked(bool checked)
 
         QString atoBaseFileName = atoFileName_.split(".",QString::SkipEmptyParts).at(0);
 
-        QProcess processRandomise;
-        processRandomise.setProcessChannelMode(QProcess::ForwardedChannels);
+//        processEPSR_.setProcessChannelMode(QProcess::ForwardedChannels);
 #ifdef _WIN32
-        processRandomise.start(epsrBinDir_+"randomise.exe", QStringList() << workingDir_ << "randomise" << atoBaseFileName);
+        processEPSR_.start(epsrBinDir_+"randomise.exe", QStringList() << workingDir_ << "randomise" << atoBaseFileName);
 #else
-        processRandomise.start(epsrBinDir_+"randomise", QStringList() << workingDir_ << "randomise" << atoBaseFileName);
+        processEPSR_.start(epsrBinDir_+"randomise", QStringList() << workingDir_ << "randomise" << atoBaseFileName);
 #endif
-        if (!processRandomise.waitForStarted()) return;
+        if (!processEPSR_.waitForStarted()) return;
 
-        if (!processRandomise.waitForFinished(1800000)) return;
-        printf("\nfinished randomising box .ato file\n");
+        if (!processEPSR_.waitForFinished(1800000)) return;
+        messageText_ += "\nfinished randomising box .ato file\n";
+        messagesDialog.refreshMessages();
         ui.messagesLineEdit->setText("Finished randomising box");
 }
 
@@ -614,8 +586,8 @@ void MainWindow::on_updateAtoFileButton_clicked(bool checked)
     double grpRotSS = ui.grpRotSSLineEdit->text().toDouble();
     double molRotSS = ui.molRotSSLineEdit->text().toDouble();
     double molTransSS = ui.molTransSSLineEdit->text().toDouble();
-    double ecore = ui.ecoredcoreTable->item(0,0)->text().toDouble();
-    double dcore = ui.ecoredcoreTable->item(0,1)->text().toDouble();
+    double ecore = ui.ecoreLineEdit->text().toDouble();
+    double dcore = ui.dcoreLineEdit->text().toDouble();
     double tetherTol = ui.atoTetherTolLineEdit->text().toDouble();
     QString atoTempstr;
     QString vibTempstr;
@@ -737,7 +709,8 @@ void MainWindow::on_updateAtoFileButton_clicked(bool checked)
     QFile::remove(workingDir_+atoFileName_);
     QFile::rename(workingDir_+"temp.txt", workingDir_+atoFileName_);
 
-    printf("\nbox .ato file updated\n");
+    messageText_ += "\nbox .ato file updated\n";
+    messagesDialog.refreshMessages();
     ui.messagesLineEdit->setText("Finished updating box .ato file");
 }
 
@@ -760,7 +733,8 @@ void MainWindow::on_fmoleButton_clicked(bool checked)
 //    if (!processFmole.waitForStarted()) return;
 
 //    if (!processFmole.waitForFinished(1800000)) return;
-    printf("\nfmole is running on box.ato file\n");
+    messageText_ += "\nfmole is running on box.ato file\n";
+    messagesDialog.refreshMessages();
     ui.messagesLineEdit->setText("Running fmole in separate window");
 }
 

@@ -14,8 +14,8 @@ class MessagesDialog : public QDialog
 private:
     MainWindow *mainWindow_;
 
-private slots:
-    void refresh();
+public slots:
+    void refreshMessages();
 
 public:
     MessagesDialog(MainWindow *parent = 0);

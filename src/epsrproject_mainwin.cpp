@@ -23,8 +23,9 @@
 #include <QHeaderView>
 #include <QWidget>
 #include <QContextMenuEvent>
+#include <QProcess>
 
-MainWindow::MainWindow(QMainWindow *parent) : QMainWindow(parent)
+MainWindow::MainWindow(QMainWindow *parent) : QMainWindow(parent), messagesDialog(this)
 {
     ui.setupUi(this);
 
@@ -50,10 +51,6 @@ MainWindow::MainWindow(QMainWindow *parent) : QMainWindow(parent)
     ui.atoFileTable->verticalHeader()->setVisible(false);
     ui.atoFileTable->horizontalHeader()->setVisible(true);
 
-    ui.ecoredcoreTable->setColumnWidth(0,75);
-    ui.ecoredcoreTable->setColumnWidth(1,75);
-
-    plotDialog = 0;
     molOptionsDialog = 0;
     makeAtomDialog = 0;
     makeLatticeDialog = 0;
@@ -67,6 +64,8 @@ MainWindow::MainWindow(QMainWindow *parent) : QMainWindow(parent)
 
     connect(ui.setupOutTypeComboBox, SIGNAL(currentIndexChanged(QString)), this, SLOT(getOutputType()));
     connect(ui.dlputilsOutCheckBox, SIGNAL(stateChanged(int)), this, SLOT(outputDlputils()));
+    connect(&processEPSR_, SIGNAL(readyReadStandardOutput()), this, SLOT(outputfromEPSRprocessReady()));
+    //also need to refresh() on adding text to messagesText_*****************************************************************************************
 }
 
 void MainWindow::createActions()
@@ -148,6 +147,10 @@ void MainWindow::readSettings()
     QString settingsFile = exeDir_.path()+"/settings";
     settingsFile = QDir::toNativeSeparators(settingsFile);
     QFile file(settingsFile);
+    if(!file.exists())
+    {
+        return;
+    }
     if(!file.open(QFile::ReadOnly | QFile::Text))
     {
         QMessageBox msgBox;
@@ -205,12 +208,12 @@ void MainWindow::createNew()
         {
             QDir().mkdir(workingDir_);
         }
-        printf("Current EPSR project name is %s\n", qPrintable(projectName_));
-        printf("Current working directory is %s\n", qPrintable(workingDir_));
+        messageText_ += "Current EPSR project name is "+projectName_+"\n";
+        messageText_ += "Current working directory is "+workingDir_+"\n";
         QDir::setCurrent(workingDir_);
         epsrBinDir_ = (epsrDir_+"/bin/");
         epsrBinDir_ = QDir::toNativeSeparators(epsrBinDir_);
-        printf("Current EPSR binaries directory is %s\n", qPrintable(epsrBinDir_));
+        messageText_ += "Current EPSR binaries directory is "+epsrBinDir_+"\n";
 
         //make .EPSR.pro file
         QString epsrProFile = workingDir_+"/"+projectName_+".EPSR.pro";
@@ -224,11 +227,12 @@ void MainWindow::createNew()
         QFile::copy(epsrDir_+"/startup/vanderWaalsRadii.txt", workingDir_+"/vanderWaalsRadii.txt");
         QFile::copy(epsrDir_+"/startup/gnubonds.txt", workingDir_+"/gnubonds.txt");
         QFile::copy(epsrDir_+"/startup/gnuatoms.txt", workingDir_+"/gnuatoms.txt");
-        QFile::copy(epsrDir_+"/startup/system_commands.txt", workingDir_+"/system_commands.txt");
 #ifdef _WIN32
         QFile::copy(epsrDir_+"/startup/epsr.bat", workingDir_+"/epsr.bat");
+        QFile::copy(epsrDir_+"/startup/system_commands.txt", workingDir_+"/system_commands.txt");
 #else
         QFile::copy(epsrDir_+"/startup/epsr", workingDir_+"/epsr");
+        QFile::copy(epsrDir_+"/startup/system_commands_linux.txt", workingDir_+"/system_commands_linux.txt");
 #endif
 
         //activate tabs
@@ -252,16 +256,30 @@ void MainWindow::createNew()
         ui.addLJRowAboveButton->setEnabled(true);
         ui.addLJRowBelowButton->setEnabled(true);
         ui.deleteLJRowButton->setEnabled(true);
-        ui.mixatoButton->setEnabled(true);
-        ui.addatoButton->setEnabled(true);
-        ui.dataFileBrowseButton->setEnabled(true);
-        ui.removeDataFileButton->setEnabled(true);
+        ui.mixatoButton->setEnabled(false);
+        ui.addatoButton->setEnabled(false);
+        ui.loadBoxButton->setEnabled(false);
+        ui.randomiseButton->setEnabled(false);
+        ui.viewAtoFileButton->setEnabled(false);
+        ui.boxCompositionButton->setEnabled(false);
+        ui.updateAtoFileButton->setEnabled(false);
+        ui.fmoleButton->setEnabled(false);
+        ui.atoEPSRButton->setEnabled(false);
+        ui.dataFileBrowseButton->setEnabled(false);
+        ui.removeDataFileButton->setEnabled(false);
+        ui.makeWtsButton->setEnabled(false);
+        ui.setupEPSRButton->setEnabled(false);
+        ui.updateInpPcofFilesButton->setEnabled(false);
+        ui.reloadEPSRinpButton->setEnabled(false);
+        ui.setupOutButton->setEnabled(false);
+        ui.applyOutputsButton->setEnabled(false);
 
         //Activate available outputs list
         getOutputType();
 
         //change window title to contain projectName
         this->setWindowTitle("EPSRgui: "+projectName_);
+        messagesDialog.refreshMessages();
         ui.messagesLineEdit->setText("New project "+projectName_+" created");
     }
 }
@@ -276,14 +294,21 @@ void MainWindow::reset()
     ui.molFileList->clear();
     ui.molChargeLabel->clear();
     ui.molAtomTable->clearContents();
+    ui.molAtomTable->setRowCount(0);
     ui.molBondTable->clearContents();
+    ui.molBondTable->setRowCount(0);
     ui.molAngleTable->clearContents();
+    ui.molAngleTable->setRowCount(0);
     ui.molDihedralTable->clearContents();
+    ui.molDihedralTable->setRowCount(0);
     ui.molRotTable->clearContents();
+    ui.molRotTable->setRowCount(0);
     ui.molLJTable->clearContents();
+    ui.molLJTable->setRowCount(0);
     molFileName_.clear();
 
     ui.atoFileTable->clearContents();
+    ui.atoFileTable->setRowCount(0);
     ui.numberDensityLineEdit->clear();
     ui.boxAtoLabel->clear();
     ui.boxAtoCharge->clear();
@@ -299,40 +324,64 @@ void MainWindow::reset()
     ui.vibtempLineEdit->setText("65");
     ui.angtempLineEdit->setText("1");
     ui.dihtempLineEdit->setText("1");
+    ui.atoTetherTable->clearContents();
+    ui.atoTetherTable->setRowCount(0);
     ui.atoAtomList->clear();
-    ui.ecoredcoreTable->item(0,0)->setText("0");
-    ui.ecoredcoreTable->item(0,1)->setText("1");
     atoFileName_.clear();
     baseFileName_.clear();
 
     ui.dataFileTable->clearContents();
+    ui.dataFileTable->setRowCount(0);
     ui.atomWtsTable->clearContents();
+    ui.atomWtsTable->setRowCount(0);
     dataFileName_.clear();
     wtsBaseFileName_.clear();
     dataFileExt_.clear();
 
     ui.epsrInpFileName->clear();
     ui.inpSettingsTable->clearContents();
+    ui.inpSettingsTable->setRowCount(0);
     ui.dataFileSettingsTable->clearContents();
+    ui.dataFileSettingsTable->setRowCount(0);
     ui.pcofSettingsTable->clearContents();
+    ui.pcofSettingsTable->setRowCount(0);
     ui.minDistanceTable->clearContents();
+    ui.minDistanceTable->setRowCount(0);
     epsrInpFileName_.clear();
 
-    //re-enable all buttons
+    //enable/disable buttons
+    ui.molFileTabWidget->setEnabled(false);
     ui.createMolFileButton->setEnabled(true);
     ui.molFileLoadButton->setEnabled(true);
     ui.createAtomButton->setEnabled(true);
     ui.createLatticeButton->setEnabled(true);
-    ui.removeMolFileButton->setEnabled(true);
+    ui.viewMolFileButton->setEnabled(false);
+    ui.removeMolFileButton->setEnabled(false);
+    ui.updateMolFileButton->setEnabled(false);
     ui.makeMolExtButton->setEnabled(true);
     ui.addLJRowAboveButton->setEnabled(true);
     ui.addLJRowBelowButton->setEnabled(true);
     ui.deleteLJRowButton->setEnabled(true);
-    ui.mixatoButton->setEnabled(true);
-    ui.addatoButton->setEnabled(true);
+    ui.mixatoButton->setEnabled(false);
+    ui.addatoButton->setEnabled(false);
     ui.loadBoxButton->setEnabled(true);
-    ui.dataFileBrowseButton->setEnabled(true);
-    ui.removeDataFileButton->setEnabled(true);
+    ui.randomiseButton->setEnabled(false);
+    ui.viewAtoFileButton->setEnabled(false);
+    ui.boxCompositionButton->setEnabled(false);
+    ui.updateAtoFileButton->setEnabled(false);
+    ui.fmoleButton->setEnabled(false);
+    ui.atoEPSRButton->setEnabled(false);
+    ui.dataFileBrowseButton->setEnabled(false);
+    ui.removeDataFileButton->setEnabled(false);
+    ui.makeWtsButton->setEnabled(false);
+    ui.setupEPSRButton->setEnabled(false);
+    ui.updateInpPcofFilesButton->setEnabled(false);
+    ui.reloadEPSRinpButton->setEnabled(false);
+    ui.setupOutButton->setEnabled(false);
+    ui.applyOutputsButton->setEnabled(false);
+    ui.dlputilsOutCheckBox->setEnabled(false);
+    ui.plot1Button->setEnabled(false);
+    ui.plot2Button->setEnabled(false);
 
     //clear plots
     ui.plot1->clearGraphs();
@@ -371,16 +420,15 @@ void MainWindow::open()
 
         // set file directories
         projectName_ = QFileInfo(newFileName).baseName();
-        printf("Current EPSR project name is %s\n", qPrintable(projectName_));
         messageText_ += "Current EPSR project name is "+projectName_+"\n";
         workingDir_ = QFileInfo(newFileName).path()+"/";
         workingDir_ = QDir::toNativeSeparators(workingDir_);
-        printf("Current working directory is %s\n", qPrintable(workingDir_));
+        messageText_ += "Current working directory is "+workingDir_+"\n";
         QDir::setCurrent(workingDir_);
         epsrDir_ = workingDir_.split("run",QString::SkipEmptyParts).at(0);
         epsrBinDir_ = (epsrDir_+"bin/");
         epsrBinDir_ = QDir::toNativeSeparators(epsrBinDir_);
-        printf("Current EPSR binaries directory is %s\n", qPrintable(epsrBinDir_));
+        messageText_ += "Current EPSR binaries directory is "+epsrBinDir_+"\n";
 
         //read in EPSR pro file
         QFile file(newFileName);
@@ -424,11 +472,18 @@ void MainWindow::open()
                     ui.atoFileTable->setItem(nMolFiles-1,0, item);
                     ui.atoFileTable->setItem(nMolFiles-1,2, new QTableWidgetItem(dataLine.at(2)));
                     ui.molFileList->setCurrentRow(nMolFiles-1);
+                    ui.viewMolFileButton->setEnabled(true);
+                    ui.removeMolFileButton->setEnabled(true);
+                    ui.molFileTabWidget->setEnabled(true);
+                    ui.updateMolFileButton->setEnabled(true);
+                    ui.mixatoButton->setEnabled(true);
+                    ui.addatoButton->setEnabled(true);
+                    ui.loadBoxButton->setEnabled(true);
                 }
                 if (dataLine.at(0) == "boxAtoFileName")
                 {
                     atoFileName_ = dataLine.at(1);
-                    printf("Box .ato filename is %s\n", qPrintable(atoFileName_));
+                    messageText_ += "Box .ato filename is "+atoFileName_+"\n";
                     ui.boxAtoLabel->setText(atoFileName_);
                     readAtoFileAtomPairs();
                     readAtoFileBoxDetails();
@@ -439,18 +494,14 @@ void MainWindow::open()
                         ui.atoAtomList->addItem(item);
                     }
                     checkBoxCharge();
-//                    ui.createMolFileButton->setDisabled(true);
-//                    ui.molFileLoadButton->setDisabled(true);
-//                    ui.createAtomButton->setDisabled(true);
-//                    ui.createLatticeButton->setDisabled(true);
-//                    ui.makeMolExtButton->setDisabled(true);
-//                    ui.removeMolFileButton->setDisabled(true);
-//                    ui.addLJRowAboveButton->setDisabled(true);
-//                    ui.addLJRowBelowButton->setDisabled(true);
-//                    ui.deleteLJRowButton->setDisabled(true);
-//                    ui.mixatoButton->setDisabled(true);
-//                    ui.addatoButton->setDisabled(true);
-//                    ui.loadBoxButton->setDisabled(true);
+                    ui.randomiseButton->setEnabled(true);
+                    ui.viewAtoFileButton->setEnabled(true);
+                    ui.boxCompositionButton->setEnabled(true);
+                    ui.updateAtoFileButton->setEnabled(true);
+                    ui.fmoleButton->setEnabled(true);
+                    ui.atoEPSRButton->setEnabled(true);
+                    ui.dataFileBrowseButton->setEnabled(true);
+                    ui.removeDataFileButton->setEnabled(true);
                     ui.deleteBoxAtoFileAct->setEnabled(true);
                 }
                 if (dataLine.at(0) == "data")
@@ -458,20 +509,28 @@ void MainWindow::open()
                     dataFileTypeList.append(dataLine.at(1));
                     dataFileList.append(dataLine.at(2));
                     normalisationList.append(dataLine.at(3));
+                    ui.makeWtsButton->setEnabled(true);
                 }
                 if (dataLine.at(0) == "wts")
                 {
                      wtsFileList.append(dataLine.at(1));
+                     ui.setupEPSRButton->setEnabled(true);
                 }
                 if (dataLine.at(0) == "EPSRinp")
                 {
                     epsrInpFileName_ = dataLine.at(1)+".EPSR.inp";
-                    printf("EPSR inp filename is %s\n", qPrintable(epsrInpFileName_));
+                    messageText_ += "EPSR inp filename is "+epsrInpFileName_+"\n";
                     ui.epsrInpFileName->setText(epsrInpFileName_);
                     readEPSRinpFile();
                     updateInpFileTables();
                     readEPSRpcofFile();
                     updatePcofFileTables();
+                    ui.updateInpPcofFilesButton->setEnabled(true);
+                    ui.reloadEPSRinpButton->setEnabled(true);
+                    ui.setupOutButton->setEnabled(true);
+                    ui.applyOutputsButton->setEnabled(true);
+                    ui.dlputilsOutCheckBox->setEnabled(true);
+                    ui.deleteBoxAtoFileAct->setEnabled(true);
                     ui.plot1Button->setEnabled(true);
                     ui.plot2Button->setEnabled(true);
                     ui.dataFileBrowseButton->setDisabled(true);
@@ -481,7 +540,11 @@ void MainWindow::open()
                     ui.stopAct->setEnabled(true);
                     ui.plotAct->setEnabled(true);
                     ui.plotEPSRshellAct->setEnabled(true);
+                    ui.plot1Button->setEnabled(true);
+                    ui.plot2Button->setEnabled(true);
                     ui.deleteEPSRinpFileAct->setEnabled(true);
+                    //Activate available outputs list
+                    getOutputType();
                 }
                 if (dataLine.at(0) == "dlputils")
                 {
@@ -541,9 +604,6 @@ void MainWindow::open()
         ui.cutAct->setEnabled(true);
         ui.pasteAct->setEnabled(true);
 
-        //Activate available outputs list
-        getOutputType();
-
         //change window title to contain projectName
         this->setWindowTitle("EPSRProject: "+projectName_);
 
@@ -560,6 +620,7 @@ void MainWindow::open()
                 plot2();
             }
         }
+        messagesDialog.refreshMessages();
         ui.messagesLineEdit->setText("Project "+projectName_+" loaded");
     }
 }
@@ -627,7 +688,8 @@ bool MainWindow::saveFile()
 
     file.close();
 
-    printf("Current EPSR project settings saved to %s.EPSR.pro\n", qPrintable(projectName_));
+    messageText_ += "Current EPSR project settings saved to "+projectName_+".EPSR.pro\n";
+    messagesDialog.refreshMessages();
     ui.messagesLineEdit->setText("Saved current EPSR project");
     return false;
 
@@ -710,15 +772,7 @@ bool MainWindow::saveAs()
         if (!atoFileName_.isEmpty())
         {
             streamWrite << "boxAtoFileName " << projectNameCopy+"box.ato" << "\n";
-            streamWrite << "numberDensity " << ui.numberDensityLineEdit->text() << "\n";
-            streamWrite << "temperature " << ui.temperatureLineEdit->text() << "\n";
-            streamWrite << "vibtemp " << ui.vibtempLineEdit->text() << "\n";
-            streamWrite << "angtemp " << ui.angtempLineEdit->text() << "\n";
-            streamWrite << "dihtemp " << ui.dihtempLineEdit->text() << "\n";
-            streamWrite << "ecoredcore " << ui.ecoredcoreTable->item(0,0)->text() << " " << ui.ecoredcoreTable->item(0,1)->text() << "\n";
-
-            //fmole iterations
-            streamWrite << "fmoleIter " << ui.fmoleLineEdit->text() << "\n";
+            ui.boxAtoLabel->setText(projectNameCopy+"box.ato");
         }
 
         //data and wts files
@@ -790,8 +844,17 @@ bool MainWindow::saveAs()
         if (!epsrInpFileName_.isEmpty())
         {
             streamWrite << "EPSRinp " << projectNameCopy+"box" << "\n";
+            if (QFile::exists(workingDir_+"run"+projectName_+".bat"))
+            {
+                QFile::remove(workingDir_+"run"+projectName_+".bat");
+            }
         }
 
+        //dlputils
+        if (ui.dlputilsOutCheckBox->isChecked())
+        {
+            streamWrite << "dlputils\n";
+        }
         file.close();
 
         //edit EPSR.inp file so first line, fnameato and fnamepcof are updated
@@ -843,6 +906,8 @@ bool MainWindow::saveAs()
                         original.append("fnamepcof   "+projectNameCopy+"box.pcof               Name of potential coefficients file.\n");
                     }
                 }
+                ui.epsrInpFileName->setText(projectNameCopy+"box.EPSR.inp");
+                updateInpFileTables();
             }
 
             fileWrite.resize(0);
@@ -851,17 +916,17 @@ bool MainWindow::saveAs()
             fileRead.close();
         }
 
-        // set file directories etc
+        // set file directories etc              
         projectName_ = projectNameCopy;
-        printf("Current EPSR project name is %s\n", qPrintable(projectName_));
+        messageText_ += "Current EPSR project name is "+projectName_+"\n";
         workingDir_ = workingDirCopy;
         workingDir_ = QDir::toNativeSeparators(workingDir_);
-        printf("Current working directory is %s\n", qPrintable(workingDir_));
+        messageText_ += "Current working directory is "+workingDir_+"\n";
         QDir::setCurrent(workingDir_);
         epsrDir_ = epsrDirCopy;
-        epsrBinDir_ = (epsrDir_+"bin/");
+        epsrBinDir_ = (epsrDir_+"/bin/");
         epsrBinDir_ = QDir::toNativeSeparators(epsrBinDir_);
-        printf("Current EPSR binaries directory is %s\n", qPrintable(epsrBinDir_));
+        messageText_ += "Current EPSR binaries directory is "+epsrBinDir_+"\n";
         if (!atoFileName_.isEmpty())
         {
             atoFileName_ = projectNameCopy+"box.ato";
@@ -877,7 +942,8 @@ bool MainWindow::saveAs()
         //change window title to contain projectName
         this->setWindowTitle("EPSRProject: "+projectName_);
 
-        printf("EPSR project to saved to %s\n", qPrintable(workingDirCopy));
+
+        messagesDialog.refreshMessages();
         ui.messagesLineEdit->setText("EPSR project saved to "+workingDirCopy);
     }
     return false;
@@ -960,7 +1026,7 @@ bool MainWindow::saveCopy()
             streamWrite << "vibtemp " << ui.vibtempLineEdit->text() << "\n";
             streamWrite << "angtemp " << ui.angtempLineEdit->text() << "\n";
             streamWrite << "dihtemp " << ui.dihtempLineEdit->text() << "\n";
-            streamWrite << "ecoredcore " << ui.ecoredcoreTable->item(0,0)->text() << " " << ui.ecoredcoreTable->item(0,1)->text() << "\n";
+            streamWrite << "ecoredcore " << ui.ecoreLineEdit->text() << " " << ui.dcoreLineEdit->text() << "\n";
 
             //fmole iterations
             streamWrite << "fmoleIter " << ui.fmoleLineEdit->text() << "\n";
@@ -1096,7 +1162,8 @@ bool MainWindow::saveCopy()
             fileRead.close();
         }
 
-        printf("Copied EPSR project to %s\n", qPrintable(workingDirCopy));
+        messageText_ += "Copied EPSR project to "+workingDirCopy+"\n";
+        messagesDialog.refreshMessages();
         ui.messagesLineEdit->setText("Copied current EPSR project to "+workingDirCopy);
     }
     return false;
@@ -1107,18 +1174,20 @@ void MainWindow::runEPSRcheck()
     updateInpFile();
     updatePcofFile();
 
+    //check everything required is present in the folder???*********************************************************************************************
+
     QDir::setCurrent(workingDir_);
 
     QString atoBaseFileName = atoFileName_.split(".",QString::SkipEmptyParts).at(0);
-    QProcess processrunEPSR;
-    processrunEPSR.setProcessChannelMode(QProcess::ForwardedChannels);
+
+//    processEPSR_.setProcessChannelMode(QProcess::ForwardedChannels);
 #ifdef _WIN32
-    processrunEPSR.start(epsrBinDir_+"epsr.exe", QStringList() << workingDir_ << "epsr" << atoBaseFileName);
+    processEPSR_.start(epsrBinDir_+"epsr.exe", QStringList() << workingDir_ << "epsr" << atoBaseFileName);
 #else
-    processrunEPSR.start(epsrBinDir_+"epsr", QStringList() << workingDir_ << "epsr" << atoBaseFileName);
+    processEPSR_.start(epsrBinDir_+"epsr", QStringList() << workingDir_ << "epsr" << atoBaseFileName);
 #endif
-    if (!processrunEPSR.waitForStarted()) return;
-    if (!processrunEPSR.waitForFinished(1800000)) return;
+    if (!processEPSR_.waitForStarted()) return;
+    if (!processEPSR_.waitForFinished(1800000)) return;
 
     ui.messagesLineEdit->setText("EPSR check finished");
 
@@ -1181,20 +1250,20 @@ void MainWindow::runEPSR()
     QDir::setCurrent(workingDir_);
 
     QProcess processrunEPSRscript;
-//    processrunEPSRscript.setProcessChannelMode(QProcess::ForwardedChannels);
-#ifdef _WIN32
     processrunEPSRscript.setProcessChannelMode(QProcess::ForwardedChannels);
+#ifdef _WIN32
+//    processrunEPSRscript.setProcessChannelMode(QProcess::ForwardedChannels);
     processrunEPSRscript.startDetached("run"+atoBaseFileName+".bat");
 #else
 //    processrunEPSRscript.startDetached("gnome-terminal -e \"bash -c \\\"sh "+workingDir_+"run"+atoBaseFileName+".sh"; exec bash\\\"\"");
-    processrunEPSRscript.start("sh run"+atoBaseFileName+".sh");
-    if (processrunEPSRscript.waitForStarted(-1))
-    {
-        while (processrunEPSRscript.waitForReadyRead(-1))
-        {
-            messageText_ +=processrunEPSRscript.readAllStandardOutput();
-        }
-    }
+    processrunEPSRscript.startDetached("sh run"+atoBaseFileName+".sh");
+//    if (processrunEPSRscript.waitForStarted(-1))
+//    {
+//        while (processrunEPSRscript.waitForReadyRead(-1))
+//        {
+//            messageText_ +=processrunEPSRscript.readAllStandardOutput();
+//        }
+//    }
 #endif
 
     //show EPSR is running
@@ -1294,14 +1363,12 @@ void MainWindow::enableButtons()
 
 void MainWindow::plot()
 {
-    if (!plotDialog)
-    {
-        plotDialog = new PlotDialog(this);
-    }
+    PlotDialog plotDialog(this);
 
-    plotDialog->show();
-    plotDialog->raise();
-    plotDialog->activateWindow();
+    plotDialog.show();
+    plotDialog.raise();
+    plotDialog.activateWindow();
+    plotDialog.exec();
 }
 
 void MainWindow::plotEPSRshell()
@@ -1340,12 +1407,12 @@ void MainWindow::plotEPSRshell()
 
     QDir::setCurrent(workingDir_);
 
-    QProcess processrunEPSRscript;
-    processrunEPSRscript.setProcessChannelMode(QProcess::ForwardedChannels);
+    QProcess processrunEPSRplot;
+    processrunEPSRplot.setProcessChannelMode(QProcess::ForwardedChannels);
 #ifdef _WIN32
-    processrunEPSRscript.startDetached("gnuplot"+atoBaseFileName+".bat");
+    processrunEPSRplot.startDetached("gnuplot"+atoBaseFileName+".bat");
 #else
-    processrunEPSRscript.startDetached("sh gnuplot"+atoBaseFileName+".sh");
+    processrunEPSRplot.startDetached("sh gnuplot"+atoBaseFileName+".sh");
 #endif
 
     ui.messagesLineEdit->setText("started plot routine within EPSRshell");
@@ -1435,9 +1502,13 @@ void MainWindow::deleteEPSRinpFile()
             epsrInpFileName_.clear();
             ui.epsrInpFileName->clear();
             ui.inpSettingsTable->clearContents();
+            ui.inpSettingsTable->setRowCount(0);
             ui.dataFileSettingsTable->clearContents();
+            ui.dataFileSettingsTable->setRowCount(0);
             ui.pcofSettingsTable->clearContents();
+            ui.pcofSettingsTable->setRowCount(0);
             ui.minDistanceTable->clearContents();
+            ui.minDistanceTable->setRowCount(0);
             epsrInpFileName_.clear();
 
             //clear plots
@@ -1447,6 +1518,21 @@ void MainWindow::deleteEPSRinpFile()
             ui.plot2->clearGraphs();
             ui.plot2->clearItems();
             ui.plot2->replot();
+
+            //enable/disable buttons
+            ui.runAct->setEnabled(false);
+            ui.stopAct->setEnabled(false);
+            ui.plotAct->setEnabled(false);
+            ui.plot1Button->setEnabled(false);
+            ui.plot2Button->setEnabled(false);
+            ui.plotEPSRshellAct->setEnabled(false);
+            ui.dataFileBrowseButton->setEnabled(true);
+            ui.removeDataFileButton->setEnabled(true);
+            ui.updateInpPcofFilesButton->setEnabled(false);
+            ui.reloadEPSRinpButton->setEnabled(false);
+            ui.setupOutButton->setEnabled(false);
+            ui.applyOutputsButton->setEnabled(false);
+            ui.dlputilsOutCheckBox->setEnabled(false);
         }
     }
     return;
@@ -1511,20 +1597,22 @@ void MainWindow::deleteBoxAtoFile()
                 ui.minDistanceTable->clearContents();
             }
 
-//            //re-enable buttons
-//            ui.createMolFileButton->setEnabled(true);
-//            ui.molFileLoadButton->setEnabled(true);
-//            ui.createAtomButton->setEnabled(true);
-//            ui.createLatticeButton->setEnabled(true);
-//            ui.makeMolExtButton->setEnabled(true);
-//            ui.removeMolFileButton->setEnabled(true);
-//            ui.addLJRowAboveButton->setEnabled(true);
-//            ui.addLJRowBelowButton->setEnabled(true);
-//            ui.deleteLJRowButton->setEnabled(true);
-//            ui.mixatoButton->setEnabled(true);
-//            ui.addatoButton->setEnabled(true);
-//            ui.dataFileBrowseButton->setEnabled(true);
-//            ui.removeDataFileButton->setEnabled(true);
+            //enable/disable buttons
+            ui.randomiseButton->setEnabled(false);
+            ui.viewAtoFileButton->setEnabled(false);
+            ui.boxCompositionButton->setEnabled(false);
+            ui.updateAtoFileButton->setEnabled(false);
+            ui.fmoleButton->setEnabled(false);
+            ui.atoEPSRButton->setEnabled(false);
+            ui.dataFileBrowseButton->setEnabled(false);
+            ui.removeDataFileButton->setEnabled(false);
+            ui.makeWtsButton->setEnabled(false);
+            ui.setupEPSRButton->setEnabled(false);
+            ui.updateInpPcofFilesButton->setEnabled(false);
+            ui.reloadEPSRinpButton->setEnabled(false);
+            ui.setupOutButton->setEnabled(false);
+            ui.applyOutputsButton->setEnabled(false);
+            ui.dlputilsOutCheckBox->setEnabled(false);
 
             //clear plots
             ui.plot1->clearGraphs();
@@ -1534,7 +1622,8 @@ void MainWindow::deleteBoxAtoFile()
             ui.plot2->clearItems();
             ui.plot2->replot();
 
-            printf("box .ato file deleted\n");
+            messageText_ += "box .ato file deleted\n";
+            messagesDialog.refreshMessages();
         }
     }
     return;
@@ -1542,10 +1631,14 @@ void MainWindow::deleteBoxAtoFile()
 
 void MainWindow::showMessages()
 {
-    MessagesDialog messagesDialog(this);
-
     messagesDialog.show();
     messagesDialog.raise();
     messagesDialog.activateWindow();
     messagesDialog.exec();
+}
+
+void MainWindow::outputfromEPSRprocessReady()
+{
+    messageText_ += processEPSR_.readAllStandardOutput();
+    messagesDialog.refreshMessages();
 }

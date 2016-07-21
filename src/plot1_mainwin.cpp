@@ -1,4 +1,4 @@
-#include "src\qcustomplot.h"
+#include "qcustomplot.h"
 #include "epsrproject.h"
 
 #include <QVector>
@@ -22,7 +22,6 @@ bool MainWindow::plot1()
 bool MainWindow::getplottype1()
 {
     int ptType = ui.plotComboBox1->currentIndex();
-//    printf("plot type %d selected\n", ptType);
     if (ptType == 0)
     {
         fqplot1();

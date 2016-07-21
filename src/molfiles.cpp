@@ -41,13 +41,12 @@ bool MainWindow::runjmol()
 {
     ui.messagesLineEdit->setText("Running Jmol");
 
-    QProcess processjmol;
     QString program = epsrBinDir_+"Jmol.jar";
 
     // set jmol save directory to EPSR directory
     QDir::setCurrent(workingDir_);
-    processjmol.start("java", QStringList() << "-jar" << program);
-    if (!processjmol.waitForFinished(1800000))
+    processEPSR_.start("java", QStringList() << "-jar" << program);
+    if (!processEPSR_.waitForFinished(1800000))
     {
         ui.messagesLineEdit->setText("Jmol timed out");
         return false;
@@ -109,56 +108,43 @@ bool MainWindow::runjmol()
 #endif
         jmolBatFile.close();
 
-        QProcess processMol;
-        processMol.setProcessChannelMode(QProcess::ForwardedChannels);
+//        processEPSR_.setProcessChannelMode(QProcess::ForwardedChannels);
 #ifdef _WIN32
-        processMol.start("mopac"+jmolBaseFileName+".bat");
+        processEPSR_.start("mopac"+jmolBaseFileName+".bat");
 #else
-        processMol.start("sh mopac"+jmolBaseFileName+".sh");
+        processEPSR_.start("sh mopac"+jmolBaseFileName+".sh");
 #endif
 
-        if (!processMol.waitForStarted()) return false;
+        if (!processEPSR_.waitForStarted()) return false;
 
-        processMol.write("3\n");          // select bonding patterns and changelabel section
-        QByteArray result = processMol.readAll();
-        qDebug(result);
+        processEPSR_.write("3\n");          // select bonding patterns and changelabel section
 
-        processMol.write("y\n");          //yes to running mopac
-        result = processMol.readAll();
-        qDebug(result);
+        processEPSR_.write("y\n");          //yes to running mopac
 
-        processMol.write(qPrintable(mopacOptionStr+"\n"));    //mopac option number
-        result = processMol.readAll();
-        qDebug(result);
+        processEPSR_.write(qPrintable(mopacOptionStr+"\n"));    //mopac option number
 
-        processMol.write(qPrintable(molChargeStr+"\n"));      //molecular charge
-        result = processMol.readAll();
-        qDebug(result);
+        processEPSR_.write(qPrintable(molChargeStr+"\n"));      //molecular charge
 
-        if (!processMol.waitForFinished()) return false;
+        if (!processEPSR_.waitForFinished()) return false;
 
-        printf("\nMOPAC finished - check %s.out file for results of calculation.\n", qPrintable(jmolBaseFileName));
+        messageText_ += "\nMOPAC finished - check "+jmolBaseFileName+".out file for results of calculation.\n";
+        messagesDialog.refreshMessages();
     }
     else
     {
-        QProcess processMol;
-        processMol.setProcessChannelMode(QProcess::ForwardedChannels);
+//        processEPSR_.setProcessChannelMode(QProcess::ForwardedChannels);
 #ifdef _WIN32
-        processMol.start(epsrBinDir_+"readmole.exe", QStringList() << workingDir_ << "jmolfile "+jmolFileName);
+        processEPSR_.start(epsrBinDir_+"readmole.exe", QStringList() << workingDir_ << "jmolfile "+jmolFileName);
 #else
-        processMol.start(epsrBinDir_+"readmole", QStringList() << workingDir_ << "jmolfile "+jmolFileName);
+        processEPSR_.start(epsrBinDir_+"readmole", QStringList() << workingDir_ << "jmolfile "+jmolFileName);
 #endif
-        if (!processMol.waitForStarted()) return false;
+        if (!processEPSR_.waitForStarted()) return false;
 
-        processMol.write("3\n");          // select bonding patterns and changelabel section
-        QByteArray result = processMol.readAll();
-        qDebug(result);
+        processEPSR_.write("3\n");          // select bonding patterns and changelabel section
 
-        processMol.write("n\n");    //don't run mopac here as calls to "%EPSRbin%" in path which obviously isn't defined!
-        result = processMol.readAll();
-        qDebug(result);
+        processEPSR_.write("n\n");    //don't run mopac here as calls to "%EPSRbin%" in path which obviously isn't defined!
 
-        if (!processMol.waitForFinished()) return false;
+        if (!processEPSR_.waitForFinished()) return false;
     }
 
     // if a new .mol file is created, load this into ui.molFileList:
@@ -203,6 +189,13 @@ bool MainWindow::runjmol()
     //set current mol file (reads mol file and updates bond distance/angles/etc tables
     ui.molFileList->setCurrentRow(nMolFiles-1);
 
+    ui.molFileTabWidget->setEnabled(true);
+    ui.viewMolFileButton->setEnabled(true);
+    ui.removeMolFileButton->setEnabled(true);
+    ui.updateMolFileButton->setEnabled(true);
+    ui.mixatoButton->setEnabled(true);
+    ui.addatoButton->setEnabled(true);
+
     ui.messagesLineEdit->setText("Finished making .mol and .ato files");
 }
 
@@ -246,19 +239,18 @@ void MainWindow::on_molFileLoadButton_clicked(bool checked)
         //check if equivalent .ato file also exists and, if not, run makemole to generate it
         if (QFile::exists(atoFileName) == 0)
         {
-            QProcess processMakemole;
-            processMakemole.setProcessChannelMode(QProcess::ForwardedChannels);
+//            processEPSR_.setProcessChannelMode(QProcess::ForwardedChannels);
 
             QString projDir = workingDir_;
             projDir = QDir::toNativeSeparators(projDir);
 #ifdef _WIN32
-            processMakemole.start(epsrBinDir_+"makemole.exe", QStringList() << projDir << "makemole" << cropped_fileName);
+            processEPSR_.start(epsrBinDir_+"makemole.exe", QStringList() << projDir << "makemole" << cropped_fileName);
 #else
-            processMakemole.start(epsrBinDir_+"makemole", QStringList() << projDir << "makemole" << cropped_fileName);
+            processEPSR_.start(epsrBinDir_+"makemole", QStringList() << projDir << "makemole" << cropped_fileName);
             //linux: ~/src/EPSR25/bin/makemole ~/src/EPSR25/run/test2/ makemole molecule
 #endif
-            if (!processMakemole.waitForStarted()) return;
-            if (!processMakemole.waitForFinished()) return;
+            if (!processEPSR_.waitForStarted()) return;
+            if (!processEPSR_.waitForFinished()) return;
         }
 
         //update mol file table
@@ -277,6 +269,13 @@ void MainWindow::on_molFileLoadButton_clicked(bool checked)
 
         //set current mol file (reads mol file and updates bond distance/angles/etc tables
         ui.molFileList->setCurrentRow(nMolFiles-1);
+
+        ui.molFileTabWidget->setEnabled(true);
+        ui.viewMolFileButton->setEnabled(true);
+        ui.removeMolFileButton->setEnabled(true);
+        ui.updateMolFileButton->setEnabled(true);
+        ui.mixatoButton->setEnabled(true);
+        ui.addatoButton->setEnabled(true);
     }
 }
 
@@ -302,53 +301,36 @@ void MainWindow::on_createAtomButton_clicked(bool checked)
         QString atomCharge = makeAtomDialog->getCharge();
         QString atomSymbol = makeAtomDialog->getSymbol();
 
-        QProcess processMakeAto;
-        processMakeAto.setProcessChannelMode(QProcess::ForwardedChannels);
+//        processEPSR_.setProcessChannelMode(QProcess::ForwardedChannels);
         QString projDir = workingDir_;
         projDir = QDir::toNativeSeparators(projDir);
 #ifdef _WIN32
-        processMakeAto.start(epsrBinDir_+"makeato.exe", QStringList() << projDir << "makeato" );
+        processEPSR_.start(epsrBinDir_+"makeato.exe", QStringList() << projDir << "makeato" );
 #else
-        processMakeAto.start(epsrBinDir_+"makeato", QStringList() << projDir << "makeato" );
+        processEPSR_.start(epsrBinDir_+"makeato", QStringList() << projDir << "makeato" );
         //linux: ~/src/EPSR25/bin/makeato ~/src/EPSR25/run/test2/ makeato
 #endif
-        if (!processMakeAto.waitForStarted()) return;
+        if (!processEPSR_.waitForStarted()) return;
 
-        processMakeAto.write(qPrintable(atomName+"\n"));
-        QByteArray result = processMakeAto.readAll();
-        qDebug(result);
+        processEPSR_.write(qPrintable(atomName+"\n"));
 
-        processMakeAto.write(qPrintable(atomEpsilon+"\n"));
-        result = processMakeAto.readAll();
-        qDebug(result);
+        processEPSR_.write(qPrintable(atomEpsilon+"\n"));
 
-        processMakeAto.write(qPrintable(atomSigma+"\n"));
-        result = processMakeAto.readAll();
-        qDebug(result);
+        processEPSR_.write(qPrintable(atomSigma+"\n"));
 
-        processMakeAto.write(qPrintable(atomMass+"\n"));
-        result = processMakeAto.readAll();
-        qDebug(result);
+        processEPSR_.write(qPrintable(atomMass+"\n"));
 
-        processMakeAto.write(qPrintable(atomCharge+"\n"));
-        result = processMakeAto.readAll();
-        qDebug(result);
+        processEPSR_.write(qPrintable(atomCharge+"\n"));
 
-        processMakeAto.write(qPrintable(atomSymbol+"\n"));
-        result = processMakeAto.readAll();
-        qDebug(result);
+        processEPSR_.write(qPrintable(atomSymbol+"\n"));
 
-        processMakeAto.write(qPrintable("300\n"));
-        result = processMakeAto.readAll();
-        qDebug(result);
+        processEPSR_.write(qPrintable("300\n"));
 
-        processMakeAto.write(qPrintable("0.1\n"));
-        result = processMakeAto.readAll();
-        qDebug(result);
+        processEPSR_.write(qPrintable("0.1\n"));
 
-        if (!processMakeAto.waitForFinished()) return;
+        if (!processEPSR_.waitForFinished()) return;
 
-        printf("\nmakeato finished\n");
+        messageText_ += "\nmakeato finished\n";
         QString atoFileName = atomName+".ato";
         QString molFileName = atomName+".mol";
         molFileName_= workingDir_+molFileName;
@@ -424,6 +406,14 @@ void MainWindow::on_createAtomButton_clicked(bool checked)
         //set current mol file (reads mol file and updates bond distance/angles/etc tables
         ui.molFileList->setCurrentRow(nMolFiles-1);
 
+        ui.molFileTabWidget->setEnabled(true);
+        ui.viewMolFileButton->setEnabled(true);
+        ui.removeMolFileButton->setEnabled(true);
+        ui.updateMolFileButton->setEnabled(true);
+        ui.mixatoButton->setEnabled(true);
+        ui.addatoButton->setEnabled(true);
+
+        messagesDialog.refreshMessages();
         ui.messagesLineEdit->setText("Finished making new atom");
     }
 }
@@ -452,32 +442,25 @@ void MainWindow::on_createLatticeButton_clicked(bool checked)
         QString bLatt = makeLatticeDialog->cellsAlongB();
         QString cLatt = makeLatticeDialog->cellsAlongC();
 
-        QProcess processMakeLattice;
-        processMakeLattice.setProcessChannelMode(QProcess::ForwardedChannels);
+//        processEPSR_.setProcessChannelMode(QProcess::ForwardedChannels);
         QString projDir = workingDir_;
         projDir = QDir::toNativeSeparators(projDir);
 #ifdef _WIN32
-        processMakeLattice.start(epsrBinDir_+"makelattice.exe", QStringList() << projDir << "makelattice" );
+        processEPSR_.start(epsrBinDir_+"makelattice.exe", QStringList() << projDir << "makelattice" );
 #else
-        processMakeLattice.start(epsrBinDir_+"makelattice", QStringList() << projDir << "makelattice" );
+        processEPSR_.start(epsrBinDir_+"makelattice", QStringList() << projDir << "makelattice" );
 #endif
-        if (!processMakeLattice.waitForStarted()) return;
+        if (!processEPSR_.waitForStarted()) return;
 
-        processMakeLattice.write(qPrintable(unitFileName+"\n"));
-        QByteArray result = processMakeLattice.readAll();
-        qDebug(result);
+        processEPSR_.write(qPrintable(unitFileName+"\n"));
 
-        processMakeLattice.write(qPrintable(aLatt+" "+bLatt+" "+cLatt+"\n"));
-        result = processMakeLattice.readAll();
-        qDebug(result);
+        processEPSR_.write(qPrintable(aLatt+" "+bLatt+" "+cLatt+"\n"));
 
-        processMakeLattice.write(qPrintable(croppedUnitFileName+"\n"));
-        result = processMakeLattice.readAll();
-        qDebug(result);
+        processEPSR_.write(qPrintable(croppedUnitFileName+"\n"));
 
-        if (!processMakeLattice.waitForFinished()) return;
+        if (!processEPSR_.waitForFinished()) return;
 
-        printf("\nmakelattice finished\n");
+        messageText_ += "\nmakelattice finished\n";
 
         // if use lattice as box
         if (makeLatticeDialog->useAsBox() == 1)
@@ -557,18 +540,17 @@ void MainWindow::on_createLatticeButton_clicked(bool checked)
                             << "density  0.1\n";
                 fileWrite.close();
 
-                QProcess processMakemole;
-                processMakemole.setProcessChannelMode(QProcess::ForwardedChannels);
+//                processEPSR_.setProcessChannelMode(QProcess::ForwardedChannels);
 
                 QString projDir = workingDir_;
                 projDir = QDir::toNativeSeparators(projDir);
 #ifdef _WIN32
-                processMakemole.start(epsrBinDir_+"makemole.exe", QStringList() << projDir << "makemole" << molFileName);
+                processEPSR_.start(epsrBinDir_+"makemole.exe", QStringList() << projDir << "makemole" << molFileName);
 #else
-                processMakemole.start(epsrBinDir_+"makemole", QStringList() << projDir << "makemole" << molFileName);
+                processEPSR_.start(epsrBinDir_+"makemole", QStringList() << projDir << "makemole" << molFileName);
 #endif
-                if (!processMakemole.waitForStarted()) return;
-                if (!processMakemole.waitForFinished()) return;
+                if (!processEPSR_.waitForStarted()) return;
+                if (!processEPSR_.waitForFinished()) return;
 
                 ui.molFileList->addItem(molFileName+".mol");
             }
@@ -636,19 +618,6 @@ void MainWindow::on_createLatticeButton_clicked(bool checked)
                 ui.atoFileTable->setItem(i,2, new QTableWidgetItem(QString::number(numberAtomLabels.at(i))));
             }
             checkBoxCharge();
-
-//            ui.createMolFileButton->setDisabled(true);
-//            ui.molFileLoadButton->setDisabled(true);
-//            ui.createAtomButton->setDisabled(true);
-//            ui.createLatticeButton->setDisabled(true);
-//            ui.makeMolExtButton->setDisabled(true);
-//            ui.removeMolFileButton->setDisabled(true);
-//            ui.addLJRowAboveButton->setDisabled(true);
-//            ui.addLJRowBelowButton->setDisabled(true);
-//            ui.deleteLJRowButton->setDisabled(true);
-//            ui.mixatoButton->setDisabled(true);
-//            ui.addatoButton->setDisabled(true);
-//            ui.loadBoxButton->setDisabled(true);
         }
 
         // otherwise use lattice as a component **NB** This is the only workflow that doesn't use a .mol file.
@@ -686,6 +655,14 @@ void MainWindow::on_createLatticeButton_clicked(bool checked)
         nMolFiles = ui.molFileList->count();
         ui.molFileList->setCurrentRow(nMolFiles-1);
 
+        ui.molFileTabWidget->setEnabled(true);
+        ui.viewMolFileButton->setEnabled(true);
+        ui.removeMolFileButton->setEnabled(true);
+        ui.updateMolFileButton->setEnabled(true);
+        ui.mixatoButton->setEnabled(true);
+        ui.addatoButton->setEnabled(true);
+
+        messagesDialog.refreshMessages();
         ui.messagesLineEdit->setText("Finished making new lattice");
     }
 }
@@ -790,20 +767,34 @@ void MainWindow::on_removeMolFileButton_clicked(bool checked)
     else
     {
         ui.molFileList->clear();
-        ui.atoFileTable->clear();
+        ui.atoFileTable->clearContents();
+        ui.atoFileTable->setRowCount(0);
 
         ui.molAtomTable->clearContents();
+        ui.molAtomTable->setRowCount(0);
         ui.molBondTable->clearContents();
+        ui.molBondTable->setRowCount(0);
         ui.molAngleTable->clearContents();
+        ui.molAngleTable->setRowCount(0);
         ui.molDihedralTable->clearContents();
+        ui.molDihedralTable->setRowCount(0);
         ui.molRotTable->clearContents();
+        ui.molRotTable->setRowCount(0);
         ui.molLJTable->clearContents();
+        ui.molLJTable->setRowCount(0);
         ui.molBoxA->clear();
         ui.molBoxB->clear();
         ui.molBoxC->clear();
         ui.molBoxPhi->clear();
         ui.molBoxTheta->clear();
         ui.molBoxChi->clear();
+
+        ui.molFileTabWidget->setEnabled(false);
+        ui.viewMolFileButton->setEnabled(false);
+        ui.removeMolFileButton->setEnabled(false);
+        ui.updateMolFileButton->setEnabled(false);
+        ui.mixatoButton->setEnabled(false);
+        ui.addatoButton->setEnabled(false);
     }
     ui.messagesLineEdit->setText(".mol file removed");
 }
@@ -1016,8 +1007,8 @@ bool MainWindow::readMolFile()
         if (ecoredcorerx.exactMatch(lineato))
         {
             dataLineato = lineato.split("  ", QString::SkipEmptyParts);
-            ui.molEcoreDcoreTable->setItem(0,0, new QTableWidgetItem(dataLineato.at(0)));
-            ui.molEcoreDcoreTable->setItem(0,1, new QTableWidgetItem(dataLineato.at(1)));
+            ui.molEcoreLineEdit->setText(dataLineato.at(0));
+            ui.molDcoreLineEdit->setText(dataLineato.at(1));
         }
     } while (!lineato.isNull());
     fileato.close();
@@ -1097,8 +1088,8 @@ bool MainWindow::readMolFile()
     ui.molLJTable->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui.molLJTable->setSelectionMode(QAbstractItemView::SingleSelection);
 
-    ui.molEcoreDcoreTable->setItem(0,0, new QTableWidgetItem(ecorestr));
-    ui.molEcoreDcoreTable->setItem(0,1, new QTableWidgetItem(dcorestr));
+    ui.molEcoreLineEdit->setText(ecorestr);
+    ui.molDcoreLineEdit->setText(dcorestr);
 
     //calculate charge for selected .mol file
     double molChargeCalcd = 0;
@@ -1269,8 +1260,8 @@ bool MainWindow::readAtoFile()
         if (ecoredcorerx.exactMatch(line))
         {
             dataLine = line.split("  ",QString::SkipEmptyParts);
-            ui.molEcoreDcoreTable->setItem(0,0, new QTableWidgetItem(dataLine.at(0)));
-            ui.molEcoreDcoreTable->setItem(0,1, new QTableWidgetItem(dataLine.at(1)));
+            ui.molEcoreLineEdit->setText(dataLine.at(0));
+            ui.molDcoreLineEdit->setText(dataLine.at(1));
         }
     } while (!line.isNull());
     file.close();
@@ -1460,8 +1451,8 @@ bool MainWindow::updateMolFile()
               "angtemp  0.100000E+01\n"
               "dihtemp  0.100000E+01\n";
 
-    QString ecorestr = ui.molEcoreDcoreTable->item(0,0)->text();
-    QString dcorestr = ui.molEcoreDcoreTable->item(0,1)->text();
+    QString ecorestr = ui.molEcoreLineEdit->text();
+    QString dcorestr = ui.molDcoreLineEdit->text();
 
     streamWrite << "ecoredcore    " << ecorestr << "    " << dcorestr << "\n"
               "density  0.100000E-02\n";
@@ -1470,23 +1461,22 @@ bool MainWindow::updateMolFile()
     //rename temp file as .mol file to copy over changes and delete temp file
     fileRead.remove();
     fileWrite.rename(workingDir_+molFileName_);
-    printf("finished updating mol file %s\n", qPrintable(molFileName_));
+    messageText_ += "finished updating mol file "+molFileName_+"\n";
 
     //run fmole 0 times to make sure everything is consistent
     QDir::setCurrent(workingDir_);
 
     QString molBaseFileName = molFileName_.split(".",QString::SkipEmptyParts).at(0);
 
-    QProcess processFmole;
-    processFmole.setProcessChannelMode(QProcess::ForwardedChannels);
+//    processEPSR_.setProcessChannelMode(QProcess::ForwardedChannels);
 #ifdef _WIN32
-    processFmole.start(epsrBinDir_+"fmole.exe", QStringList() << workingDir_ << "fmole" << molBaseFileName << "0" << "0");
+    processEPSR_.start(epsrBinDir_+"fmole.exe", QStringList() << workingDir_ << "fmole" << molBaseFileName << "0" << "0");
 #else
-    processFmole.start(epsrBinDir_+"fmole", QStringList() << workingDir_ << "fmole" << molBaseFileName << "0" << "0");
+    processEPSR_.start(epsrBinDir_+"fmole", QStringList() << workingDir_ << "fmole" << molBaseFileName << "0" << "0");
 #endif
-    if (!processFmole.waitForStarted()) return false;
+    if (!processEPSR_.waitForStarted()) return false;
 
-    if (!processFmole.waitForFinished()) return false;
+    if (!processEPSR_.waitForFinished()) return false;
 
     //update molecule .ato file with additional details (not those already changed via .mol file)
     QString atoFile;
@@ -1600,8 +1590,8 @@ bool MainWindow::updateMolFile()
         checkBoxCharge();
     }
 
-    printf("\nfinished updating molecule ato file\n");
-
+    messageText_ += "\nfinished updating molecule ato file\n";
+    messagesDialog.refreshMessages();
     ui.messagesLineEdit->setText(".mol file updated");
 
     return true;
@@ -1640,8 +1630,8 @@ bool MainWindow::updateAtoFile()
     QStringList dataLine;
     dataLine.clear();
     QString original;
-    QString ecorestr = ui.molEcoreDcoreTable->item(0,0)->text();
-    QString dcorestr = ui.molEcoreDcoreTable->item(0,1)->text();
+    QString ecorestr = ui.molEcoreLineEdit->text();
+    QString dcorestr = ui.molDcoreLineEdit->text();
 
     QRegExp atomLabelrx(" ([A-Z][A-Za-z0-9 ]{2}) ([A-Za-z ]{1,2})   ([0-1]{1})");
     QRegExp ecoredcorerx("  ([0-9]{1}[.]{1}[0-9]{5}[E+]{2}[0-9]{2})  ([0-9]{1}[.]{1}[0-9]{5}[E+]{2}[0-9]{2})");
@@ -1718,8 +1708,8 @@ bool MainWindow::updateAtoFile()
         checkBoxCharge();
     }
 
-    printf("\nfinished updating component .ato file\n");
-
+    messageText_ += "\nfinished updating component .ato file\n";
+    messagesDialog.refreshMessages();
     ui.messagesLineEdit->setText("Component .ato file updated");
 
     return true;

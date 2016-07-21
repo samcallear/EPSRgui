@@ -54,6 +54,7 @@ void MainWindow::on_dataFileBrowseButton_clicked(bool checked)
             setSelectedDataFile();
         }
     }
+    ui.makeWtsButton->setEnabled(true);
     ui.messagesLineEdit->setText("New data file added");
 }
 
@@ -65,41 +66,27 @@ bool MainWindow::makeNwtsSetup()
     //create wtsBaseFileName_.NWTS.dat if it doesn't already exist
     if (QFile::exists(workingDir_+wtsBaseFileName_+".NWTS.dat") == 0)
     {
-        QProcess processWtsSetup;
-        processWtsSetup.setProcessChannelMode(QProcess::ForwardedChannels);
+//        processEPSR_.setProcessChannelMode(QProcess::ForwardedChannels);
 #ifdef _WIN32
-        processWtsSetup.start(epsrBinDir_+"upset.exe", QStringList() << workingDir_ << "upset" << "nwts" << wtsBaseFileName_);
+        processEPSR_.start(epsrBinDir_+"upset.exe", QStringList() << workingDir_ << "upset" << "nwts" << wtsBaseFileName_);
 #else
-        processWtsSetup.start(epsrBinDir_+"upset", QStringList() << workingDir_ << "upset" << "nwts" << wtsBaseFileName_);
+        processEPSR_.start(epsrBinDir_+"upset", QStringList() << workingDir_ << "upset" << "nwts" << wtsBaseFileName_);
 #endif
-        if (!processWtsSetup.waitForStarted()) return false;
+        if (!processEPSR_.waitForStarted()) return false;
 
-        processWtsSetup.write("\n");          // move to fnameato line
-        QByteArray result = processWtsSetup.readAll();
-        qDebug(result);
+        processEPSR_.write("\n");          // move to fnameato line
+        processEPSR_.write(qPrintable(atoBaseFileName+"\n"));
+        processEPSR_.write("\n");
+        processEPSR_.write("e\n");
+        processEPSR_.write("\n");
 
-        processWtsSetup.write(qPrintable(atoBaseFileName+"\n"));
-        result = processWtsSetup.readAll();
-        qDebug(result);
-
-        processWtsSetup.write("\n");
-        result = processWtsSetup.readAll();
-        qDebug(result);
-
-        processWtsSetup.write("e\n");
-        result = processWtsSetup.readAll();
-        qDebug(result);
-
-        processWtsSetup.write("\n");
-        result = processWtsSetup.readAll();
-        qDebug(result);
-
-        if (!processWtsSetup.waitForFinished()) return false;
-        printf("\nfinished making wts setup file\n");
+        if (!processEPSR_.waitForFinished()) return false;
+        messageText_ += "\nfinished making wts setup file\n";
     }
 
     //read values in NWTS.dat file and write to table and combobox
     normalisationList.append("0");
+    messagesDialog.refreshMessages();
     ui.messagesLineEdit->setText("NWTS setup file created");
     return true;
 }
@@ -111,39 +98,25 @@ bool MainWindow::makeXwtsSetup()
     QString atoBaseFileName = atoFileName_.split(".",QString::SkipEmptyParts).at(0);
     if (QFile::exists(workingDir_+wtsBaseFileName_+".XWTS.dat") == 0)
     {
-        QProcess processWtsSetup;
-        processWtsSetup.setProcessChannelMode(QProcess::ForwardedChannels);
+//        processEPSR_.setProcessChannelMode(QProcess::ForwardedChannels);
 #ifdef _WIN32
-        processWtsSetup.start(epsrBinDir_+"upset.exe", QStringList() << workingDir_ << "upset" << "xwts" << wtsBaseFileName_);
+        processEPSR_.start(epsrBinDir_+"upset.exe", QStringList() << workingDir_ << "upset" << "xwts" << wtsBaseFileName_);
 #else
-        processWtsSetup.start(epsrBinDir_+"upset", QStringList() << workingDir_ << "upset" << "xwts" << wtsBaseFileName_);
+        processEPSR_.start(epsrBinDir_+"upset", QStringList() << workingDir_ << "upset" << "xwts" << wtsBaseFileName_);
 #endif
-        if (!processWtsSetup.waitForStarted()) return false;
+        if (!processEPSR_.waitForStarted()) return false;
 
-        processWtsSetup.write("\n");          // move to fnameato line
-        QByteArray result = processWtsSetup.readAll();
-        qDebug(result);
+        processEPSR_.write("\n");          // move to fnameato line
+        processEPSR_.write(qPrintable(atoBaseFileName+"\n"));
+        processEPSR_.write("\n");
+        processEPSR_.write("e\n");
+        processEPSR_.write("\n");
 
-        processWtsSetup.write(qPrintable(atoBaseFileName+"\n"));
-        result = processWtsSetup.readAll();
-        qDebug(result);
-
-        processWtsSetup.write("\n");
-        result = processWtsSetup.readAll();
-        qDebug(result);
-
-        processWtsSetup.write("e\n");
-        result = processWtsSetup.readAll();
-        qDebug(result);
-
-        processWtsSetup.write("\n");
-        result = processWtsSetup.readAll();
-        qDebug(result);
-
-        if (!processWtsSetup.waitForFinished()) return false;
-        printf("\nfinished making wts setup file\n");
+        if (!processEPSR_.waitForFinished()) return false;
+        messageText_ += "\nfinished making wts setup file\n";
     }
     normalisationList.append("2");
+    messagesDialog.refreshMessages();
     ui.messagesLineEdit->setText("XWTS setup file created");
     return true;
 }
@@ -329,14 +302,16 @@ void MainWindow::on_makeWtsButton_clicked(bool checked)
         return;
     }
 
-    if (dataFileExt_ == "mint01")
+    if (QFile::exists(workingDir_+wtsBaseFileName_+".NWTS.dat"))
     {
         makeNwts();
+        ui.setupEPSRButton->setEnabled(true);
         ui.messagesLineEdit->setText("NWTS wts file created");
     }
-    if (dataFileExt_ == "int01")
+    if (QFile::exists(workingDir_+wtsBaseFileName_+".XWTS.dat"))
     {
         makeXwts();
+        ui.setupEPSRButton->setEnabled(true);
         ui.messagesLineEdit->setText("XWTS wts file created");
     }
 }
@@ -433,16 +408,16 @@ void MainWindow::makeNwts()
     fileRead.remove();
     fileWrite.rename(workingDir_+wtsBaseFileName_+".NWTS.dat");
 
-    QProcess processMakeWts;
-    processMakeWts.setProcessChannelMode(QProcess::ForwardedChannels);
+//    processEPSR_.setProcessChannelMode(QProcess::ForwardedChannels);
 #ifdef _WIN32
-    processMakeWts.start(epsrBinDir_+"nwts.exe", QStringList() << workingDir_ << "nwts" << wtsBaseFileName_);
+    processEPSR_.start(epsrBinDir_+"nwts.exe", QStringList() << workingDir_ << "nwts" << wtsBaseFileName_);
 #else
-    processMakeWts.start(epsrBinDir_+"nwts", QStringList() << workingDir_ << "nwts" << wtsBaseFileName_);
+    processEPSR_.start(epsrBinDir_+"nwts", QStringList() << workingDir_ << "nwts" << wtsBaseFileName_);
 #endif
-    if (!processMakeWts.waitForStarted()) return;
-    if (!processMakeWts.waitForFinished()) return;
-    printf("\nfinished making wts file\n");
+    if (!processEPSR_.waitForStarted()) return;
+    if (!processEPSR_.waitForFinished()) return;
+    messageText_ += "\nfinished making wts file\n";
+    messagesDialog.refreshMessages();
     refreshDataFileTable();
 }
 
@@ -530,16 +505,16 @@ void MainWindow::makeXwts()
     fileRead.remove();
     fileWrite.rename(workingDir_+wtsBaseFileName_+".XWTS.dat");
 
-    QProcess processMakeWts;
-    processMakeWts.setProcessChannelMode(QProcess::ForwardedChannels);
+//    processEPSR_.setProcessChannelMode(QProcess::ForwardedChannels);
 #ifdef _WIN32
-    processMakeWts.start(epsrBinDir_+"xwts.exe", QStringList() << workingDir_ << "xwts" << wtsBaseFileName_);
+    processEPSR_.start(epsrBinDir_+"xwts.exe", QStringList() << workingDir_ << "xwts" << wtsBaseFileName_);
 #else
-    processMakeWts.start(epsrBinDir_+"xwts", QStringList() << workingDir_ << "xwts" << wtsBaseFileName_);
+    processEPSR_.start(epsrBinDir_+"xwts", QStringList() << workingDir_ << "xwts" << wtsBaseFileName_);
 #endif
-    if (!processMakeWts.waitForStarted()) return;
-    if (!processMakeWts.waitForFinished()) return;
-    printf("\nfinished making wts file\n");
+    if (!processEPSR_.waitForStarted()) return;
+    if (!processEPSR_.waitForFinished()) return;
+    messageText_ += "\nfinished making wts file\n";
+    messagesDialog.refreshMessages();
     refreshDataFileTable();
 }
 
@@ -553,24 +528,19 @@ void MainWindow::refreshDataFileTable()
     {
         QString wholeDataFileName = dataFileList.at(file);
         QString dataFileName = wholeDataFileName.split(".",QString::SkipEmptyParts).at(0);
-        QString dataFileExt = wholeDataFileName.split(".",QString::SkipEmptyParts).at(1);
-        if (dataFileExt == "mint01")
+        if (!QFile::exists(dataFileName+".NWTStot.wts") && !QFile::exists(dataFileName+".XWTS.wts"))
         {
-            if (QFile::exists(dataFileName+".NWTStot.wts") == 1)
-            {
-                wtsFileList.append(dataFileName+".NWTStot.wts");
-            }
-            else
             wtsFileList.append(" ");
         }
-        if (dataFileExt == "int01")
+        else
+        if (QFile::exists(dataFileName+".NWTStot.wts"))
         {
-            if (QFile::exists(dataFileName+".XWTS.wts") == 1)
-            {
-                wtsFileList.append(dataFileName+".XWTS.wts");
-            }
-            else
-            wtsFileList.append(" ");
+            wtsFileList.append(dataFileName+".NWTS.wts");
+        }
+        else
+        if (QFile::exists(dataFileName+".XWTS.wts"))
+        {
+            wtsFileList.append(dataFileName+".XWTS.wts");
         }
     }
 
@@ -621,14 +591,15 @@ void MainWindow::setSelectedDataFile()
     QFileInfo fileInfo(dataFileName);
     QString justFileName = fileInfo.fileName();
     wtsBaseFileName_ = justFileName.split(".",QString::SkipEmptyParts).at(0);
-    dataFileExt_ = justFileName.split(".",QString::SkipEmptyParts).at(1);
+//    dataFileExt_ = justFileName.split(".",QString::SkipEmptyParts).at(1);
     dataFileName_ = dataFileName;
 
-    if (dataFileExt_ == "mint01")
+    if (QFile::exists(workingDir_+wtsBaseFileName_+".NWTS.dat"))
     {
         readNwtsSetup();
     }
-    if (dataFileExt_ == "int01")
+    else
+    if (QFile::exists(workingDir_+wtsBaseFileName_+".XWTS.dat"))
     {
         readXwtsSetup();
     }
@@ -648,10 +619,8 @@ void MainWindow::on_removeDataFileButton_clicked(bool checked)
         }
     }
     int row = ui.dataFileTable->currentRow();
-    printf("currentRow = %d\n", row);
     if (dataFileList.count() > 1)
     {
-        printf("if\n");
         dataFileList.takeAt(row);
         dataFileTypeList.takeAt(row);
         wtsFileList.takeAt(row);
@@ -661,14 +630,15 @@ void MainWindow::on_removeDataFileButton_clicked(bool checked)
     }
     else
     {
-        printf("else\n");
         dataFileList.clear();
         dataFileTypeList.clear();
         wtsFileList.clear();
         normalisationList.clear();
         ui.normalisationComboBox->setCurrentIndex(0);
         ui.atomWtsTable->clearContents();
+        ui.atomWtsTable->setRowCount(0);
         ui.dataFileTable->removeRow(0);
+        ui.makeWtsButton->setEnabled(false);
     }
     ui.messagesLineEdit->setText("Data file removed");
 }

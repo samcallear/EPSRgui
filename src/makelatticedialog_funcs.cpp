@@ -32,6 +32,9 @@ MakeLatticeDialog::MakeLatticeDialog(MainWindow *parent) : QDialog(parent)
     ui.bLattLineEdit->setValidator(new QRegExpValidator(integerrx, this));
     ui.cLattLineEdit->setValidator(new QRegExpValidator(integerrx, this));
 
+    setWindowFlags(windowFlags() | Qt::WindowMinimizeButtonHint);
+    setWindowFlags(windowFlags() | Qt::WindowMaximizeButtonHint);
+
     connect(ui.okButton, SIGNAL(clicked()), this, SLOT(checkEntries()));
     connect(ui.cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
     connect(ui.coordTable, SIGNAL(cellChanged(int, int)), this, SLOT(checkAtomLabel(int, int)));

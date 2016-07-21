@@ -7,6 +7,7 @@
 #include "wtscomponent.h"
 #include "datafilesettings.h"
 #include "array.h"
+#include "messagesdialog.h"
 
 class CreateNewDialog;
 class PlotDialog;
@@ -16,7 +17,6 @@ class MakeAtomDialog;
 class MakeLatticeDialog;
 class BoxCompositionDialog;
 class AddAtoDialog;
-class MessagesDialog;
 
 class MainWindow : public QMainWindow
 {
@@ -44,6 +44,7 @@ private slots:
     void deleteEPSRinpFile();
     void deleteBoxAtoFile();
     void showMessages();
+    void outputfromEPSRprocessReady();
 
 private:
     void createActions();
@@ -59,7 +60,7 @@ private:
 //    SettingsDialog *settingsDialog;
     MakeAtomDialog *makeAtomDialog;
     MakeLatticeDialog *makeLatticeDialog;
-    MessagesDialog *messagesDialog;
+    MessagesDialog messagesDialog;
 
     QDir exeDir_;
     QDir currentDir;
@@ -79,6 +80,7 @@ private:
     QFileSystemWatcher epsrFinished_;
     int inpEntries_;
     QByteArray messageText_;
+    QProcess processEPSR_;
 
     int endscript;
 

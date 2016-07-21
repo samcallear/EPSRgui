@@ -18,18 +18,22 @@ PlotDialog::PlotDialog(MainWindow *parent) : QDialog(parent)
 {
     ui.setupUi(this);
     mainWindow_ = parent;
+
+    workingDir_ = mainWindow_->workingDir();
+    atoFileName_ = mainWindow_->atoFileName();
+    baseFileName_ = workingDir_+atoFileName_.split(".").at(0);
+
     ui.listWidget_3->setCurrentRow(0);
     connect(ui.closeButton, SIGNAL(clicked()), this, SLOT(reject()));
     readatofile();
     getnDataCol();
 
+    setWindowFlags(windowFlags() | Qt::WindowMinimizeButtonHint);
+    setWindowFlags(windowFlags() | Qt::WindowMaximizeButtonHint);
+
     //MouseTracking;
     connect(ui.customPlot, SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(showPointToolTip(QMouseEvent*)));
     connect(ui.customPlot, SIGNAL(mouseWheel(QWheelEvent*)), this, SLOT(plotZoom(QWheelEvent*)));
-
-    workingDir_ = mainWindow_->workingDir();
-    atoFileName_ = mainWindow_->atoFileName();
-    baseFileName_ = workingDir_+atoFileName_.split(".").at(0);
 }
 
 void PlotDialog::on_plotButton_clicked(bool checked)
@@ -164,7 +168,6 @@ bool PlotDialog::getnDataCol()
 bool PlotDialog::getplottype()
 {
     int ptType = ui.listWidget_3->currentRow();
-//    printf("plot type %d selected\n", ptType);
     if (ptType == 0)
     {
         fqplot();

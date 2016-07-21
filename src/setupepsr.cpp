@@ -26,73 +26,57 @@ void MainWindow::on_setupEPSRButton_clicked(bool checked)
     //search folder to see if a .EPSR.inp of same name as box already exists
     if (!QFileInfo(workingDir_+epsrInpFileName_).exists())
     {
-        QProcess processEpsrSetup;
-        processEpsrSetup.setProcessChannelMode(QProcess::ForwardedChannels);
+//        processEPSR_.setProcessChannelMode(QProcess::ForwardedChannels);
 #ifdef _WIN32
-        processEpsrSetup.start(epsrBinDir_+"upset.exe", QStringList() << workingDir_ << "upset" << "epsr" << atoBaseFileName);
+        processEPSR_.start(epsrBinDir_+"upset.exe", QStringList() << workingDir_ << "upset" << "epsr" << atoBaseFileName);
 #else
-        processEpsrSetup.start(epsrBinDir_+"upset", QStringList() << workingDir_ << "upset" << "epsr" << atoBaseFileName);
+        processEPSR_.start(epsrBinDir_+"upset", QStringList() << workingDir_ << "upset" << "epsr" << atoBaseFileName);
 #endif
-        if (!processEpsrSetup.waitForStarted()) return;
+        if (!processEPSR_.waitForStarted()) return;
 
-        processEpsrSetup.write("fnameato\n");          // move to fnameato line
-        QByteArray result = processEpsrSetup.readAll();
-        qDebug(result);
+        processEPSR_.write("fnameato\n");          // move to fnameato line
 
-        processEpsrSetup.write(qPrintable(atoBaseFileName+"\n\n"));
-        result = processEpsrSetup.readAll();
-        qDebug(result);
 
-        processEpsrSetup.write(qPrintable(atoBaseFileName+"\n\n"));
-        result = processEpsrSetup.readAll();
-        qDebug(result);
+        processEPSR_.write(qPrintable(atoBaseFileName+"\n\n"));
 
-        processEpsrSetup.write("ndata\n");          // move to ndata line
-        result = processEpsrSetup.readAll();
-        qDebug(result);
+
+        processEPSR_.write(qPrintable(atoBaseFileName+"\n\n"));
+
+
+        processEPSR_.write("ndata\n");          // move to ndata line
+
 
         int N_data = dataFileList.count();
-        processEpsrSetup.write(qPrintable(QString::number(N_data)+"\n\n"));          // move to data section
-        result = processEpsrSetup.readAll();
-        qDebug(result);
+        processEPSR_.write(qPrintable(QString::number(N_data)+"\n\n"));          // move to data section
+
 
         for (int file = 0; file < N_data; file++)
         {
             QString wholeDataFileName = dataFileList.at(file);
             QFileInfo fileInfo1(wholeDataFileName);
             QString dataFileName = fileInfo1.fileName();
-            processEpsrSetup.write(qPrintable(dataFileName+"\n\n"));
-            result = processEpsrSetup.readAll();
-            qDebug(result);
+            processEPSR_.write(qPrintable(dataFileName+"\n\n"));
+
 
             QString wholeWtsFileName = wtsFileList.at(file);
             QFileInfo fileInfo2(wholeWtsFileName);
             QString wtsFileName = fileInfo2.fileName();
-            processEpsrSetup.write(qPrintable(wtsFileName+"\n\n"));            //get from column 3 in wts file table
-            result = processEpsrSetup.readAll();
-            qDebug(result);
+            processEPSR_.write(qPrintable(wtsFileName+"\n\n"));            //get from column 3 in wts file table
+
 
     //        QString dataType = dataFileTypeList.at(dataFile);
-            processEpsrSetup.write(qPrintable("5\n\n"));            //NEED TO CHANGE THIS FOR OTHER DATA FORMATS************************************************************************
-            result = processEpsrSetup.readAll();
-            qDebug(result);
+            processEPSR_.write(qPrintable("5\n\n"));            //NEED TO CHANGE THIS FOR OTHER DATA FORMATS************************************************************************
 
-            processEpsrSetup.write("\n\n\n\n");
-            result = processEpsrSetup.readAll();
-            qDebug(result);
+            processEPSR_.write("\n\n\n\n");
         }
 
-        processEpsrSetup.write("e\n");
-        result = processEpsrSetup.readAll();
-        qDebug(result);
+        processEPSR_.write("e\n");
 
-        processEpsrSetup.write("\n");
-        result = processEpsrSetup.readAll();
-        qDebug(result);
+        processEPSR_.write("\n");
 
-        if (!processEpsrSetup.waitForFinished(60000)) return;
+        if (!processEPSR_.waitForFinished(60000)) return;
 
-        printf("\nfinished making EPSR setup file %s\n", qPrintable(epsrInpFileName_));
+        messageText_ += "\nfinished making EPSR setup file "+epsrInpFileName_+"\n";
     }
 
     readEPSRinpFile();
@@ -100,13 +84,22 @@ void MainWindow::on_setupEPSRButton_clicked(bool checked)
     readEPSRpcofFile();
     updatePcofFileTables();
     ui.epsrInpFileName->setText(epsrInpFileName_);
-//    ui.dataFileBrowseButton->setDisabled(true);
-//    ui.removeDataFileButton->setDisabled(true);
     ui.checkAct->setEnabled(true);
     ui.runAct->setEnabled(true);
     ui.stopAct->setEnabled(true);
     ui.plotAct->setEnabled(true);
+    ui.plot1Button->setEnabled(true);
+    ui.plot2Button->setEnabled(true);
+    ui.plotEPSRshellAct->setEnabled(true);
 
+    ui.updateInpPcofFilesButton->setEnabled(true);
+    ui.reloadEPSRinpButton->setEnabled(true);
+    ui.setupOutButton->setEnabled(true);
+    ui.applyOutputsButton->setEnabled(true);
+    ui.dlputilsOutCheckBox->setEnabled(true);
+    ui.deleteEPSRinpFileAct->setEnabled(true);
+
+    messagesDialog.refreshMessages();
     ui.messagesLineEdit->setText("EPSR .inp file created");
 }
 
@@ -231,7 +224,7 @@ void MainWindow::updateInpFileTables()
     ui.inpSettingsTable->setCurrentCell(N_InpValues-1,0);
 
     //EPSR .inp data file settings
-    ui.dataFileSettingsTable->setColumnWidth(1,120);
+    ui.dataFileSettingsTable->setColumnWidth(1,200);
     ui.dataFileSettingsTable->setColumnWidth(2,300);
     ui.dataFileSettingsTable->setRowCount(nDatasets*7);       //just data files
     ui.inpSettingsTable->horizontalHeader()->setVisible(true);
@@ -320,7 +313,6 @@ bool MainWindow::readEPSRpcofFile()
 
     //read in minimum distance restraints
     line = stream.readLine();
-//    line = stream.readLine();
 
     for (int i = 0; i < nPartials; i++)
     {
@@ -330,8 +322,6 @@ bool MainWindow::readEPSRpcofFile()
     QString minDistance = line.split(" ", QString::SkipEmptyParts).at(0);
     minDistances.append(minDistance);
     line = stream.readLine();
-//    printf("%s", qPrintable(atomPairs.at(i)));
-//    printf("%s", qPrintable(minDistances.at(i)));
     }
     file.close();
 
@@ -458,35 +448,6 @@ void MainWindow::updateInpFile()
     QFile fileRead(workingDir_+epsrInpFileName_);
     fileRead.remove();
     fileWrite.rename(workingDir_+epsrInpFileName_);
-
-    //now format the file correctly by opening in setup epsr and then exiting and saving
-    QProcess processEpsrSetup;
-//    processEpsrSetup.setProcessChannelMode(QProcess::ForwardedChannels);
-#ifdef _WIN32
-    processEpsrSetup.start(epsrBinDir_+"upset.exe", QStringList() << workingDir_ << "upset" << "epsr" << atoBaseFileName);
-#else
-    processEpsrSetup.start(epsrBinDir_+"upset", QStringList() << workingDir_ << "upset" << "epsr" << atoBaseFileName);
-#endif
-    if (!processEpsrSetup.waitForStarted()) return;
-    while (processEpsrSetup.waitForReadyRead(-1))
-    {
-        processEpsrSetup.write("e\n");
-        messageText_ += processEpsrSetup.readAllStandardOutput();
-    //    qDebug(result);
-
-        processEpsrSetup.write("\n");
-        messageText_ += processEpsrSetup.readAllStandardOutput();
-    //    qDebug(result);
-
-        processEpsrSetup.write("y\n");
-        messageText_ += processEpsrSetup.readAllStandardOutput();;
-    //    qDebug(result);
-    }
-
-
-    if (!processEpsrSetup.waitForFinished(60000)) return;
-
-    updateInpFileTables();
 }
 
 void MainWindow::updatePcofFile()
@@ -540,9 +501,6 @@ void MainWindow::updatePcofFile()
         minDistances.append(ui.minDistanceTable->item(j,1)->text());
     }
 
-//    printf("%s\n", qPrintable(datafilesettings.at(0).datafile));
-
-//    fileWrite.resize(0);
     for (int k = 0; k < pcofKeywords.count(); k++)
     {
         streamWrite << pcofKeywords.at(k)+"  "+pcofValues.at(k)+"               "+pcofDescriptions.at(k)+"\n";
@@ -574,32 +532,6 @@ void MainWindow::updatePcofFile()
 
     fileRead.remove();
     fileWrite.rename(epsrpcofFileName);
-
-    //now format the file correctly by opening in setup epsr and then exiting and saving
-    QProcess processEpsrSetup;
-    processEpsrSetup.setProcessChannelMode(QProcess::ForwardedChannels);
-#ifdef _WIN32
-    processEpsrSetup.start(epsrBinDir_+"upset.exe", QStringList() << workingDir_ << "upset" << "epsr" << atoBaseFileName);
-#else
-    processEpsrSetup.start(epsrBinDir_+"upset", QStringList() << workingDir_ << "upset" << "epsr" << atoBaseFileName);
-#endif
-    if (!processEpsrSetup.waitForStarted()) return;
-
-    processEpsrSetup.write("e\n");
-    QByteArray result = processEpsrSetup.readAll();
-    qDebug(result);
-
-    processEpsrSetup.write("\n");
-    result = processEpsrSetup.readAll();
-    qDebug(result);
-
-    processEpsrSetup.write("y\n");
-    result = processEpsrSetup.readAll();
-    qDebug(result);
-
-    if (!processEpsrSetup.waitForFinished(60000)) return;
-
-    updatePcofFileTables();
 }
 
 void MainWindow::on_updateInpPcofFilesButton_clicked(bool checked)
@@ -607,6 +539,34 @@ void MainWindow::on_updateInpPcofFilesButton_clicked(bool checked)
     updateInpFile();
     updatePcofFile();
 
-    printf("\nfinished updating EPSR setup file %s\n", qPrintable(epsrInpFileName_));
+    QString atoBaseFileName = atoFileName_.split(".",QString::SkipEmptyParts).at(0);
+
+    //now format the file correctly by opening in setup epsr and then exiting and saving
+//    processEPSR_.setProcessChannelMode(QProcess::ForwardedChannels);
+#ifdef _WIN32
+    processEPSR_.start(epsrBinDir_+"upset.exe", QStringList() << workingDir_ << "upset" << "epsr" << atoBaseFileName);
+#else
+    processEPSR_.start(epsrBinDir_+"upset", QStringList() << workingDir_ << "upset" << "epsr" << atoBaseFileName);
+#endif
+    if (!processEPSR_.waitForStarted()) return;
+//    while (processEPSR_.waitForReadyRead(-1))
+//    {
+        processEPSR_.write("e\n");
+
+
+        processEPSR_.write("\n");
+
+
+        processEPSR_.write("y\n");
+        ;
+//    }
+
+    if (!processEPSR_.waitForFinished(60000)) return;
+
+    updateInpFileTables();
+    updatePcofFileTables();
+
+    messageText_ +="\nfinished updating EPSR setup files\n";
+    messagesDialog.refreshMessages();
     ui.messagesLineEdit->setText("Finished updating EPSR setup files");
 }
