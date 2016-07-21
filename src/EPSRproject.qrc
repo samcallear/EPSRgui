@@ -1,0 +1,5 @@
+<RCC>
+  <qresource prefix="mainicon">
+    <file>guimainicon.png</file>
+  </qresource>
+</RCC>
