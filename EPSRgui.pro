@@ -5,7 +5,7 @@
 #CONFIG += console //implement this is need somwhere for outputs to go e.g. printf
 QT += core gui widgets printsupport
 TEMPLATE = app
-TARGET = EPSRProject
+TARGET = EPSRgui
 INCLUDEPATH += src/
 
 # Input

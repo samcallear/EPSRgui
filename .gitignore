@@ -1,8 +1,9 @@
 Makefile
 Makefile.Debug
 MakeFile.Release
-object_script.EPSRgui.Debug
+object_script.EPSRPgui.Debug
 object_script.EPSRgui.Release
+EPSRgui.pro.user
 ui_*
 
 release/
