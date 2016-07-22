@@ -535,7 +535,7 @@ void MainWindow::refreshDataFileTable()
         else
         if (QFile::exists(dataFileName+".NWTStot.wts"))
         {
-            wtsFileList.append(dataFileName+".NWTS.wts");
+            wtsFileList.append(dataFileName+".NWTStot.wts");
         }
         else
         if (QFile::exists(dataFileName+".XWTS.wts"))
