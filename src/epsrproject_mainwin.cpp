@@ -232,7 +232,7 @@ void MainWindow::createNew()
         QFile::copy(epsrDir_+"/startup/system_commands.txt", workingDir_+"/system_commands.txt");
 #else
         QFile::copy(epsrDir_+"/startup/epsr", workingDir_+"/epsr");
-        QFile::copy(epsrDir_+"/startup/system_commands_linux.txt", workingDir_+"/system_commands_linux.txt");
+        QFile::copy(epsrDir_+"/startup/system_commands_linux.txt", workingDir_+"/system_commands.txt");
 #endif
 
         //activate tabs

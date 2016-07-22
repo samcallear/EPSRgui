@@ -27,6 +27,7 @@ void SettingsDialog::readSettings()
     QString settingsFile = currentDir.path()+"/settings";
     settingsFile = QDir::toNativeSeparators(settingsFile);
     QFile file(settingsFile);
+    if (!file.exists()) return;
     if(!file.open(QFile::ReadOnly | QFile::Text))
     {
         QMessageBox msgBox;

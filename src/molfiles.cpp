@@ -1334,28 +1334,31 @@ bool MainWindow::updateMolFile()
         return false;
     }
 
-    //this doesn't work if the atom labels are the same as the element labels******************************************************************************************
-    for (int i = 0; i < ui.molLJTable->rowCount(); i++)
+    if (ui.molAtomTable->rowCount() > 0) //only do this if there are some atom labels
     {
-        QList<QTableWidgetItem*> atomTypeItem = ui.molAtomTable->findItems(ui.molLJTable->item(i,0)->text(), Qt::MatchExactly);
-        if (atomTypeItem.isEmpty())
+        //this doesn't work if the atom labels are the same as the element labels******************************************************************************************
+        for (int i = 0; i < ui.molLJTable->rowCount(); i++)
         {
-            QMessageBox msgBox;
-            msgBox.setText("Mismatch between atom types and those listed in Lennard-Jones parameters");
-            msgBox.exec();
-            return 0;
+            QList<QTableWidgetItem*> atomTypeItem = ui.molAtomTable->findItems(ui.molLJTable->item(i,0)->text(), Qt::MatchExactly);
+            if (atomTypeItem.isEmpty())
+            {
+                QMessageBox msgBox;
+                msgBox.setText("Mismatch between atom types and those listed in Lennard-Jones parameters");
+                msgBox.exec();
+                return 0;
+            }
         }
-    }
 
-    for (int i = 0; i < ui.molAtomTable->rowCount(); i++)
-    {
-        QList<QTableWidgetItem*> atomTypeItem = ui.molLJTable->findItems(ui.molAtomTable->item(i,1)->text(), Qt::MatchExactly);
-        if (atomTypeItem.isEmpty())
+        for (int i = 0; i < ui.molAtomTable->rowCount(); i++)
         {
-            QMessageBox msgBox;
-            msgBox.setText("Mismatch between atom types and those listed in Lennard-Jones parameters");
-            msgBox.exec();
-            return 0;
+            QList<QTableWidgetItem*> atomTypeItem = ui.molLJTable->findItems(ui.molAtomTable->item(i,1)->text(), Qt::MatchExactly);
+            if (atomTypeItem.isEmpty())
+            {
+                QMessageBox msgBox;
+                msgBox.setText("Mismatch between atom types and those listed in Lennard-Jones parameters");
+                msgBox.exec();
+                return 0;
+            }
         }
     }
 

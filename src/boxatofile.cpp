@@ -59,7 +59,7 @@ void MainWindow::on_mixatoButton_clicked(bool checked)
     #ifdef _WIN32
         processEPSR_.start(epsrBinDir_+"mixato.exe", QStringList() << projDir << "mixato");
     #else
-        processEPSR_.start(epsrBinDir_+"mixato", QStringList() << workingDir_ << "mixato");
+        processEPSR_.start(epsrBinDir_+"mixato", QStringList() << projDir << "mixato");
     #endif
         if (!processEPSR_.waitForStarted()) return;
 
@@ -72,21 +72,16 @@ void MainWindow::on_mixatoButton_clicked(bool checked)
             for (int nl = 0; nl < newlines; nl++)
             {
                 processEPSR_.write("\n");
-
             }
             processEPSR_.write("y\n");
 
-
             int nMols = numberOfMolecules.at(i).toInt();
             processEPSR_.write(qPrintable(QString::number(nMols)+"\n"));
-
         }
             double numberDensity = ui.numberDensityLineEdit->text().toDouble();
             processEPSR_.write(qPrintable(QString::number(numberDensity)+"\n"));
 
-
             processEPSR_.write(qPrintable(atoFileBaseName+"\n"));
-
 
         if (!processEPSR_.waitForFinished(1800000)) return;
 
