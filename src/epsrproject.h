@@ -44,6 +44,8 @@ private slots:
     void deleteEPSRinpFile();
     void deleteBoxAtoFile();
     void showMessages();
+    void openEPSRmanual();
+    void openEPSRguiManual();
     void outputfromEPSRprocessReady();
 
 private:

@@ -36,19 +36,14 @@ void MainWindow::on_setupEPSRButton_clicked(bool checked)
 
         processEPSR_.write("fnameato\n");          // move to fnameato line
 
-
         processEPSR_.write(qPrintable(atoBaseFileName+"\n\n"));
 
-
         processEPSR_.write(qPrintable(atoBaseFileName+"\n\n"));
-
 
         processEPSR_.write("ndata\n");          // move to ndata line
 
-
         int N_data = dataFileList.count();
         processEPSR_.write(qPrintable(QString::number(N_data)+"\n\n"));          // move to data section
-
 
         for (int file = 0; file < N_data; file++)
         {
@@ -57,12 +52,10 @@ void MainWindow::on_setupEPSRButton_clicked(bool checked)
             QString dataFileName = fileInfo1.fileName();
             processEPSR_.write(qPrintable(dataFileName+"\n\n"));
 
-
             QString wholeWtsFileName = wtsFileList.at(file);
             QFileInfo fileInfo2(wholeWtsFileName);
             QString wtsFileName = fileInfo2.fileName();
             processEPSR_.write(qPrintable(wtsFileName+"\n\n"));            //get from column 3 in wts file table
-
 
     //        QString dataType = dataFileTypeList.at(dataFile);
             processEPSR_.write(qPrintable("5\n\n"));            //NEED TO CHANGE THIS FOR OTHER DATA FORMATS************************************************************************
@@ -426,7 +419,7 @@ void MainWindow::updateInpFile()
     streamWrite << atoBaseFileName+".EPSR               Title of this file\n";
     for (int i = 0; i < inpKeywords.count(); i++)
     {
-        streamWrite << inpKeywords.at(i)+"  "+inpValues.at(i)+"               "+inpDescriptions.at(i)+"\n";
+        streamWrite << inpKeywords.at(i).leftJustified(12, ' ')+inpValues.at(i)+"               "+inpDescriptions.at(i)+"\n";
     }
     int n;
     for (n = 0; n < datafilesettings.count(); n++)
@@ -435,11 +428,11 @@ void MainWindow::updateInpFile()
         streamWrite << "data   "+nstr.number(n+1)+"\n";
         streamWrite << "\n";
         streamWrite << "datafile    "+datafilesettings.at(n).datafile+"               Name of data file to be fit\n";
-        streamWrite << "wtsfile    "+datafilesettings.at(n).wtsfile+"               Name of weights file for this data set\n";
-        streamWrite << "nrtype    "+datafilesettings.at(n).nrtype+"               Data type - see User Manual for more details\n";
-        streamWrite << "rshmin    "+datafilesettings.at(n).rshmin+"               Minimum radius [A] - used for background subtraction\n";
-        streamWrite << "szeros    "+datafilesettings.at(n).szeros+"               Zero limit - 0 means use first data point for Q=0\n";
-        streamWrite << "tweak    "+datafilesettings.at(n).tweak+"               Scaling factor for this data set. [1.0]\n";
+        streamWrite << "wtsfile     "+datafilesettings.at(n).wtsfile+"               Name of weights file for this data set\n";
+        streamWrite << "nrtype      "+datafilesettings.at(n).nrtype+"               Data type - see User Manual for more details\n";
+        streamWrite << "rshmin      "+datafilesettings.at(n).rshmin+"               Minimum radius [A] - used for background subtraction\n";
+        streamWrite << "szeros      "+datafilesettings.at(n).szeros+"               Zero limit - 0 means use first data point for Q=0\n";
+        streamWrite << "tweak       "+datafilesettings.at(n).tweak+"               Scaling factor for this data set. [1.0]\n";
         streamWrite << "efilereq    "+datafilesettings.at(n).efilereq+"               Requested energy amplitude for this data set [1.0]\n";
     }
     streamWrite << "q\n";
@@ -503,7 +496,7 @@ void MainWindow::updatePcofFile()
 
     for (int k = 0; k < pcofKeywords.count(); k++)
     {
-        streamWrite << pcofKeywords.at(k)+"  "+pcofValues.at(k)+"               "+pcofDescriptions.at(k)+"\n";
+        streamWrite << pcofKeywords.at(k).leftJustified(12, ' ')+pcofValues.at(k)+"               "+pcofDescriptions.at(k)+"\n";
     }
     streamWrite << "q\n";
     streamWrite << "          "+nPartialsstr.number(nPartials)+"\n";
@@ -538,30 +531,6 @@ void MainWindow::on_updateInpPcofFilesButton_clicked(bool checked)
 {
     updateInpFile();
     updatePcofFile();
-
-    QString atoBaseFileName = atoFileName_.split(".",QString::SkipEmptyParts).at(0);
-
-    //now format the file correctly by opening in setup epsr and then exiting and saving
-//    processEPSR_.setProcessChannelMode(QProcess::ForwardedChannels);
-#ifdef _WIN32
-    processEPSR_.start(epsrBinDir_+"upset.exe", QStringList() << workingDir_ << "upset" << "epsr" << atoBaseFileName);
-#else
-    processEPSR_.start(epsrBinDir_+"upset", QStringList() << workingDir_ << "upset" << "epsr" << atoBaseFileName);
-#endif
-    if (!processEPSR_.waitForStarted()) return;
-//    while (processEPSR_.waitForReadyRead(-1))
-//    {
-        processEPSR_.write("e\n");
-
-
-        processEPSR_.write("\n");
-
-
-        processEPSR_.write("y\n");
-        ;
-//    }
-
-    if (!processEPSR_.waitForFinished(60000)) return;
 
     updateInpFileTables();
     updatePcofFileTables();

@@ -65,7 +65,6 @@ MainWindow::MainWindow(QMainWindow *parent) : QMainWindow(parent), messagesDialo
     connect(ui.setupOutTypeComboBox, SIGNAL(currentIndexChanged(QString)), this, SLOT(getOutputType()));
     connect(ui.dlputilsOutCheckBox, SIGNAL(stateChanged(int)), this, SLOT(outputDlputils()));
     connect(&processEPSR_, SIGNAL(readyReadStandardOutput()), this, SLOT(outputfromEPSRprocessReady()));
-    //also need to refresh() on adding text to messagesText_*****************************************************************************************
 }
 
 void MainWindow::createActions()
@@ -94,7 +93,7 @@ void MainWindow::createActions()
     ui.plotEPSRshellAct->setStatusTip(tr("Plot EPSR using EPSRshell"));
     connect(ui.plotEPSRshellAct, SIGNAL(triggered()), this, SLOT(plotEPSRshell()));
 
-    ui.settingsAct->setStatusTip(tr("Change EPSRProject settings"));
+    ui.settingsAct->setStatusTip(tr("Change EPSRgui settings"));
     connect(ui.settingsAct, SIGNAL(triggered()), this, SLOT(settings()));
 
     ui.checkAct->setStatusTip(tr("Run EPSR once to check everything works"));
@@ -114,6 +113,12 @@ void MainWindow::createActions()
 
     ui.showMessagesAct->setStatusTip(tr("Show messages from EPSR"));
     connect(ui.showMessagesAct, SIGNAL(triggered()), this, SLOT(showMessages()));
+
+    ui.epsrManualAct->setStatusTip(tr("Open EPSR manual"));
+    connect(ui.epsrManualAct, SIGNAL(triggered()), this, SLOT(openEPSRmanual()));
+
+    ui.epsrguiManualAct->setStatusTip(tr("Open EPSRgui manual"));
+    connect(ui.epsrguiManualAct, SIGNAL(triggered()), this, SLOT(openEPSRguiManual()));
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
@@ -605,7 +610,7 @@ void MainWindow::open()
         ui.pasteAct->setEnabled(true);
 
         //change window title to contain projectName
-        this->setWindowTitle("EPSRProject: "+projectName_);
+        this->setWindowTitle("EPSRgui: "+projectName_);
 
         //plot data if present
         if (!atoFileName_.isEmpty())
@@ -940,7 +945,7 @@ bool MainWindow::saveAs()
         saveFile();
 
         //change window title to contain projectName
-        this->setWindowTitle("EPSRProject: "+projectName_);
+        this->setWindowTitle("EPSRgui: "+projectName_);
 
 
         messagesDialog.refreshMessages();
@@ -1641,4 +1646,19 @@ void MainWindow::outputfromEPSRprocessReady()
 {
     messageText_ += processEPSR_.readAllStandardOutput();
     messagesDialog.refreshMessages();
+}
+
+void MainWindow::openEPSRmanual()
+{
+    //search in epsrDir_+/doc/ for a pdf file with EPSRshell in the filename
+    //if not present say could not find EPSR manual
+    //if present make string of this file
+    QString manual = epsrDir_+"/doc/EPSRshell - User's Guide - 2015-01-04.pdf";
+    QDesktopServices::openUrl(QUrl("file:///"+manual, QUrl::TolerantMode));
+}
+
+void MainWindow::openEPSRguiManual()
+{
+    QString guimanual = exeDir_.path()+"/EPSRgui Manual.pdf";
+    QDesktopServices::openUrl(QUrl("file:///"+guimanual, QUrl::TolerantMode));
 }

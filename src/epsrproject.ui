@@ -17,7 +17,7 @@
    <string>EPSRgui</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="EPSRProject.qrc">
+   <iconset resource="EPSRproject.qrc">
     <normaloff>:/mainicon/guimainicon.png</normaloff>:/mainicon/guimainicon.png</iconset>
   </property>
   <widget class="QWidget" name="centralWidget">
@@ -2939,11 +2939,19 @@
     <addaction name="settingsAct"/>
     <addaction name="showMessagesAct"/>
    </widget>
+   <widget class="QMenu" name="helpMenu">
+    <property name="title">
+     <string>Help</string>
+    </property>
+    <addaction name="epsrManualAct"/>
+    <addaction name="epsrguiManualAct"/>
+   </widget>
    <addaction name="fileMenu"/>
    <addaction name="editMenu"/>
    <addaction name="runMenu"/>
    <addaction name="plotMenu"/>
    <addaction name="settingsMenu"/>
+   <addaction name="helpMenu"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <attribute name="toolBarArea">
@@ -3082,6 +3090,21 @@
     <string>Show messages</string>
    </property>
   </action>
+  <action name="epsrManualAct">
+   <property name="text">
+    <string>EPSR manual</string>
+   </property>
+  </action>
+  <action name="epsrguiManualAct">
+   <property name="text">
+    <string>EPSRgui manual</string>
+   </property>
+  </action>
+  <action name="aboutAct">
+   <property name="text">
+    <string>About...</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
@@ -3201,7 +3224,7 @@
   <tabstop>epsrRunningSign</tabstop>
  </tabstops>
  <resources>
-  <include location="EPSRProject.qrc"/>
+  <include location="EPSRproject.qrc"/>
  </resources>
  <connections>
   <connection>
