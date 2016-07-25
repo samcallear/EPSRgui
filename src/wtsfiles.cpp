@@ -27,9 +27,33 @@ void MainWindow::on_dataFileBrowseButton_clicked(bool checked)
     }
     if (!newDataFileName.isEmpty())
     {
+        QString dataFilePath = QFileInfo(newDataFileName).path()+"/";
+        dataFilePath = QDir::toNativeSeparators(dataFilePath);
         QFileInfo dataFileInfo(newDataFileName);
         QString dataFileName;
         dataFileName = dataFileInfo.fileName();
+
+        if (dataFilePath != workingDir_)
+        {
+            if (QFile::exists(workingDir_+dataFileName) == true)
+            {
+                QMessageBox::StandardButton msgBox;
+                msgBox  = QMessageBox::question(this, "Warning", "This will overwrite the data file already present in the project folder with the same name.\nProceed?", QMessageBox::Ok|QMessageBox::Cancel);
+                if (msgBox == QMessageBox::Cancel)
+                {
+                    return;
+                }
+                else
+                {
+                    QFile::copy(newDataFileName, workingDir_+dataFileName);
+                }
+            }
+            else
+            {
+                QFile::copy(newDataFileName, workingDir_+dataFileName);
+            }
+        }
+
         wtsBaseFileName_ = dataFileName.split(".",QString::SkipEmptyParts).at(0);
 
         ui.dataFileLineEdit->setText(newDataFileName);
@@ -37,7 +61,7 @@ void MainWindow::on_dataFileBrowseButton_clicked(bool checked)
         dataFileList.append(dataFileName);
         dataFileTypeList.append("5");
 
-        dataFileName_ = newDataFileName;
+        dataFileName_ = dataFileName;
         if (ui.neutronDataRB->isChecked())
         {
             makeNwtsSetup();

@@ -279,12 +279,37 @@ void MainWindow::on_loadBoxButton_clicked (bool checked)
     QString atoFile = QFileDialog::getOpenFileName(this, "Choose EPSR box .ato file", workingDir_, tr(".ato files (*.ato)"));
     if (!atoFile.isEmpty())
     {
+        QString atoFilePath = QFileInfo(atoFile).path()+"/";
+        atoFilePath = QDir::toNativeSeparators(atoFilePath);
         QFileInfo fi(atoFile);
         atoFileName_ = fi.fileName();
+
+        if (atoFilePath != workingDir_)
+        {
+            if (QFile::exists(workingDir_+atoFileName_) == true)
+            {
+                QMessageBox::StandardButton msgBox;
+                msgBox  = QMessageBox::question(this, "Warning", "This will overwrite the .ato file already present in the project folder with the same name.\nProceed?", QMessageBox::Ok|QMessageBox::Cancel);
+                if (msgBox == QMessageBox::Cancel)
+                {
+                    return;
+                }
+                else
+                {
+                    QFile::copy(atoFile, workingDir_+atoFileName_);
+                }
+            }
+            else
+            {
+                QFile::copy(atoFile, workingDir_+atoFileName_);
+            }
+        }
 
         ui.boxAtoLabel->setText(atoFileName_);
         readAtoFileAtomPairs();
         readAtoFileBoxDetails();
+        //for each .ato file listed in atofiletable, add the number of this file in the box to column 2***************************************************
+        ui.atoFileTable->item(0,2)->setText(ui.boxAtoMols->text());
         ui.atoAtomList->clear();
         for (int n=0; n < atoAtomLabels.count(); ++n)
         {

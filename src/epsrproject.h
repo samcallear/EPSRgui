@@ -56,17 +56,14 @@ private:
     void processEnd();
     void readSettings();
 
-//    CreateNewDialog *createNewDialog;
     PlotDialog *plotDialog;
     MolOptionsDialog *molOptionsDialog;
-//    SettingsDialog *settingsDialog;
     MakeAtomDialog *makeAtomDialog;
     MakeLatticeDialog *makeLatticeDialog;
     MessagesDialog messagesDialog;
 
     QDir exeDir_;
     QDir currentDir;
-//    QDir baseDir;
     QString projectName_; //folder name in EPSR but doesn't include path or a "/" after it
     QString workingDir_; //includes projectName and has a "/" after it
     QString epsrDir_; //has a "/" after it

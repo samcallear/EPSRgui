@@ -768,9 +768,9 @@ void MainWindow::showPointToolTip1(QMouseEvent *event)
 //    setToolTip(QString("%1 , %2").arg(x).arg(y));
 
     QString x1str;
-    x1str.sprintf("%.4g", x1);
+    x1str.sprintf(" %5g", x1);
     QString y1str;
-    y1str.sprintf("%.4g", y1);
+    y1str.sprintf(" %5g", y1);
 
     QString value1 = x1str+","+y1str;
     ui.mousecoord1->setText(value1);

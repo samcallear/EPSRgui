@@ -53,9 +53,9 @@ void PlotDialog::showPointToolTip(QMouseEvent *event)
 //    setToolTip(QString("%1 , %2").arg(x).arg(y));
 
     QString xstr;
-    xstr.sprintf("%.4f", x);
+    xstr.sprintf(" %5g", x);
     QString ystr;
-    ystr.sprintf("%.4f", y);
+    ystr.sprintf(" %5g", y);
     QString value = xstr+","+ystr;
     ui.mousecoord->setText(value);
 }

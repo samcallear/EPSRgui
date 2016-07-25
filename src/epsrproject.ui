@@ -2762,6 +2762,18 @@
           </item>
           <item row="0" column="4">
            <widget class="QLabel" name="mousecoord1">
+            <property name="minimumSize">
+             <size>
+              <width>150</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>150</width>
+              <height>16777215</height>
+             </size>
+            </property>
             <property name="text">
              <string/>
             </property>
@@ -2846,6 +2858,18 @@
           </item>
           <item row="3" column="4">
            <widget class="QLabel" name="mousecoord2">
+            <property name="minimumSize">
+             <size>
+              <width>150</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>150</width>
+              <height>16777215</height>
+             </size>
+            </property>
             <property name="text">
              <string/>
             </property>
@@ -3091,8 +3115,14 @@
    </property>
   </action>
   <action name="epsrManualAct">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>EPSR manual</string>
+   </property>
+   <property name="visible">
+    <bool>true</bool>
    </property>
   </action>
   <action name="epsrguiManualAct">

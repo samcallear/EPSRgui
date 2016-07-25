@@ -195,6 +195,7 @@ bool MainWindow::runjmol()
     ui.updateMolFileButton->setEnabled(true);
     ui.mixatoButton->setEnabled(true);
     ui.addatoButton->setEnabled(true);
+    ui.loadBoxButton->setEnabled(true);
 
     ui.messagesLineEdit->setText("Finished making .mol and .ato files");
 }
@@ -276,6 +277,7 @@ void MainWindow::on_molFileLoadButton_clicked(bool checked)
         ui.updateMolFileButton->setEnabled(true);
         ui.mixatoButton->setEnabled(true);
         ui.addatoButton->setEnabled(true);
+        ui.loadBoxButton->setEnabled(true);
     }
 }
 
@@ -412,6 +414,7 @@ void MainWindow::on_createAtomButton_clicked(bool checked)
         ui.updateMolFileButton->setEnabled(true);
         ui.mixatoButton->setEnabled(true);
         ui.addatoButton->setEnabled(true);
+        ui.loadBoxButton->setEnabled(true);
 
         messagesDialog.refreshMessages();
         ui.messagesLineEdit->setText("Finished making new atom");

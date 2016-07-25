@@ -250,6 +250,7 @@ void MainWindow::createNew()
         ui.copyAct->setEnabled(true);
         ui.cutAct->setEnabled(true);
         ui.pasteAct->setEnabled(true);
+        ui.epsrManualAct->setEnabled(true);
 
         //activate buttons (in case disabled from previous project)
         ui.createMolFileButton->setEnabled(true);
@@ -409,6 +410,7 @@ void MainWindow::reset()
     ui.runAct->setEnabled(false);
     ui.stopAct->setEnabled(false);
     ui.plotAct->setEnabled(false);
+    ui.epsrManualAct->setEnabled(false);
 }
 
 void MainWindow::open()
@@ -542,7 +544,6 @@ void MainWindow::open()
                     ui.removeDataFileButton->setEnabled(false);
                     ui.checkAct->setEnabled(true);
                     ui.runAct->setEnabled(true);
-                    ui.stopAct->setEnabled(true);
                     ui.plotAct->setEnabled(true);
                     ui.plotEPSRshellAct->setEnabled(true);
                     ui.plot1Button->setEnabled(true);
@@ -608,6 +609,7 @@ void MainWindow::open()
         ui.copyAct->setEnabled(true);
         ui.cutAct->setEnabled(true);
         ui.pasteAct->setEnabled(true);
+        ui.epsrManualAct->setEnabled(true);
 
         //change window title to contain projectName
         this->setWindowTitle("EPSRgui: "+projectName_);
@@ -1273,6 +1275,9 @@ void MainWindow::runEPSR()
 
     //show EPSR is running
     ui.epsrRunningSign->setEnabled(true);
+    ui.stopAct->setEnabled(true);
+    ui.runAct->setEnabled(false);
+    ui.checkAct->setEnabled(false);
 
     //disable editing buttons while EPSR is running
     ui.updateMolFileButton->setDisabled(true);
@@ -1327,6 +1332,9 @@ void MainWindow::enableButtons()
 {
     //turn off EPSR running sign
     ui.epsrRunningSign->setEnabled(false);
+    ui.stopAct->setEnabled(false);
+    ui.runAct->setEnabled(true);
+    ui.checkAct->setEnabled(true);
 
     //re-enable editing buttons
     ui.updateMolFileButton->setEnabled(true);
@@ -1650,10 +1658,30 @@ void MainWindow::outputfromEPSRprocessReady()
 
 void MainWindow::openEPSRmanual()
 {
-    //search in epsrDir_+/doc/ for a pdf file with EPSRshell in the filename
-    //if not present say could not find EPSR manual
-    //if present make string of this file
-    QString manual = epsrDir_+"/doc/EPSRshell - User's Guide - 2015-01-04.pdf";
+    QStringList filters;
+    filters << "*.pdf";
+    QString docDirstr = epsrDir_+"/doc/";
+    QDir docDir = QDir::toNativeSeparators(docDirstr);
+    QStringList pdfFiles = docDir.entryList(filters, QDir::Files);
+    if (pdfFiles.isEmpty())
+    {
+        QMessageBox msgBox;
+        msgBox.setText("Could not find any .pdf files");
+        msgBox.exec();
+        return;
+    }
+
+    QString filename;
+    for (int i = 0 ; i < pdfFiles.count(); i++)
+    {
+        filename = pdfFiles.at(i);
+        if (filename.contains("EPSRshell"))
+        {
+            break;
+        }
+    }
+
+    QString manual = docDirstr+filename;
     QDesktopServices::openUrl(QUrl("file:///"+manual, QUrl::TolerantMode));
 }
 
