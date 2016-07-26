@@ -492,7 +492,7 @@ bool MainWindow::Eplot1()
     {
         ui.plot1->yAxis->setScaleType(QCPAxis::stLinear);
         ui.plot1->yAxis->setNumberFormat("g");
-        ui.plot1->yAxis->setNumberPrecision(2);
+        ui.plot1->yAxis->setNumberPrecision(3);
         ui.plot1->yAxis->setAutoTickStep(true);
     }
 

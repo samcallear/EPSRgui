@@ -630,7 +630,7 @@ bool PlotDialog::Eplot()
     {
         ui.customPlot->yAxis->setScaleType(QCPAxis::stLinear);
         ui.customPlot->yAxis->setNumberFormat("g");
-        ui.customPlot->yAxis->setNumberPrecision(2);
+        ui.customPlot->yAxis->setNumberPrecision(3);
         ui.customPlot->yAxis->setAutoTickStep(true);
     }
 
