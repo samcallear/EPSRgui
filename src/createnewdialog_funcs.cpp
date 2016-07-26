@@ -33,7 +33,9 @@ void CreateNewDialog::on_okButton_clicked(bool checked)
 void CreateNewDialog::checkProjectName()
 {
     projectName_ = ui.lineEditEPSRname->text();
-    QString newDir = workingDir_+"/"+projectName_;
+    workingDir_ = ui.lineEditEPSRdir->text()+"/run/";
+    workingDir_ = QDir::toNativeSeparators(workingDir_);
+    QString newDir = workingDir_+projectName_;
     newDir = QDir::toNativeSeparators(newDir);
 
     if (QDir(newDir).exists())
