@@ -133,6 +133,7 @@ private slots:
     void on_deleteRotAllButton_clicked (bool checked);
     void on_molChangeAtobutton_clicked(bool checked);
     void on_makeMolExtButton_clicked(bool checked);
+    void on_molFmoleButton_clicked(bool checked);
 
 public:
     QList<IntraMolecular> bonds;

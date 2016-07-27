@@ -1891,3 +1891,27 @@ void MainWindow::on_molChangeAtobutton_clicked(bool checked)
 
     //read .mol and .ato files after changeato finished *************************************************************************************TO DO **********************************
 }
+
+void MainWindow::on_molFmoleButton_clicked(bool checked)
+{
+    int fmoleIter = ui.molFmoleLineEdit->text().toInt();
+
+    QDir::setCurrent(workingDir_);
+
+    QString molBaseFileName = molFileName_.split(".",QString::SkipEmptyParts).at(0);
+
+    QProcess processFmole;
+    processFmole.setProcessChannelMode(QProcess::ForwardedChannels);
+#ifdef _WIN32
+    processFmole.startDetached(epsrBinDir_+"fmole.exe", QStringList() << workingDir_ << "fmole" << molBaseFileName << qPrintable(QString::number(fmoleIter)));
+#else
+    processFmole.startDetached(epsrBinDir_+"fmole", QStringList() << workingDir_ << "fmole" << molBaseFileName << qPrintable(QString::number(fmoleIter)));
+#endif
+//    if (!processEPSR_.waitForStarted()) return;
+//    if (!processEPSR_.waitForFinished(1800000)) return;
+
+    messageText_ += "\nfmole finished running for component .ato file\n";
+    messagesDialog.refreshMessages();
+    ui.messagesLineEdit->setText("fmole finished running for component .ato file");
+
+}

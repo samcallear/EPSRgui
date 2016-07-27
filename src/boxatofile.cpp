@@ -745,14 +745,10 @@ void MainWindow::on_fmoleButton_clicked(bool checked)
     QProcess processFmole;
     processFmole.setProcessChannelMode(QProcess::ForwardedChannels);
 #ifdef _WIN32
-    processFmole.startDetached(epsrBinDir_+"fmole.exe", QStringList() << workingDir_ << "fmole" << atoBaseFileName << qPrintable(QString::number(fmoleIter)) << "0");
+    processFmole.startDetached(epsrBinDir_+"fmole.exe", QStringList() << workingDir_ << "fmole" << atoBaseFileName << qPrintable(QString::number(fmoleIter)));
 #else
-    processFmole.startDetached(epsrBinDir_+"fmole", QStringList() << workingDir_ << "fmole" << atoBaseFileName << qPrintable(QString::number(fmoleIter)) << "0");
-//    processFmole.startDetached("gnome-terminal -e \"bash -c \""+epsrBinDir_+"fmole "+workingDir_+" fmole "+atoBaseFileName+" "+qPrintable(QString::number(fmoleIter))+" 0; exec bash\\\"\"");
+    processFmole.startDetached(epsrBinDir_+"fmole", QStringList() << workingDir_ << "fmole" << atoBaseFileName << qPrintable(QString::number(fmoleIter)));
 #endif
-//    if (!processFmole.waitForStarted()) return;
-
-//    if (!processFmole.waitForFinished(1800000)) return;
     messageText_ += "\nfmole is running on box.ato file\n";
     messagesDialog.refreshMessages();
     ui.messagesLineEdit->setText("Running fmole in separate window");
