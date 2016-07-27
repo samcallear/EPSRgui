@@ -1915,3 +1915,29 @@ void MainWindow::on_molFmoleButton_clicked(bool checked)
     ui.messagesLineEdit->setText("fmole finished running for component .ato file");
 
 }
+
+void MainWindow::on_dockatoButton_clicked(bool checked)
+{
+    QDir::setCurrent(workingDir_);
+
+    QProcess processDockato;
+    processDockato.setProcessChannelMode(QProcess::ForwardedChannels);
+#ifdef _WIN32
+    processDockato.startDetached(epsrBinDir_+"dockato.exe", QStringList() << workingDir_ << "dockato");
+#else
+    processDockato.startDetached(epsrBinDir_+"dockato", QStringList() << workingDir_ << "dockato");
+#endif
+}
+
+void MainWindow::on_makelatticeatoButton_clicked(bool checked)
+{
+    QDir::setCurrent(workingDir_);
+
+    QProcess processMakelatticeato;
+    processMakelatticeato.setProcessChannelMode(QProcess::ForwardedChannels);
+#ifdef _WIN32
+    processMakelatticeato.startDetached(epsrBinDir_+"makelatticeato.exe", QStringList() << workingDir_ << "makelatticeato");
+#else
+    processMakelatticeato.startDetached(epsrBinDir_+"makelatticeato", QStringList() << workingDir_ << "makelatticeato");
+#endif
+}

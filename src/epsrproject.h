@@ -134,6 +134,8 @@ private slots:
     void on_molChangeAtobutton_clicked(bool checked);
     void on_makeMolExtButton_clicked(bool checked);
     void on_molFmoleButton_clicked(bool checked);
+    void on_dockatoButton_clicked(bool checked);
+    void on_makelatticeatoButton_clicked(bool checked);
 
 public:
     QList<IntraMolecular> bonds;

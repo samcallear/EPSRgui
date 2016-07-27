@@ -189,7 +189,6 @@ void MainWindow::on_addatoButton_clicked(bool checked)
 
         processEPSR_.write(qPrintable(QString::number(nIndex)+"\n"));
 
-
         // press enter to get to each ato file listed in the table that will be added to the container
         for (int i = 0 ; i < atoFilesToAdd.count(); i++)
         {
@@ -197,26 +196,20 @@ void MainWindow::on_addatoButton_clicked(bool checked)
             for (int nl = 0; nl < newlines; nl++)
             {
                 processEPSR_.write("\n");
-
             }
             processEPSR_.write("y\n");
 
-
             processEPSR_.write(qPrintable(numberOfMolecules.at(i)+"\n"));
-
         }
 
         // press enter to get to the ato file that is the container
         for (int nl = 0; nl < containerIndex; nl++)
         {
             processEPSR_.write("\n");
-
         }
         processEPSR_.write("y\n");
 
-
         processEPSR_.write(qPrintable(atoFileBaseName+"\n"));
-
 
         if (!processEPSR_.waitForFinished(1800000)) return;
 
