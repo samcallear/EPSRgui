@@ -154,15 +154,13 @@ void MainWindow::on_applyOutputsButton_clicked(bool checked)
 #else
     QFile batFile(workingDir_+"run"+atoBaseFileName+".sh");
 #endif
-    messageText_ += workingDir_+"run"+atoBaseFileName+".bat\n";
-    messagesDialog.refreshMessages();
-    if(batFile.exists() == false)
+    if (batFile.exists() == false)
     {
         QMessageBox msgBox;
         msgBox.setText("The script file doesn't exist yet - run EPSR first");
         msgBox.exec();
     }
-    if(!batFile.open(QFile::ReadWrite | QFile::Text))
+    if (!batFile.open(QFile::ReadWrite | QFile::Text))
     {
         QMessageBox msgBox;
         msgBox.setText("Could not open script file.");

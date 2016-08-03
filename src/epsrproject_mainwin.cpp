@@ -975,7 +975,6 @@ bool MainWindow::saveAs()
         //change window title to contain projectName
         this->setWindowTitle("EPSRgui: "+projectName_);
 
-
         messagesDialog.refreshMessages();
         ui.messagesLineEdit->setText("EPSR project saved to "+workingDirCopy);
     }
@@ -1328,9 +1327,12 @@ void MainWindow::runEPSR()
     ui.plot1Button->setEnabled(true);
     ui.plot2Button->setEnabled(true);
 
-    //Start watching EPSR.out file and feed to messages window [or use a timer and refresh if changed??]
-    connect(&epsrRunning_, SIGNAL(fileChanged(const QString &)), this, SLOT(autoUpdate()));
-    epsrRunning_.addPath(baseFileName_+".EPSR.out");
+    //If autoupdate switched on, start watching EPSR.out file and feed to messages window [or use a timer and refresh if changed??]
+    if (ui.autoUpdateCheckBox->isChecked() == true)
+    {
+        connect(&epsrRunning_, SIGNAL(fileChanged(const QString &)), this, SLOT(autoUpdate()));
+        epsrRunning_.addPath(baseFileName_+".EPSR.out");
+    }
 }
 
 void MainWindow::stopEPSR()
@@ -1387,7 +1389,10 @@ void MainWindow::enableButtons()
     ui.messagesLineEdit->setText("EPSR stopped");
 
     epsrFinished_.removePath(workingDir_+"killepsr");
-    epsrRunning_.removePath(baseFileName_+".EPSR.out");
+    if (ui.autoUpdateCheckBox->isChecked() == true)
+    {
+        epsrRunning_.removePath(baseFileName_+".EPSR.out");
+    }
 }
 
 void MainWindow::plot()
