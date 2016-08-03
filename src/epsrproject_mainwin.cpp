@@ -133,20 +133,17 @@ void MainWindow::closeEvent(QCloseEvent *event)
     QDir dir;
     QStringList batFilter;
 #ifdef _WIN32
-    batFilter << "*.bat";
+    batFilter << "plot*.bat";
 #else
-    batFilter << "*.sh";
+    batFilter << "plot*.sh";
 #endif
     QStringList batFiles = dir.entryList(batFilter, QDir::Files);
     if (!batFiles.isEmpty())
     {
         for (int i = 0; i < batFiles.count(); i++)
         {
-            if (!batFiles.at(i).contains("epsr"))
-            {
-                QFile file(batFiles.at(i));
-                file.remove();
-            }
+            QFile file(batFiles.at(i));
+            file.remove();
         }
     }
 
@@ -1250,7 +1247,7 @@ void MainWindow::runEPSR()
 #endif
 
     // if script file already exists, don't overwrite it
-    if (!batFile.exists())
+    if (batFile.exists() == false)
     {
         if(!batFile.open(QFile::WriteOnly | QFile::Text))
         {
@@ -1331,7 +1328,7 @@ void MainWindow::runEPSR()
     ui.plot1Button->setEnabled(true);
     ui.plot2Button->setEnabled(true);
 
-    //Start watching EPSR.out file and feed to messages window.
+    //Start watching EPSR.out file and feed to messages window [or use a timer and refresh if changed??]
     connect(&epsrRunning_, SIGNAL(fileChanged(const QString &)), this, SLOT(autoUpdate()));
     epsrRunning_.addPath(baseFileName_+".EPSR.out");
 }
@@ -1390,11 +1387,7 @@ void MainWindow::enableButtons()
     ui.messagesLineEdit->setText("EPSR stopped");
 
     epsrFinished_.removePath(workingDir_+"killepsr");
-
-    readEPSRinpFile();
-    readEPSRpcofFile();
-    updateInpFileTables();
-    updatePcofFileTables();
+    epsrRunning_.removePath(baseFileName_+".EPSR.out");
 }
 
 void MainWindow::plot()
@@ -1771,6 +1764,8 @@ void MainWindow::autoUpdate()
     plot1();
     plot2();
 
+    readEPSRinpFile();
+    readEPSRpcofFile();
     updateInpFileTables();
     updatePcofFileTables();
 

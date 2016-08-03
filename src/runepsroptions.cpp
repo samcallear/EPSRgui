@@ -58,7 +58,7 @@ void MainWindow::showAvailableFiles()
 
     QString atoBaseFileName = atoFileName_.split(".",QString::SkipEmptyParts).at(0);
     QFile file(workingDir_+"run"+atoBaseFileName+".bat");
-    if(!file.exists())
+    if (file.exists() == false)
     {
         return;
     }
@@ -99,6 +99,7 @@ void MainWindow::setupOutput()
     if (!ui.setupOutNameNew->text().isEmpty())
     {
         outputFileName_ = ui.setupOutNameNew->text();
+        ui.outputAvailableList->addItem(outputFileName_);
     }
     else
     {
@@ -114,8 +115,6 @@ void MainWindow::setupOutput()
 #else
     processSetupOutput.startDetached(epsrBinDir_+"upset", QStringList() << workingDir_ << "upset" << outputSetupFileType_ << outputFileName_);
 #endif
-
-    //QFileWatcher for a new file of this type and name in the workingDir_ and add to ui.outputAvailableList
 }
 
 void MainWindow::on_addOutputButton_clicked(bool checked)
@@ -155,7 +154,9 @@ void MainWindow::on_applyOutputsButton_clicked(bool checked)
 #else
     QFile batFile(workingDir_+"run"+atoBaseFileName+".sh");
 #endif
-    if(!batFile.exists())
+    messageText_ += workingDir_+"run"+atoBaseFileName+".bat\n";
+    messagesDialog.refreshMessages();
+    if(batFile.exists() == false)
     {
         QMessageBox msgBox;
         msgBox.setText("The script file doesn't exist yet - run EPSR first");
@@ -199,7 +200,7 @@ void MainWindow::on_applyOutputsButton_clicked(bool checked)
 #ifdef _WIN32
                     lineToAdd = "%EPSRbin%"+outputSetupFileType_+".exe "+workingDir_+" "+outputSetupFileType_+" "+outputFileName+"\n";
 #else
-                    lineToAdd = "%\"$EPSRbin\"'"+outputSetupFileType_+"' "+workingDir_+" "+outputSetupFileType_+" "+outputFileName+"\n";
+                    lineToAdd = "  \"$EPSRbin\"'"+outputSetupFileType_+"' "+workingDir_+" "+outputSetupFileType_+" "+outputFileName+"\n";
 #endif
                     original.append(lineToAdd);
                 }
@@ -254,7 +255,7 @@ void MainWindow::outputDlputils()
 #else
         QFile batFile(workingDir_+"run"+atoBaseFileName+".sh");
 #endif
-        if(!batFile.exists())
+        if(batFile.exists() == false)
         {
             QMessageBox msgBox;
             msgBox.setText("The script file doesn't exist yet - run EPSR first");
@@ -291,7 +292,7 @@ void MainWindow::outputDlputils()
 #ifdef _WIN32
                 lineToAdd = "%EPSRbin%writexyz.exe "+workingDir_+" writexyz "+atoBaseFileName+" y 0 "+halfboxLengthAStr+" "+halfboxLengthBStr+" -"+halfboxLengthCStr+" "+halfboxLengthCStr+" 0 0 0 0"+"\n";
 #else
-                lineToAdd = "%\"$EPSRbin\"'writexyz' "+workingDir_+" writexyz "+atoBaseFileName+" y 0 "+halfboxLengthAStr+" "+halfboxLengthBStr+" -"+halfboxLengthCStr+" "+halfboxLengthCStr+" 0 0 0 0"+"\n";
+                lineToAdd = "  \"$EPSRbin\"'writexyz' "+workingDir_+" writexyz "+atoBaseFileName+" y 0 "+halfboxLengthAStr+" "+halfboxLengthBStr+" -"+halfboxLengthCStr+" "+halfboxLengthCStr+" 0 0 0 0"+"\n";
 #endif
                 original.append(lineToAdd);
                 original.append(line+"\n");
@@ -314,7 +315,7 @@ void MainWindow::outputDlputils()
 #else
         QFile batFile(workingDir_+"run"+atoBaseFileName+".sh");
 #endif
-        if(!batFile.exists())
+        if(batFile.exists() == false)
         {
             QMessageBox msgBox;
             msgBox.setText("The script file doesn't exist yet - run EPSR first");
