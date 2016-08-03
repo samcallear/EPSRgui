@@ -1316,6 +1316,8 @@ void MainWindow::runEPSR()
     ui.addatoButton->setEnabled(false);
     ui.dataFileBrowseButton->setEnabled(false);
     ui.removeDataFileButton->setEnabled(false);
+    ui.setupOutButton->setEnabled(false);
+    ui.applyOutputsButton->setEnabled(false);
 
     ui.messagesLineEdit->setText("EPSR is running in a separate window");
 
@@ -1380,6 +1382,8 @@ void MainWindow::enableButtons()
     ui.addatoButton->setEnabled(true);
     ui.dataFileBrowseButton->setEnabled(true);
     ui.removeDataFileButton->setEnabled(true);
+    ui.setupOutButton->setEnabled(true);
+    ui.applyOutputsButton->setEnabled(true);
 
     ui.inpSettingsTable->setEditTriggers(QAbstractItemView::AllEditTriggers);
     ui.dataFileSettingsTable->setEditTriggers(QAbstractItemView::AllEditTriggers);
