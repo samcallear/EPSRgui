@@ -186,11 +186,11 @@ bool MainWindow::fqplot2()
         {
             if (ui.plot2LogY->isChecked() == true)
             {
-                columnsDF[column].append((dataLineDF.at(column*2+1).toDouble())+column+1);
+                columnsDF[column].append((dataLineDF.at(column*2+1).toDouble())+column+1-0.2);
             }
             else
             {
-                columnsDF[column].append((dataLineDF.at(column*2+1).toDouble())+column);
+                columnsDF[column].append((dataLineDF.at(column*2+1).toDouble())+column-0.2);
             }        }
     } while (!lineDF.isNull());
     fileDF.close();

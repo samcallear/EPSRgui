@@ -84,6 +84,7 @@ void MainWindow::on_setupEPSRButton_clicked(bool checked)
     ui.plot1Button->setEnabled(true);
     ui.plot2Button->setEnabled(true);
     ui.plotEPSRshellAct->setEnabled(true);
+    ui.jmolPlotAct->setEnabled(true);
 
     ui.updateInpPcofFilesButton->setEnabled(true);
     ui.reloadEPSRinpButton->setEnabled(true);

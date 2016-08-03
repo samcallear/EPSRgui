@@ -12,8 +12,6 @@
 #include <QVector>
 #include <QGuiApplication>
 
-// Constructor
-
 PlotDialog::PlotDialog(MainWindow *parent) : QDialog(parent)
 {
     ui.setupUi(this);
@@ -23,10 +21,16 @@ PlotDialog::PlotDialog(MainWindow *parent) : QDialog(parent)
     atoFileName_ = mainWindow_->atoFileName();
     baseFileName_ = workingDir_+atoFileName_.split(".").at(0);
 
-    ui.listWidget_3->setCurrentRow(0);
+    ui.standardPlotList->setCurrentRow(0);
     connect(ui.closeButton, SIGNAL(clicked()), this, SLOT(reject()));
     readatofile();
     getnDataCol();
+
+    //get list of outputs that are in folder (note this means that they might not have been run in epsr)
+    populateOutputsList();
+
+    //hide optionsGroupBox
+    ui.optionsGroupBox->setVisible(false);
 
     setWindowFlags(windowFlags() | Qt::WindowMinimizeButtonHint);
     setWindowFlags(windowFlags() | Qt::WindowMaximizeButtonHint);
@@ -34,6 +38,35 @@ PlotDialog::PlotDialog(MainWindow *parent) : QDialog(parent)
     //MouseTracking;
     connect(ui.customPlot, SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(showPointToolTip(QMouseEvent*)));
     connect(ui.customPlot, SIGNAL(mouseWheel(QWheelEvent*)), this, SLOT(plotZoom(QWheelEvent*)));
+}
+
+void PlotDialog::populateOutputsList()
+{
+    QDir::setCurrent(workingDir_);
+    QDir dir;
+    QStringList outputFilesFilters;
+    outputFilesFilters << "*.CHAINS.n01" << "*.CLUSTERS.n01" << "*.COORD.n01" << ".FLUCTUATIONS.n01"
+                       << "*.RINGS.n01"<< "*.TOR.c01" << "*.TRI.c01" << "*.VOIDS.n01";
+    QStringList outputFilesList = dir.entryList(outputFilesFilters, QDir::Files);
+    if (outputFilesList.isEmpty())
+    {
+        return;
+    }
+
+    for (int i = 0; i < outputFilesList.count(); i++)
+    {
+        ui.outputPlotList->addItem(outputFilesList.at(i));
+    }
+}
+
+void PlotDialog::on_standardPlotList_itemClicked(QListWidgetItem *item)
+{
+    ui.outputPlotList->setCurrentRow(-1);
+}
+
+void PlotDialog::on_outputPlotList_itemClicked(QListWidgetItem *item)
+{
+    ui.standardPlotList->setCurrentRow(-1);
 }
 
 void PlotDialog::on_plotButton_clicked(bool checked)
@@ -165,58 +198,108 @@ bool PlotDialog::getnDataCol()
 }
 
 
-bool PlotDialog::getplottype()
+void PlotDialog::getplottype()
 {
-    int ptType = ui.listWidget_3->currentRow();
-    if (ptType == 0)
+    plotFileExt_.clear();
+    int ptType = ui.standardPlotList->currentRow();
+    if (ptType != -1)
     {
-        fqplot();
-        return 0;
+        if (ptType == 0)
+        {
+            fqplot();
+        }
+        else
+        if (ptType == 1)
+        {
+            frplot();
+        }
+        else
+        if (ptType == 2)
+        {
+            //energy
+            plotFileExt_ = ".EPSR.erg";
+            dataColumn_ = 0;
+            yPlot();
+        }
+        else
+        if (ptType == 3)
+        {
+            //R-factor
+            plotFileExt_ = ".EPSR.erg";
+            dataColumn_= 2;
+            yPlot();
+        }
+        else
+        if (ptType == 4)
+        {
+            partialsplot();
+        }
+        else
+        if (ptType == 5)
+        {
+            gofrintraplot();
+        }
+        else
+        if (ptType == 6)
+        {
+            sqterplot();
+        }
+        else
+        if (ptType == 7)
+        {
+            sqtraplot();
+        }
+        else
+        if (ptType == 8)
+        {
+            //ereq plot
+            ereqPlot();
+        }
     }
     else
-    if (ptType == 1)
     {
-        frplot();
-        return 0;
+        QString ptTypeName = ui.outputPlotList->currentItem()->text();
+        if (ptTypeName.contains("CHAINS"))
+        {
+            xyPlot();
+              //column(3) (4th) also has some data in but not sure what??
+        }
+        else
+        if (ptTypeName.contains("CLUSTER"))
+        {
+            xyPlot();
+        }
+        else
+        if (ptTypeName.contains("COORD"))
+        {
+            coordPlot();
+        }
+        else
+        if (ptTypeName.contains("FLUCTUATIONS"))
+        {
+            xyPlot();
+        }
+        else
+        if (ptTypeName.contains("RINGS"))
+        {
+            xyPlot();
+        }
+        else
+        if (ptTypeName.contains("TOR"))
+        {
+            xyPlot();
+        }
+        else
+        if (ptTypeName.contains("TRI"))
+        {
+            xyPlot();
+        }
+        else
+        if (ptTypeName.contains("VOIDS"))
+        {
+            xyPlot();
+        }
     }
-    else
-    if (ptType == 2)
-    {
-        Eplot();
-        return 0;
-    }
-    else
-    if (ptType == 3)
-    {
-        Rplot();
-        return 0;
-    }
-    else
-    if (ptType == 4)
-    {
-        partialsplot();
-        return 0;
-    }
-    else
-    if (ptType == 5)
-    {
-        gofrintraplot();
-        return 0;
-    }
-    else
-    if (ptType == 6)
-    {
-        sqterplot();
-        return 0;
-    }
-    else
-    if (ptType == 7)
-    {
-        sqtraplot();
-        return 0;
-    }
-    else
-    return 0;
 }
 
 bool PlotDialog::fqplot()
@@ -232,6 +315,11 @@ bool PlotDialog::fqplot()
     QFile fileD(fqdataFileName);
     QFile fileDF(fqdiffFileName);
     int column;
+    double residualOffset = -0.2;
+    if (!ui.residualOffsetLineEdit->text().isEmpty())
+    {
+        residualOffset = ui.residualOffsetLineEdit->text().toDouble();
+    }
 
     //open and read data file to array
     if(!fileD.open(QFile::ReadOnly | QFile::Text))
@@ -340,38 +428,68 @@ bool PlotDialog::fqplot()
         {
             if (ui.logYButton->isChecked() == true)
             {
-                columnsDF[column].append((dataLineDF.at(column*2+1).toDouble())+column+1);
+                columnsDF[column].append((dataLineDF.at(column*2+1).toDouble())+column+1+residualOffset);
             }
             else
             {
-                columnsDF[column].append((dataLineDF.at(column*2+1).toDouble())+column);
+                columnsDF[column].append((dataLineDF.at(column*2+1).toDouble())+column+residualOffset);
             }
         }
     } while (!lineDF.isNull());
     fileDF.close();
 
+    //find x max to work out where to put data labels
+    double xmax = 30;
+    if (!ui.xMaxLineEdit->text().isEmpty())
+    {
+        xmax = ui.xMaxLineEdit->text().toDouble();
+    }
+
     // create graph and assign data to it:
     QPen pen;
     QString datafileLabel;
-    for (int i=0; i < nDatasets*3; i += 3)
+    if (ui.residualCheckBox->isChecked())
     {
-        ui.customPlot->addGraph();
-        pen.setColor(QColor(qSin(i*0.3)*100+100, qSin(i*0.6+0.7)*100+100, qSin(i*0.4+0.6)*100+100));
-        ui.customPlot->graph(i)->setPen(pen);
-        ui.customPlot->graph(i)->setData(xM, columnsM.at(i/3));
-        ui.customPlot->addGraph();
-        ui.customPlot->graph(i+1)->setPen(pen);
-        ui.customPlot->graph(i+1)->setData(xD, columnsD.at(i/3));
-        ui.customPlot->graph(i+1)->setLineStyle(QCPGraph::lsNone);
-        ui.customPlot->graph(i+1)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc, 3));
-        ui.customPlot->addGraph();
-        ui.customPlot->graph(i+2)->setData(xDF, columnsDF.at(i/3));
-        ui.customPlot->graph(i+2)->setPen(QPen(Qt::gray));
-        QCPItemText *dataLabel = new QCPItemText(ui.customPlot);
-        ui.customPlot->addItem(dataLabel);
-        dataLabel->position->setCoords(20,(i/3)+0.2);
-        datafileLabel = mainWindow_->dataFileList.at(i/3);
-        dataLabel->setText(qPrintable(datafileLabel));
+        for (int i=0; i < nDatasets*3; i += 3)
+        {
+            ui.customPlot->addGraph();
+            pen.setColor(QColor(qSin(i*0.3)*100+100, qSin(i*0.6+0.7)*100+100, qSin(i*0.4+0.6)*100+100));
+            ui.customPlot->graph(i)->setPen(pen);
+            ui.customPlot->graph(i)->setData(xM, columnsM.at(i/3));
+            QCPItemText *dataLabel = new QCPItemText(ui.customPlot);
+            ui.customPlot->addItem(dataLabel);
+            dataLabel->position->setCoords(0.7*xmax,(i/3)+0.2);
+            datafileLabel = mainWindow_->dataFileList.at(i/3);
+            dataLabel->setText(qPrintable(datafileLabel));
+            ui.customPlot->addGraph();
+            ui.customPlot->graph(i+1)->setPen(pen);
+            ui.customPlot->graph(i+1)->setData(xD, columnsD.at(i/3));
+            ui.customPlot->graph(i+1)->setLineStyle(QCPGraph::lsNone);
+            ui.customPlot->graph(i+1)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc, 3));
+            ui.customPlot->addGraph();
+            ui.customPlot->graph(i+2)->setData(xDF, columnsDF.at(i/3));
+            ui.customPlot->graph(i+2)->setPen(QPen(Qt::gray));
+        }
+    }
+    else
+    {
+        for (int i=0; i < nDatasets*2; i += 2)
+        {
+            ui.customPlot->addGraph();
+            pen.setColor(QColor(qSin(i*0.3)*100+100, qSin(i*0.6+0.7)*100+100, qSin(i*0.4+0.6)*100+100));
+            ui.customPlot->graph(i)->setPen(pen);
+            ui.customPlot->graph(i)->setData(xM, columnsM.at(i/2));
+            QCPItemText *dataLabel = new QCPItemText(ui.customPlot);
+            ui.customPlot->addItem(dataLabel);
+            dataLabel->position->setCoords(0.7*xmax,(i/2)+0.2);
+            datafileLabel = mainWindow_->dataFileList.at(i/2);
+            dataLabel->setText(qPrintable(datafileLabel));
+            ui.customPlot->addGraph();
+            ui.customPlot->graph(i+1)->setPen(pen);
+            ui.customPlot->graph(i+1)->setData(xD, columnsD.at(i/2));
+            ui.customPlot->graph(i+1)->setLineStyle(QCPGraph::lsNone);
+            ui.customPlot->graph(i+1)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc, 3));
+        }
     }
 
     if (ui.logXButton->isChecked() == true)
@@ -411,7 +529,40 @@ bool PlotDialog::fqplot()
 
     //plot
     ui.customPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
-    ui.customPlot->rescaleAxes();
+    if (ui.xMinLineEdit->text().isEmpty() && ui.xMaxLineEdit->text().isEmpty() && ui.yMinLineEdit->text().isEmpty() && ui.yMaxLineEdit->text().isEmpty())
+    {
+        ui.customPlot->rescaleAxes();
+    }
+    else
+    {
+        if (!ui.xMinLineEdit->text().isEmpty())
+        {
+            ui.customPlot->xAxis->setRangeLower(ui.xMinLineEdit->text().toDouble());
+        }
+        else
+        ui.customPlot->xAxis->setRangeLower(0.0);
+
+        if (!ui.xMaxLineEdit->text().isEmpty())
+        {
+            ui.customPlot->xAxis->setRangeUpper(ui.xMaxLineEdit->text().toDouble());
+        }
+        else
+        ui.customPlot->xAxis->setRangeUpper(xmax);        //read this from data??
+
+        if (!ui.yMinLineEdit->text().isEmpty())
+        {
+            ui.customPlot->yAxis->setRangeLower(ui.yMinLineEdit->text().toDouble());
+        }
+        else
+        ui.customPlot->yAxis->setRangeLower(-1.5);     //read this from data!!**************************************************
+
+        if (!ui.yMaxLineEdit->text().isEmpty())
+        {
+            ui.customPlot->yAxis->setRangeUpper(ui.yMaxLineEdit->text().toDouble());
+        }
+        else
+        ui.customPlot->yAxis->setRangeUpper(nDatasets);     //read this from data!!**************************************************
+    }
     ui.customPlot->replot();
     return 0;
 }
@@ -426,6 +577,11 @@ bool PlotDialog::frplot()
     QFile fileM(frmodelFileName);
     QFile fileD(frdataFileName);
     int column;
+    double residualOffset = -0.2;
+    if (!ui.residualOffsetLineEdit->text().isEmpty())
+    {
+        residualOffset = ui.residualOffsetLineEdit->text().toDouble();
+    }
 
     //open and read data file to array
     if(!fileD.open(QFile::ReadOnly | QFile::Text))
@@ -505,25 +661,87 @@ bool PlotDialog::frplot()
     } while (!lineM.isNull());
     fileM.close();
 
+    //create a difference array from model and data arrays
+    if (columnsM.count() != columnsD.count() || columnsM[0].count() != columnsD[0].count())
+    {
+        QMessageBox msgBox;
+        msgBox.setText("The number of data points in the data and model files is not equal.");
+        msgBox.exec();
+        return 0;
+    }
+    QVector<double> xDF;
+    QVector< QVector<double> > columnsDF;
+    xDF.clear();
+    columnsDF.clear();
+    columnsDF.resize(nDataCol);
+    for (int i = 0; i < columnsM[0].count(); i++)
+    {
+        xDF.append(xM.at(i));
+        for (column = 0; column < nDataCol; ++column)
+        {
+            if (ui.logYButton->isChecked() == true)
+            {
+                columnsDF[column].append(columnsM[column].at(i)-columnsD[column].at(i)+column+1-0.2); //diff = model-data -offset
+            }
+            else
+            {
+                columnsDF[column].append(columnsM[column].at(i)-columnsD[column].at(i)+column-0.2);
+            }
+        }
+    }
+
+    //find x max to work out where to put data labels
+    double xmax = 20;
+    if (!ui.xMaxLineEdit->text().isEmpty())
+    {
+        xmax = ui.xMaxLineEdit->text().toDouble();
+    }
+
     // create graph and assign data to it:
     QPen pen;
     QString datafileLabel;
-    for (int i=0; i < nDatasets*2; i += 2)
+    if (ui.residualCheckBox->isChecked())
     {
-        ui.customPlot->addGraph();
-        pen.setColor(QColor(qSin(i*0.3)*100+100, qSin(i*0.6+0.7)*100+100, qSin(i*0.4+0.6)*100+100));
-        ui.customPlot->graph(i)->setPen(pen);
-        ui.customPlot->graph(i)->setData(xM, columnsM.at(i/2));
-        ui.customPlot->addGraph();
-        ui.customPlot->graph(i+1)->setPen(pen);
-        ui.customPlot->graph(i+1)->setData(xD, columnsD.at(i/2));
-        ui.customPlot->graph(i+1)->setLineStyle(QCPGraph::lsNone);
-        ui.customPlot->graph(i+1)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc, 3));
-        QCPItemText *dataLabel = new QCPItemText(ui.customPlot);
-        ui.customPlot->addItem(dataLabel);
-        dataLabel->position->setCoords(16,(i/2)+0.2);
-        datafileLabel = mainWindow_->dataFileList.at(i/2);
-        dataLabel->setText(qPrintable(datafileLabel));
+        for (int i=0; i < nDatasets*3; i += 3)
+        {
+            ui.customPlot->addGraph();
+            pen.setColor(QColor(qSin(i*0.3)*100+100, qSin(i*0.6+0.7)*100+100, qSin(i*0.4+0.6)*100+100));
+            ui.customPlot->graph(i)->setPen(pen);
+            ui.customPlot->graph(i)->setData(xM, columnsM.at(i/3));
+            QCPItemText *dataLabel = new QCPItemText(ui.customPlot);
+            ui.customPlot->addItem(dataLabel);
+            dataLabel->position->setCoords(0.8*xmax,(i/3)+0.2);
+            datafileLabel = mainWindow_->dataFileList.at(i/3);
+            dataLabel->setText(qPrintable(datafileLabel));
+            ui.customPlot->addGraph();
+            ui.customPlot->graph(i+1)->setPen(pen);
+            ui.customPlot->graph(i+1)->setData(xD, columnsD.at(i/3));
+            ui.customPlot->graph(i+1)->setLineStyle(QCPGraph::lsNone);
+            ui.customPlot->graph(i+1)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc, 3));
+            ui.customPlot->addGraph();
+            ui.customPlot->graph(i+2)->setData(xDF, columnsDF.at(i/3));
+            ui.customPlot->graph(i+2)->setPen(QPen(Qt::gray));
+        }
+    }
+    else
+    {
+        for (int i=0; i < nDatasets*2; i += 2)
+        {
+            ui.customPlot->addGraph();
+            pen.setColor(QColor(qSin(i*0.3)*100+100, qSin(i*0.6+0.7)*100+100, qSin(i*0.4+0.6)*100+100));
+            ui.customPlot->graph(i)->setPen(pen);
+            ui.customPlot->graph(i)->setData(xM, columnsM.at(i/2));
+            QCPItemText *dataLabel = new QCPItemText(ui.customPlot);
+            ui.customPlot->addItem(dataLabel);
+            dataLabel->position->setCoords(0.7*xmax,(i/2)+0.2);
+            datafileLabel = mainWindow_->dataFileList.at(i/2);
+            dataLabel->setText(qPrintable(datafileLabel));
+            ui.customPlot->addGraph();
+            ui.customPlot->graph(i+1)->setPen(pen);
+            ui.customPlot->graph(i+1)->setData(xD, columnsD.at(i/2));
+            ui.customPlot->graph(i+1)->setLineStyle(QCPGraph::lsNone);
+            ui.customPlot->graph(i+1)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc, 3));
+        }
     }
 
     if (ui.logXButton->isChecked() == true)
@@ -563,15 +781,48 @@ bool PlotDialog::frplot()
 
     //plot
     ui.customPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
-    ui.customPlot->rescaleAxes();
+    if (ui.xMinLineEdit->text().isEmpty() && ui.xMaxLineEdit->text().isEmpty() && ui.yMinLineEdit->text().isEmpty() && ui.yMaxLineEdit->text().isEmpty())
+    {
+        ui.customPlot->rescaleAxes();
+    }
+    else
+    {
+        if (!ui.xMinLineEdit->text().isEmpty())
+        {
+            ui.customPlot->xAxis->setRangeLower(ui.xMinLineEdit->text().toDouble());
+        }
+        else
+        ui.customPlot->xAxis->setRangeLower(0.0);
+
+        if (!ui.xMaxLineEdit->text().isEmpty())
+        {
+            ui.customPlot->xAxis->setRangeUpper(ui.xMaxLineEdit->text().toDouble());
+        }
+        else
+        ui.customPlot->xAxis->setRangeUpper(xmax);        //read this from data??
+
+        if (!ui.yMinLineEdit->text().isEmpty())
+        {
+            ui.customPlot->yAxis->setRangeLower(ui.yMinLineEdit->text().toDouble());
+        }
+        else
+        ui.customPlot->yAxis->setRangeLower(-1.0);     //read this from data!!**************************************************
+
+        if (!ui.yMaxLineEdit->text().isEmpty())
+        {
+            ui.customPlot->yAxis->setRangeUpper(ui.yMinLineEdit->text().toDouble());
+        }
+        else
+        ui.customPlot->yAxis->setRangeUpper(nDatasets);     //read this from data!!**************************************************
+    }
     ui.customPlot->replot();
     return 0;
 }
 
-bool PlotDialog::Eplot()
+bool PlotDialog::yPlot()
 {
     QString FileName;
-    FileName = (baseFileName_+".EPSR.erg");
+    FileName = (baseFileName_+plotFileExt_);
     QFile file(FileName);
 
     //open and read data file to array
@@ -586,95 +837,19 @@ bool PlotDialog::Eplot()
     QString line;
     QStringList dataLine;
     QVector<double> x;          //number of iterations
-    QVector<double> y;          //energy
+    QVector<double> y;          //y value
     dataLine.clear();
     x.clear();
     y.clear();
-    for (iterations = 1; iterations < 1000000; ++iterations)
-    {
+    int iterations = 1;
+    do {
         line = stream.readLine();
         dataLine = line.split(" ", QString::SkipEmptyParts);
         if (dataLine.count() == 0) break;
-        y.append(dataLine.at(0).toDouble());
+        y.append(dataLine.at(dataColumn_).toDouble());
         x.append(iterations);
-    }
-    file.close();
-
-    // create graph and assign data to it:
-    ui.customPlot->addGraph();
-    ui.customPlot->graph()->setData(x, y);
-    if (ui.logXButton->isChecked() == true)
-    {
-        ui.customPlot->xAxis->setScaleType(QCPAxis::stLogarithmic);
-        ui.customPlot->xAxis->setScaleLogBase(100);
-        ui.customPlot->xAxis->setNumberFormat("eb");
-        ui.customPlot->xAxis->setNumberPrecision(0);
-        ui.customPlot->xAxis->setSubTickCount(10);
-    }
-    else
-    {
-        ui.customPlot->xAxis->setScaleType(QCPAxis::stLinear);
-        ui.customPlot->xAxis->setNumberFormat("g");
-        ui.customPlot->xAxis->setNumberPrecision(2);
-        ui.customPlot->xAxis->setAutoTickStep(true);
-    }
-    if (ui.logYButton->isChecked() == true)
-    {
-        ui.customPlot->yAxis->setScaleType(QCPAxis::stLogarithmic);
-        ui.customPlot->yAxis->setScaleLogBase(100);
-        ui.customPlot->yAxis->setNumberFormat("eb");
-        ui.customPlot->yAxis->setNumberPrecision(0);
-        ui.customPlot->yAxis->setSubTickCount(10);
-    }
-    else
-    {
-        ui.customPlot->yAxis->setScaleType(QCPAxis::stLinear);
-        ui.customPlot->yAxis->setNumberFormat("g");
-        ui.customPlot->yAxis->setNumberPrecision(3);
-        ui.customPlot->yAxis->setAutoTickStep(true);
-    }
-
-    // give the axes some labels:
-    ui.customPlot->xAxis->setLabel("iteration");
-    ui.customPlot->yAxis->setLabel("Energy");
-
-    //plot
-    ui.customPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
-    ui.customPlot->rescaleAxes();
-    ui.customPlot->replot();
-    return 0;
-}
-
-bool PlotDialog::Rplot()
-{
-    QString FileName;
-    FileName = (baseFileName_+".EPSR.erg");
-    QFile file(FileName);
-
-    //open and read data file to array
-    if(!file.open(QFile::ReadOnly | QFile::Text))
-    {
-        QMessageBox msgBox;
-        msgBox.setText("Could not open .erg file.");
-        msgBox.exec();
-        return 0;
-    }
-    QTextStream stream(&file);
-    QString line;
-    QStringList dataLine;
-    QVector<double> x;          //number of iterations
-    QVector<double> y;          //R-factor
-    dataLine.clear();
-    x.clear();
-    y.clear();
-    for (iterations = 1; iterations < 1000000; ++iterations)
-    {
-        line = stream.readLine();
-        dataLine = line.split(" ", QString::SkipEmptyParts);
-        if (dataLine.count() == 0) break;
-        y.append(dataLine.at(2).toDouble());
-        x.append(iterations);
-    }
+        iterations++;
+    } while (!line.isNull());
     file.close();
 
     // create graph and assign data to it:
@@ -713,7 +888,120 @@ bool PlotDialog::Rplot()
 
     // give the axes some labels:
     ui.customPlot->xAxis->setLabel("iteration");
-    ui.customPlot->yAxis->setLabel("R-factor");
+    if (dataColumn_ == 0)
+    {
+        ui.customPlot->yAxis->setLabel("Energy");
+    }
+    else
+    if (dataColumn_ == 2)
+    {
+        ui.customPlot->yAxis->setLabel("R-factor");
+    }
+
+    //plot
+    ui.customPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
+    ui.customPlot->rescaleAxes();
+    ui.customPlot->replot();
+    return 0;
+}
+
+bool PlotDialog::xyPlot()
+{
+    QString FileName = workingDir_+ui.outputPlotList->currentItem()->text();
+//    FileName = (baseFileName_+plotFileExt_);
+    QFile file(FileName);
+
+    //open and read data file to array
+    if(!file.open(QFile::ReadOnly | QFile::Text))
+    {
+        QMessageBox msgBox;
+        msgBox.setText("Could not open "+FileName);
+        msgBox.exec();
+        return 0;
+    }
+    QTextStream stream(&file);
+    QString line;
+    QStringList dataLine;
+    QVector<double> x;          //theta
+    QVector<double> y;          //percentage
+    dataLine.clear();
+    x.clear();
+    y.clear();
+    line = stream.readLine();
+    do {
+        line = stream.readLine();
+        dataLine = line.split(" ", QString::SkipEmptyParts);
+        if (dataLine.count() == 0) break;
+        x.append(dataLine.at(0).toDouble());
+        y.append(dataLine.at(1).toDouble());
+    } while (!line.isNull());
+    file.close();
+
+    // create graph and assign data to it:
+    QCPBars *histogram = new QCPBars(ui.customPlot->xAxis, ui.customPlot->yAxis);
+    ui.customPlot->addPlottable(histogram);
+    histogram->setData(x, y);
+    if (ui.logXButton->isChecked() == true)
+    {
+        ui.customPlot->xAxis->setScaleType(QCPAxis::stLogarithmic);
+        ui.customPlot->xAxis->setScaleLogBase(100);
+        ui.customPlot->xAxis->setNumberFormat("eb");
+        ui.customPlot->xAxis->setNumberPrecision(0);
+        ui.customPlot->xAxis->setSubTickCount(10);
+    }
+    else
+    {
+        ui.customPlot->xAxis->setScaleType(QCPAxis::stLinear);
+        ui.customPlot->xAxis->setNumberFormat("g");
+        ui.customPlot->xAxis->setNumberPrecision(2);
+        ui.customPlot->xAxis->setAutoTickStep(true);
+    }
+    if (ui.logYButton->isChecked() == true)
+    {
+        ui.customPlot->yAxis->setScaleType(QCPAxis::stLogarithmic);
+        ui.customPlot->yAxis->setScaleLogBase(100);
+        ui.customPlot->yAxis->setNumberFormat("eb");
+        ui.customPlot->yAxis->setNumberPrecision(0);
+        ui.customPlot->yAxis->setSubTickCount(10);
+    }
+    else
+    {
+        ui.customPlot->yAxis->setScaleType(QCPAxis::stLinear);
+        ui.customPlot->yAxis->setNumberFormat("g");
+        ui.customPlot->yAxis->setNumberPrecision(2);
+        ui.customPlot->yAxis->setAutoTickStep(true);
+    }
+
+    // give the axes some labels:
+    if (FileName.contains("CHAINS"))
+    {
+        ui.customPlot->xAxis->setLabel("Chain size");
+    }
+    else
+    if (FileName.contains("VOIDS"))
+    {
+        ui.customPlot->xAxis->setLabel("Void size");
+    }
+    else
+    if (FileName.contains("RINGS"))
+    {
+        ui.customPlot->xAxis->setLabel("Ring size");
+    }
+    else
+    if (FileName.contains("FLUCTUATIONS"))
+    {
+        ui.customPlot->xAxis->setLabel("Fluctuation size");
+    }
+    else
+    if (FileName.contains("CLUSTERS"))
+    {
+        ui.customPlot->xAxis->setLabel("Cluster size");
+    }
+    else
+    {
+        ui.customPlot->xAxis->setLabel("theta / degrees");
+    }
+    ui.customPlot->yAxis->setLabel("percentage");
 
     //plot
     ui.customPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
@@ -890,7 +1178,12 @@ bool PlotDialog::partialsplot()
         //the first file contains 100 pairs (even columns from 2 to 200) and atompair_indexes from 0 - 99
         if (atompair_index < 100)
         {
-            partialsFileName = (baseFileName_+".EPSR.g01");
+            if (ui.outputPlotList->currentRow() != -1)
+            {
+                QString baseFileName = ui.outputPlotList->currentItem()->text().split(".", QString::KeepEmptyParts).at(0);
+                partialsFileName = workingDir_+baseFileName+".PARTIALS.g01";
+            }
+            else {  partialsFileName = (baseFileName_+".EPSR.g01");}
             CNFileName = (baseFileName_+".EPSR.z01");
         }
         else
@@ -1362,7 +1655,188 @@ bool PlotDialog::sqtraplot()
     ui.customPlot->rescaleAxes();
     ui.customPlot->replot();
     return 0;
+}
 
+bool PlotDialog::ereqPlot()
+{
+    QString FileNameerg;
+    FileNameerg = (baseFileName_+".EPSR.erg");
+    QFile fileerg(FileNameerg);
+
+    //open and read data file to array
+    if(!fileerg.open(QFile::ReadOnly | QFile::Text))
+    {
+        QMessageBox msgBox;
+        msgBox.setText("Could not open .erg file.");
+        msgBox.exec();
+        return 0;
+    }
+    QTextStream streamerg(&fileerg);
+    QString lineerg;
+    QStringList dataLineerg;
+    QVector<double> x1;          //ereq
+    QVector<double> y1;         //fit quality
+    QVector<double> y2;         //fitted line showing gradient of last 50 iterations
+    dataLineerg.clear();
+    x1.clear();
+    y1.clear();
+    y2.clear();
+    for (int iterations = 1; iterations < 1000000; ++iterations)
+    {
+        lineerg = streamerg.readLine();
+        dataLineerg = lineerg.split(" ", QString::SkipEmptyParts);
+        if (dataLineerg.count() == 0) break;
+        if (dataLineerg.count() <= 6)
+        {
+            QMessageBox msgBox;
+            msgBox.setText("This plot type is not compatible with this version of EPSR.");
+            msgBox.exec();
+            fileerg.close();
+            break;
+        }
+        x1.append(dataLineerg.at(3).toDouble());
+        y1.append(dataLineerg.at(6).toDouble());
+    }
+    fileerg.close();
+
+    QString FileNameqdr;
+    FileNameqdr = (baseFileName_+".EPSR.qdr");
+    QFile fileqdr(FileNameqdr);
+
+    //open and read data file to array
+    if(!fileqdr.open(QFile::ReadOnly | QFile::Text))
+    {
+        QMessageBox msgBox;
+        msgBox.setText("Could not open .erg file.");
+        msgBox.exec();
+        return 0;
+    }
+    QTextStream streamqdr(&fileqdr);
+    QString lineqdr;
+    QStringList dataLineqdr;
+    dataLineqdr.clear();
+
+    for (int iterations = 1; iterations < 1000000; ++iterations)
+    {
+        lineqdr = streamqdr.readLine();
+        dataLineqdr = lineqdr.split(" ", QString::SkipEmptyParts);
+        if (dataLineqdr.count() == 0) break;
+        if (dataLineqdr.count() <= 6)
+        {
+            QMessageBox msgBox;
+            msgBox.setText("This plot type is not compatible with this version of EPSR.");
+            msgBox.exec();
+            fileqdr.close();
+            break;
+        }
+        y2.append(dataLineqdr.at(4).toDouble());
+    }
+    fileqdr.close();
+
+    // create graph and assign data to it:
+    QCPCurve *ergCurve = new QCPCurve(ui.customPlot->xAxis, ui.customPlot->yAxis);
+    ui.customPlot->addPlottable(ergCurve);
+    ergCurve->setData(x1, y1);
+    ui.customPlot->addGraph();
+    ui.customPlot->graph(0)->setData(x1, y2);
+    ui.customPlot->graph(0)->setLineStyle(QCPGraph::lsNone);
+    ui.customPlot->graph(0)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc, 3));
+
+    // give the axes some labels:
+    ui.customPlot->xAxis->setLabel("ereq energy");
+    ui.customPlot->yAxis->setLabel("quality of fit");
+
+    //plot
+    ui.customPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
+    ui.customPlot->rescaleAxes();
+    ui.customPlot->replot();
+    return 0;
+}
+
+bool PlotDialog::coordPlot()
+{
+    QString FileName = workingDir_+ui.outputPlotList->currentItem()->text();
+    QFile file(FileName);
+
+    //open and read data file to array
+    if(!file.open(QFile::ReadOnly | QFile::Text))
+    {
+        QMessageBox msgBox;
+        msgBox.setText("Could not open "+FileName);
+        msgBox.exec();
+        return 0;
+    }
+    QTextStream stream(&file);
+    QString line;
+    QStringList dataLine;
+    QVector<double> x;
+    QVector< QVector<double> > columns;
+    dataLine.clear();
+    x.clear();
+    columns.clear();
+
+    //read first line to get number of columns (and therefore atom pairs)
+    line = stream.readLine();
+    dataLine = line.split(" ", QString::SkipEmptyParts);
+    if (dataLine.count() == 0) return 0;
+    int numberPairs = (dataLine.count()-2);
+    QStringList atomPairs;
+    for (int i = 2; i < numberPairs+2; i++)
+    {
+        atomPairs.append(dataLine.at(i).split("(", QString::SkipEmptyParts).at(0));
+    }
+    columns.resize(numberPairs);
+
+    //now read data from each column
+    do {
+    line = stream.readLine();
+    dataLine = line.split(" ", QString::SkipEmptyParts);
+    if (dataLine.count() == 0) break;
+    x.append(dataLine.at(0).toDouble());
+    for (int column = 0; column < numberPairs; ++column)
+    {
+       columns[column].append((dataLine.at(column*2+1).toDouble())+column);
+    }
+
+    } while (!line.isNull());
+    file.close();
+
+    // create graph and assign data to it:
+    QPen pen;
+    QString datafileLabel;
+    for (int i=0; i < 4; i++)
+    {
+        ui.customPlot->addGraph();
+        pen.setColor(QColor(qSin(i*0.9)*100+100, qSin(i*1.8+0.7)*100+100, qSin(i*1.2+0.6)*100+100));
+        ui.customPlot->graph(i)->setPen(pen);
+        ui.customPlot->graph(i)->setData(x, columns.at(i));
+        QCPItemText *dataLabel = new QCPItemText(ui.customPlot);
+        ui.customPlot->addItem(dataLabel);
+        dataLabel->position->setCoords(16,(i)+0.2);
+        datafileLabel = atomPairs.at(i);
+        dataLabel->setText(qPrintable(datafileLabel));
+    }
+
+    ui.customPlot->xAxis->setScaleType(QCPAxis::stLinear);
+    ui.customPlot->xAxis->setNumberFormat("g");
+    ui.customPlot->xAxis->setNumberPrecision(2);
+    ui.customPlot->xAxis->setAutoTickStep(true);
+
+    ui.customPlot->yAxis->setScaleType(QCPAxis::stLinear);
+    ui.customPlot->yAxis->setNumberFormat("g");
+    ui.customPlot->yAxis->setNumberPrecision(2);
+    ui.customPlot->yAxis->setAutoTickStep(true);
+
+    // give the axes some labels:
+    ui.customPlot->xAxis->setLabel("coordination number");
+    ui.customPlot->yAxis->setLabel("percentage");
+
+    //plot
+    ui.customPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
+    ui.customPlot->rescaleAxes();
+    ui.customPlot->replot();
+
+    return 0;
 }
 
 void PlotDialog::on_addPairButton_clicked(bool checked)
@@ -1387,5 +1861,17 @@ void PlotDialog::on_removePairButton_clicked(bool checked)
         ui.pairStackPlotList->takeItem(row);
         iList.removeAt(row);
         jList.removeAt(row);
+    }
+}
+
+void PlotDialog::on_optionsButton_clicked(bool checked)
+{
+    if (ui.optionsGroupBox->isVisible() == true)
+    {
+        ui.optionsGroupBox->setVisible(false);
+    }
+    else
+    {
+        ui.optionsGroupBox->setVisible(true);
     }
 }

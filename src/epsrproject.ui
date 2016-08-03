@@ -2595,6 +2595,11 @@
                    </item>
                    <item>
                     <property name="text">
+                     <string>Partials</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
                      <string>Plot2D</string>
                     </property>
                    </item>
@@ -3003,6 +3008,7 @@
     </property>
     <addaction name="plotAct"/>
     <addaction name="plotEPSRshellAct"/>
+    <addaction name="jmolPlotAct"/>
    </widget>
    <widget class="QMenu" name="settingsMenu">
     <property name="title">
@@ -3181,6 +3187,14 @@
   <action name="aboutAct">
    <property name="text">
     <string>About...</string>
+   </property>
+  </action>
+  <action name="jmolPlotAct">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Plot in Jmol</string>
    </property>
   </action>
  </widget>

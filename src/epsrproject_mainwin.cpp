@@ -93,6 +93,9 @@ void MainWindow::createActions()
     ui.plotEPSRshellAct->setStatusTip(tr("Plot EPSR using EPSRshell"));
     connect(ui.plotEPSRshellAct, SIGNAL(triggered()), this, SLOT(plotEPSRshell()));
 
+    ui.jmolPlotAct->setStatusTip(tr("Plot SHARM or SDF outputs using Jmol"));
+    connect(ui.jmolPlotAct, SIGNAL(triggered()), this, SLOT(plotJmol()));
+
     ui.settingsAct->setStatusTip(tr("Change EPSRgui settings"));
     connect(ui.settingsAct, SIGNAL(triggered()), this, SLOT(settings()));
 
@@ -124,6 +127,29 @@ void MainWindow::createActions()
 void MainWindow::closeEvent(QCloseEvent *event)
 {
     //stopEPSR();     WANT TO STOP EPSR HERE IF RUNNING BUT THIS IS NOT HOW TO DO IT!!!!!!!!!!
+
+    //delete .bat/.sh files
+    QDir::setCurrent(workingDir_);
+    QDir dir;
+    QStringList batFilter;
+#ifdef _WIN32
+    batFilter << "*.bat";
+#else
+    batFilter << "*.sh";
+#endif
+    QStringList batFiles = dir.entryList(batFilter, QDir::Files);
+    if (!batFiles.isEmpty())
+    {
+        for (int i = 0; i < batFiles.count(); i++)
+        {
+            if (!batFiles.at(i).contains("epsr"))
+            {
+                QFile file(batFiles.at(i));
+                file.remove();
+            }
+        }
+    }
+
     event->accept();
 }
 
@@ -410,6 +436,8 @@ void MainWindow::reset()
     ui.runAct->setEnabled(false);
     ui.stopAct->setEnabled(false);
     ui.plotAct->setEnabled(false);
+    ui.plotEPSRshellAct->setEnabled(false);
+    ui.jmolPlotAct->setEnabled(false);
     ui.epsrManualAct->setEnabled(false);
 }
 
@@ -546,6 +574,7 @@ void MainWindow::open()
                     ui.runAct->setEnabled(true);
                     ui.plotAct->setEnabled(true);
                     ui.plotEPSRshellAct->setEnabled(true);
+                    ui.jmolPlotAct->setEnabled(true);
                     ui.plot1Button->setEnabled(true);
                     ui.plot2Button->setEnabled(true);
                     ui.deleteEPSRinpFileAct->setEnabled(true);
@@ -1259,18 +1288,9 @@ void MainWindow::runEPSR()
     QProcess processrunEPSRscript;
     processrunEPSRscript.setProcessChannelMode(QProcess::ForwardedChannels);
 #ifdef _WIN32
-//    processrunEPSRscript.setProcessChannelMode(QProcess::ForwardedChannels);
     processrunEPSRscript.startDetached("run"+atoBaseFileName+".bat");
 #else
-//    processrunEPSRscript.startDetached("gnome-terminal -e \"bash -c \\\"sh "+workingDir_+"run"+atoBaseFileName+".sh"; exec bash\\\"\"");
     processrunEPSRscript.startDetached("sh run"+atoBaseFileName+".sh");
-//    if (processrunEPSRscript.waitForStarted(-1))
-//    {
-//        while (processrunEPSRscript.waitForReadyRead(-1))
-//        {
-//            messageText_ +=processrunEPSRscript.readAllStandardOutput();
-//        }
-//    }
 #endif
 
     //show EPSR is running
@@ -1310,6 +1330,10 @@ void MainWindow::runEPSR()
     ui.minDistanceTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
     ui.plot1Button->setEnabled(true);
     ui.plot2Button->setEnabled(true);
+
+    //Start watching EPSR.out file and feed to messages window.
+    connect(&epsrRunning_, SIGNAL(fileChanged(const QString &)), this, SLOT(autoUpdate()));
+    epsrRunning_.addPath(baseFileName_+".EPSR.out");
 }
 
 void MainWindow::stopEPSR()
@@ -1373,7 +1397,6 @@ void MainWindow::enableButtons()
     updatePcofFileTables();
 }
 
-
 void MainWindow::plot()
 {
     PlotDialog plotDialog(this);
@@ -1428,7 +1451,58 @@ void MainWindow::plotEPSRshell()
     processrunEPSRplot.startDetached("sh gnuplot"+atoBaseFileName+".sh");
 #endif
 
-    ui.messagesLineEdit->setText("started plot routine within EPSRshell");
+    ui.messagesLineEdit->setText("Started plot routine within EPSRshell");
+}
+
+void MainWindow::plotJmol()
+{
+    QString jmolFile = QFileDialog::getOpenFileName(this, "Choose .CUBE.txt file", workingDir_, tr(".CUBE.txt files (*.CUBE.txt)"));
+    if (!jmolFile.isEmpty())
+    {
+        QFileInfo fi(jmolFile);
+        QString jmolFileName = fi.fileName();
+        QString baseJmolFileName = jmolFileName.split(".", QString::KeepEmptyParts).at(0);
+        QDir::setCurrent(workingDir_);
+
+#ifdef _WIN32
+        QFile batFile(workingDir_+"plot"+baseJmolFileName+".bat");
+#else
+        QFile batFile(workingDir_+"plot"+baseJmolFileName+".sh");
+#endif
+        if(!batFile.open(QFile::WriteOnly | QFile::Text))
+        {
+            QMessageBox msgBox;
+            msgBox.setText("Could not open script file.");
+            msgBox.exec();;
+        }
+
+        QTextStream stream(&batFile);
+#ifdef _WIN32
+        stream << "set EPSRbin=" << epsrBinDir_ << "\n"
+                << "set EPSRrun=" << workingDir_ << "\n"
+                << "%EPSRbin%plot3djmol.exe " << workingDir_ << " plot3djmol " << jmolFileName << "\n";
+#else
+        stream << "export EPSRbin=" << epsrBinDir_ << "\n"
+                << "export EPSRrun=" << workingDir_ << "\n"
+                << "  \"$EPSRbin\"'plot3djmol' " << workingDir_ << " plot3djmol " << jmolFileName << "\n";
+#endif
+        batFile.close();
+
+        QDir::setCurrent(workingDir_);
+
+        QProcess processrunEPSRplot;
+        processrunEPSRplot.setProcessChannelMode(QProcess::ForwardedChannels);
+#ifdef _WIN32
+        processrunEPSRplot.startDetached("plot"+baseJmolFileName+".bat");
+#else
+        processrunEPSRplot.startDetached("sh plot"+baseJmolFileName+".sh");
+#endif
+
+        messageText_ += jmolFileName+" plotted in Jmol.\n";
+        messagesDialog.refreshMessages();
+
+        ui.messagesLineEdit->setText("Plotted .SHARM output in Jmol");
+    }
 }
 
 void MainWindow::settings()
@@ -1502,7 +1576,8 @@ void MainWindow::deleteEPSRinpFile()
     if(file.exists() == true)
     {
         QMessageBox::StandardButton msgBox;
-        msgBox  = QMessageBox::question(this, "Warning", "This will delete the existing EPSR.inp file.\nProceed?", QMessageBox::Ok|QMessageBox::Cancel);
+        msgBox  = QMessageBox::question(this, "Warning", "This will delete the existing EPSR.inp file.\nProceed?",
+                                        QMessageBox::Ok|QMessageBox::Cancel);
         if (msgBox == QMessageBox::Cancel)
         {
             return;
@@ -1689,4 +1764,29 @@ void MainWindow::openEPSRguiManual()
 {
     QString guimanual = exeDir_.path()+"/EPSRgui Manual.pdf";
     QDesktopServices::openUrl(QUrl("file:///"+guimanual, QUrl::TolerantMode));
+}
+
+void MainWindow::autoUpdate()
+{
+    plot1();
+    plot2();
+
+    updateInpFileTables();
+    updatePcofFileTables();
+
+    QFile file(baseFileName_+".EPSR.out");
+    if (!file.open(QFile::ReadOnly | QFile::Text))
+    {
+        return;
+    }
+
+    QTextStream stream(&file);
+    QString line;
+    do
+    {
+        line = stream.readLine();
+        messageText_ +=  line+"\n";
+        messagesDialog.refreshMessages();
+    } while (!line.isNull());
+    file.close();
 }

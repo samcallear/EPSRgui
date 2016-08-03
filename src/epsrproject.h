@@ -39,6 +39,7 @@ private slots:
     void runEPSRcheck();
     void plot();
     void plotEPSRshell();
+    void plotJmol();
     void settings();
     void stopEPSR();
     void deleteEPSRinpFile();
@@ -47,6 +48,7 @@ private slots:
     void openEPSRmanual();
     void openEPSRguiManual();
     void outputfromEPSRprocessReady();
+    void autoUpdate();
 
 private:
     void createActions();
@@ -56,7 +58,6 @@ private:
     void processEnd();
     void readSettings();
 
-    PlotDialog *plotDialog;
     MolOptionsDialog *molOptionsDialog;
     MakeAtomDialog *makeAtomDialog;
     MakeLatticeDialog *makeLatticeDialog;
@@ -77,6 +78,7 @@ private:
     QString dataFileExt_; //data file extension
     QString epsrInpFileName_; //filename and extension for EPSR.inp file
     QFileSystemWatcher epsrFinished_;
+    QFileSystemWatcher epsrRunning_;
     int inpEntries_;
     QByteArray messageText_;
     QProcess processEPSR_;

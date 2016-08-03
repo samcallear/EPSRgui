@@ -190,11 +190,11 @@ bool MainWindow::fqplot1()
         {
             if (ui.plot1LogY->isChecked() == true)
             {
-                columnsDF[column].append((dataLineDF.at(column*2+1).toDouble())+column+1);
+                columnsDF[column].append((dataLineDF.at(column*2+1).toDouble())+column+1-0.2);
             }
             else
             {
-                columnsDF[column].append((dataLineDF.at(column*2+1).toDouble())+column);
+                columnsDF[column].append((dataLineDF.at(column*2+1).toDouble())+column-0.2);
             }
         }
     } while (!lineDF.isNull());
@@ -741,7 +741,7 @@ bool MainWindow::Ereqplot1()
     fileqdr.close();
 
     // create graph and assign data to it:
-    QCPCurve *ergCurve = new QCPCurve(ui.plot2->xAxis, ui.plot2->yAxis);
+    QCPCurve *ergCurve = new QCPCurve(ui.plot1->xAxis, ui.plot1->yAxis);
     ui.plot1->addPlottable(ergCurve);
     ergCurve->setData(x1, y1);
     ui.plot1->addGraph();

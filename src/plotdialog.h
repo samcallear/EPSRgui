@@ -20,6 +20,8 @@ private:
     QString atoFileName_;
     QString baseFileName_;
     MainWindow *mainWindow_;
+    QString plotFileExt_;
+    int dataColumn_;
 
 private slots:
     void on_plotButton_clicked(bool checked);
@@ -27,14 +29,20 @@ private slots:
     void on_addPairButton_clicked(bool checked);
     void on_removePairButton_clicked(bool checked);
     void plotZoom(QWheelEvent *event);
+    void on_standardPlotList_itemClicked(QListWidgetItem *item);
+    void on_outputPlotList_itemClicked(QListWidgetItem *item);
+    void on_optionsButton_clicked(bool checked);
 
 public:
-    PlotDialog(MainWindow *parent);
+    PlotDialog(MainWindow *parent = 0);
     Ui::plotDialog ui;
     QString getFileName();
 
+    //prep outputPlotList
+    void populateOutputsList();
+
     // prep for plots involving experimental datasets
-    bool getplottype();
+    void getplottype();
     bool getnDataCol();
     int nDatasets;
     int nDataCol;
@@ -52,6 +60,8 @@ public:
     QList<int> jList;
 
     //plot functions
+    bool yPlot();
+    bool xyPlot();
     bool fqplot();
     bool frplot();
     bool Eplot();
@@ -62,6 +72,8 @@ public:
     bool gofrintraplot();
     bool sqterplot();
     bool sqtraplot();
+    bool ereqPlot();
+    bool coordPlot();
 
     //plotting
     QCustomPlot customPlot;
