@@ -57,7 +57,11 @@ void MainWindow::showAvailableFiles()
     ui.outputAvailableList->setCurrentRow(0);
 
     QString atoBaseFileName = atoFileName_.split(".",QString::SkipEmptyParts).at(0);
+#ifdef _WIN32
     QFile file(workingDir_+"run"+atoBaseFileName+".bat");
+#else
+    QFile file(workingDir_+"run"+atoBaseFileName+".sh");
+#endif
     if (file.exists() == false)
     {
         return;
