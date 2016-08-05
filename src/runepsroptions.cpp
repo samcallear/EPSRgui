@@ -55,7 +55,10 @@ void MainWindow::showAvailableFiles()
         ui.outputAvailableList->addItem(fileName);
     }
     ui.outputAvailableList->setCurrentRow(0);
+}
 
+void MainWindow::getOutputsRunning()
+{
     QString atoBaseFileName = atoFileName_.split(".",QString::SkipEmptyParts).at(0);
 #ifdef _WIN32
     QFile file(workingDir_+"run"+atoBaseFileName+".bat");
@@ -81,10 +84,24 @@ void MainWindow::showAvailableFiles()
 
     do {
         line = stream.readLine();
-        if (line.contains(outputSetupFileType_))
+        if (line.contains("chains")
+                || line.contains("clusters")
+                || line.contains("coord")
+                || line.contains("partials")
+                || line.contains("plot2d")
+                || line.contains("plot3d")
+                || line.contains("plot3djmol")
+                || line.contains("rings")
+                || line.contains("sdf")
+                || line.contains("sdfcube")
+                || line.contains("sharm")
+                || line.contains("splot2d")
+                || line.contains("torangles")
+                || line.contains("triangles")
+                || line.contains("voids"))
         {
             dataLine = line.split(" ", QString::SkipEmptyParts);
-            ui.runOutEPSRList->addItem(dataLine.at(3));
+            ui.runOutEPSRList->addItem(dataLine.at(2)+": "+dataLine.at(3));
         }
     }while (!line.isNull());
     file.close();
@@ -103,7 +120,6 @@ void MainWindow::setupOutput()
     if (!ui.setupOutNameNew->text().isEmpty())
     {
         outputFileName_ = ui.setupOutNameNew->text();
-//        if (!ui.outputAvailableList->contains outputFileName_ then add to the outputAvailableList
         ui.outputAvailableList->addItem(outputFileName_);
     }
     else

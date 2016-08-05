@@ -65,6 +65,8 @@ MainWindow::MainWindow(QMainWindow *parent) : QMainWindow(parent), messagesDialo
     connect(ui.setupOutTypeComboBox, SIGNAL(currentIndexChanged(QString)), this, SLOT(getOutputType()));
     connect(ui.dlputilsOutCheckBox, SIGNAL(stateChanged(int)), this, SLOT(outputDlputils()));
     connect(&processEPSR_, SIGNAL(readyReadStandardOutput()), this, SLOT(outputfromEPSRprocessReady()));
+    connect(&epsrFinished_, SIGNAL(fileChanged(const QString &)), this, SLOT(enableButtons()));
+    connect(&epsrRunning_, SIGNAL(fileChanged(const QString &)), this, SLOT(autoUpdate()));
 }
 
 void MainWindow::createActions()
@@ -236,6 +238,7 @@ void MainWindow::createNew()
         {
             QDir().mkdir(workingDir_);
         }
+        messageText_ += "\n***************************************************************************\n";
         messageText_ += "Current EPSR project name is "+projectName_+"\n";
         messageText_ += "Current working directory is "+workingDir_+"\n";
         QDir::setCurrent(workingDir_);
@@ -365,6 +368,7 @@ void MainWindow::reset()
     dataFileExt_.clear();
 
     ui.epsrInpFileName->clear();
+    ui.autoUpdateCheckBox->setChecked(false);
     ui.inpSettingsTable->clearContents();
     ui.inpSettingsTable->setRowCount(0);
     ui.dataFileSettingsTable->clearContents();
@@ -446,6 +450,7 @@ void MainWindow::open()
         reset();
 
         // set file directories
+        messageText_ += "\n***************************************************************************\n";
         projectName_ = QFileInfo(newFileName).baseName();
         messageText_ += "Current EPSR project name is "+projectName_+"\n";
         workingDir_ = QFileInfo(newFileName).path()+"/";
@@ -572,6 +577,7 @@ void MainWindow::open()
                     ui.deleteEPSRinpFileAct->setEnabled(true);
                     //Activate available outputs list
                     getOutputType();
+                    getOutputsRunning();
                 }
                 if (dataLine.at(0) == "dlputils")
                 {
@@ -1343,7 +1349,9 @@ void MainWindow::runEPSR()
     ui.removeOutputButton->setEnabled(false);
     ui.dlputilsOutCheckBox->setEnabled(false);
 
-    ui.messagesLineEdit->setText("EPSR is running in a separate window");
+    ui.messagesLineEdit->setText("EPSR is running in a terminal window");
+    messageText_ += "\nEPSR is running in a terminal window.\n";
+    messagesDialog.refreshMessages();
 
     //enable plotting as data files should now exist ************if this is clicked before files exist does program crash?
     ui.inpSettingsTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
@@ -1353,12 +1361,8 @@ void MainWindow::runEPSR()
     ui.plot1Button->setEnabled(true);
     ui.plot2Button->setEnabled(true);
 
-    //If autoupdate switched on, start watching EPSR.out file and feed to messages window [or use a timer and refresh if changed??]
-    if (ui.autoUpdateCheckBox->isChecked() == true)
-    {
-        connect(&epsrRunning_, SIGNAL(fileChanged(const QString &)), this, SLOT(autoUpdate()));
-        epsrRunning_.addPath(baseFileName_+".EPSR.out");
-    }
+    //add path for auto updating in case it is switched on
+    epsrRunning_.addPath(baseFileName_+".EPSR.out");
 }
 
 void MainWindow::stopEPSR()
@@ -1369,11 +1373,11 @@ void MainWindow::stopEPSR()
         QMessageBox msgBox;
         msgBox.setText("Could not stop EPSR script");
         msgBox.exec();
+        return;
     }
     file.close();
     ui.messagesLineEdit->setText("EPSR will stop at the end of this iteration");
 
-    connect(&epsrFinished_, SIGNAL(fileChanged(const QString &)), this, SLOT(enableButtons()));
     epsrFinished_.addPath(workingDir_+"killepsr");
 }
 
@@ -1447,12 +1451,11 @@ void MainWindow::enableButtons()
     ui.minDistanceTable->setEditTriggers(QAbstractItemView::AllEditTriggers);
 
     ui.messagesLineEdit->setText("EPSR stopped");
+    messageText_ += "\nEPSR stopped.\n";
+    messagesDialog.refreshMessages();
 
     epsrFinished_.removePath(workingDir_+"killepsr");
-    if (ui.autoUpdateCheckBox->isChecked() == true)
-    {
-        epsrRunning_.removePath(baseFileName_+".EPSR.out");
-    }
+    epsrRunning_.removePath(baseFileName_+".EPSR.out");
 }
 
 void MainWindow::plot()
@@ -1679,6 +1682,10 @@ void MainWindow::deleteEPSRinpFile()
             ui.setupOutButton->setEnabled(false);
             ui.applyOutputsButton->setEnabled(false);
             ui.dlputilsOutCheckBox->setEnabled(false);
+
+            messageText_ += "EPSR .inp file deleted\n";
+            messagesDialog.refreshMessages();
+            ui.messagesLineEdit->setText("EPSR .inp file deleted");
         }
     }
     return;
@@ -1770,6 +1777,7 @@ void MainWindow::deleteBoxAtoFile()
 
             messageText_ += "box .ato file deleted\n";
             messagesDialog.refreshMessages();
+            ui.messagesLineEdit->setText("box .ato file deleted");
         }
     }
     return;
@@ -1826,6 +1834,10 @@ void MainWindow::openEPSRguiManual()
 
 void MainWindow::autoUpdate()
 {
+    if (ui.autoUpdateCheckBox->isChecked() == false)
+    {
+        return;
+    }
     plot1();
     plot2();
 

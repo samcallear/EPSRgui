@@ -578,16 +578,6 @@
             </property>
             <layout class="QHBoxLayout" name="horizontalLayout_2">
              <item>
-              <widget class="QLabel" name="label_6">
-               <property name="text">
-                <string>filename</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLineEdit" name="savePlotFileNameLineEdit"/>
-             </item>
-             <item>
               <widget class="QPushButton" name="savePlotButton">
                <property name="text">
                 <string>Save</string>

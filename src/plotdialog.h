@@ -32,6 +32,7 @@ private slots:
     void on_standardPlotList_itemClicked(QListWidgetItem *item);
     void on_outputPlotList_itemClicked(QListWidgetItem *item);
     void on_optionsButton_clicked(bool checked);
+    void on_savePlotButton_clicked(bool checked);
 
 public:
     PlotDialog(MainWindow *parent = 0);

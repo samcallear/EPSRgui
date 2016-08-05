@@ -405,7 +405,7 @@ bool PlotDialog::datasetPlot()
         modelFileName = (baseFileName_+".EPSR.u01");
         dataFileName = (baseFileName_+".EPSR.t01");
         diffFileName = (baseFileName_+".EPSR.v01");
-        xLabel = "Q / Å<sup>-1</sup>";
+        xLabel = "Q / Å\u207B\u00B9";
         yLabel = "F(Q)";
         xMin = 0.0;
         yMin = -1.5;
@@ -432,6 +432,7 @@ bool PlotDialog::datasetPlot()
     int column;
     double residualOffset = -0.2;
     double yZeroOffset = 0.0;
+    double dataSetOffset = 1.0;
     if (!ui.residualOffsetLineEdit->text().isEmpty())
     {
         residualOffset = ui.residualOffsetLineEdit->text().toDouble();
@@ -440,6 +441,11 @@ bool PlotDialog::datasetPlot()
     {
         yZeroOffset = ui.yZeroOffsetLineEdit->text().toDouble();
     }
+    if (!ui.manOffsetLineEdit->text().isEmpty() && ui.manOffsetRB->isChecked())
+    {
+        dataSetOffset = ui.manOffsetLineEdit->text().toDouble();
+    }
+    double dataSetOffsetFactor = 1/dataSetOffset;
 
     //open and read data file to array
     if(!fileD.open(QFile::ReadOnly | QFile::Text))
@@ -468,7 +474,7 @@ bool PlotDialog::datasetPlot()
         int nColumns = (dataLineD.count() - 1) / 2;
         for (column = 0; column < nColumns; ++column)
         {
-            columnsD[column].append((dataLineD.at(column*2+1).toDouble())+column+yZeroOffset);
+            columnsD[column].append((dataLineD.at(column*2+1).toDouble())+column/dataSetOffsetFactor+yZeroOffset);
         }
     } while (!lineD.isNull());
     fileD.close();
@@ -500,7 +506,7 @@ bool PlotDialog::datasetPlot()
         int nColumns = (dataLineM.count() - 1) / 2;
         for (column = 0; column < nColumns; ++column)
         {
-            columnsM[column].append((dataLineM.at(column*2+1).toDouble())+column+yZeroOffset);
+            columnsM[column].append((dataLineM.at(column*2+1).toDouble())+column/dataSetOffsetFactor+yZeroOffset);
         }
     } while (!lineM.isNull());
     fileM.close();
@@ -534,7 +540,7 @@ bool PlotDialog::datasetPlot()
             int nColumns = (dataLineDF.count() - 1) / 2;
             for (column = 0; column < nColumns; ++column)
             {
-                columnsDF[column].append((dataLineDF.at(column*2+1).toDouble())+column+yZeroOffset+residualOffset);
+                columnsDF[column].append((dataLineDF.at(column*2+1).toDouble())+column/dataSetOffsetFactor+yZeroOffset+residualOffset);
             }
         } while (!lineDF.isNull());
         fileDF.close();
@@ -553,7 +559,7 @@ bool PlotDialog::datasetPlot()
             xDF.append(xM.at(i));
             for (column = 0; column < nDataCol; ++column)
             {
-                columnsDF[column].append(columnsM[column].at(i)-columnsD[column].at(i)+column+yZeroOffset-residualOffset); //diff = model-data -offset
+                columnsDF[column].append(columnsM[column].at(i)-columnsD[column].at(i)+column/dataSetOffsetFactor+yZeroOffset+residualOffset); //diff = model-data -offset
             }
         }
     }
@@ -577,7 +583,7 @@ bool PlotDialog::datasetPlot()
             ui.customPlot->graph(i)->setData(xM, columnsM.at(i/3));
             QCPItemText *dataLabel = new QCPItemText(ui.customPlot);
             ui.customPlot->addItem(dataLabel);
-            dataLabel->position->setCoords(0.7*xMax,(i/3)+0.2);
+            dataLabel->position->setCoords(0.7*xMax,((i/3)/dataSetOffsetFactor)+yZeroOffset+0.2);
             datafileLabel = mainWindow_->dataFileList.at(i/3);
             dataLabel->setText(qPrintable(datafileLabel));
             ui.customPlot->addGraph();
@@ -600,7 +606,7 @@ bool PlotDialog::datasetPlot()
             ui.customPlot->graph(i)->setData(xM, columnsM.at(i/2));
             QCPItemText *dataLabel = new QCPItemText(ui.customPlot);
             ui.customPlot->addItem(dataLabel);
-            dataLabel->position->setCoords(0.7*xMax,(i/2)+0.2);
+            dataLabel->position->setCoords(0.7*xMax,((i/2)/dataSetOffsetFactor)+yZeroOffset+0.2);
             datafileLabel = mainWindow_->dataFileList.at(i/2);
             dataLabel->setText(qPrintable(datafileLabel));
             ui.customPlot->addGraph();
@@ -1673,5 +1679,28 @@ void PlotDialog::on_optionsButton_clicked(bool checked)
     else
     {
         ui.optionsGroupBox->setVisible(true);
+    }
+}
+
+void PlotDialog::on_savePlotButton_clicked(bool checked)
+{
+    QString plotFile = QFileDialog::getSaveFileName(this, "Input a filename and choose the file type", workingDir_, tr(".jpg files (*.jpg);;.png files(*.png);;.bmp files (*.bmp)"));
+    if (!plotFile.isEmpty())
+    {
+        QString fileExt = plotFile.split(".", QString::SkipEmptyParts).at(1);
+        if (fileExt.contains("jpg"))
+        {
+            ui.customPlot->savePng(plotFile, 0, 0, 1.0, -1);
+        }
+        else
+        if (fileExt.contains("png"))
+        {
+            ui.customPlot->saveJpg(plotFile, 0, 0, 1.0, -1);
+        }
+        else
+        if (fileExt.contains("bmp"))
+        {
+            ui.customPlot->saveBmp(plotFile, 0, 0, 1.0);
+        }
     }
 }

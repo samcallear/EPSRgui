@@ -311,7 +311,7 @@ bool MainWindow::readEPSRpcofFile()
     for (int i = 0; i < nPartials; i++)
     {
     line = stream.readLine();
-    atomPairs.append(line);
+    atomPairs.append(line.split("         ", QString::SkipEmptyParts).at(0));
     line = stream.readLine();
     QString minDistance = line.split(" ", QString::SkipEmptyParts).at(0);
     minDistances.append(minDistance);

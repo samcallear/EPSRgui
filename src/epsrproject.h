@@ -237,10 +237,11 @@ private:
     QString outputSetupFileType_;
     QString outputRunFileType_;
     void showAvailableFiles();
+    void getOutputsRunning();
 
 private slots:
     void on_setupOutButton_clicked(bool checked);
-    void getOutputType();
+    void getOutputType(); 
     void on_addOutputButton_clicked(bool checked);
     void on_removeOutputButton_clicked(bool checked);
     void on_applyOutputsButton_clicked(bool checked);
