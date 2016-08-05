@@ -2247,7 +2247,7 @@
                </sizepolicy>
               </property>
               <property name="title">
-               <string>Make/Edit scattering weights file</string>
+               <string>Edit scattering weights file</string>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout">
                <item>
