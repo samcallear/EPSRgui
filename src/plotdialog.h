@@ -61,9 +61,8 @@ public:
 
     //plot functions
     bool yPlot();
-    bool xyPlot();
-    bool fqplot();
-    bool frplot();
+    bool histPlot();
+    bool datasetPlot();
     bool Eplot();
     bool Rplot();
     bool Pplot();
@@ -73,7 +72,6 @@ public:
     bool sqterplot();
     bool sqtraplot();
     bool ereqPlot();
-    bool coordPlot();
 
     //plotting
     QCustomPlot customPlot;

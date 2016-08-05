@@ -2857,7 +2857,7 @@
              </font>
             </property>
             <property name="text">
-             <string>EPSR Running</string>
+             <string>EPSR not running</string>
             </property>
            </widget>
           </item>
@@ -2997,12 +2997,8 @@
     <property name="title">
      <string>Edit</string>
     </property>
-    <addaction name="cutAct"/>
-    <addaction name="copyAct"/>
-    <addaction name="pasteAct"/>
-    <addaction name="separator"/>
-    <addaction name="deleteEPSRinpFileAct"/>
     <addaction name="deleteBoxAtoFileAct"/>
+    <addaction name="deleteEPSRinpFileAct"/>
    </widget>
    <widget class="QMenu" name="runMenu">
     <property name="title">

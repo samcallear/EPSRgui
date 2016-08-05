@@ -256,7 +256,7 @@ bool MainWindow::fqplot1()
     }
 
     // give the axes some labels:
-    ui.plot1->xAxis->setLabel("Q (Angstrom-1)");
+    ui.plot1->xAxis->setLabel("Q / Å\u207B\u00B9");
     ui.plot1->yAxis->setLabel("F(Q)");
 
     // show legend
@@ -416,7 +416,7 @@ bool MainWindow::frplot1()
     }
 
     // give the axes some labels:
-    ui.plot1->xAxis->setLabel("r (Angstrom)");
+    ui.plot1->xAxis->setLabel("r / Å");
     ui.plot1->yAxis->setLabel("G(r)");
 
     // show legend

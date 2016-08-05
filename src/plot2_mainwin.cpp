@@ -254,7 +254,7 @@ bool MainWindow::fqplot2()
     }
 
     // give the axes some labels:
-    ui.plot2->xAxis->setLabel("Q (Angstrom-1)");
+    ui.plot2->xAxis->setLabel("Q / Å\u207B\u00B9");
     ui.plot2->yAxis->setLabel("F(Q)");
 
     //plot
@@ -409,7 +409,7 @@ bool MainWindow::frplot2()
     }
 
     // give the axes some labels:
-    ui.plot2->xAxis->setLabel("r (Angstrom)");
+    ui.plot2->xAxis->setLabel("r / Å");
     ui.plot2->yAxis->setLabel("G(r)");
 
     //plot

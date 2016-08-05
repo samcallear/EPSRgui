@@ -103,12 +103,15 @@ void MainWindow::setupOutput()
     if (!ui.setupOutNameNew->text().isEmpty())
     {
         outputFileName_ = ui.setupOutNameNew->text();
+//        if (!ui.outputAvailableList->contains outputFileName_ then add to the outputAvailableList
         ui.outputAvailableList->addItem(outputFileName_);
     }
     else
     {
         outputFileName_ = ui.outputAvailableList->currentItem()->text();
     }
+
+    ui.setupOutNameNew->clear();
 
     QDir::setCurrent(workingDir_);
 

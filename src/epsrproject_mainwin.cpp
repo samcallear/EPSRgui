@@ -270,9 +270,6 @@ void MainWindow::createNew()
         ui.saveAct->setEnabled(true);
         ui.saveAsAct->setEnabled(true);
         ui.saveCopyAct->setEnabled(true);
-        ui.copyAct->setEnabled(true);
-        ui.cutAct->setEnabled(true);
-        ui.pasteAct->setEnabled(true);
         ui.epsrManualAct->setEnabled(true);
 
         //activate buttons (in case disabled from previous project)
@@ -377,6 +374,7 @@ void MainWindow::reset()
     ui.minDistanceTable->clearContents();
     ui.minDistanceTable->setRowCount(0);
     epsrInpFileName_.clear();
+    ui.dlputilsOutCheckBox->setChecked(false);
 
     //enable/disable buttons
     ui.molFileTabWidget->setEnabled(false);
@@ -426,9 +424,6 @@ void MainWindow::reset()
     ui.saveAct->setEnabled(false);
     ui.saveAsAct->setEnabled(false);
     ui.saveCopyAct->setEnabled(false);
-    ui.copyAct->setEnabled(false);
-    ui.cutAct->setEnabled(false);
-    ui.pasteAct->setEnabled(false);
     ui.checkAct->setEnabled(false);
     ui.runAct->setEnabled(false);
     ui.stopAct->setEnabled(false);
@@ -632,9 +627,6 @@ void MainWindow::open()
         ui.saveAct->setEnabled(true);
         ui.saveAsAct->setEnabled(true);
         ui.saveCopyAct->setEnabled(true);
-        ui.copyAct->setEnabled(true);
-        ui.cutAct->setEnabled(true);
-        ui.pasteAct->setEnabled(true);
         ui.epsrManualAct->setEnabled(true);
 
         //change window title to contain projectName
@@ -1290,12 +1282,20 @@ void MainWindow::runEPSR()
 #endif
 
     //show EPSR is running
+    ui.epsrRunningSign->setText("EPSR running");
     ui.epsrRunningSign->setEnabled(true);
     ui.stopAct->setEnabled(true);
     ui.runAct->setEnabled(false);
     ui.checkAct->setEnabled(false);
 
     //disable editing buttons while EPSR is running
+    ui.newAct->setEnabled(false);
+    ui.openAct->setEnabled(false);
+    ui.saveAsAct->setEnabled(false);
+    ui.saveCopyAct->setEnabled(false);
+    ui.deleteBoxAtoFileAct->setEnabled(false);
+    ui.deleteEPSRinpFileAct->setEnabled(false);
+
     ui.updateMolFileButton->setDisabled(true);
     ui.updateAtoFileButton->setDisabled(true);
     ui.randomiseButton->setDisabled(true);
@@ -1308,16 +1308,40 @@ void MainWindow::runEPSR()
     ui.createAtomButton->setEnabled(false);
     ui.createLatticeButton->setEnabled(false);
     ui.makeMolExtButton->setEnabled(false);
+    ui.dockatoButton->setEnabled(false);
+    ui.makelatticeatoButton->setEnabled(false);
     ui.removeMolFileButton->setEnabled(false);
     ui.addLJRowAboveButton->setEnabled(false);
     ui.addLJRowBelowButton->setEnabled(false);
     ui.deleteLJRowButton->setEnabled(false);
+    ui.addDistRowAboveButton->setEnabled(false);
+    ui.addDistRowBelowButton->setEnabled(false);
+    ui.deleteDistRowButton->setEnabled(false);
+    ui.addAngRowAboveButton->setEnabled(false);
+    ui.addAngRowBelowButton->setEnabled(false);
+    ui.deleteAngRowButton->setEnabled(false);
+    ui.addDihRowAboveButton->setEnabled(false);
+    ui.addDihRowBelowButton->setEnabled(false);
+    ui.deleteDihRowButton->setEnabled(false);
+    ui.deleteDihAllButton->setEnabled(false);
+    ui.addRotRowAboveButton->setEnabled(false);
+    ui.addRotRowBelowButton->setEnabled(false);
+    ui.deleteRotRowButton->setEnabled(false);
+    ui.deleteRotAllButton->setEnabled(false);
+    ui.molChangeAtobutton->setEnabled(false);
+    ui.molFmoleButton->setEnabled(false);
     ui.mixatoButton->setEnabled(false);
     ui.addatoButton->setEnabled(false);
+    ui.loadBoxButton->setEnabled(false);
     ui.dataFileBrowseButton->setEnabled(false);
     ui.removeDataFileButton->setEnabled(false);
+    ui.setupEPSRButton->setEnabled(false);
+    ui.updateInpPcofFilesButton->setEnabled(false);
     ui.setupOutButton->setEnabled(false);
     ui.applyOutputsButton->setEnabled(false);
+    ui.addOutputButton->setEnabled(false);
+    ui.removeOutputButton->setEnabled(false);
+    ui.dlputilsOutCheckBox->setEnabled(false);
 
     ui.messagesLineEdit->setText("EPSR is running in a separate window");
 
@@ -1356,12 +1380,20 @@ void MainWindow::stopEPSR()
 void MainWindow::enableButtons()
 {
     //turn off EPSR running sign
+    ui.epsrRunningSign->setText("EPSR not running");
     ui.epsrRunningSign->setEnabled(false);
     ui.stopAct->setEnabled(false);
     ui.runAct->setEnabled(true);
     ui.checkAct->setEnabled(true);
 
-    //re-enable editing buttons
+    //re-enable editing buttons   
+    ui.newAct->setEnabled(true);
+    ui.openAct->setEnabled(true);
+    ui.saveAsAct->setEnabled(true);
+    ui.saveCopyAct->setEnabled(true);
+    ui.deleteBoxAtoFileAct->setEnabled(true);
+    ui.deleteEPSRinpFileAct->setEnabled(true);
+
     ui.updateMolFileButton->setEnabled(true);
     ui.updateAtoFileButton->setEnabled(true);
     ui.randomiseButton->setEnabled(true);
@@ -1374,16 +1406,40 @@ void MainWindow::enableButtons()
     ui.createAtomButton->setEnabled(true);
     ui.createLatticeButton->setEnabled(true);
     ui.makeMolExtButton->setEnabled(true);
+    ui.dockatoButton->setEnabled(true);
+    ui.makelatticeatoButton->setEnabled(true);
     ui.removeMolFileButton->setEnabled(true);
     ui.addLJRowAboveButton->setEnabled(true);
     ui.addLJRowBelowButton->setEnabled(true);
     ui.deleteLJRowButton->setEnabled(true);
+    ui.addDistRowAboveButton->setEnabled(true);
+    ui.addDistRowBelowButton->setEnabled(true);
+    ui.deleteDistRowButton->setEnabled(true);
+    ui.addAngRowAboveButton->setEnabled(true);
+    ui.addAngRowBelowButton->setEnabled(true);
+    ui.deleteAngRowButton->setEnabled(true);
+    ui.addDihRowAboveButton->setEnabled(true);
+    ui.addDihRowBelowButton->setEnabled(true);
+    ui.deleteDihRowButton->setEnabled(true);
+    ui.deleteDihAllButton->setEnabled(true);
+    ui.addRotRowAboveButton->setEnabled(true);
+    ui.addRotRowBelowButton->setEnabled(true);
+    ui.deleteRotRowButton->setEnabled(true);
+    ui.deleteRotAllButton->setEnabled(true);
+    ui.molChangeAtobutton->setEnabled(true);
+    ui.molFmoleButton->setEnabled(true);
     ui.mixatoButton->setEnabled(true);
     ui.addatoButton->setEnabled(true);
+    ui.loadBoxButton->setEnabled(true);
     ui.dataFileBrowseButton->setEnabled(true);
     ui.removeDataFileButton->setEnabled(true);
+    ui.setupEPSRButton->setEnabled(true);
+    ui.updateInpPcofFilesButton->setEnabled(true);
     ui.setupOutButton->setEnabled(true);
     ui.applyOutputsButton->setEnabled(true);
+    ui.addOutputButton->setEnabled(true);
+    ui.removeOutputButton->setEnabled(true);
+    ui.dlputilsOutCheckBox->setEnabled(true);
 
     ui.inpSettingsTable->setEditTriggers(QAbstractItemView::AllEditTriggers);
     ui.dataFileSettingsTable->setEditTriggers(QAbstractItemView::AllEditTriggers);
