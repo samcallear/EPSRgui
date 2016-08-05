@@ -55,7 +55,7 @@
            </size>
           </property>
           <property name="currentIndex">
-           <number>0</number>
+           <number>3</number>
           </property>
           <widget class="QWidget" name="buildMolTab">
            <attribute name="title">
@@ -2387,6 +2387,9 @@
               </item>
               <item>
                <widget class="QCheckBox" name="autoUpdateCheckBox">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
                 <property name="text">
                  <string>Auto Update</string>
                 </property>

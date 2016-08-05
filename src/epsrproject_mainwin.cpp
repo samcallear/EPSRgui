@@ -66,7 +66,7 @@ MainWindow::MainWindow(QMainWindow *parent) : QMainWindow(parent), messagesDialo
     connect(ui.dlputilsOutCheckBox, SIGNAL(stateChanged(int)), this, SLOT(outputDlputils()));
     connect(&processEPSR_, SIGNAL(readyReadStandardOutput()), this, SLOT(outputfromEPSRprocessReady()));
     connect(&epsrFinished_, SIGNAL(fileChanged(const QString &)), this, SLOT(enableButtons()));
-    connect(&epsrRunning_, SIGNAL(fileChanged(const QString &)), this, SLOT(autoUpdate()));
+//    connect(&epsrRunning_, SIGNAL(fileChanged(const QString &)), this, SLOT(autoUpdate()));
 }
 
 void MainWindow::createActions()
@@ -1362,7 +1362,7 @@ void MainWindow::runEPSR()
     ui.plot2Button->setEnabled(true);
 
     //add path for auto updating in case it is switched on
-    epsrRunning_.addPath(baseFileName_+".EPSR.out");
+//    epsrRunning_.addPath(baseFileName_+".EPSR.out");
 }
 
 void MainWindow::stopEPSR()
@@ -1455,7 +1455,7 @@ void MainWindow::enableButtons()
     messagesDialog.refreshMessages();
 
     epsrFinished_.removePath(workingDir_+"killepsr");
-    epsrRunning_.removePath(baseFileName_+".EPSR.out");
+//    epsrRunning_.removePath(baseFileName_+".EPSR.out");
 }
 
 void MainWindow::plot()
