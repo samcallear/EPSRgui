@@ -245,7 +245,6 @@ private slots:
     void on_addOutputButton_clicked(bool checked);
     void on_removeOutputButton_clicked(bool checked);
     void on_applyOutputsButton_clicked(bool checked);
-    void outputDlputils();
 
     //main window embedded plots
 private:

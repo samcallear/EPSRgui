@@ -201,12 +201,12 @@ void MainWindow::on_applyOutputsButton_clicked(bool checked)
         line = stream.readLine();
         dataLine = line.split(" ", QString::KeepEmptyParts);
         original.append(line+"\n");
-        if (line.contains(outputSetupFileType_)) //if file type is already in the file, remove the line
+        if (line.contains(outputSetupFileType_) || line.contains("writexyz")) //if file type is already in the file, remove the line
         {
             original.remove(line+"\n");
         }
         //once get to the 'last' line of the script part, add in the list of filenames to include
-        if (!outputFileNames.isEmpty())
+        if (!outputFileNames.isEmpty() || ui.dlputilsOutCheckBox->isChecked() == true)
         {
 #ifdef _WIN32
             if (line.contains("if not exist"))
@@ -225,6 +225,42 @@ void MainWindow::on_applyOutputsButton_clicked(bool checked)
 #endif
                     original.append(lineToAdd);
                 }
+                if (ui.dlputilsOutCheckBox->isChecked() == true)
+                {
+                    //get box side length and divide by 2 to get value for bat file **Alan sugggested add 10% to this to be certain to get any molecule that is right on the very edge of the box
+                    double boxLengthA = ui.boxAtoLengthA->text().toDouble();
+                    double boxLengthB = ui.boxAtoLengthB->text().toDouble();
+                    double boxLengthC = ui.boxAtoLengthC->text().toDouble();
+                    double halfboxLengthA = boxLengthA/2;
+                    double halfboxLengthB;
+                    double halfboxLengthC;
+                    if (ui.boxAtoLengthB->text().isEmpty())
+                    {
+                        halfboxLengthB = halfboxLengthA;
+                    }
+                    else
+                    {
+                        halfboxLengthB = boxLengthB/2;
+                    }
+                    if (ui.boxAtoLengthC->text().isEmpty())
+                    {
+                        halfboxLengthC = halfboxLengthA;
+                    }
+                    else
+                    {
+                        halfboxLengthC = boxLengthC/2;
+                    }
+
+                    QString halfboxLengthAStr = QString::number(halfboxLengthA);
+                    QString halfboxLengthBStr = QString::number(halfboxLengthB);
+                    QString halfboxLengthCStr = QString::number(halfboxLengthC);
+#ifdef _WIN32
+                    lineToAdd = "%EPSRbin%writexyz.exe "+workingDir_+" writexyz "+atoBaseFileName+" y 0 "+halfboxLengthAStr+" "+halfboxLengthBStr+" -"+halfboxLengthCStr+" "+halfboxLengthCStr+" 0 0 0 0"+"\n";
+#else
+                    lineToAdd = "  \"$EPSRbin\"'writexyz' "+workingDir_+" writexyz "+atoBaseFileName+" y 0 "+halfboxLengthAStr+" "+halfboxLengthBStr+" -"+halfboxLengthCStr+" "+halfboxLengthCStr+" 0 0 0 0"+"\n";
+#endif
+                    original.append(lineToAdd);
+                }
                 original.append(line+"\n");
             }
         }
@@ -234,139 +270,4 @@ void MainWindow::on_applyOutputsButton_clicked(bool checked)
     batFile.close();
 
     ui.messagesLineEdit->setText("script file updated");
-}
-
-void MainWindow::outputDlputils()
-{
-    if (ui.dlputilsOutCheckBox->isChecked())
-    {
-        //get box side length and divide by 2 to get value for bat file **Alan sugggested add 10% to this to be certain to get any molecule that is right on the very edge of the box
-        double boxLengthA = ui.boxAtoLengthA->text().toDouble();
-        double boxLengthB = ui.boxAtoLengthB->text().toDouble();
-        double boxLengthC = ui.boxAtoLengthC->text().toDouble();
-        double halfboxLengthA = boxLengthA/2;
-        double halfboxLengthB;
-        double halfboxLengthC;
-        if (ui.boxAtoLengthB->text().isEmpty())
-        {
-            halfboxLengthB = halfboxLengthA;
-        }
-        else
-        {
-            halfboxLengthB = boxLengthB/2;
-        }
-        if (ui.boxAtoLengthC->text().isEmpty())
-        {
-            halfboxLengthC = halfboxLengthA;
-        }
-        else
-        {
-            halfboxLengthC = boxLengthC/2;
-        }
-
-        QString halfboxLengthAStr = QString::number(halfboxLengthA);
-        QString halfboxLengthBStr = QString::number(halfboxLengthB);
-        QString halfboxLengthCStr = QString::number(halfboxLengthC);
-
-        //open and edit .bat file
-        QString atoBaseFileName = atoFileName_.split(".",QString::SkipEmptyParts).at(0);
-
-#ifdef _WIN32
-        QFile batFile(workingDir_+"run"+atoBaseFileName+".bat");
-#else
-        QFile batFile(workingDir_+"run"+atoBaseFileName+".sh");
-#endif
-        if(batFile.exists() == false)
-        {
-            QMessageBox msgBox;
-            msgBox.setText("The script file doesn't exist yet - run EPSR first");
-            msgBox.exec();
-        }
-        if(!batFile.open(QFile::ReadWrite | QFile::Text))
-        {
-            QMessageBox msgBox;
-            msgBox.setText("Could not open script file.");
-            msgBox.exec();
-        }
-
-        QTextStream stream(&batFile);
-        QString lineToAdd;
-        QString line;
-        QString original;
-        QStringList dataLine;
-        dataLine.clear();
-
-        do {
-            line = stream.readLine();
-            original.append(line+"\n");
-            if (line.contains("writexyz")) //if line is already in the file, remove the line
-            {
-                original.remove(line+"\n");
-            }
-#ifdef _WIN32
-            if (line.contains("if not exist"))
-#else
-            if (line.contains("if ([ -e"))
-#endif
-            {
-                original.remove(line+"\n");
-#ifdef _WIN32
-                lineToAdd = "%EPSRbin%writexyz.exe "+workingDir_+" writexyz "+atoBaseFileName+" y 0 "+halfboxLengthAStr+" "+halfboxLengthBStr+" -"+halfboxLengthCStr+" "+halfboxLengthCStr+" 0 0 0 0"+"\n";
-#else
-                lineToAdd = "  \"$EPSRbin\"'writexyz' "+workingDir_+" writexyz "+atoBaseFileName+" y 0 "+halfboxLengthAStr+" "+halfboxLengthBStr+" -"+halfboxLengthCStr+" "+halfboxLengthCStr+" 0 0 0 0"+"\n";
-#endif
-                original.append(lineToAdd);
-                original.append(line+"\n");
-            }
-        } while (!line.isNull());
-        batFile.resize(0);
-        stream << original;
-        batFile.close();
-
-        ui.messagesLineEdit->setText("output for dlputils added to script file");
-    }
-
-    else //or check if line exists and remove it if it does
-    {
-        //open and edit .bat file
-        QString atoBaseFileName = atoFileName_.split(".",QString::SkipEmptyParts).at(0);
-
-#ifdef _WIN32
-        QFile batFile(workingDir_+"run"+atoBaseFileName+".bat");
-#else
-        QFile batFile(workingDir_+"run"+atoBaseFileName+".sh");
-#endif
-        if(batFile.exists() == false)
-        {
-            QMessageBox msgBox;
-            msgBox.setText("The script file doesn't exist yet - run EPSR first");
-            msgBox.exec();
-        }
-        if(!batFile.open(QFile::ReadWrite | QFile::Text))
-        {
-            QMessageBox msgBox;
-            msgBox.setText("Could not open script file.");
-            msgBox.exec();
-        }
-
-        QTextStream stream(&batFile);
-        QString line;
-        QString original;
-        QStringList dataLine;
-        dataLine.clear();
-
-        do {
-            line = stream.readLine();
-            original.append(line+"\n");
-            if (line.contains("writexyz"))
-            {
-                original.remove(line+"\n");
-            }
-        } while (!line.isNull());
-        batFile.resize(0);
-        stream << original;
-        batFile.close();
-
-        ui.messagesLineEdit->setText("output for dlputils removed from script file");
-    }
 }

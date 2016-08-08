@@ -2550,14 +2550,14 @@
               <layout class="QHBoxLayout" name="horizontalLayout_24">
                <item>
                 <layout class="QGridLayout" name="gridLayout_7">
-                 <item row="7" column="2">
+                 <item row="8" column="2">
                   <widget class="QPushButton" name="setupOutButton">
                    <property name="text">
                     <string>Setup</string>
                    </property>
                   </widget>
                  </item>
-                 <item row="7" column="5">
+                 <item row="8" column="5">
                   <widget class="QPushButton" name="applyOutputsButton">
                    <property name="text">
                     <string>Apply</string>
@@ -2583,9 +2583,6 @@
                     <string>&lt;&lt;</string>
                    </property>
                   </widget>
-                 </item>
-                 <item row="1" column="1" rowspan="6" colspan="2">
-                  <widget class="QListWidget" name="outputAvailableList"/>
                  </item>
                  <item row="0" column="1">
                   <widget class="QComboBox" name="setupOutTypeComboBox">
@@ -2671,7 +2668,7 @@
                    </item>
                   </widget>
                  </item>
-                 <item row="7" column="0">
+                 <item row="8" column="0">
                   <widget class="QLabel" name="label_55">
                    <property name="text">
                     <string>New output name</string>
@@ -2692,7 +2689,7 @@
                    </property>
                   </widget>
                  </item>
-                 <item row="7" column="1">
+                 <item row="8" column="1">
                   <widget class="QLineEdit" name="setupOutNameNew"/>
                  </item>
                  <item row="2" column="3">
@@ -2725,6 +2722,16 @@
                    </property>
                   </widget>
                  </item>
+                 <item row="7" column="4" colspan="2">
+                  <widget class="QCheckBox" name="dlputilsOutCheckBox">
+                   <property name="text">
+                    <string>Output for dlputils</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="1" rowspan="7" colspan="2">
+                  <widget class="QListWidget" name="outputAvailableList"/>
+                 </item>
                 </layout>
                </item>
                <item>
@@ -2741,13 +2748,6 @@
                 </spacer>
                </item>
               </layout>
-             </widget>
-            </item>
-            <item>
-             <widget class="QCheckBox" name="dlputilsOutCheckBox">
-              <property name="text">
-               <string>Output for dlputils</string>
-              </property>
              </widget>
             </item>
             <item>
@@ -2768,7 +2768,7 @@
          </widget>
         </item>
         <item>
-         <layout class="QGridLayout" name="gridLayout" rowstretch="2,1,0,0,1,0">
+         <layout class="QGridLayout" name="gridLayout">
           <item row="0" column="0">
            <widget class="QComboBox" name="plotComboBox1">
             <item>
@@ -2843,47 +2843,17 @@
             </property>
            </widget>
           </item>
-          <item row="5" column="0" colspan="4">
-           <widget class="QLineEdit" name="messagesLineEdit"/>
-          </item>
-          <item row="5" column="4">
-           <widget class="QPushButton" name="epsrRunningSign">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="font">
-             <font>
-              <weight>75</weight>
-              <bold>true</bold>
-             </font>
-            </property>
-            <property name="text">
-             <string>EPSR not running</string>
+          <item row="1" column="0" colspan="5">
+           <widget class="QCustomPlot" name="plot1" native="true">
+            <property name="minimumSize">
+             <size>
+              <width>400</width>
+              <height>0</height>
+             </size>
             </property>
            </widget>
           </item>
-          <item row="3" column="2">
-           <widget class="QCheckBox" name="plot2LogX">
-            <property name="text">
-             <string>log x</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="3">
-           <widget class="QCheckBox" name="plot2LogY">
-            <property name="text">
-             <string>log y</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="1">
-           <widget class="QPushButton" name="plot2Button">
-            <property name="text">
-             <string>Plot</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="0">
+          <item row="2" column="0">
            <widget class="QComboBox" name="plotComboBox2">
             <property name="currentIndex">
              <number>2</number>
@@ -2920,7 +2890,28 @@
             </item>
            </widget>
           </item>
-          <item row="3" column="4">
+          <item row="2" column="1">
+           <widget class="QPushButton" name="plot2Button">
+            <property name="text">
+             <string>Plot</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="2">
+           <widget class="QCheckBox" name="plot2LogX">
+            <property name="text">
+             <string>log x</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="3">
+           <widget class="QCheckBox" name="plot2LogY">
+            <property name="text">
+             <string>log y</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="4">
            <widget class="QLabel" name="mousecoord2">
             <property name="minimumSize">
              <size>
@@ -2939,21 +2930,11 @@
             </property>
            </widget>
           </item>
-          <item row="1" column="0" rowspan="2" colspan="5">
-           <widget class="QCustomPlot" name="plot1" native="true">
-            <property name="minimumSize">
-             <size>
-              <width>400</width>
-              <height>0</height>
-             </size>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="0" colspan="5">
+          <item row="3" column="0" colspan="5">
            <widget class="QCustomPlot" name="plot2" native="true">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-              <horstretch>1</horstretch>
+              <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
@@ -2962,6 +2943,25 @@
               <width>400</width>
               <height>0</height>
              </size>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0" colspan="4">
+           <widget class="QLineEdit" name="messagesLineEdit"/>
+          </item>
+          <item row="4" column="4">
+           <widget class="QPushButton" name="epsrRunningSign">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="font">
+             <font>
+              <weight>75</weight>
+              <bold>true</bold>
+             </font>
+            </property>
+            <property name="text">
+             <string>EPSR not running</string>
             </property>
            </widget>
           </item>
@@ -3048,7 +3048,7 @@
   </widget>
   <action name="openAct">
    <property name="text">
-    <string>&amp;Open...</string>
+    <string>Open...</string>
    </property>
   </action>
   <action name="newAct">
@@ -3061,7 +3061,7 @@
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>&amp;Save a copy...</string>
+    <string>Save a copy...</string>
    </property>
   </action>
   <action name="cutAct">
@@ -3069,7 +3069,7 @@
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>&amp;Cut</string>
+    <string>Cut</string>
    </property>
   </action>
   <action name="copyAct">
@@ -3077,7 +3077,7 @@
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>&amp;Copy</string>
+    <string>Copy</string>
    </property>
   </action>
   <action name="pasteAct">
@@ -3085,12 +3085,12 @@
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>&amp;Paste</string>
+    <string>Paste</string>
    </property>
   </action>
   <action name="exitAct">
    <property name="text">
-    <string>&amp;Exit</string>
+    <string>Exit</string>
    </property>
   </action>
   <action name="checkAct">
@@ -3135,7 +3135,7 @@
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>&amp;Save</string>
+    <string>Save</string>
    </property>
   </action>
   <action name="deleteEPSRinpFileAct">

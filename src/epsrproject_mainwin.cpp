@@ -63,7 +63,6 @@ MainWindow::MainWindow(QMainWindow *parent) : QMainWindow(parent), messagesDialo
     connect(ui.plot2, SIGNAL(mouseWheel(QWheelEvent*)), this, SLOT(plotZoom2(QWheelEvent*)));
 
     connect(ui.setupOutTypeComboBox, SIGNAL(currentIndexChanged(QString)), this, SLOT(getOutputType()));
-    connect(ui.dlputilsOutCheckBox, SIGNAL(stateChanged(int)), this, SLOT(outputDlputils()));
     connect(&processEPSR_, SIGNAL(readyReadStandardOutput()), this, SLOT(outputfromEPSRprocessReady()));
     connect(&epsrFinished_, SIGNAL(fileChanged(const QString &)), this, SLOT(enableButtons()));
 //    connect(&epsrRunning_, SIGNAL(fileChanged(const QString &)), this, SLOT(autoUpdate()));
@@ -382,6 +381,8 @@ void MainWindow::reset()
     ui.minDistanceTable->clearContents();
     ui.minDistanceTable->setRowCount(0);
     epsrInpFileName_.clear();
+
+    ui.runOutEPSRList->clear();
     ui.dlputilsOutCheckBox->setChecked(false);
 
     //enable/disable buttons
@@ -439,14 +440,16 @@ void MainWindow::reset()
     ui.plotEPSRshellAct->setEnabled(false);
     ui.jmolPlotAct->setEnabled(false);
     ui.epsrManualAct->setEnabled(false);
+
 }
 
 void MainWindow::open()
 {
     if (!epsrDir_.isEmpty())
     {
-        currentDir=epsrDir_;
+        currentDir.setPath(epsrDir_);
     }
+
     QString newFileName = QFileDialog::getOpenFileName(this, "Choose EPSR .pro file", currentDir.path(), tr(".EPSR.pro files (*.EPSR.pro)"));
     if (!newFileName.isEmpty())
     {

@@ -1327,7 +1327,7 @@ bool PlotDialog::gofrintraplot()
         ui.customPlot->graph(i)->setData(x, columns.at(i));
         QCPItemText *dataLabel = new QCPItemText(ui.customPlot);
         ui.customPlot->addItem(dataLabel);
-        dataLabel->position->setCoords(12,i+1.1);
+        dataLabel->position->setCoords(12,i+0.1);
         pairLabel = ui.pairStackPlotList->item(i)->text();
         dataLabel->setText(qPrintable(pairLabel));
     }
@@ -1337,9 +1337,9 @@ bool PlotDialog::gofrintraplot()
     ui.customPlot->yAxis->setLabel("g(r)");
 
     ui.customPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
-    ui.customPlot->xAxis->setRange(0, 15);
-    ui.customPlot->yAxis->setRange(0, numberPairs+1);
-//    ui.customPlot->rescaleAxes();
+    ui.customPlot->rescaleAxes();
+//    ui.customPlot->xAxis->setRange(0, 15);
+//    ui.customPlot->yAxis->setRange(0, numberPairs+1);
     ui.customPlot->replot();
     return 0;
 }
