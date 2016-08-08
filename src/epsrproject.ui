@@ -44,7 +44,7 @@
           </property>
           <property name="sizePolicy">
            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-            <horstretch>3</horstretch>
+            <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
@@ -55,7 +55,7 @@
            </size>
           </property>
           <property name="currentIndex">
-           <number>3</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="buildMolTab">
            <attribute name="title">
@@ -291,8 +291,8 @@
                    <property name="title">
                     <string>Define component</string>
                    </property>
-                   <layout class="QGridLayout" name="gridLayout_11">
-                    <item row="0" column="0">
+                   <layout class="QHBoxLayout" name="horizontalLayout_26">
+                    <item>
                      <widget class="QTabWidget" name="molFileTabWidget">
                       <property name="minimumSize">
                        <size>
@@ -302,7 +302,7 @@
                       </property>
                       <property name="maximumSize">
                        <size>
-                        <width>650</width>
+                        <width>100000</width>
                         <height>16777215</height>
                        </size>
                       </property>
@@ -319,6 +319,9 @@
                           <property name="horizontalScrollBarPolicy">
                            <enum>Qt::ScrollBarAsNeeded</enum>
                           </property>
+                          <attribute name="horizontalHeaderDefaultSectionSize">
+                           <number>110</number>
+                          </attribute>
                           <column>
                            <property name="text">
                             <string>Atom Type</string>
@@ -1074,13 +1077,13 @@
                        </property>
                        <property name="minimumSize">
                         <size>
-                         <width>0</width>
+                         <width>45</width>
                          <height>20</height>
                         </size>
                        </property>
                        <property name="maximumSize">
                         <size>
-                         <width>40</width>
+                         <width>60</width>
                          <height>16777215</height>
                         </size>
                        </property>
@@ -2251,7 +2254,7 @@
               </property>
               <layout class="QVBoxLayout" name="verticalLayout">
                <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_4">
+                <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="1,1,8,1">
                  <item>
                   <widget class="QLabel" name="label_16">
                    <property name="text">
@@ -2300,7 +2303,7 @@
                    </property>
                    <property name="sizeHint" stdset="0">
                     <size>
-                     <width>778</width>
+                     <width>400</width>
                      <height>20</height>
                     </size>
                    </property>

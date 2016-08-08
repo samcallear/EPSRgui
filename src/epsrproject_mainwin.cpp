@@ -366,6 +366,10 @@ void MainWindow::reset()
     dataFileName_.clear();
     wtsBaseFileName_.clear();
     dataFileExt_.clear();
+    dataFileList.clear();
+    dataFileTypeList.clear();
+    wtsFileList.clear();
+    normalisationList.clear();
 
     ui.epsrInpFileName->clear();
     ui.autoUpdateCheckBox->setChecked(false);
@@ -475,12 +479,6 @@ void MainWindow::open()
         QString line;
         QStringList dataLine;
         dataLine.clear();
-
-        dataFileList.clear();
-        dataFileTypeList.clear();
-        wtsFileList.clear();
-        normalisationList.clear();
-        ui.atoAtomList->clear();
 
         do
         {
@@ -1455,7 +1453,21 @@ void MainWindow::enableButtons()
     messagesDialog.refreshMessages();
 
     epsrFinished_.removePath(workingDir_+"killepsr");
+
+    //remove path for auto update in case it is switched on
 //    epsrRunning_.removePath(baseFileName_+".EPSR.out");
+
+    //if auto update not ticked, reload .inp and .pcof files and replot plots
+    if (ui.autoUpdateCheckBox->isChecked() == false)
+    {
+        readEPSRinpFile();
+        readEPSRpcofFile();
+        updateInpFileTables();
+        updatePcofFileTables();
+
+        plot1();
+        plot2();
+    }
 }
 
 void MainWindow::plot()
@@ -1628,8 +1640,6 @@ QByteArray MainWindow::messageText()
 {
     return messageText_;
 }
-
-
 
 void MainWindow::deleteEPSRinpFile()
 {

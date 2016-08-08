@@ -326,6 +326,14 @@ void MainWindow::on_makeWtsButton_clicked(bool checked)
         return;
     }
 
+    //update dataFileTypeList to contain what is in dataFileTable
+    dataFileTypeList.clear();
+    for (int i = 0; i < ui.dataFileTable->rowCount(); i++)
+    {
+        dataFileTypeList.append(ui.dataFileTable->item(i,1)->text());
+    }
+
+    //make weights files
     if (QFile::exists(workingDir_+wtsBaseFileName_+".NWTS.dat"))
     {
         makeNwts();

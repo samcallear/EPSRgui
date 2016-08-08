@@ -57,8 +57,8 @@ void MainWindow::on_setupEPSRButton_clicked(bool checked)
             QString wtsFileName = fileInfo2.fileName();
             processEPSR_.write(qPrintable(wtsFileName+"\n\n"));            //get from column 3 in wts file table
 
-    //        QString dataType = dataFileTypeList.at(dataFile);
-            processEPSR_.write(qPrintable("5\n\n"));            //NEED TO CHANGE THIS FOR OTHER DATA FORMATS************************************************************************
+            QString dataType = dataFileTypeList.at(file);
+            processEPSR_.write(qPrintable(dataType+"\n\n"));
 
             processEPSR_.write("\n\n\n\n");
         }
