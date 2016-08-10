@@ -3,12 +3,23 @@
 ######################################################################
 
 #CONFIG += console //implement this is need somwhere for outputs to go e.g. printf
+CONFIG += c++11
 QT += core gui widgets printsupport
 TEMPLATE = app
 TARGET = EPSRgui
 INCLUDEPATH += src/
 
 # Input
+FORMS += src/addatodialog.ui \
+         src/boxcompositiondialog.ui \
+         src/createnewdialog.ui \
+         src/epsrproject.ui \
+         src/makeatomdialog.ui \
+         src/makelatticedialog.ui \
+         src/messagesdialog.ui \
+         src/moloptionsdialog.ui \
+         src/plotdialog.ui \
+         src/settingsdialog.ui
 HEADERS += src/addatodialog.h \
            src/array.h \
            src/boxcompositiondialog.h \
@@ -24,16 +35,6 @@ HEADERS += src/addatodialog.h \
            src/qcustomplot.h \
            src/settingsdialog.h \
            src/wtscomponent.h
-FORMS += src/addatodialog.ui \
-         src/boxcompositiondialog.ui \
-         src/createnewdialog.ui \
-         src/epsrproject.ui \
-         src/makeatomdialog.ui \
-         src/makelatticedialog.ui \
-         src/messagesdialog.ui \
-         src/moloptionsdialog.ui \
-         src/plotdialog.ui \
-         src/settingsdialog.ui
 SOURCES += src/addatodialog_funcs.cpp \
            src/boxatofile.cpp \
            src/boxcompositiondialog_funcs.cpp \
