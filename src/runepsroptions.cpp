@@ -120,7 +120,7 @@ void MainWindow::setupOutput()
     if (!ui.setupOutNameNew->text().isEmpty())
     {
         outputFileName_ = ui.setupOutNameNew->text();
-        ui.outputAvailableList->addItem(outputFileName_);
+//        ui.outputAvailableList->addItem(outputFileName_);
     }
     else
     {
@@ -128,6 +128,8 @@ void MainWindow::setupOutput()
     }
 
     ui.setupOutNameNew->clear();
+
+//    processDetachedFile_ = workingDir_+outputFileName_+"."+outputSetupFileType_+".dat";
 
     QDir::setCurrent(workingDir_);
 
@@ -138,6 +140,8 @@ void MainWindow::setupOutput()
 #else
     processSetupOutput.startDetached(epsrBinDir_+"upset", QStringList() << workingDir_ << "upset" << outputSetupFileType_ << outputFileName_);
 #endif
+
+    outputTimerId_ = startTimer(5000);
 }
 
 void MainWindow::on_addOutputButton_clicked(bool checked)
@@ -182,12 +186,14 @@ void MainWindow::on_applyOutputsButton_clicked(bool checked)
         QMessageBox msgBox;
         msgBox.setText("The script file doesn't exist yet - run EPSR first");
         msgBox.exec();
+        return;
     }
     if (!batFile.open(QFile::ReadWrite | QFile::Text))
     {
         QMessageBox msgBox;
         msgBox.setText("Could not open script file.");
         msgBox.exec();
+        return;
     }
 
     QTextStream stream(&batFile);
@@ -197,14 +203,31 @@ void MainWindow::on_applyOutputsButton_clicked(bool checked)
     QStringList dataLine;
     dataLine.clear();
 
-    do {
+
+    do {            // SOMETHING NOT QUITE RIGHT HERE AS ADDS AN ADDITIONAL BLANK LINE AT END OF FILE EACH TIME ADD SOMETHING TO FILE***************************************************
         line = stream.readLine();
         dataLine = line.split(" ", QString::KeepEmptyParts);
         original.append(line+"\n");
-        if (line.contains(outputSetupFileType_) || line.contains("writexyz")) //if file type is already in the file, remove the line
+        if (line.contains("chains")             //remove all entries in script file
+                || line.contains("clusters")
+                || line.contains("coord")
+                || line.contains("partials")
+                || line.contains("plot2d")
+                || line.contains("plot3d")
+                || line.contains("plot3djmol")
+                || line.contains("rings")
+                || line.contains("sdf")
+                || line.contains("sdfcube")
+                || line.contains("sharm")
+                || line.contains("splot2d")
+                || line.contains("torangles")
+                || line.contains("triangles")
+                || line.contains("voids")
+                || line.contains("writexyz"))
         {
             original.remove(line+"\n");
         }
+
         //once get to the 'last' line of the script part, add in the list of filenames to include
         if (!outputFileNames.isEmpty() || ui.dlputilsOutCheckBox->isChecked() == true)
         {
@@ -255,16 +278,17 @@ void MainWindow::on_applyOutputsButton_clicked(bool checked)
                     QString halfboxLengthBStr = QString::number(halfboxLengthB);
                     QString halfboxLengthCStr = QString::number(halfboxLengthC);
 #ifdef _WIN32
-                    lineToAdd = "%EPSRbin%writexyz.exe "+workingDir_+" writexyz "+atoBaseFileName+" y 0 "+halfboxLengthAStr+" "+halfboxLengthBStr+" -"+halfboxLengthCStr+" "+halfboxLengthCStr+" 0 0 0 0"+"\n";
+                    lineToAdd = "%EPSRbin%writexyz.exe "+workingDir_+" writexyz "+atoBaseFileName+" y 0 "+halfboxLengthAStr+" "+halfboxLengthBStr+" -"+halfboxLengthCStr+" "+halfboxLengthCStr+" 0 0 0 0\n";
 #else
-                    lineToAdd = "  \"$EPSRbin\"'writexyz' "+workingDir_+" writexyz "+atoBaseFileName+" y 0 "+halfboxLengthAStr+" "+halfboxLengthBStr+" -"+halfboxLengthCStr+" "+halfboxLengthCStr+" 0 0 0 0"+"\n";
+                    lineToAdd = "  \"$EPSRbin\"'writexyz' "+workingDir_+" writexyz "+atoBaseFileName+" y 0 "+halfboxLengthAStr+" "+halfboxLengthBStr+" -"+halfboxLengthCStr+" "+halfboxLengthCStr+" 0 0 0 0\n";
 #endif
                     original.append(lineToAdd);
                 }
-                original.append(line+"\n");
+                original.append(line);
             }
         }
     } while (!line.isNull());
+
     batFile.resize(0);
     stream << original;
     batFile.close();

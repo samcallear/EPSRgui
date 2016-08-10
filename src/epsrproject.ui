@@ -2391,7 +2391,7 @@
               <item>
                <widget class="QCheckBox" name="autoUpdateCheckBox">
                 <property name="enabled">
-                 <bool>false</bool>
+                 <bool>true</bool>
                 </property>
                 <property name="text">
                  <string>Auto Update</string>

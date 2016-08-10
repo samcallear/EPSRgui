@@ -43,7 +43,9 @@ MainWindow::MainWindow(QMainWindow *parent) : QMainWindow(parent), messagesDialo
     ui.numberDensityLineEdit->setValidator((new QRegExpValidator(numberDensityrx, this)));
 
     ui.normalisationComboBox->setCurrentIndex(0);
+    ui.plotComboBox1->setCurrentIndex(0);
     ui.plotComboBox2->setCurrentIndex(2);
+    ui.setupOutTypeComboBox->setCurrentIndex(0);
 
     QStringList atoheader;
     atoheader << "Component" << "Charge" << "# in box";
@@ -129,7 +131,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
 {
     //stopEPSR();     WANT TO STOP EPSR HERE IF RUNNING BUT THIS IS NOT HOW TO DO IT!!!!!!!!!!
 
-    //delete .bat/.sh files
+    //delete plotting .bat/.sh files
     QDir::setCurrent(workingDir_);
     QDir dir;
     QStringList batFilter;
@@ -149,26 +151,6 @@ void MainWindow::closeEvent(QCloseEvent *event)
     }
 
     event->accept();
-}
-
-void MainWindow::processStart()
-{
-//    QProgressDialog progress("working...", "Cancel", 0, 100, this);
-//    progress.setWindowModality(Qt::WindowModal);
-
-//    for (int i = 0; i < 100; ++i)
-//    {
-//        progress.setValue(i);
-//        QThread::sleep(1);
-//        QApplication::processEvents();
-//        if(progress.wasCanceled())
-//            break;
-//    }
-}
-
-void MainWindow::processEnd()
-{
-
 }
 
 void MainWindow::readSettings()
@@ -672,6 +654,7 @@ bool MainWindow::saveFile()
         QMessageBox msgBox;
         msgBox.setText("Could not save to "+projectName_+".EPSR.pro");
         msgBox.exec();
+        return false;
     }
 
     QTextStream streamWrite(&file);
@@ -786,6 +769,7 @@ bool MainWindow::saveAs()
             QMessageBox msgBox;
             msgBox.setText("Could not save to "+projectNameCopy+".EPSR.pro");
             msgBox.exec();
+            return false;
         }
 
         QTextStream streamWrite(&file);
@@ -876,10 +860,6 @@ bool MainWindow::saveAs()
         if (!epsrInpFileName_.isEmpty())
         {
             streamWrite << "EPSRinp " << projectNameCopy+"box" << "\n";
-            if (QFile::exists(workingDir_+"run"+projectName_+".bat"))
-            {
-                QFile::remove(workingDir_+"run"+projectName_+".bat");
-            }
         }
 
         //dlputils
@@ -946,6 +926,36 @@ bool MainWindow::saveAs()
             streamWrite << original;
             fileWrite.close();
             fileRead.close();
+        }
+
+        //update EPSR script file - this only works if box is projectName_+"box" ***********************************
+#ifdef _WIN32
+        QFile batFile(workingDirCopy+"run"+projectNameCopy+"box.bat");
+#else
+        QFile batFile(workingDirCopy+"run"+projectNameCopy+"box.sh");
+#endif
+        if (batFile.exists() == true)
+        {
+            if (!batFile.open(QFile::ReadWrite | QFile::Text))
+            {
+                QMessageBox msgBox;
+                msgBox.setText("Could not open script file to edit.");
+                msgBox.exec();
+                return false;
+            }
+
+            QTextStream stream(&batFile);
+            QString line;
+            QString original;
+
+            do {
+                line = stream.readLine();
+                line.replace(projectName_, projectNameCopy);
+                original.append(line+"\n");
+            } while (!line.isNull());
+            batFile.resize(0);
+            stream << original;
+            batFile.close();
         }
 
         // set file directories etc              
@@ -1034,6 +1044,7 @@ bool MainWindow::saveCopy()
             QMessageBox msgBox;
             msgBox.setText("Could not save to "+projectNameCopy+".EPSR.pro");
             msgBox.exec();
+            return false;
         }
 
         QTextStream streamWrite(&file);
@@ -1252,6 +1263,7 @@ void MainWindow::runEPSR()
             QMessageBox msgBox;
             msgBox.setText("Could not open script file.");
             msgBox.exec();
+            return;
         }
 
         //write script file to run epsr
@@ -1364,6 +1376,7 @@ void MainWindow::runEPSR()
 
     //add path for auto updating in case it is switched on
 //    epsrRunning_.addPath(baseFileName_+".EPSR.out");
+    epsrRunningTimerId_ = startTimer(20000);
 }
 
 void MainWindow::stopEPSR()
@@ -1459,6 +1472,8 @@ void MainWindow::enableButtons()
 
     //remove path for auto update in case it is switched on
 //    epsrRunning_.removePath(baseFileName_+".EPSR.out");
+    killTimer(epsrRunningTimerId_);
+    epsrRunningTimerId_ = -1;
 
     //if auto update not ticked, reload .inp and .pcof files and replot plots
     if (ui.autoUpdateCheckBox->isChecked() == false)
@@ -1497,7 +1512,8 @@ void MainWindow::plotEPSRshell()
     {
         QMessageBox msgBox;
         msgBox.setText("Could not open script file.");
-        msgBox.exec();;
+        msgBox.exec();
+        return;
     }
 
     QString gnuBinDir = epsrBinDir_+"gnuplot/bin";      //note this is without the last "/"
@@ -1549,7 +1565,8 @@ void MainWindow::plotJmol()
         {
             QMessageBox msgBox;
             msgBox.setText("Could not open script file.");
-            msgBox.exec();;
+            msgBox.exec();
+            return;
         }
 
         QTextStream stream(&batFile);
@@ -1658,9 +1675,13 @@ void MainWindow::deleteEPSRinpFile()
         }
         else
         {
-            file.remove();
-            QFile epsrFile(workingDir_+epsrInpFileName_);
-            epsrFile.remove();
+            QDir dir(workingDir_);
+            dir.setNameFilters(QStringList() << "*.EPSR.*");
+            dir.setFilter(QDir::Files);
+            foreach (QString EPSRfile, dir.entryList())
+            {
+                dir.remove(EPSRfile);
+            }
             epsrInpFileName_.clear();
             ui.epsrInpFileName->clear();
             ui.inpSettingsTable->clearContents();
@@ -1874,4 +1895,75 @@ void MainWindow::autoUpdate()
         messagesDialog.refreshMessages();
     } while (!line.isNull());
     file.close();
+}
+
+void MainWindow::timerEvent(QTimerEvent *event)
+{
+    if (event->timerId() == outputTimerId_)
+    {
+        QFile file(workingDir_+outputFileName_+"."+outputSetupFileType_+".dat");
+        if (file.exists())
+        {
+            showAvailableFiles();
+            killTimer(outputTimerId_);
+            outputTimerId_ = -1;
+        }
+    }
+    else
+    if (event->timerId() == epsrRunningTimerId_)
+    {
+        QFileInfo fi(workingDir_+epsrInpFileName_);
+        int secs = fi.lastModified().secsTo(QDateTime::currentDateTime());
+        if (secs < 21)
+        {
+            autoUpdate();
+        }
+    }
+    else
+    if (event->timerId() == fmoleFinishedTimerId_)
+    {
+        QFileInfo fi(workingDir_+atoFileName_);
+        if (fi.lastModified() != atoLastMod_)
+        {
+            //reenable buttons
+            ui.fmoleButton->setEnabled(true);
+            ui.updateAtoFileButton->setEnabled(true);
+            ui.mixatoButton->setEnabled(true);
+            ui.addatoButton->setEnabled(true);
+            ui.loadBoxButton->setEnabled(true);
+            ui.randomiseButton->setEnabled(true);
+            ui.atoEPSRButton->setEnabled(true);
+            ui.updateMolFileButton->setEnabled(true);
+
+            messageText_ += "\nfmole finished running on box.ato file\n";
+            messagesDialog.refreshMessages();
+            ui.messagesLineEdit->setText("Finished running fmole");
+
+            killTimer(fmoleFinishedTimerId_);
+            fmoleFinishedTimerId_ = -1;
+        }
+    }
+    else
+    if (event->timerId() == newJmolTimerId_)
+    {
+        QDir dir;
+        dir.setSorting(QDir::Time);
+        QStringList jmolFilter;
+        jmolFilter << "*.jmol";
+        QStringList jmolFiles = dir.entryList(jmolFilter, QDir::Files);
+        if (!jmolFiles.isEmpty())
+        {
+            QString jmolFileName = jmolFiles.at(0);
+            QFileInfo jmolFileInfo(jmolFileName);
+            QDateTime jmolModTime;
+            jmolModTime = jmolFileInfo.lastModified();
+            QDateTime dateTimeNow = QDateTime::currentDateTime();
+            if (jmolModTime > dateTimeNow.addSecs(-2))
+            {
+                killTimer(newJmolTimerId_);
+                newJmolTimerId_ = -1;
+                makeMolFile();
+            }
+        }
+    }
 }

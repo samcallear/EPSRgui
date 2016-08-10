@@ -30,6 +30,7 @@ public:
 
 protected:
     void closeEvent(QCloseEvent *event);
+    void timerEvent(QTimerEvent* event);
 
 private slots:
     bool save();
@@ -54,8 +55,6 @@ private:
     void createActions();
     bool saveFile();
     void reset();
-    void processStart();
-    void processEnd();
     void readSettings();
 
     MolOptionsDialog *molOptionsDialog;
@@ -82,6 +81,11 @@ private:
     int inpEntries_;
     QByteArray messageText_;
     QProcess processEPSR_;
+    int outputTimerId_;
+    int epsrRunningTimerId_;
+    int fmoleFinishedTimerId_;
+    QDateTime atoLastMod_;
+    int newJmolTimerId_;
 
     int endscript;
 
@@ -149,7 +153,8 @@ public:
     int nMolFiles;
 
 private:
-    bool runjmol();
+    void runjmol();
+    void makeMolFile();
     bool readMolFile();
     bool updateMolFile();
     bool readAtoFile();

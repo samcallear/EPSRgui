@@ -745,6 +745,20 @@ void MainWindow::on_fmoleButton_clicked(bool checked)
     messageText_ += "\nfmole is running on box.ato file\n";
     messagesDialog.refreshMessages();
     ui.messagesLineEdit->setText("Running fmole in separate window");
+
+    fmoleFinishedTimerId_ = startTimer(2000);
+    QFileInfo fi(workingDir_+atoFileName_);
+    atoLastMod_ = fi.lastModified();
+
+    //disable buttons
+    ui.fmoleButton->setDisabled(true);
+    ui.updateAtoFileButton->setDisabled(true);
+    ui.mixatoButton->setDisabled(true);
+    ui.addatoButton->setDisabled(true);
+    ui.loadBoxButton->setDisabled(true);
+    ui.randomiseButton->setDisabled(true);
+    ui.atoEPSRButton->setDisabled(true);
+    ui.updateMolFileButton->setDisabled(true);
 }
 
 void MainWindow::on_viewAtoFileButton_clicked(bool checked)

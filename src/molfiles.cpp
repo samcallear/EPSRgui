@@ -37,7 +37,7 @@ void MainWindow::runMolOptions()
     }
 }
 
-bool MainWindow::runjmol()
+void MainWindow::runjmol()
 {
     ui.messagesLineEdit->setText("Running Jmol");
 
@@ -45,35 +45,21 @@ bool MainWindow::runjmol()
 
     // set jmol save directory to EPSR directory
     QDir::setCurrent(workingDir_);
-    processEPSR_.start("java", QStringList() << "-jar" << program);
-    if (!processEPSR_.waitForFinished(1800000))
-    {
-        ui.messagesLineEdit->setText("Jmol timed out");
-        return false;
-    }
+    QProcess processJmol;
+    processJmol.startDetached("java", QStringList() << "-jar" << program);
+    newJmolTimerId_ = startTimer(1000);
+}
 
+void MainWindow::makeMolFile()
+{
     //find most recently modified *.jmol file
     QDir dir;
     dir.setSorting(QDir::Time);
     QStringList jmolFilter;
     jmolFilter << "*.jmol";
     QStringList jmolFiles = dir.entryList(jmolFilter, QDir::Files);
-    if (jmolFiles.isEmpty())
-    {
-        ui.messagesLineEdit->setText("No .jmol files found");
-        return false;
-    }
-    QString jmolFileName = jmolFiles.at(0);
 
-    QFileInfo jmolFileInfo(jmolFileName);
-    QDateTime jmolModTime;
-    jmolModTime = jmolFileInfo.lastModified();
-    QDateTime dateTimeNow = QDateTime::currentDateTime();
-    if (jmolModTime < dateTimeNow.addSecs(-30))
-    {
-        ui.messagesLineEdit->setText("No new .jmol files found");
-        return false;
-    }
+    QString jmolFileName = jmolFiles.at(0);
 
     ui.messagesLineEdit->setText("Making .mol and .ato files");  
 
@@ -93,7 +79,8 @@ bool MainWindow::runjmol()
         {
             QMessageBox msgBox;
             msgBox.setText("Could not make MOPAC setup file.");
-            msgBox.exec();;
+            msgBox.exec();
+            return;
         }
 
         QTextStream stream(&jmolBatFile);
@@ -115,7 +102,7 @@ bool MainWindow::runjmol()
         processEPSR_.start("sh mopac"+jmolBaseFileName+".sh");
 #endif
 
-        if (!processEPSR_.waitForStarted()) return false;
+        if (!processEPSR_.waitForStarted()) return;
 
         processEPSR_.write("3\n");          // select bonding patterns and changelabel section
 
@@ -125,7 +112,7 @@ bool MainWindow::runjmol()
 
         processEPSR_.write(qPrintable(molChargeStr+"\n"));      //molecular charge
 
-        if (!processEPSR_.waitForFinished()) return false;
+        if (!processEPSR_.waitForFinished()) return;
 
         messageText_ += "\nMOPAC finished - check "+jmolBaseFileName+".out file for results of calculation.\n";
         messagesDialog.refreshMessages();
@@ -138,13 +125,13 @@ bool MainWindow::runjmol()
 #else
         processEPSR_.start(epsrBinDir_+"readmole", QStringList() << workingDir_ << "jmolfile "+jmolFileName);
 #endif
-        if (!processEPSR_.waitForStarted()) return false;
+        if (!processEPSR_.waitForStarted()) return;
 
         processEPSR_.write("3\n");          // select bonding patterns and changelabel section
 
         processEPSR_.write("n\n");    //don't run mopac here as calls to "%EPSRbin%" in path which obviously isn't defined!
 
-        if (!processEPSR_.waitForFinished()) return false;
+        if (!processEPSR_.waitForFinished()) return;
     }
 
     // if a new .mol file is created, load this into ui.molFileList:
@@ -156,7 +143,7 @@ bool MainWindow::runjmol()
     if (molFiles.isEmpty())
     {
         ui.messagesLineEdit->setText("No .mol files found");
-        return 0;
+        return;
     }
     QString molFileName = molFiles.at(0);
     QFileInfo molFileInfo(molFileName);
@@ -166,7 +153,7 @@ bool MainWindow::runjmol()
     if (molModTime < dateTimeNow2.addSecs(-30))
     {
         ui.messagesLineEdit->setText("No new .mol files found");
-        return 0;
+        return;
     }
     molFileName_= molFileName;
     QString cropped_fileName = molFileName_.split(".",QString::SkipEmptyParts).at(0);
@@ -240,15 +227,12 @@ void MainWindow::on_molFileLoadButton_clicked(bool checked)
         //check if equivalent .ato file also exists and, if not, run makemole to generate it
         if (QFile::exists(atoFileName) == 0)
         {
-//            processEPSR_.setProcessChannelMode(QProcess::ForwardedChannels);
-
             QString projDir = workingDir_;
             projDir = QDir::toNativeSeparators(projDir);
 #ifdef _WIN32
             processEPSR_.start(epsrBinDir_+"makemole.exe", QStringList() << projDir << "makemole" << cropped_fileName);
 #else
             processEPSR_.start(epsrBinDir_+"makemole", QStringList() << projDir << "makemole" << cropped_fileName);
-            //linux: ~/src/EPSR25/bin/makemole ~/src/EPSR25/run/test2/ makemole molecule
 #endif
             if (!processEPSR_.waitForStarted()) return;
             if (!processEPSR_.waitForFinished()) return;
@@ -303,14 +287,12 @@ void MainWindow::on_createAtomButton_clicked(bool checked)
         QString atomCharge = makeAtomDialog->getCharge();
         QString atomSymbol = makeAtomDialog->getSymbol();
 
-//        processEPSR_.setProcessChannelMode(QProcess::ForwardedChannels);
         QString projDir = workingDir_;
         projDir = QDir::toNativeSeparators(projDir);
 #ifdef _WIN32
         processEPSR_.start(epsrBinDir_+"makeato.exe", QStringList() << projDir << "makeato" );
 #else
         processEPSR_.start(epsrBinDir_+"makeato", QStringList() << projDir << "makeato" );
-        //linux: ~/src/EPSR25/bin/makeato ~/src/EPSR25/run/test2/ makeato
 #endif
         if (!processEPSR_.waitForStarted()) return;
 
@@ -338,7 +320,6 @@ void MainWindow::on_createAtomButton_clicked(bool checked)
         molFileName_= workingDir_+molFileName;
 
         //make an equivalent .mol file
-
         QFile fileRead(workingDir_+atoFileName);
         if(!fileRead.open(QFile::ReadOnly | QFile::Text))
         {
@@ -543,8 +524,6 @@ void MainWindow::on_createLatticeButton_clicked(bool checked)
                             << "density  0.1\n";
                 fileWrite.close();
 
-//                processEPSR_.setProcessChannelMode(QProcess::ForwardedChannels);
-
                 QString projDir = workingDir_;
                 projDir = QDir::toNativeSeparators(projDir);
 #ifdef _WIN32
@@ -626,7 +605,7 @@ void MainWindow::on_createLatticeButton_clicked(bool checked)
         // otherwise use lattice as a component **NB** This is the only workflow that doesn't use a .mol file.
         else
         {
-            //add .ato to molFileList <make sure molFileList doesn't assume an extension and reads the extension to check what to do.
+            //add .ato to molFileList
             ui.molFileList->addItem(atoFileName);
 
             //add .ato to atoFileTable
@@ -729,7 +708,8 @@ void MainWindow::on_viewMolFileButton_clicked(bool checked)
         {
             QMessageBox msgBox;
             msgBox.setText("Could not make Jmol plotting file.");
-            msgBox.exec();;
+            msgBox.exec();
+            return;
         }
 
         QTextStream stream(&jmolFile);
@@ -1070,15 +1050,33 @@ bool MainWindow::readMolFile()
     ui.molLJTable->setRowCount(N_LJparam);
     ui.molLJTable->verticalHeader()->setVisible(false);
 
-    for (int i = 0; i < N_LJparam; ++i)
+    if (atomTypes.count() < 1)
     {
-        ui.molLJTable->setItem(i,0, new QTableWidgetItem(ljAtoms.at(i)));
-        ui.molLJTable->setItem(i,1, new QTableWidgetItem(sigmas.at(i)));
-        ui.molLJTable->setItem(i,2, new QTableWidgetItem(epsilons.at(i)));
-        ui.molLJTable->setItem(i,3, new QTableWidgetItem(masses.at(i)));
-        ui.molLJTable->setItem(i,4, new QTableWidgetItem(charges.at(i)));
-        ui.molLJTable->setItem(i,5, new QTableWidgetItem(ljTypes.at(i)));
+        for (int i = 0; i < N_LJparam; ++i)
+        {
+            QTableWidgetItem *item = new QTableWidgetItem(ljAtoms.at(i));
+            item->setFlags(item->flags() & ~Qt::ItemIsEditable);
+            ui.molLJTable->setItem(i,0, item);
+            ui.molLJTable->setItem(i,1, new QTableWidgetItem(sigmas.at(i)));
+            ui.molLJTable->setItem(i,2, new QTableWidgetItem(epsilons.at(i)));
+            ui.molLJTable->setItem(i,3, new QTableWidgetItem(masses.at(i)));
+            ui.molLJTable->setItem(i,4, new QTableWidgetItem(charges.at(i)));
+            ui.molLJTable->setItem(i,5, new QTableWidgetItem(ljTypes.at(i)));
+        }
     }
+    else
+    {
+        for (int i = 0; i < N_LJparam; ++i)
+        {
+            ui.molLJTable->setItem(i,0, new QTableWidgetItem(ljAtoms.at(i)));
+            ui.molLJTable->setItem(i,1, new QTableWidgetItem(sigmas.at(i)));
+            ui.molLJTable->setItem(i,2, new QTableWidgetItem(epsilons.at(i)));
+            ui.molLJTable->setItem(i,3, new QTableWidgetItem(masses.at(i)));
+            ui.molLJTable->setItem(i,4, new QTableWidgetItem(charges.at(i)));
+            ui.molLJTable->setItem(i,5, new QTableWidgetItem(ljTypes.at(i)));
+        }
+    }
+
 
     ui.molBondTable->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui.molBondTable->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -1281,7 +1279,9 @@ bool MainWindow::readAtoFile()
     ui.molLJTable->verticalHeader()->setVisible(false);
     for (int i = 0; i < ljTypes.count(); ++i)
     {
-        ui.molLJTable->setItem(i,0, new QTableWidgetItem(ljAtoms.at(i)));
+        QTableWidgetItem *item = new QTableWidgetItem(ljAtoms.at(i));
+        item->setFlags(item->flags() & ~Qt::ItemIsEditable);
+        ui.molLJTable->setItem(i,0, item);
         ui.molLJTable->setItem(i,1, new QTableWidgetItem(sigmas.at(i)));
         ui.molLJTable->setItem(i,2, new QTableWidgetItem(epsilons.at(i)));
         ui.molLJTable->setItem(i,3, new QTableWidgetItem(masses.at(i)));

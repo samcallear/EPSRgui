@@ -1016,7 +1016,7 @@ bool PlotDialog::Ereqplot()
             msgBox.setText("This plot type is not compatible with this version of EPSR.");
             msgBox.exec();
             file.close();
-            break;
+            return 0;
         }
         x1.append(dataLine.at(5).toDouble());
         y1.append(dataLine.at(6).toDouble());
@@ -1584,7 +1584,7 @@ bool PlotDialog::ereqPlot()
             msgBox.setText("This plot type is not compatible with this version of EPSR.");
             msgBox.exec();
             fileerg.close();
-            break;
+            return 0;
         }
         x1.append(dataLineerg.at(3).toDouble());
         y1.append(dataLineerg.at(6).toDouble());
@@ -1619,7 +1619,7 @@ bool PlotDialog::ereqPlot()
             msgBox.setText("This plot type is not compatible with this version of EPSR.");
             msgBox.exec();
             fileqdr.close();
-            break;
+            return 0;
         }
         y2.append(dataLineqdr.at(4).toDouble());
     }

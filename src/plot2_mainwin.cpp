@@ -467,7 +467,7 @@ bool MainWindow::Eplot2()
     {
         ui.plot2->xAxis->setScaleType(QCPAxis::stLinear);
         ui.plot2->xAxis->setNumberFormat("g");
-        ui.plot2->xAxis->setNumberPrecision(2);
+        ui.plot2->xAxis->setNumberPrecision(3);
         ui.plot2->xAxis->setAutoTickStep(true);
     }
     if (ui.plot2LogY->isChecked() == true)
@@ -545,7 +545,7 @@ bool MainWindow::Rplot2()
     {
         ui.plot2->xAxis->setScaleType(QCPAxis::stLinear);
         ui.plot2->xAxis->setNumberFormat("g");
-        ui.plot2->xAxis->setNumberPrecision(2);
+        ui.plot2->xAxis->setNumberPrecision(3);
         ui.plot2->xAxis->setAutoTickStep(true);
     }
     if (ui.plot2LogY->isChecked() == true)
@@ -560,7 +560,7 @@ bool MainWindow::Rplot2()
     {
         ui.plot2->yAxis->setScaleType(QCPAxis::stLinear);
         ui.plot2->yAxis->setNumberFormat("g");
-        ui.plot2->yAxis->setNumberPrecision(2);
+        ui.plot2->yAxis->setNumberPrecision(3);
         ui.plot2->yAxis->setAutoTickStep(true);
     }
 
@@ -623,7 +623,7 @@ bool MainWindow::Pplot2()
     {
         ui.plot2->xAxis->setScaleType(QCPAxis::stLinear);
         ui.plot2->xAxis->setNumberFormat("g");
-        ui.plot2->xAxis->setNumberPrecision(2);
+        ui.plot2->xAxis->setNumberPrecision(3);
         ui.plot2->xAxis->setAutoTickStep(true);
     }
     if (ui.plot2LogY->isChecked() == true)
@@ -638,7 +638,7 @@ bool MainWindow::Pplot2()
     {
         ui.plot2->yAxis->setScaleType(QCPAxis::stLinear);
         ui.plot2->yAxis->setNumberFormat("g");
-        ui.plot2->yAxis->setNumberPrecision(2);
+        ui.plot2->yAxis->setNumberPrecision(3);
         ui.plot2->yAxis->setAutoTickStep(true);
     }
 
@@ -689,7 +689,7 @@ bool MainWindow::Ereqplot2()
             msgBox.setText("This plot type is not compatible with this version of EPSR.");
             msgBox.exec();
             fileerg.close();
-            break;
+            return 0;
         }
         x1.append(dataLineerg.at(3).toDouble());
         y1.append(dataLineerg.at(6).toDouble());
@@ -724,7 +724,7 @@ bool MainWindow::Ereqplot2()
             msgBox.setText("This plot type is not compatible with this version of EPSR.");
             msgBox.exec();
             fileqdr.close();
-            break;
+            return 0;
         }
         y2.append(dataLineqdr.at(4).toDouble());
     }
