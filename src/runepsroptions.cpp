@@ -40,6 +40,16 @@ void MainWindow::showAvailableFiles()
         outputFilter << "*.tor.dat";
     }
     else
+    if (outputSetupFileType_ == "plot2d")
+    {
+        outputFilter << "*.plot2d.txt";
+    }
+    else
+    if (outputSetupFileType_ == "plot3d")
+    {
+        outputFilter << "*.plot3d.txt";
+    }
+    else
     {
         outputFilter << "*."+outputSetupFileType_+".dat";
     }
