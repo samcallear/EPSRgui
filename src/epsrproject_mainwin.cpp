@@ -1493,13 +1493,29 @@ void MainWindow::enableButtons()
     //if auto update not ticked, reload .inp and .pcof files and replot plots
     if (ui.autoUpdateCheckBox->isChecked() == false)
     {
+        plot1();
+        plot2();
+
         readEPSRinpFile();
         readEPSRpcofFile();
         updateInpFileTables();
         updatePcofFileTables();
 
-        plot1();
-        plot2();
+        QFile file(baseFileName_+".EPSR.out");
+        if (!file.open(QFile::ReadOnly | QFile::Text))
+        {
+            return;
+        }
+
+        QTextStream stream(&file);
+        QString line;
+        do
+        {
+            line = stream.readLine();
+            messageText_ +=  line+"\n";
+            messagesDialog.refreshMessages();
+        } while (!line.isNull());
+        file.close();
     }
 }
 
