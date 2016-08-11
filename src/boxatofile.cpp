@@ -709,13 +709,16 @@ void MainWindow::on_updateAtoFileButton_clicked(bool checked)
                 line = line.replace(91, 6, "F     ");
             }
         }
-        original.append(line+"\n");
-
-        if (ecoredcorerx.exactMatch(line))
+        else
+        if (dataLine.count() == 2)
         {
-            original.remove(line+"\n");
-            original.append("  "+ecorestr.setNum(ecore,'E',5)+"  "+dcorestr.setNum(dcore,'E',5)+"\n");
+            if (ecoredcorerx.exactMatch(line))
+            {
+                line = line.replace(0, 27, "  "+ecorestr.setNum(ecore,'E',5)+"  "+dcorestr.setNum(dcore,'E',5));
+            }
+
         }
+        original.append(line+"\n");
     }
     fileWrite.resize(0);
     streamWrite << original;
