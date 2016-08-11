@@ -61,6 +61,19 @@ void MainWindow::makeMolFile()
 
     QString jmolFileName = jmolFiles.at(0);
 
+    //check if a .mol file of the same name is already listed as a component
+    QString jmolBaseFileName=jmolFileName.split(".",QString::SkipEmptyParts).at(0);
+    for (int i = 0; i < ui.molFileList->count(); i++)
+    {
+        if (ui.molFileList->item(i)->text() == jmolBaseFileName+".mol")
+        {
+            QMessageBox msgBox;
+            msgBox.setText("This .mol file is already listed as a component.");
+            msgBox.exec();
+            return;
+        }
+    }
+
     ui.messagesLineEdit->setText("Making .mol and .ato files");  
 
     QString mopacOptionStr = QString::number(mopacOption);
@@ -69,7 +82,6 @@ void MainWindow::makeMolFile()
     // Run MOPAC if mopacOption is selected
     if (mopacOption != 0)
     {
-        QString jmolBaseFileName=jmolFileName.split(".",QString::SkipEmptyParts).at(0);
 #ifdef _WIN32
         QFile jmolBatFile(workingDir_+"mopac"+jmolBaseFileName+".bat");
 #else
@@ -160,7 +172,7 @@ void MainWindow::makeMolFile()
     QString atoFileName = cropped_fileName+".ato";
 
     //update mol file table
-    ui.molFileList->addItem(molFileName);
+    ui.molFileList->addItem(molFileName_);
     nMolFiles = ui.molFileList->count();
 
     //update ato file table in box ato tab
@@ -198,8 +210,20 @@ void MainWindow::on_molFileLoadButton_clicked(bool checked)
         molFilePath = QDir::toNativeSeparators(molFilePath);
         QFileInfo fi(molFile);
         QString molFileName = fi.fileName();
-        molFileName_= molFileName;
 
+        //check if .mol file is already listed as a component
+        for (int i = 0; i < ui.molFileList->count(); i++)
+        {
+            if (ui.molFileList->item(i)->text() == molFileName)
+            {
+                QMessageBox msgBox;
+                msgBox.setText("This .mol file is already listed as a component.");
+                msgBox.exec();
+                return;
+            }
+        }
+
+        //if necessary, copy to workingDir_ (question if a file of the same name is already present there)
         if (molFilePath != workingDir_)
         {
             if (QFile::exists(workingDir_+molFileName) == true)
@@ -221,7 +245,8 @@ void MainWindow::on_molFileLoadButton_clicked(bool checked)
             }
         }
 
-        QString cropped_fileName = molFileName.split(".",QString::SkipEmptyParts).at(0);
+        molFileName_= molFileName;
+        QString cropped_fileName = molFileName_.split(".",QString::SkipEmptyParts).at(0);
         QString atoFileName = cropped_fileName+".ato";
 
         //check if equivalent .ato file also exists and, if not, run makemole to generate it
@@ -372,7 +397,14 @@ void MainWindow::on_createAtomButton_clicked(bool checked)
         fileRead.close();
         fileWrite.close();
 
-        //update mol file table
+        //if not already listed, update mol file table
+        for (int i = 0; i < ui.molFileList->count(); i++)
+        {
+            if (ui.molFileList->item(i)->text() == molFileName)
+            {
+                return;
+            }
+        }
         ui.molFileList->addItem(molFileName);
         nMolFiles = ui.molFileList->count();
 
@@ -534,7 +566,7 @@ void MainWindow::on_createLatticeButton_clicked(bool checked)
                 if (!processEPSR_.waitForStarted()) return;
                 if (!processEPSR_.waitForFinished()) return;
 
-                ui.molFileList->addItem(molFileName+".mol");
+                ui.molFileList->addItem(molFileName+".mol"); //**********************THis doesn't check if the .mol is already listed*******************************************************
             }
             file.close();
 
@@ -605,7 +637,7 @@ void MainWindow::on_createLatticeButton_clicked(bool checked)
         // otherwise use lattice as a component **NB** This is the only workflow that doesn't use a .mol file.
         else
         {
-            //add .ato to molFileList
+            //add .ato to molFileList **********************THis doesn't check if the .ato is already listed*******************************************************
             ui.molFileList->addItem(atoFileName);
 
             //add .ato to atoFileTable

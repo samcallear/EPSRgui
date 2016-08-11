@@ -62,6 +62,7 @@ void MakeLatticeDialog::on_okButton_clicked(bool checked)
 
 void MakeLatticeDialog::checkEntries()
 {
+    QString fileName = workingDir_+ui.fileNameLineEdit->text()+".ato";
     //if anything not filled in give error message
     if (ui.fileNameLineEdit->text().isEmpty()
         || ui.aLineEdit->text().isEmpty()
@@ -78,6 +79,21 @@ void MakeLatticeDialog::checkEntries()
     {
         QMessageBox::warning(this, tr("Error making .unit file"),
             tr("All fields need to be completed before proceeding."));
+    }
+    else
+    if (QFile::exists(fileName) == true)
+    {
+        QMessageBox::StandardButton msgBox;
+        msgBox  = QMessageBox::question(this, "Warning", "This will overwrite the lattice file already present in the project folder with the same name.\nProceed?", QMessageBox::Ok|QMessageBox::Cancel);
+        if (msgBox == QMessageBox::Cancel)
+        {
+            return;
+        }
+        else
+        {
+            saveToUnitFile();
+            accept();
+        }
     }
     else
     {

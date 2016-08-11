@@ -1,13 +1,18 @@
 #include "makeatomdialog.h"
+#include "epsrproject.h"
 
 #include <QPushButton>
 #include <QMessageBox>
 #include <QString>
 #include <QLabel>
 
-MakeAtomDialog::MakeAtomDialog(QWidget *parent) : QDialog(parent)
+MakeAtomDialog::MakeAtomDialog(MainWindow *parent) : QDialog(parent)
 {
     ui.setupUi(this);
+
+    mainWindow_ = parent;
+
+    workingDir_ = mainWindow_->workingDir();
 
     //restrict what can be entered into each of the boxes
     QRegExp namerx("[A-Z][A-Za-z0-9]{2}");
@@ -21,13 +26,31 @@ MakeAtomDialog::MakeAtomDialog(QWidget *parent) : QDialog(parent)
     QRegExp symbolrx("[A-Z]{1}[a-z]?");
     ui.symbolLineEdit->setValidator(new QRegExpValidator(symbolrx, this));
 
-    connect(ui.okButton, SIGNAL(clicked()), this, SLOT(accept()));
+    connect(ui.okButton, SIGNAL(clicked()), this, SLOT(checkFiles()));
     connect(ui.cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
 }
 
 void MakeAtomDialog::on_okButton_clicked(bool checked)
 {
 
+}
+
+void MakeAtomDialog::checkFiles()
+{
+    QString fileName = workingDir_+ui.nameLineEdit->text()+".mol";
+    if (QFile::exists(fileName) == true)
+    {
+        QMessageBox::StandardButton msgBox;
+        msgBox  = QMessageBox::question(this, "Warning", "This will overwrite the atom .mol and .ato files already present in the project folder with the same name.\nProceed?", QMessageBox::Ok|QMessageBox::Cancel);
+        if (msgBox == QMessageBox::Cancel)
+        {
+            return;
+        }
+        else
+        {
+            accept();
+        }
+    }
 }
 
 void MakeAtomDialog::on_cancelButton_clicked(bool checked)

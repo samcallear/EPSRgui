@@ -33,6 +33,19 @@ void MainWindow::on_dataFileBrowseButton_clicked(bool checked)
         QString dataFileName;
         dataFileName = dataFileInfo.fileName();
 
+        //check if the selected file is already listed as a dataset in the project
+        for (int i = 0; i < ui.dataFileTable->rowCount(); i++)
+        {
+            if (ui.dataFileTable->item(i,0)->text() == dataFileName)
+            {
+                QMessageBox msgBox;
+                msgBox.setText("This data file is already listed as in the project.");
+                msgBox.exec();
+                return;
+            }
+        }
+
+        //if necessary, copy to workingDir_ (question if a file of the same name is already present there)
         if (dataFilePath != workingDir_)
         {
             if (QFile::exists(workingDir_+dataFileName) == true)
