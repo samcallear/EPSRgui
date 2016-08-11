@@ -7,10 +7,8 @@ MessagesDialog::MessagesDialog(MainWindow *parent) : QDialog(parent)
 
     mainWindow_ = parent;
 
-    setWindowFlags(windowFlags() | Qt::WindowMinimizeButtonHint | Qt::Tool);
-    setWindowFlags(windowFlags() | Qt::WindowMaximizeButtonHint);
-
-//    connect(mainWindow_->messageText(),SIGNAL(there are none...), this, SLOT(refresh()));
+    Qt::WindowFlags flags = Qt::Window | Qt::WindowMinimizeButtonHint | Qt::WindowMaximizeButtonHint | Qt::WindowCloseButtonHint;
+    this->setWindowFlags(flags);
 }
 
 void MessagesDialog::refreshMessages()

@@ -32,8 +32,8 @@ PlotDialog::PlotDialog(MainWindow *parent) : QDialog(parent)
     //hide optionsGroupBox
     ui.optionsGroupBox->setVisible(false);
 
-    setWindowFlags(windowFlags() | Qt::WindowMinimizeButtonHint);
-    setWindowFlags(windowFlags() | Qt::WindowMaximizeButtonHint);
+    Qt::WindowFlags flags = Qt::Window | Qt::WindowMinimizeButtonHint | Qt::WindowMaximizeButtonHint | Qt::WindowCloseButtonHint;
+    this->setWindowFlags(flags);
 
     //MouseTracking;
     connect(ui.customPlot, SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(showPointToolTip(QMouseEvent*)));
