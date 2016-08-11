@@ -26,7 +26,6 @@ void MainWindow::on_setupEPSRButton_clicked(bool checked)
     //search folder to see if a .EPSR.inp of same name as box already exists
     if (!QFileInfo(workingDir_+epsrInpFileName_).exists())
     {
-//        processEPSR_.setProcessChannelMode(QProcess::ForwardedChannels);
 #ifdef _WIN32
         processEPSR_.start(epsrBinDir_+"upset.exe", QStringList() << workingDir_ << "upset" << "epsr" << atoBaseFileName);
 #else
