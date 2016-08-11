@@ -2122,7 +2122,7 @@ void MainWindow::timerEvent(QTimerEvent *event)
     if (event->timerId() == fmoleFinishedTimerId_)
     {
         QFileInfo fi(workingDir_+atoFileName_);
-        if (fi.lastModified() != atoLastMod_)
+        if (fi.lastModified() > atoLastMod_)
         {
             //reenable buttons
             ui.fmoleButton->setEnabled(true);
@@ -2168,7 +2168,7 @@ void MainWindow::timerEvent(QTimerEvent *event)
     {
         QString atoFileName = molFileName_.split(".", QString::SkipEmptyParts).at(0)+".ato";
         QFileInfo fi(workingDir_+atoFileName);
-        if (fi.lastModified() != atoLastMod_)
+        if (fi.lastModified() > atoLastMod_)
         {
             setSelectedMolFile();
 
@@ -2184,7 +2184,7 @@ void MainWindow::timerEvent(QTimerEvent *event)
     if (event->timerId() == changeatoFinishedTimerId_)
     {
         QFileInfo fi(workingDir_+atoFileName_);
-        if (fi.lastModified() != atoLastMod_)
+        if (fi.lastModified() > atoLastMod_)
         {
 
 
