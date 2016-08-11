@@ -1531,7 +1531,7 @@ void MainWindow::plotEPSRshell()
         return;
     }
 
-    QString gnuBinDir = epsrBinDir_+"gnuplot/bin";      //note this is without the last "/"
+    QString gnuBinDir = epsrBinDir_+"gnuplot/binary";      //note this is without the last "/"
     gnuBinDir = QDir::toNativeSeparators(gnuBinDir);
 
     QTextStream stream(&batFile);
@@ -1615,6 +1615,7 @@ void MainWindow::plotJmol()
 
 void MainWindow::splot2d()
 {
+    //get filename
     QString plotFile = QFileDialog::getOpenFileName(this, "Choose .splot2d.txt file", workingDir_, tr(".splot2d.txt files (*.splot2d.txt)"));
     if (!plotFile.isEmpty())
     {
@@ -1623,32 +1624,55 @@ void MainWindow::splot2d()
         QString basePlotFileName = plotFileName.split(".", QString::KeepEmptyParts).at(0);
         QDir::setCurrent(workingDir_);
 
+        //write script file
 #ifdef _WIN32
-        processEPSR_.start(epsrBinDir_+"splot2d.exe", QStringList() << projDir << "splot2d" << basePlotFileName);
+        QFile batFile(workingDir_+"splot2d"+basePlotFileName+".bat");
 #else
-        processEPSR_.start(epsrBinDir_+"splot2d", QStringList() << projDir << "splot2d" << basePlotFileName);
+        QFile batFile(workingDir_+"splot2d"+basePlotFileName+".sh");
 #endif
-        if (!processEPSR_.waitForStarted()) return;
-        if (!processEPSR_.waitForFinished(1800000)) return;
+        if(!batFile.open(QFile::WriteOnly | QFile::Text))
+        {
+            QMessageBox msgBox;
+            msgBox.setText("Could not open script file.");
+            msgBox.exec();
+            return;
+        }
+
+        QString gnuBinDir = epsrBinDir_+"gnuplot/binary";      //note this is without the last "/"
+        gnuBinDir = QDir::toNativeSeparators(gnuBinDir);
+
+        QTextStream stream(&batFile);
+#ifdef _WIN32
+        stream << "set EPSRbin=" << epsrBinDir_ << "\n"
+                << "set EPSRrun=" << workingDir_ << "\n"
+                << "set EPSRgnu=" << gnuBinDir << "\n"
+                << "%EPSRbin%splot2d.exe " << workingDir_ << " splot2d " << basePlotFileName << "\n";
+#else
+        stream << "export EPSRbin=" << epsrBinDir_ << "\n"
+                << "export EPSRrun=" << workingDir_ << "\n"
+                << "export EPSRgnu=" << gnuBinDir << "\n"
+                << "  \"$EPSRbin\"'splot2d' " << workingDir_ << " splot2d " << basePlotFileName << "\n";
+  #endif
+        batFile.close();
+
+        //run script file
+        QProcess processrunEPSRplot;
+        processrunEPSRplot.setProcessChannelMode(QProcess::ForwardedChannels);
+#ifdef _WIN32
+        processrunEPSRplot.startDetached("splot2d"+basePlotFileName+".bat");
+#else
+        processrunEPSRplot.startDetached("sh splot2d"+basePlotFileName+".sh");
+#endif
 
         messageText_ += "\nfinished running "+plotFileName+"\n";
         messagesDialog.refreshMessages();
         ui.messagesLineEdit->setText("Finished running splot2d file");
-
-        QString gnuplotFile = workingDir_+"plot"+basePlotFileName+".txt";
-
-        QProcess processrungnuplot;
-        processrungnuplot.setProcessChannelMode(QProcess::ForwardedChannels);
-#ifdef _WIN32
-        processrungnuplot.startDetached(epsrBinDir_+"\gnuplot\bin\wgnuplot.exe", QStringList() << gnuplotFile);
-#else
-        processrungnuplot.startDetached(epsrBinDir_+"/gnuplot/bin/gnuplot", QStringList() << gnuplotFile);
-#endif
     }
 }
 
 void MainWindow::plot2d()
 {
+    //get filename
     QString plotFile = QFileDialog::getOpenFileName(this, "Choose .plot2d.txt file", workingDir_, tr(".plot2d.txt files (*.plot2d.txt)"));
     if (!plotFile.isEmpty())
     {
@@ -1657,32 +1681,51 @@ void MainWindow::plot2d()
         QString basePlotFileName = plotFileName.split(".", QString::KeepEmptyParts).at(0);
         QDir::setCurrent(workingDir_);
 
+        //make script file to run plot2d
 #ifdef _WIN32
-        processEPSR_.start(epsrBinDir_+"plot2d.exe", QStringList() << projDir << "plot2d" << basePlotFileName);
+        QFile batFile(workingDir_+"plot2d"+basePlotFileName+".bat");
 #else
-        processEPSR_.start(epsrBinDir_+"plot2d", QStringList() << projDir << "plot2d" << basePlotFileName);
+        QFile batFile(workingDir_+"plot2d"+basePlotFileName+".sh");
 #endif
-        if (!processEPSR_.waitForStarted()) return;
-        if (!processEPSR_.waitForFinished(1800000)) return;
-
-        messageText_ += "\nfinished running "+plotFileName+"\n";
-        messagesDialog.refreshMessages();
-        ui.messagesLineEdit->setText("Finished running plot2d file");
-
-        QString pgplotFile = workingDir_+"pgplot.gif";
-        if (QFile::exists(pgplotFile) == false)
+        if(!batFile.open(QFile::WriteOnly | QFile::Text))
         {
             QMessageBox msgBox;
-            msgBox.setText("Could not find pgplot.gif file.");
+            msgBox.setText("Could not open script file.");
             msgBox.exec();
             return;
         }
-        QDesktopServices::openUrl(QUrl("file:///"+pgplotFile, QUrl::TolerantMode));
+
+        QTextStream stream(&batFile);
+#ifdef _WIN32
+        stream << "set EPSRbin=" << epsrBinDir_ << "\n"
+                << "set EPSRrun=" << workingDir_ << "\n"
+                << "%EPSRbin%plot2d.exe " << workingDir_ << " plot2d " << basePlotFileName << "\n"
+                << workingDir_+"pgplot.gif\n";
+#else
+        stream << "export EPSRbin=" << epsrBinDir_ << "\n"
+                << "export EPSRrun=" << workingDir_ << "\n"
+                << "  \"$EPSRbin\"'plot2d' " << workingDir_ << " plot2d " << basePlotFileName << "\n"
+                << workingDir_+"pgplot.gif\n";
+#endif
+        batFile.close();
+
+        //run script file
+        processEPSR_.setProcessChannelMode(QProcess::ForwardedChannels);
+#ifdef _WIN32
+        processEPSR_.startDetached("plot2d"+basePlotFileName+".bat");
+#else
+        processEPSR_.startDetached("sh plot2d"+basePlotFileName+".sh");
+#endif
+
+        messageText_ += "\nfinished running "+basePlotFileName+" in plot2d\n";
+        messagesDialog.refreshMessages();
+        ui.messagesLineEdit->setText("Finished running plot2d file");
     }
 }
 
 void MainWindow::plot3d()
 {
+    //get filename
     QString plotFile = QFileDialog::getOpenFileName(this, "Choose .plot3d.txt file", workingDir_, tr(".plot3d.txt files (*.plot3d.txt)"));
     if (!plotFile.isEmpty())
     {
@@ -1691,27 +1734,45 @@ void MainWindow::plot3d()
         QString basePlotFileName = plotFileName.split(".", QString::KeepEmptyParts).at(0);
         QDir::setCurrent(workingDir_);
 
+        //make script file to run plot3d
 #ifdef _WIN32
-        processEPSR_.start(epsrBinDir_+"plot3d.exe", QStringList() << projDir << "plot3d" << basePlotFileName);
+        QFile batFile(workingDir_+"plot3d"+basePlotFileName+".bat");
 #else
-        processEPSR_.start(epsrBinDir_+"plot3d", QStringList() << projDir << "plot3d" << basePlotFileName);
+        QFile batFile(workingDir_+"plot3d"+basePlotFileName+".sh");
 #endif
-        if (!processEPSR_.waitForStarted()) return;
-        if (!processEPSR_.waitForFinished(1800000)) return;
-
-        messageText_ += "\nfinished running "+plotFileName+"\n";
-        messagesDialog.refreshMessages();
-        ui.messagesLineEdit->setText("Finished running plot3d file");
-
-        QString pgplotFile = workingDir_+"pgplot.gif";
-        if (QFile::exists(pgplotFile) == false)
+        if(!batFile.open(QFile::WriteOnly | QFile::Text))
         {
             QMessageBox msgBox;
-            msgBox.setText("Could not find pgplot.gif file.");
+            msgBox.setText("Could not open script file.");
             msgBox.exec();
             return;
         }
-        QDesktopServices::openUrl(QUrl("file:///"+pgplotFile, QUrl::TolerantMode));
+
+        QTextStream stream(&batFile);
+#ifdef _WIN32
+        stream << "set EPSRbin=" << epsrBinDir_ << "\n"
+                << "set EPSRrun=" << workingDir_ << "\n"
+                << "%EPSRbin%plot3d.exe " << workingDir_ << " plot3d " << basePlotFileName << "\n"
+                << workingDir_+"pgplot.gif\n";
+#else
+        stream << "export EPSRbin=" << epsrBinDir_ << "\n"
+                << "export EPSRrun=" << workingDir_ << "\n"
+                << "  \"$EPSRbin\"'plot3d' " << workingDir_ << " plot3d " << basePlotFileName << "\n"
+                << workingDir_+"pgplot.gif\n";
+#endif
+        batFile.close();
+
+        //run script file
+        processEPSR_.setProcessChannelMode(QProcess::ForwardedChannels);
+#ifdef _WIN32
+        processEPSR_.startDetached("plot3d"+basePlotFileName+".bat");
+#else
+        processEPSR_.startDetached("sh plot3d"+basePlotFileName+".sh");
+#endif
+
+        messageText_ += "\nfinished running "+basePlotFileName+" in plot3d\n";
+        messagesDialog.refreshMessages();
+        ui.messagesLineEdit->setText("Finished running plot3d file");
     }
 }
 
