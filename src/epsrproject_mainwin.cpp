@@ -1377,6 +1377,12 @@ void MainWindow::runEPSR()
     //add path for auto updating in case it is switched on
 //    epsrRunning_.addPath(baseFileName_+".EPSR.out");
     epsrRunningTimerId_ = startTimer(20000);
+
+    //also kill any other timers that might be still running if a setup was quit but not saved
+    killTimer(outputTimerId_);
+    outputTimerId_ = -1;
+    killTimer(newJmolTimerId_);
+    newJmolTimerId_ = -1;
 }
 
 void MainWindow::stopEPSR()
@@ -1960,9 +1966,7 @@ void MainWindow::timerEvent(QTimerEvent *event)
             QDateTime dateTimeNow = QDateTime::currentDateTime();
             if (jmolModTime > dateTimeNow.addSecs(-2))
             {
-                killTimer(newJmolTimerId_);
-                newJmolTimerId_ = -1;
-                makeMolFile();
+                makeMolFile();   //timer killed in mixato and addato
             }
         }
     }

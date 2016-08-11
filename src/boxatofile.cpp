@@ -110,6 +110,9 @@ void MainWindow::on_mixatoButton_clicked(bool checked)
         ui.removeDataFileButton->setEnabled(true);
 
         ui.deleteBoxAtoFileAct->setEnabled(true);
+
+        killTimer(newJmolTimerId_);
+        newJmolTimerId_ = -1;
     }
 }
 
@@ -263,6 +266,9 @@ void MainWindow::on_addatoButton_clicked(bool checked)
         ui.removeDataFileButton->setEnabled(true);
 
         ui.deleteBoxAtoFileAct->setEnabled(true);
+
+        killTimer(newJmolTimerId_);
+        newJmolTimerId_ = -1;
     }
 }
 
