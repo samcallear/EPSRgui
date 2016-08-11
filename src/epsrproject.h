@@ -41,6 +41,9 @@ private slots:
     void plot();
     void plotEPSRshell();
     void plotJmol();
+    void splot2d();
+    void plot2d();
+    void plot3d();
     void settings();
     void stopEPSR();
     void deleteEPSRinpFile();

@@ -2608,6 +2608,11 @@
                    </item>
                    <item>
                     <property name="text">
+                     <string>Mapgr</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
                      <string>Partials</string>
                     </property>
                    </item>
@@ -3010,12 +3015,27 @@
     <addaction name="stopAct"/>
    </widget>
    <widget class="QMenu" name="plotMenu">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
     <property name="title">
      <string>Plot</string>
     </property>
+    <widget class="QMenu" name="plotOutputsMenu">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="title">
+      <string>Plot outputs</string>
+     </property>
+     <addaction name="plot3djmolAct"/>
+     <addaction name="splot2dAct"/>
+     <addaction name="plot3dAct"/>
+     <addaction name="plot2dAct"/>
+    </widget>
     <addaction name="plotAct"/>
     <addaction name="plotEPSRshellAct"/>
-    <addaction name="jmolPlotAct"/>
+    <addaction name="plotOutputsMenu"/>
    </widget>
    <widget class="QMenu" name="settingsMenu">
     <property name="title">
@@ -3202,6 +3222,46 @@
    </property>
    <property name="text">
     <string>Plot in Jmol</string>
+   </property>
+  </action>
+  <action name="actionPlot2d">
+   <property name="text">
+    <string>plot2d</string>
+   </property>
+  </action>
+  <action name="actionPlot3d">
+   <property name="text">
+    <string>plot3d</string>
+   </property>
+  </action>
+  <action name="actionSplot2d">
+   <property name="text">
+    <string>splot2d</string>
+   </property>
+  </action>
+  <action name="actionMapgr">
+   <property name="text">
+    <string>mapgr</string>
+   </property>
+  </action>
+  <action name="plot3djmolAct">
+   <property name="text">
+    <string>plot3djmol</string>
+   </property>
+  </action>
+  <action name="splot2dAct">
+   <property name="text">
+    <string>splot2d</string>
+   </property>
+  </action>
+  <action name="plot3dAct">
+   <property name="text">
+    <string>plot3d</string>
+   </property>
+  </action>
+  <action name="plot2dAct">
+   <property name="text">
+    <string>plot2d</string>
    </property>
   </action>
  </widget>

@@ -30,6 +30,11 @@ void MainWindow::showAvailableFiles()
         outputFilter << "*.cube.dat";
     }
     else
+    if (outputSetupFileType_== "splot2d")
+    {
+        outputFilter << "*.splot2d.txt";
+    }
+    else
     if (outputSetupFileType_== "triangles")
     {
         outputFilter << "*.tri.dat";
@@ -97,6 +102,7 @@ void MainWindow::getOutputsRunning()
         if (line.contains("chains")
                 || line.contains("clusters")
                 || line.contains("coord")
+                || line.contains("mapgr")
                 || line.contains("partials")
                 || line.contains("plot2d")
                 || line.contains("plot3d")
@@ -221,6 +227,7 @@ void MainWindow::on_applyOutputsButton_clicked(bool checked)
         if (line.contains("chains")             //remove all entries in script file
                 || line.contains("clusters")
                 || line.contains("coord")
+                || line.contains("mapgr")
                 || line.contains("partials")
                 || line.contains("plot2d")
                 || line.contains("plot3d")

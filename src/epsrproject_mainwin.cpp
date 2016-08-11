@@ -96,8 +96,17 @@ void MainWindow::createActions()
     ui.plotEPSRshellAct->setStatusTip(tr("Plot EPSR using EPSRshell"));
     connect(ui.plotEPSRshellAct, SIGNAL(triggered()), this, SLOT(plotEPSRshell()));
 
-    ui.jmolPlotAct->setStatusTip(tr("Plot SHARM or SDF outputs using Jmol"));
-    connect(ui.jmolPlotAct, SIGNAL(triggered()), this, SLOT(plotJmol()));
+    ui.plot3djmolAct->setStatusTip(tr("Plot SHARM or SDF outputs using Jmol"));
+    connect(ui.plot3djmolAct, SIGNAL(triggered()), this, SLOT(plotJmol()));
+
+    ui.plot2dAct->setStatusTip(tr("Plot SHARM or SDF outputs as a 2D surface in PGPLOT"));
+    connect(ui.plot2dAct, SIGNAL(triggered()), this, SLOT(plot2d()));
+
+    ui.plot3dAct->setStatusTip(tr("Plot SHARM or SDF outputs as a 3D surface in PGPLOT"));
+    connect(ui.plot3dAct, SIGNAL(triggered()), this, SLOT(plot3d()));
+
+    ui.splot2dAct->setStatusTip(tr("Plot SHARM or SDF outputs as a 2D surface in gnuplot"));
+    connect(ui.splot2dAct, SIGNAL(triggered()), this, SLOT(splot2d()));
 
     ui.settingsAct->setStatusTip(tr("Change EPSRgui settings"));
     connect(ui.settingsAct, SIGNAL(triggered()), this, SLOT(settings()));
@@ -420,7 +429,7 @@ void MainWindow::reset()
     ui.stopAct->setEnabled(false);
     ui.plotAct->setEnabled(false);
     ui.plotEPSRshellAct->setEnabled(false);
-    ui.jmolPlotAct->setEnabled(false);
+    ui.plotOutputsMenu->setEnabled(false);
     ui.epsrManualAct->setEnabled(false);
 
 }
@@ -554,7 +563,7 @@ void MainWindow::open()
                     ui.runAct->setEnabled(true);
                     ui.plotAct->setEnabled(true);
                     ui.plotEPSRshellAct->setEnabled(true);
-                    ui.jmolPlotAct->setEnabled(true);
+                    ui.plotOutputsMenu->setEnabled(true);
                     ui.plot1Button->setEnabled(true);
                     ui.plot2Button->setEnabled(true);
                     ui.deleteEPSRinpFileAct->setEnabled(true);
@@ -1601,6 +1610,108 @@ void MainWindow::plotJmol()
         messagesDialog.refreshMessages();
 
         ui.messagesLineEdit->setText("Plotted .SHARM output in Jmol");
+    }
+}
+
+void MainWindow::splot2d()
+{
+    QString plotFile = QFileDialog::getOpenFileName(this, "Choose .splot2d.txt file", workingDir_, tr(".splot2d.txt files (*.splot2d.txt)"));
+    if (!plotFile.isEmpty())
+    {
+        QFileInfo fi(plotFile);
+        QString plotFileName = fi.fileName();
+        QString basePlotFileName = plotFileName.split(".", QString::KeepEmptyParts).at(0);
+        QDir::setCurrent(workingDir_);
+
+#ifdef _WIN32
+        processEPSR_.start(epsrBinDir_+"splot2d.exe", QStringList() << projDir << "splot2d" << basePlotFileName);
+#else
+        processEPSR_.start(epsrBinDir_+"splot2d", QStringList() << projDir << "splot2d" << basePlotFileName);
+#endif
+        if (!processEPSR_.waitForStarted()) return;
+        if (!processEPSR_.waitForFinished(1800000)) return;
+
+        messageText_ += "\nfinished running "+plotFileName+"\n";
+        messagesDialog.refreshMessages();
+        ui.messagesLineEdit->setText("Finished running splot2d file");
+
+        QString gnuplotFile = workingDir_+"plot"+basePlotFileName+".txt";
+
+        QProcess processrungnuplot;
+        processrungnuplot.setProcessChannelMode(QProcess::ForwardedChannels);
+#ifdef _WIN32
+        processrungnuplot.startDetached(epsrBinDir_+"\gnuplot\bin\wgnuplot.exe", QStringList() << gnuplotFile);
+#else
+        processrungnuplot.startDetached(epsrBinDir_+"/gnuplot/bin/gnuplot", QStringList() << gnuplotFile);
+#endif
+    }
+}
+
+void MainWindow::plot2d()
+{
+    QString plotFile = QFileDialog::getOpenFileName(this, "Choose .plot2d.txt file", workingDir_, tr(".plot2d.txt files (*.plot2d.txt)"));
+    if (!plotFile.isEmpty())
+    {
+        QFileInfo fi(plotFile);
+        QString plotFileName = fi.fileName();
+        QString basePlotFileName = plotFileName.split(".", QString::KeepEmptyParts).at(0);
+        QDir::setCurrent(workingDir_);
+
+#ifdef _WIN32
+        processEPSR_.start(epsrBinDir_+"plot2d.exe", QStringList() << projDir << "plot2d" << basePlotFileName);
+#else
+        processEPSR_.start(epsrBinDir_+"plot2d", QStringList() << projDir << "plot2d" << basePlotFileName);
+#endif
+        if (!processEPSR_.waitForStarted()) return;
+        if (!processEPSR_.waitForFinished(1800000)) return;
+
+        messageText_ += "\nfinished running "+plotFileName+"\n";
+        messagesDialog.refreshMessages();
+        ui.messagesLineEdit->setText("Finished running plot2d file");
+
+        QString pgplotFile = workingDir_+"pgplot.gif";
+        if (QFile::exists(pgplotFile) == false)
+        {
+            QMessageBox msgBox;
+            msgBox.setText("Could not find pgplot.gif file.");
+            msgBox.exec();
+            return;
+        }
+        QDesktopServices::openUrl(QUrl("file:///"+pgplotFile, QUrl::TolerantMode));
+    }
+}
+
+void MainWindow::plot3d()
+{
+    QString plotFile = QFileDialog::getOpenFileName(this, "Choose .plot3d.txt file", workingDir_, tr(".plot3d.txt files (*.plot3d.txt)"));
+    if (!plotFile.isEmpty())
+    {
+        QFileInfo fi(plotFile);
+        QString plotFileName = fi.fileName();
+        QString basePlotFileName = plotFileName.split(".", QString::KeepEmptyParts).at(0);
+        QDir::setCurrent(workingDir_);
+
+#ifdef _WIN32
+        processEPSR_.start(epsrBinDir_+"plot3d.exe", QStringList() << projDir << "plot3d" << basePlotFileName);
+#else
+        processEPSR_.start(epsrBinDir_+"plot3d", QStringList() << projDir << "plot3d" << basePlotFileName);
+#endif
+        if (!processEPSR_.waitForStarted()) return;
+        if (!processEPSR_.waitForFinished(1800000)) return;
+
+        messageText_ += "\nfinished running "+plotFileName+"\n";
+        messagesDialog.refreshMessages();
+        ui.messagesLineEdit->setText("Finished running plot3d file");
+
+        QString pgplotFile = workingDir_+"pgplot.gif";
+        if (QFile::exists(pgplotFile) == false)
+        {
+            QMessageBox msgBox;
+            msgBox.setText("Could not find pgplot.gif file.");
+            msgBox.exec();
+            return;
+        }
+        QDesktopServices::openUrl(QUrl("file:///"+pgplotFile, QUrl::TolerantMode));
     }
 }
 
