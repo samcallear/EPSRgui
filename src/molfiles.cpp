@@ -107,7 +107,6 @@ void MainWindow::makeMolFile()
 #endif
         jmolBatFile.close();
 
-//        processEPSR_.setProcessChannelMode(QProcess::ForwardedChannels);
 #ifdef _WIN32
         processEPSR_.start("mopac"+jmolBaseFileName+".bat");
 #else
@@ -131,7 +130,6 @@ void MainWindow::makeMolFile()
     }
     else
     {
-//        processEPSR_.setProcessChannelMode(QProcess::ForwardedChannels);
 #ifdef _WIN32
         processEPSR_.start(epsrBinDir_+"readmole.exe", QStringList() << workingDir_ << "jmolfile "+jmolFileName);
 #else
@@ -458,7 +456,6 @@ void MainWindow::on_createLatticeButton_clicked(bool checked)
         QString bLatt = makeLatticeDialog->cellsAlongB();
         QString cLatt = makeLatticeDialog->cellsAlongC();
 
-//        processEPSR_.setProcessChannelMode(QProcess::ForwardedChannels);
         QString projDir = workingDir_;
         projDir = QDir::toNativeSeparators(projDir);
 #ifdef _WIN32
@@ -1506,7 +1503,6 @@ bool MainWindow::updateMolFile()
 
     QString molBaseFileName = molFileName_.split(".",QString::SkipEmptyParts).at(0);
 
-//    processEPSR_.setProcessChannelMode(QProcess::ForwardedChannels);
 #ifdef _WIN32
     processEPSR_.start(epsrBinDir_+"fmole.exe", QStringList() << workingDir_ << "fmole" << molBaseFileName << "0" << "0");
 #else
@@ -1895,6 +1891,9 @@ void MainWindow::on_deleteRotAllButton_clicked (bool checked)
 
 void MainWindow::on_updateMolFileButton_clicked(bool checked)
 {
+    killTimer(molChangeatoFinishedTimerId_);
+    molChangeatoFinishedTimerId_ = -1;
+
     QString extension = molFileName_.split(".",QString::SkipEmptyParts).at(1);
     if (extension == "ato")
     {
@@ -1921,7 +1920,8 @@ void MainWindow::on_molChangeAtobutton_clicked(bool checked)
 #endif
     ui.messagesLineEdit->setText("Changeato opened in separate window");
 
-    //read .mol and .ato files after changeato finished *************************************************************************************TO DO **********************************
+    molChangeatoFinishedTimerId_ = startTimer(2000);
+    atoLastMod_ = QDateTime::currentDateTime();
 }
 
 void MainWindow::on_molFmoleButton_clicked(bool checked)
@@ -1932,15 +1932,15 @@ void MainWindow::on_molFmoleButton_clicked(bool checked)
 
     QString molBaseFileName = molFileName_.split(".",QString::SkipEmptyParts).at(0);
 
-    QProcess processFmole;
-    processFmole.setProcessChannelMode(QProcess::ForwardedChannels);
 #ifdef _WIN32
-    processFmole.startDetached(epsrBinDir_+"fmole.exe", QStringList() << workingDir_ << "fmole" << molBaseFileName << qPrintable(QString::number(fmoleIter)));
+    processEPSR_.start(epsrBinDir_+"fmole.exe", QStringList() << workingDir_ << "fmole" << molBaseFileName << qPrintable(QString::number(fmoleIter)));
 #else
-    processFmole.startDetached(epsrBinDir_+"fmole", QStringList() << workingDir_ << "fmole" << molBaseFileName << qPrintable(QString::number(fmoleIter)));
+    processEPSR_.start(epsrBinDir_+"fmole", QStringList() << workingDir_ << "fmole" << molBaseFileName << qPrintable(QString::number(fmoleIter)));
 #endif
-//    if (!processEPSR_.waitForStarted()) return;
-//    if (!processEPSR_.waitForFinished(1800000)) return;
+    if (!processEPSR_.waitForStarted()) return;
+    if (!processEPSR_.waitForFinished(1800000)) return;
+
+    setSelectedMolFile();
 
     messageText_ += "\nfmole finished running for component .ato file\n";
     messagesDialog.refreshMessages();

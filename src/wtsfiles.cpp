@@ -103,7 +103,6 @@ bool MainWindow::makeNwtsSetup()
     //create wtsBaseFileName_.NWTS.dat if it doesn't already exist
     if (QFile::exists(workingDir_+wtsBaseFileName_+".NWTS.dat") == 0)
     {
-//        processEPSR_.setProcessChannelMode(QProcess::ForwardedChannels);
 #ifdef _WIN32
         processEPSR_.start(epsrBinDir_+"upset.exe", QStringList() << workingDir_ << "upset" << "nwts" << wtsBaseFileName_);
 #else
@@ -135,7 +134,6 @@ bool MainWindow::makeXwtsSetup()
     QString atoBaseFileName = atoFileName_.split(".",QString::SkipEmptyParts).at(0);
     if (QFile::exists(workingDir_+wtsBaseFileName_+".XWTS.dat") == 0)
     {
-//        processEPSR_.setProcessChannelMode(QProcess::ForwardedChannels);
 #ifdef _WIN32
         processEPSR_.start(epsrBinDir_+"upset.exe", QStringList() << workingDir_ << "upset" << "xwts" << wtsBaseFileName_);
 #else
@@ -453,7 +451,6 @@ void MainWindow::makeNwts()
     fileRead.remove();
     fileWrite.rename(workingDir_+wtsBaseFileName_+".NWTS.dat");
 
-//    processEPSR_.setProcessChannelMode(QProcess::ForwardedChannels);
 #ifdef _WIN32
     processEPSR_.start(epsrBinDir_+"nwts.exe", QStringList() << workingDir_ << "nwts" << wtsBaseFileName_);
 #else
@@ -550,7 +547,6 @@ void MainWindow::makeXwts()
     fileRead.remove();
     fileWrite.rename(workingDir_+wtsBaseFileName_+".XWTS.dat");
 
-//    processEPSR_.setProcessChannelMode(QProcess::ForwardedChannels);
 #ifdef _WIN32
     processEPSR_.start(epsrBinDir_+"xwts.exe", QStringList() << workingDir_ << "xwts" << wtsBaseFileName_);
 #else

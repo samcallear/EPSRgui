@@ -89,6 +89,8 @@ private:
     int fmoleFinishedTimerId_;
     QDateTime atoLastMod_;
     int newJmolTimerId_;
+    int molChangeatoFinishedTimerId_;
+    int changeatoFinishedTimerId_;
 
     int endscript;
 

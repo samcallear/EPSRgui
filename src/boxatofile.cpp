@@ -52,8 +52,6 @@ void MainWindow::on_mixatoButton_clicked(bool checked)
 
         int nIndex = atoFileIndexes.count();
 
-//        processEPSR_.setProcessChannelMode(QProcess::ForwardedChannels);
-
         QString projDir = workingDir_;
         projDir = QDir::toNativeSeparators(projDir);
     #ifdef _WIN32
@@ -178,8 +176,6 @@ void MainWindow::on_addatoButton_clicked(bool checked)
         }
 
         int nIndex = atoFilesToAdd.count(); //this is the number of files to be added to the container
-
-//        processEPSR_.setProcessChannelMode(QProcess::ForwardedChannels);
 
         QString projDir = workingDir_;
         projDir = QDir::toNativeSeparators(projDir);
@@ -581,7 +577,6 @@ void MainWindow::on_randomiseButton_clicked(bool checked)
 
         QString atoBaseFileName = atoFileName_.split(".",QString::SkipEmptyParts).at(0);
 
-//        processEPSR_.setProcessChannelMode(QProcess::ForwardedChannels);
 #ifdef _WIN32
         processEPSR_.start(epsrBinDir_+"randomise.exe", QStringList() << workingDir_ << "randomise" << atoBaseFileName);
 #else
@@ -597,6 +592,9 @@ void MainWindow::on_randomiseButton_clicked(bool checked)
 
 void MainWindow::on_updateAtoFileButton_clicked(bool checked)
 {
+    killTimer(changeatoFinishedTimerId_);
+    changeatoFinishedTimerId_ = -1;
+
     double atoTemp = ui.temperatureLineEdit->text().toDouble();
     double vibTemp = ui.vibtempLineEdit->text().toDouble();
     double angTemp = ui.angtempLineEdit->text().toDouble();
@@ -735,6 +733,9 @@ void MainWindow::on_updateAtoFileButton_clicked(bool checked)
 
 void MainWindow::on_fmoleButton_clicked(bool checked)
 {
+    killTimer(changeatoFinishedTimerId_);
+    changeatoFinishedTimerId_ = -1;
+
     int fmoleIter = ui.fmoleLineEdit->text().toInt();
 
     QDir::setCurrent(workingDir_);
@@ -861,6 +862,9 @@ void MainWindow::on_atoEPSRButton_clicked(bool checked)
     processEditAto.startDetached(epsrBinDir_+"changeato", QStringList() << workingDir_ << "changeato" << atoBaseFileName);
 #endif
     ui.messagesLineEdit->setText("Changeato opened in separate window");
+
+    changeatoFinishedTimerId_ = startTimer(2000);
+    atoLastMod_ = QDateTime::currentDateTime();
 }
 
 bool MainWindow::checkBoxCharge()

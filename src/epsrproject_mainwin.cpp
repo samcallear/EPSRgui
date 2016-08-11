@@ -1231,7 +1231,6 @@ void MainWindow::runEPSRcheck()
 
     QString atoBaseFileName = atoFileName_.split(".",QString::SkipEmptyParts).at(0);
 
-//    processEPSR_.setProcessChannelMode(QProcess::ForwardedChannels);
 #ifdef _WIN32
     processEPSR_.start(epsrBinDir_+"epsr.exe", QStringList() << workingDir_ << "epsr" << atoBaseFileName);
 #else
@@ -1392,6 +1391,10 @@ void MainWindow::runEPSR()
     outputTimerId_ = -1;
     killTimer(newJmolTimerId_);
     newJmolTimerId_ = -1;
+    killTimer(molChangeatoFinishedTimerId_);
+    molChangeatoFinishedTimerId_ = -1;
+    killTimer(changeatoFinishedTimerId_);
+    changeatoFinishedTimerId_ = -1;
 }
 
 void MainWindow::stopEPSR()
@@ -1726,11 +1729,12 @@ void MainWindow::plot2d()
         batFile.close();
 
         //run script file
-        processEPSR_.setProcessChannelMode(QProcess::ForwardedChannels);
+        QProcess processPlot2d;
+        processPlot2d.setProcessChannelMode(QProcess::ForwardedChannels);
 #ifdef _WIN32
-        processEPSR_.startDetached("plot2d"+basePlotFileName+".bat");
+        processPlot2d.startDetached("plot2d"+basePlotFileName+".bat");
 #else
-        processEPSR_.startDetached("sh plot2d"+basePlotFileName+".sh");
+        processPlot2d.startDetached("sh plot2d"+basePlotFileName+".sh");
 #endif
 
         messageText_ += "\nfinished running "+basePlotFileName+" in plot2d\n";
@@ -1779,11 +1783,12 @@ void MainWindow::plot3d()
         batFile.close();
 
         //run script file
-        processEPSR_.setProcessChannelMode(QProcess::ForwardedChannels);
+        QProcess processPlot3d;
+        processPlot3d.setProcessChannelMode(QProcess::ForwardedChannels);
 #ifdef _WIN32
-        processEPSR_.startDetached("plot3d"+basePlotFileName+".bat");
+        processPlot3d.startDetached("plot3d"+basePlotFileName+".bat");
 #else
-        processEPSR_.startDetached("sh plot3d"+basePlotFileName+".sh");
+        processPlot3d.startDetached("sh plot3d"+basePlotFileName+".sh");
 #endif
 
         messageText_ += "\nfinished running "+basePlotFileName+" in plot3d\n";
@@ -2156,6 +2161,39 @@ void MainWindow::timerEvent(QTimerEvent *event)
             {
                 makeMolFile();   //timer killed in mixato and addato
             }
+        }
+    }
+    else
+    if (event->timerId() == molChangeatoFinishedTimerId_)
+    {
+        QString atoFileName = molFileName_.split(".", QString::SkipEmptyParts).at(0)+".ato";
+        QFileInfo fi(workingDir_+atoFileName);
+        if (fi.lastModified() != atoLastMod_)
+        {
+            setSelectedMolFile();
+
+            messageText_ += "\nComponent .ato file updated\n";
+            messagesDialog.refreshMessages();
+            ui.messagesLineEdit->setText("Component .ato file updated");
+
+            killTimer(molChangeatoFinishedTimerId_);
+            molChangeatoFinishedTimerId_ = -1;
+        }
+    }
+    else
+    if (event->timerId() == changeatoFinishedTimerId_)
+    {
+        QFileInfo fi(workingDir_+atoFileName_);
+        if (fi.lastModified() != atoLastMod_)
+        {
+
+
+            messageText_ += "\nBox .ato file updated\n";
+            messagesDialog.refreshMessages();
+            ui.messagesLineEdit->setText("Box .ato file updated");
+
+            killTimer(changeatoFinishedTimerId_);
+            changeatoFinishedTimerId_ = -1;
         }
     }
 }
