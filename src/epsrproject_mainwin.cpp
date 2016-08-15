@@ -858,7 +858,6 @@ bool MainWindow::saveAs()
                         }
                     }
                 }
-
                 filewts.resize(0);
                 streamwts << originalwts;
                 filewts.close();
@@ -927,14 +926,14 @@ bool MainWindow::saveAs()
                         original.append("fnamepcof   "+projectNameCopy+"box.pcof               Name of potential coefficients file.\n");
                     }
                 }
-                ui.epsrInpFileName->setText(projectNameCopy+"box.EPSR.inp");
-                updateInpFileTables();
             }
-
             fileWrite.resize(0);
             streamWrite << original;
             fileWrite.close();
             fileRead.close();
+
+            ui.epsrInpFileName->setText(projectNameCopy+"box.EPSR.inp");
+            updateInpFileTables();
         }
 
         //update EPSR script file - this only works if box is projectName_+"box" ***********************************
