@@ -769,6 +769,7 @@ void MainWindow::on_fmoleButton_clicked(bool checked)
     ui.randomiseButton->setDisabled(true);
     ui.atoEPSRButton->setDisabled(true);
     ui.updateMolFileButton->setDisabled(true);
+    ui.runMenu->setDisabled(true);
 }
 
 void MainWindow::on_viewAtoFileButton_clicked(bool checked)
