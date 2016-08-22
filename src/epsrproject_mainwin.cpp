@@ -732,6 +732,8 @@ bool MainWindow::saveAs()
     createNewDialog.raise();
     createNewDialog.activateWindow();
 
+    createNewDialog.setWindowTitle("Save As...");
+
     newDialog = createNewDialog.exec();
 
     if (newDialog == CreateNewDialog::Accepted)
@@ -769,7 +771,7 @@ bool MainWindow::saveAs()
         QFile filedelete(epsrProFile);
         filedelete.remove();
 
-        //make new .EPSR.pro file
+        //make new .EPSR.pro file and write to it
         QString epsrProFileCopy = workingDirCopy+projectNameCopy+".EPSR.pro";
         QFile file(epsrProFileCopy);
 
@@ -812,6 +814,19 @@ bool MainWindow::saveAs()
                 streamWrite << "wts " << ui.dataFileTable->item(i,3)->text() << "\n";
             }
         }
+
+        //EPSR.inp file
+        if (!epsrInpFileName_.isEmpty())
+        {
+            streamWrite << "EPSRinp " << projectNameCopy+"box" << "\n";
+        }
+
+        //dlputils
+        if (ui.dlputilsOutCheckBox->isChecked())
+        {
+            streamWrite << "dlputils\n";
+        }
+        file.close();
 
         //change fnameato in NWTS.dat and XWTS.dat
         if (!wtsFileList.isEmpty())
@@ -863,19 +878,6 @@ bool MainWindow::saveAs()
                 filewts.close();
             }
         }
-
-        //EPSR.inp and .pcof files
-        if (!epsrInpFileName_.isEmpty())
-        {
-            streamWrite << "EPSRinp " << projectNameCopy+"box" << "\n";
-        }
-
-        //dlputils
-        if (ui.dlputilsOutCheckBox->isChecked())
-        {
-            streamWrite << "dlputils\n";
-        }
-        file.close();
 
         //edit EPSR.inp file so first line, fnameato and fnamepcof are updated
         if (!epsrInpFileName_.isEmpty())
@@ -931,9 +933,6 @@ bool MainWindow::saveAs()
             streamWrite << original;
             fileWrite.close();
             fileRead.close();
-
-            ui.epsrInpFileName->setText(projectNameCopy+"box.EPSR.inp");
-            updateInpFileTables();
         }
 
         //update EPSR script file - this only works if box is projectName_+"box" ***********************************
@@ -983,11 +982,14 @@ bool MainWindow::saveAs()
         }
         if (!epsrInpFileName_.isEmpty())
         {
-            epsrInpFileName_ = projectName_+"box.EPSR.inp";
+            epsrInpFileName_ = projectNameCopy+"box.EPSR.inp";
+            ui.epsrInpFileName->setText(epsrInpFileName_);
+            readEPSRinpFile();
+            updateInpFileTables();
         }
 
-        //ensure current settings are saved to .pro file
-        saveFile();
+//        //ensure current settings are saved to .pro file - this is already done when writing .pro file
+//        saveFile();
 
         //change window title to contain projectName
         this->setWindowTitle("EPSRgui: "+projectName_);
@@ -2132,6 +2134,7 @@ void MainWindow::timerEvent(QTimerEvent *event)
             ui.randomiseButton->setEnabled(true);
             ui.atoEPSRButton->setEnabled(true);
             ui.updateMolFileButton->setEnabled(true);
+            ui.runMenu->setEnabled(true);
 
             messageText_ += "\nfmole finished running on box.ato file\n";
             messagesDialog.refreshMessages();
