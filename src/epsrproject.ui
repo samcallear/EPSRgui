@@ -2989,7 +2989,7 @@
    </property>
    <widget class="QMenu" name="fileMenu">
     <property name="title">
-     <string>&amp;File</string>
+     <string>File</string>
     </property>
     <addaction name="newAct"/>
     <addaction name="openAct"/>
