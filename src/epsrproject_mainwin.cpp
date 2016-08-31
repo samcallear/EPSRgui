@@ -1956,6 +1956,16 @@ void MainWindow::deleteBoxAtoFile()
             ui.atoTetherTable->clearContents();
             ui.atoTetherTable->setRowCount(0);
             ui.atoTetherTolLineEdit->setText(0);
+            ui.temperatureLineEdit->clear();
+            ui.vibtempLineEdit->clear();
+            ui.angtempLineEdit->clear();
+            ui.dihtempLineEdit->clear();
+            ui.intraTransSSLineEdit->clear();
+            ui.grpRotSSLineEdit->clear();
+            ui.molRotSSLineEdit->clear();
+            ui.molTransSSLineEdit->clear();
+            ui.ecoreLineEdit->clear();
+            ui.dcoreLineEdit->clear();
             ui.numberDensityLineEdit->clear();
 
             //remove wts files and clear data and wts tables
@@ -1972,7 +1982,7 @@ void MainWindow::deleteBoxAtoFile()
             }
 
             //remove inp file and clear name if exists
-            if (!epsrInpFileName_.isEmpty() == true)
+            if (epsrInpFileName_.isEmpty() == false)
             {
                 QFile epsrFile(workingDir_+epsrInpFileName_);
                 epsrFile.remove();
@@ -2159,7 +2169,7 @@ void MainWindow::timerEvent(QTimerEvent *event)
             QDateTime jmolModTime;
             jmolModTime = jmolFileInfo.lastModified();
             QDateTime dateTimeNow = QDateTime::currentDateTime();
-            if (jmolModTime > dateTimeNow.addSecs(-2))
+            if (jmolModTime > dateTimeNow.addSecs(-1))
             {
                 makeMolFile();   //timer killed in mixato and addato
             }
