@@ -1137,7 +1137,7 @@ bool MainWindow::readMolFile()
         double atomTypeCharge = QString(atomTypeChargeStr).toDouble();
         molChargeCalcd = molChargeCalcd+(ctr*atomTypeCharge);
     }
-    if (ljAtoms.isEmpty())
+    if (atomLabels.isEmpty())
     {
         ui.molChargeLabel->setText("not available");
         QTableWidgetItem *item = new QTableWidgetItem("n/a");
