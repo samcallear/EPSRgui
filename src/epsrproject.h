@@ -17,6 +17,7 @@ class MakeAtomDialog;
 class MakeLatticeDialog;
 class BoxCompositionDialog;
 class AddAtoDialog;
+class ImportDialog;
 
 class MainWindow : public QMainWindow
 {
@@ -56,7 +57,6 @@ private slots:
 
 private:
     void createActions();
-    bool saveFile();
     void reset();
     void readSettings();
 

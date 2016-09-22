@@ -19,7 +19,8 @@ FORMS += src/addatodialog.ui \
          src/messagesdialog.ui \
          src/moloptionsdialog.ui \
          src/plotdialog.ui \
-         src/settingsdialog.ui
+         src/settingsdialog.ui \
+    src/importdialog.ui
 HEADERS += src/addatodialog.h \
            src/array.h \
            src/boxcompositiondialog.h \
@@ -34,7 +35,8 @@ HEADERS += src/addatodialog.h \
            src/plotdialog.h \
            src/qcustomplot.h \
            src/settingsdialog.h \
-           src/wtscomponent.h
+           src/wtscomponent.h \
+    src/importdialog.h
 SOURCES += src/addatodialog_funcs.cpp \
            src/boxatofile.cpp \
            src/boxcompositiondialog_funcs.cpp \
@@ -55,5 +57,6 @@ SOURCES += src/addatodialog_funcs.cpp \
            src/settingsdialog_funcs.cpp \
            src/setupepsr.cpp \
            src/wtscomponent.cpp \
-           src/wtsfiles.cpp
+           src/wtsfiles.cpp \
+    src/importdialog_funcs.cpp
 RESOURCES += src/EPSRproject.qrc

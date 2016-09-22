@@ -9,6 +9,7 @@
 #include "boxcompositiondialog.h"
 #include "addatodialog.h"
 #include "messagesdialog.h"
+#include "importdialog.h"
 
 #include <QtGui>
 #include <QMainWindow>
@@ -29,7 +30,7 @@ MainWindow::MainWindow(QMainWindow *parent) : QMainWindow(parent), messagesDialo
 {
     ui.setupUi(this);
 
-    exeDir_=QDir::currentPath();
+    exeDir_ = QDir::currentPath();
 
     createActions();
 
@@ -631,10 +632,10 @@ void MainWindow::open()
         this->setWindowTitle("EPSRgui: "+projectName_);
 
         //plot data if present
-        if (!atoFileName_.isEmpty())
+        if (!epsrInpFileName_.isEmpty())
         {
             QString atoBaseFileName = atoFileName_.split(".",QString::SkipEmptyParts).at(0);
-            if (QFile::exists(atoBaseFileName+".EPSR.u01") && !dataFileList.isEmpty())
+            if (QFile::exists(atoBaseFileName+".EPSR.u01")) //this was also included but not sure why: && !dataFileList.isEmpty())
             {
                 plot1();
             }
@@ -649,11 +650,6 @@ void MainWindow::open()
 }
 
 bool MainWindow::save()
-{
-    return saveFile();
-}
-
-bool MainWindow::saveFile()
 {
     QString saveFileName = workingDir_+projectName_+".EPSR.pro";
     QFile file(saveFileName);
@@ -790,7 +786,7 @@ bool MainWindow::saveAs()
         {
             for (int i = 0; i < ui.molFileList->count(); i++)
             {
-                streamWrite << "mol " << ui.molFileList->item(i)->text().split(".",QString::SkipEmptyParts).at(0)
+                streamWrite << "mol " << ui.molFileList->item(i)->text()
                             << " " << ui.atoFileTable->item(i,2)->text() << "\n";
             }
         }
@@ -989,7 +985,7 @@ bool MainWindow::saveAs()
         }
 
 //        //ensure current settings are saved to .pro file - this is already done when writing .pro file
-//        saveFile();
+//        save();
 
         //change window title to contain projectName
         this->setWindowTitle("EPSRgui: "+projectName_);
@@ -1064,7 +1060,7 @@ bool MainWindow::saveCopy()
         {
             for (int i = 0; i < ui.molFileList->count(); i++)
             {
-                streamWrite << "mol " << ui.molFileList->item(i)->text().split(".",QString::SkipEmptyParts).at(0)
+                streamWrite << "mol " << ui.molFileList->item(i)->text()
                             << " " << ui.atoFileTable->item(i,2)->text() << "\n";
             }
         }
@@ -1214,6 +1210,36 @@ bool MainWindow::saveCopy()
             fileRead.close();
         }
 
+        //update EPSR script file - this only works if box is projectName_+"box" ***********************************
+#ifdef _WIN32
+        QFile batFile(workingDirCopy+"run"+projectNameCopy+"box.bat");
+#else
+        QFile batFile(workingDirCopy+"run"+projectNameCopy+"box.sh");
+#endif
+        if (batFile.exists() == true)
+        {
+            if (!batFile.open(QFile::ReadWrite | QFile::Text))
+            {
+                QMessageBox msgBox;
+                msgBox.setText("Could not open script file to edit.");
+                msgBox.exec();
+                return false;
+            }
+
+            QTextStream stream(&batFile);
+            QString line;
+            QString original;
+
+            do {
+                line = stream.readLine();
+                line.replace(projectName_, projectNameCopy);
+                original.append(line+"\n");
+            } while (!line.isNull());
+            batFile.resize(0);
+            stream << original;
+            batFile.close();
+        }
+
         messageText_ += "Copied EPSR project to "+workingDirCopy+"\n";
         messagesDialog.refreshMessages();
         ui.messagesLineEdit->setText("Copied current EPSR project to "+workingDirCopy);
@@ -1321,6 +1347,7 @@ void MainWindow::runEPSR()
     ui.openAct->setEnabled(false);
     ui.saveAsAct->setEnabled(false);
     ui.saveCopyAct->setEnabled(false);
+    ui.exitAct->setEnabled(false);
     ui.deleteBoxAtoFileAct->setEnabled(false);
     ui.deleteEPSRinpFileAct->setEnabled(false);
 
@@ -1428,6 +1455,7 @@ void MainWindow::enableButtons()
     ui.openAct->setEnabled(true);
     ui.saveAsAct->setEnabled(true);
     ui.saveCopyAct->setEnabled(true);
+    ui.exitAct->setEnabled(true);
     ui.deleteBoxAtoFileAct->setEnabled(true);
     ui.deleteEPSRinpFileAct->setEnabled(true);
 
@@ -1876,7 +1904,11 @@ void MainWindow::deleteEPSRinpFile()
         else
         {
             QDir dir(workingDir_);
-            dir.setNameFilters(QStringList() << "*.EPSR.*");
+#ifdef _WIN32
+            dir.setNameFilters(QStringList() << "*.EPSR.*" << "run*.bat");
+#else
+            dir.setNameFilters(QStringList() << "*.EPSR.*" << "run*.sh");
+#endif
             dir.setFilter(QDir::Files);
             foreach (QString EPSRfile, dir.entryList())
             {
@@ -1893,6 +1925,11 @@ void MainWindow::deleteEPSRinpFile()
             ui.minDistanceTable->clearContents();
             ui.minDistanceTable->setRowCount(0);
             epsrInpFileName_.clear();
+            ui.dataFileTable->clearContents();
+            ui.dataFileTable->setRowCount(0);
+            ui.atomWtsTable->clearContents();
+            ui.atomWtsTable->setRowCount(0);
+            ui.dlputilsOutCheckBox->setChecked(false);
 
             //clear plots
             ui.plot1->clearGraphs();
@@ -1920,6 +1957,8 @@ void MainWindow::deleteEPSRinpFile()
             messageText_ += "EPSR .inp file deleted\n";
             messagesDialog.refreshMessages();
             ui.messagesLineEdit->setText("EPSR .inp file deleted");
+
+            save();
         }
     }
     return;
@@ -1984,14 +2023,56 @@ void MainWindow::deleteBoxAtoFile()
             //remove inp file and clear name if exists
             if (epsrInpFileName_.isEmpty() == false)
             {
-                QFile epsrFile(workingDir_+epsrInpFileName_);
-                epsrFile.remove();
+                QDir dir(workingDir_);
+    #ifdef _WIN32
+                dir.setNameFilters(QStringList() << "*.EPSR.*" << "run*.bat");
+    #else
+                dir.setNameFilters(QStringList() << "*.EPSR.*" << "run*.sh");
+    #endif
+                dir.setFilter(QDir::Files);
+                foreach (QString EPSRfile, dir.entryList())
+                {
+                    dir.remove(EPSRfile);
+                }
                 epsrInpFileName_.clear();
                 ui.epsrInpFileName->clear();
                 ui.inpSettingsTable->clearContents();
+                ui.inpSettingsTable->setRowCount(0);
                 ui.dataFileSettingsTable->clearContents();
+                ui.dataFileSettingsTable->setRowCount(0);
                 ui.pcofSettingsTable->clearContents();
+                ui.pcofSettingsTable->setRowCount(0);
                 ui.minDistanceTable->clearContents();
+                ui.minDistanceTable->setRowCount(0);
+                epsrInpFileName_.clear();
+                ui.dataFileTable->clearContents();
+                ui.dataFileTable->setRowCount(0);
+                ui.atomWtsTable->clearContents();
+                ui.atomWtsTable->setRowCount(0);
+                ui.dlputilsOutCheckBox->setChecked(false);
+
+                //clear plots
+                ui.plot1->clearGraphs();
+                ui.plot1->clearItems();
+                ui.plot1->replot();
+                ui.plot2->clearGraphs();
+                ui.plot2->clearItems();
+                ui.plot2->replot();
+
+                //enable/disable buttons
+                ui.runAct->setEnabled(false);
+                ui.stopAct->setEnabled(false);
+                ui.plotAct->setEnabled(false);
+                ui.plot1Button->setEnabled(false);
+                ui.plot2Button->setEnabled(false);
+                ui.plotEPSRshellAct->setEnabled(false);
+                ui.dataFileBrowseButton->setEnabled(true);
+                ui.removeDataFileButton->setEnabled(true);
+                ui.updateInpPcofFilesButton->setEnabled(false);
+                ui.reloadEPSRinpButton->setEnabled(false);
+                ui.setupOutButton->setEnabled(false);
+                ui.applyOutputsButton->setEnabled(false);
+                ui.dlputilsOutCheckBox->setEnabled(false);
             }
 
             //enable/disable buttons
@@ -2018,6 +2099,8 @@ void MainWindow::deleteBoxAtoFile()
             ui.plot2->clearGraphs();
             ui.plot2->clearItems();
             ui.plot2->replot();
+
+            save();
 
             messageText_ += "box .ato file deleted\n";
             messagesDialog.refreshMessages();
