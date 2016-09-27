@@ -92,6 +92,10 @@ void MainWindow::on_dataFileBrowseButton_clicked(bool checked)
         }
     }
     ui.makeWtsButton->setEnabled(true);
+
+    //save .pro file
+    save();
+
     ui.messagesLineEdit->setText("New data file added");
 }
 
@@ -357,6 +361,9 @@ void MainWindow::on_makeWtsButton_clicked(bool checked)
         ui.setupEPSRButton->setEnabled(true);
         ui.messagesLineEdit->setText("XWTS wts file created");
     }
+
+    //save .pro file
+    save();
 }
 
 void MainWindow::makeNwts()
@@ -681,5 +688,9 @@ void MainWindow::on_removeDataFileButton_clicked(bool checked)
         ui.dataFileTable->removeRow(0);
         ui.makeWtsButton->setEnabled(false);
     }
+
+    //save .pro file
+    save();
+
     ui.messagesLineEdit->setText("Data file removed");
 }

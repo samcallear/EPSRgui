@@ -538,8 +538,15 @@ void MainWindow::open()
                 }
                 if (dataLine.at(0) == "wts")
                 {
-                     wtsFileList.append(dataLine.at(1));
-                     ui.setupEPSRButton->setEnabled(true);
+                    if (dataLine.count() == 2)
+                    {
+                        wtsFileList.append(dataLine.at(1));
+                        ui.setupEPSRButton->setEnabled(true);
+                    }
+                    else
+                    {
+                        wtsFileList.append(" ");
+                    }
                 }
                 if (dataLine.at(0) == "EPSRinp")
                 {
@@ -571,10 +578,29 @@ void MainWindow::open()
                     //Activate available outputs list
                     getOutputType();
                     getOutputsRunning();
-                }
-                if (dataLine.at(0) == "dlputils")
-                {
-                    ui.dlputilsOutCheckBox->setChecked(true);
+                    //open .bat file to check if dlputils line is in there
+                    QString atoBaseFileName = atoFileName_.split(".",QString::SkipEmptyParts).at(0);
+                #ifdef _WIN32
+                    QFile batFile(workingDir_+"run"+atoBaseFileName+".bat");
+                #else
+                    QFile batFile(workingDir_+"run"+atoBaseFileName+".sh");
+                #endif
+                    if (batFile.exists() == true)
+                    {
+                        if (batFile.open(QFile::ReadWrite | QFile::Text))
+                        {
+                            QTextStream batstream(&batFile);
+                            QString batline;
+                            do {
+                                batline = batstream.readLine();
+                                if(batline.contains("writexyz"))
+                                {
+                                    ui.dlputilsOutCheckBox->setChecked(true);
+                                }
+                            } while (!batline.isNull());
+                            batFile.close();
+                        }
+                    }
                 }
             }
         } while (!stream.atEnd());
@@ -700,17 +726,17 @@ bool MainWindow::save()
         streamWrite << "EPSRinp " << atoBaseFileName << "\n";
     }
 
-    //Additional options
-    if (ui.dlputilsOutCheckBox->isChecked())
-    {
-        streamWrite << "dlputils" << "\n";
-    }
+//    //Additional options
+//    if (ui.dlputilsOutCheckBox->isChecked())
+//    {
+//        streamWrite << "dlputils" << "\n";
+//    }
 
     file.close();
 
-    messageText_ += "Current EPSR project settings saved to "+projectName_+".EPSR.pro\n";
-    messagesDialog.refreshMessages();
-    ui.messagesLineEdit->setText("Saved current EPSR project");
+//    messageText_ += "Current EPSR project settings saved to "+projectName_+".EPSR.pro\n";
+//    messagesDialog.refreshMessages();
+//    ui.messagesLineEdit->setText("Saved current EPSR project");
     return false;
 
     if (!epsrInpFileName_.isEmpty())

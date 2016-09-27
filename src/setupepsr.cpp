@@ -92,6 +92,9 @@ void MainWindow::on_setupEPSRButton_clicked(bool checked)
     ui.dlputilsOutCheckBox->setEnabled(true);
     ui.deleteEPSRinpFileAct->setEnabled(true);
 
+    //save .pro file
+    save();
+
     messagesDialog.refreshMessages();
     ui.messagesLineEdit->setText("EPSR .inp file created");
 }

@@ -109,6 +109,9 @@ void MainWindow::on_mixatoButton_clicked(bool checked)
 
         ui.deleteBoxAtoFileAct->setEnabled(true);
 
+        //save .pro file
+        save();
+
         killTimer(newJmolTimerId_);
         newJmolTimerId_ = -1;
     }
@@ -263,6 +266,9 @@ void MainWindow::on_addatoButton_clicked(bool checked)
 
         ui.deleteBoxAtoFileAct->setEnabled(true);
 
+        //save .pro file
+        save();
+
         killTimer(newJmolTimerId_);
         newJmolTimerId_ = -1;
     }
@@ -321,6 +327,9 @@ void MainWindow::on_loadBoxButton_clicked (bool checked)
         ui.atoEPSRButton->setEnabled(true);
         ui.dataFileBrowseButton->setEnabled(true);
         ui.removeDataFileButton->setEnabled(true);
+
+        //save .pro file
+        save();
 
         ui.deleteBoxAtoFileAct->setEnabled(true);
     }

@@ -183,6 +183,9 @@ void MainWindow::makeMolFile()
         ui.atoFileTable->setItem(nMolFiles-1,2, new QTableWidgetItem("0"));
     }
 
+    //save .pro file
+    save();
+
     //set current mol file (reads mol file and updates bond distance/angles/etc tables
     ui.molFileList->setCurrentRow(nMolFiles-1);
 
@@ -274,6 +277,9 @@ void MainWindow::on_molFileLoadButton_clicked(bool checked)
             ui.atoFileTable->setItem(nMolFiles-1,0, item);
             ui.atoFileTable->setItem(nMolFiles-1,2, new QTableWidgetItem("0"));
         }
+
+        //save .pro file
+        save();
 
         //set current mol file (reads mol file and updates bond distance/angles/etc tables
         ui.molFileList->setCurrentRow(nMolFiles-1);
@@ -416,6 +422,9 @@ void MainWindow::on_createAtomButton_clicked(bool checked)
             ui.atoFileTable->setItem(nMolFiles-1,2, new QTableWidgetItem("0"));
         }
 
+        //save .pro file
+        save();
+
         //set current mol file (reads mol file and updates bond distance/angles/etc tables
         ui.molFileList->setCurrentRow(nMolFiles-1);
 
@@ -551,7 +560,7 @@ void MainWindow::on_createLatticeButton_clicked(bool checked)
                             << "dihtemp  0.100000E+02\n"
                             << "ecoredcore    0.00000    1.00000\n"
                             << "density  0.1\n";
-                fileWrite.close();
+                fileWrite.close();          
 
                 QString projDir = workingDir_;
                 projDir = QDir::toNativeSeparators(projDir);
@@ -628,7 +637,7 @@ void MainWindow::on_createLatticeButton_clicked(bool checked)
                 ui.atoFileTable->setItem(i,1, new QTableWidgetItem(atomCharges.at(i)));
                 ui.atoFileTable->setItem(i,2, new QTableWidgetItem(QString::number(numberAtomLabels.at(i))));
             }
-            checkBoxCharge();
+            checkBoxCharge();                      
         }
 
         // otherwise use lattice as a component **NB** This is the only workflow that doesn't use a .mol file.
@@ -661,6 +670,9 @@ void MainWindow::on_createLatticeButton_clicked(bool checked)
                 ui.loadBoxButton->setDisabled(true);
             }
         }
+
+        //save .pro file
+        save();
 
         //set mol file table to select last item and update mol tables(runs via 'selectionChanged' signal)
         nMolFiles = ui.molFileList->count();
@@ -808,6 +820,10 @@ void MainWindow::on_removeMolFileButton_clicked(bool checked)
         ui.mixatoButton->setEnabled(false);
         ui.addatoButton->setEnabled(false);
     }
+
+    //save .pro file
+    save();
+
     ui.messagesLineEdit->setText(".mol file removed");
 }
 
