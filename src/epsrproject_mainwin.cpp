@@ -1281,26 +1281,112 @@ void MainWindow::runEPSRcheck()
     //check everything required is present in the folder???*********************************************************************************************
 
     QDir::setCurrent(workingDir_);
-
+    QProcess processrunEPSRcheck;
     QString atoBaseFileName = atoFileName_.split(".",QString::SkipEmptyParts).at(0);
 
 #ifdef _WIN32
-    processEPSR_.start(epsrBinDir_+"epsr.exe", QStringList() << workingDir_ << "epsr" << atoBaseFileName);
+    processrunEPSRcheck.startDetached(epsrBinDir_+"epsr.exe", QStringList() << workingDir_ << "epsr" << atoBaseFileName);
 #else
-    processEPSR_.start(epsrBinDir_+"epsr", QStringList() << workingDir_ << "epsr" << atoBaseFileName);
+    processrunEPSRcheck.startDetached(epsrBinDir_+"epsr", QStringList() << workingDir_ << "epsr" << atoBaseFileName);
 #endif
-    if (!processEPSR_.waitForStarted()) return;
-    if (!processEPSR_.waitForFinished(1800000)) return;
 
-    ui.messagesLineEdit->setText("EPSR check finished");
+    //show EPSR is running
+    ui.epsrRunningSign->setText("EPSR running");
+    ui.epsrRunningSign->setEnabled(true);
+    ui.stopAct->setEnabled(true);
+    ui.runAct->setEnabled(false);
+    ui.checkAct->setEnabled(false);
 
+    //disable editing buttons while EPSR is running
+    ui.newAct->setEnabled(false);
+    ui.openAct->setEnabled(false);
+    ui.saveAsAct->setEnabled(false);
+    ui.saveCopyAct->setEnabled(false);
+    ui.exitAct->setEnabled(false);
+    ui.deleteBoxAtoFileAct->setEnabled(false);
+    ui.deleteEPSRinpFileAct->setEnabled(false);
+
+    ui.updateMolFileButton->setDisabled(true);
+    ui.updateAtoFileButton->setDisabled(true);
+    ui.randomiseButton->setDisabled(true);
+    ui.fmoleButton->setDisabled(true);
+    ui.atoEPSRButton->setDisabled(true);
+    ui.makeWtsButton->setDisabled(true);
+
+    ui.createMolFileButton->setEnabled(false);
+    ui.molFileLoadButton->setEnabled(false);
+    ui.createAtomButton->setEnabled(false);
+    ui.createLatticeButton->setEnabled(false);
+    ui.makeMolExtButton->setEnabled(false);
+    ui.dockatoButton->setEnabled(false);
+    ui.makelatticeatoButton->setEnabled(false);
+    ui.removeMolFileButton->setEnabled(false);
+    ui.addLJRowAboveButton->setEnabled(false);
+    ui.addLJRowBelowButton->setEnabled(false);
+    ui.deleteLJRowButton->setEnabled(false);
+    ui.addDistRowAboveButton->setEnabled(false);
+    ui.addDistRowBelowButton->setEnabled(false);
+    ui.deleteDistRowButton->setEnabled(false);
+    ui.addAngRowAboveButton->setEnabled(false);
+    ui.addAngRowBelowButton->setEnabled(false);
+    ui.deleteAngRowButton->setEnabled(false);
+    ui.addDihRowAboveButton->setEnabled(false);
+    ui.addDihRowBelowButton->setEnabled(false);
+    ui.deleteDihRowButton->setEnabled(false);
+    ui.deleteDihAllButton->setEnabled(false);
+    ui.addRotRowAboveButton->setEnabled(false);
+    ui.addRotRowBelowButton->setEnabled(false);
+    ui.deleteRotRowButton->setEnabled(false);
+    ui.deleteRotAllButton->setEnabled(false);
+    ui.molChangeAtobutton->setEnabled(false);
+    ui.molFmoleButton->setEnabled(false);
+    ui.mixatoButton->setEnabled(false);
+    ui.addatoButton->setEnabled(false);
+    ui.loadBoxButton->setEnabled(false);
+    ui.dataFileBrowseButton->setEnabled(false);
+    ui.removeDataFileButton->setEnabled(false);
+    ui.setupEPSRButton->setEnabled(false);
+    ui.updateInpPcofFilesButton->setEnabled(false);
+    ui.setupOutButton->setEnabled(false);
+    ui.applyOutputsButton->setEnabled(false);
+    ui.addOutputButton->setEnabled(false);
+    ui.removeOutputButton->setEnabled(false);
+    ui.dlputilsOutCheckBox->setEnabled(false);
+
+    ui.messagesLineEdit->setText("EPSR is running for 1 iteration");
+    messageText_ += "\nEPSR is running for 1 iteration in a terminal window.\n";
+    messagesDialog.refreshMessages();
+
+    //enable plotting as data files should now exist ************if this is clicked before files exist does program crash?
+    ui.inpSettingsTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    ui.dataFileSettingsTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    ui.pcofSettingsTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    ui.minDistanceTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
     ui.plot1Button->setEnabled(true);
     ui.plot2Button->setEnabled(true);
 
-    readEPSRinpFile();
-    readEPSRpcofFile();
-    updateInpFileTables();
-    updatePcofFileTables();
+    // kill any other timers that might be still running if a setup was quit but not saved
+    killTimer(outputTimerId_);
+    outputTimerId_ = -1;
+    killTimer(newJmolTimerId_);
+    newJmolTimerId_ = -1;
+    killTimer(molChangeatoFinishedTimerId_);
+    molChangeatoFinishedTimerId_ = -1;
+    killTimer(changeatoFinishedTimerId_);
+    changeatoFinishedTimerId_ = -1;
+
+    //use the killepsr file to determine when epsr has finished and run enableButtons() once it has
+    QFile file(workingDir_+"killepsr");
+    if(!file.open(QFile::WriteOnly))
+    {
+        QMessageBox msgBox;
+        msgBox.setText("Could not stop EPSR script");
+        msgBox.exec();
+        return;
+    }
+    file.close();
+    epsrFinished_.addPath(workingDir_+"killepsr");
+    file.remove();
 }
 
 void MainWindow::runEPSR()

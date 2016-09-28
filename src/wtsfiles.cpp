@@ -39,7 +39,7 @@ void MainWindow::on_dataFileBrowseButton_clicked(bool checked)
             if (ui.dataFileTable->item(i,0)->text() == dataFileName)
             {
                 QMessageBox msgBox;
-                msgBox.setText("This data file is already listed as in the project.");
+                msgBox.setText("This data file is already listed in the project.");
                 msgBox.exec();
                 return;
             }
@@ -92,6 +92,7 @@ void MainWindow::on_dataFileBrowseButton_clicked(bool checked)
         }
     }
     ui.makeWtsButton->setEnabled(true);
+    ui.setupEPSRButton->setEnabled(true);
 
     //save .pro file
     save();
@@ -352,13 +353,11 @@ void MainWindow::on_makeWtsButton_clicked(bool checked)
     if (QFile::exists(workingDir_+wtsBaseFileName_+".NWTS.dat"))
     {
         makeNwts();
-        ui.setupEPSRButton->setEnabled(true);
         ui.messagesLineEdit->setText("NWTS wts file created");
     }
     if (QFile::exists(workingDir_+wtsBaseFileName_+".XWTS.dat"))
     {
         makeXwts();
-        ui.setupEPSRButton->setEnabled(true);
         ui.messagesLineEdit->setText("XWTS wts file created");
     }
 
@@ -687,6 +686,7 @@ void MainWindow::on_removeDataFileButton_clicked(bool checked)
         ui.atomWtsTable->setRowCount(0);
         ui.dataFileTable->removeRow(0);
         ui.makeWtsButton->setEnabled(false);
+        ui.setupEPSRButton->setEnabled(false);
     }
 
     //save .pro file

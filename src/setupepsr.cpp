@@ -18,7 +18,7 @@ void MainWindow::on_setupEPSRButton_clicked(bool checked)
         return;
     }
 
-    //set epsrInFileName_
+    //set epsrInpFileName_
     QDir::setCurrent(workingDir_);
     QString atoBaseFileName = atoFileName_.split(".",QString::SkipEmptyParts).at(0);
     epsrInpFileName_ = atoBaseFileName+".EPSR.inp";

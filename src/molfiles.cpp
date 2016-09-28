@@ -787,6 +787,7 @@ void MainWindow::on_removeMolFileButton_clicked(bool checked)
             ui.molFileList->takeItem(row);
             setSelectedMolFile();
             ui.atoFileTable->removeRow(row);
+            nMolFiles = ui.molFileList->count();
     }
     else
     {
