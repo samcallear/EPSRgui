@@ -73,20 +73,20 @@ MainWindow::MainWindow(QMainWindow *parent) : QMainWindow(parent), messagesDialo
 
 void MainWindow::createActions()
 {
-    ui.newAct->setStatusTip(tr("Create a new EPSR Project"));
+    ui.newAct->setStatusTip(tr("Create a new EPSR project"));
     connect(ui.newAct, SIGNAL(triggered()), this, SLOT(createNew()));
 
-    ui.openAct->setStatusTip(tr("Open an existing EPSR Project"));
+    ui.openAct->setStatusTip(tr("Open an existing EPSR project"));
     connect(ui.openAct, SIGNAL(triggered()), this, SLOT(open()));
 
-    ui.saveAct->setStatusTip(tr("Save the current EPSR Project"));
-    connect(ui.saveAct, SIGNAL(triggered()), this, SLOT(save()));
+//    ui.saveAct->setStatusTip(tr("Save the current EPSR project"));
+//    connect(ui.saveAct, SIGNAL(triggered()), this, SLOT(save()));
 
-    ui.saveAsAct->setStatusTip(tr("Make a copy of the current EPSR Project"));
+    ui.saveAsAct->setStatusTip(tr("Save the current EPSR project as a different name"));
     connect(ui.saveAsAct, SIGNAL(triggered()), this, SLOT(saveAs()));
 
-    ui.saveCopyAct->setStatusTip(tr("Save the current EPSR Project"));
-    connect(ui.saveCopyAct, SIGNAL(triggered()), this, SLOT(saveCopy()));
+//    ui.saveCopyAct->setStatusTip(tr("Save the current EPSR project"));
+//    connect(ui.saveCopyAct, SIGNAL(triggered()), this, SLOT(saveCopy()));
 
     ui.exitAct->setStatusTip(tr("Exit the application"));
     connect(ui.exitAct, SIGNAL(triggered()), this, SLOT(close()));
@@ -261,9 +261,9 @@ void MainWindow::createNew()
         ui.tabWidget->setEnabled(true);
 
         //activate menu options
-        ui.saveAct->setEnabled(true);
+//        ui.saveAct->setEnabled(true);
         ui.saveAsAct->setEnabled(true);
-        ui.saveCopyAct->setEnabled(true);
+//        ui.saveCopyAct->setEnabled(true);
         ui.epsrManualAct->setEnabled(true);
 
         //activate buttons (in case disabled from previous project)
@@ -422,9 +422,9 @@ void MainWindow::reset()
     ui.plot2->replot();
 
     //disable menu actions
-    ui.saveAct->setEnabled(false);
+//    ui.saveAct->setEnabled(false);
     ui.saveAsAct->setEnabled(false);
-    ui.saveCopyAct->setEnabled(false);
+//    ui.saveCopyAct->setEnabled(false);
     ui.checkAct->setEnabled(false);
     ui.runAct->setEnabled(false);
     ui.stopAct->setEnabled(false);
@@ -649,9 +649,9 @@ void MainWindow::open()
         ui.tabWidget->setEnabled(true);
 
         //activate menu options
-        ui.saveAct->setEnabled(true);
+//        ui.saveAct->setEnabled(true);
         ui.saveAsAct->setEnabled(true);
-        ui.saveCopyAct->setEnabled(true);
+//        ui.saveCopyAct->setEnabled(true);
         ui.epsrManualAct->setEnabled(true);
 
         //change window title to contain projectName

@@ -3006,9 +3006,7 @@
     </property>
     <addaction name="newAct"/>
     <addaction name="openAct"/>
-    <addaction name="saveAct"/>
     <addaction name="saveAsAct"/>
-    <addaction name="saveCopyAct"/>
     <addaction name="separator"/>
     <addaction name="exitAct"/>
    </widget>
