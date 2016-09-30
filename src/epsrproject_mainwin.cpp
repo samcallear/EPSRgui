@@ -273,19 +273,21 @@ void MainWindow::createNew()
         projectName_ = createNewDialog.getEPSRname();
         epsrDir_ = createNewDialog.getEPSRdir();
         epsrDir_ = QDir::toNativeSeparators(epsrDir_);
+        epsrBinDir_ = (epsrDir_+"/bin/");
+        epsrBinDir_ = QDir::toNativeSeparators(epsrBinDir_);
         workingDir_ = (epsrDir_+"/run/"+projectName_+"/");
         workingDir_ = QDir::toNativeSeparators(workingDir_);
         if (!QDir(workingDir_).exists())
         {
             QDir().mkdir(workingDir_);
         }
+
         messageText_ += "\n***************************************************************************\n";
         messageText_ += "Current EPSR project name is "+projectName_+"\n";
         messageText_ += "Current working directory is "+workingDir_+"\n";
-        QDir::setCurrent(workingDir_);
-        epsrBinDir_ = (epsrDir_+"/bin/");
-        epsrBinDir_ = QDir::toNativeSeparators(epsrBinDir_);
         messageText_ += "Current EPSR binaries directory is "+epsrBinDir_+"\n";
+
+        QDir::setCurrent(workingDir_);
 
         //make .EPSR.pro file
         QString epsrProFile = workingDir_+"/"+projectName_+".EPSR.pro";
@@ -502,17 +504,19 @@ void MainWindow::open()
         reset();
 
         // set file directories
-        messageText_ += "\n***************************************************************************\n";
         projectName_ = QFileInfo(newFileName).baseName();
-        messageText_ += "Current EPSR project name is "+projectName_+"\n";
         workingDir_ = QFileInfo(newFileName).path()+"/";
         workingDir_ = QDir::toNativeSeparators(workingDir_);
-        messageText_ += "Current working directory is "+workingDir_+"\n";
-        QDir::setCurrent(workingDir_);
         epsrDir_ = workingDir_.split("run",QString::SkipEmptyParts).at(0);
         epsrBinDir_ = (epsrDir_+"bin/");
         epsrBinDir_ = QDir::toNativeSeparators(epsrBinDir_);
+
+        messageText_ += "\n***************************************************************************\n";
+        messageText_ += "Current EPSR project name is "+projectName_+"\n";
+        messageText_ += "Current working directory is "+workingDir_+"\n";
         messageText_ += "Current EPSR binaries directory is "+epsrBinDir_+"\n";
+
+        QDir::setCurrent(workingDir_);
 
         //read in EPSR pro file
         QFile file(newFileName);
@@ -2406,6 +2410,7 @@ void MainWindow::timerEvent(QTimerEvent *event)
     if (event->timerId() == newJmolTimerId_)
     {
         QDir dir;
+        dir.setPath(workingDir_);
         dir.setSorting(QDir::Time);
         QStringList jmolFilter;
         jmolFilter << "*.jmol";

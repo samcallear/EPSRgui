@@ -54,6 +54,7 @@ void MainWindow::makeMolFile()
 {
     //find most recently modified *.jmol file
     QDir dir;
+    dir.setPath(workingDir_);
     dir.setSorting(QDir::Time);
     QStringList jmolFilter;
     jmolFilter << "*.jmol";
