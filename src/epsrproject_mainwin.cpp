@@ -166,7 +166,29 @@ void MainWindow::createActions()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    //stopEPSR();     WANT TO STOP EPSR HERE IF RUNNING BUT THIS IS NOT HOW TO DO IT!!!!!!!!!!
+    if (ui.epsrRunningSign->isEnabled() == true)
+    {
+        QMessageBox::StandardButton msgBox;
+        msgBox  = QMessageBox::question(this, "Warning", "EPSR is currently running. \nTo close EPSRgui and stop EPSR at the end of the current iteration, click OK.",
+                                        QMessageBox::Ok|QMessageBox::Cancel);
+        if (msgBox == QMessageBox::Cancel)
+        {
+            event->ignore();
+            return;
+        }
+        else
+        {
+            QFile file(workingDir_+"killepsr");
+            if(!file.open(QFile::WriteOnly))
+            {
+                QMessageBox msgBox;
+                msgBox.setText("Could not stop EPSR script");
+                msgBox.exec();
+                return;
+            }
+            file.close();
+        }
+    }
 
     //delete plotting .bat/.sh files
     QDir::setCurrent(workingDir_);
