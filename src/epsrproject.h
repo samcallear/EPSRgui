@@ -176,6 +176,8 @@ private slots:
     void on_atoEPSRButton_clicked(bool checked);
     void on_viewAtoFileButton_clicked(bool checked);
     void on_boxCompositionButton_clicked(bool checked);
+    void on_SSbutton_clicked(bool checked);
+    void on_tetherButton_clicked(bool checked);
 
 private:
     bool readAtoFileBoxDetails();

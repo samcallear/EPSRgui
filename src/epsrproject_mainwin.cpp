@@ -40,8 +40,35 @@ MainWindow::MainWindow(QMainWindow *parent) : QMainWindow(parent), messagesDialo
 
     ui.fileMenu->setFocus();
 
+    //set accepted characters in box tab
     QRegExp numberDensityrx("^\\d*\\.?\\d*$");
     ui.numberDensityLineEdit->setValidator((new QRegExpValidator(numberDensityrx, this)));
+    QRegExp noNegIntrx("^\\d*$");
+    QRegExp onlyIntrx("^\\-?\\d*$");
+    QRegExp threeIntrx("^\\d*\\ \\d*\\ \\d*$");
+    ui.plotAtoCentreLineEdit->setValidator((new QRegExpValidator(noNegIntrx, this)));
+    ui.plotAtoMaxXLineEdit->setValidator((new QRegExpValidator(onlyIntrx, this)));
+    ui.plotAtoMaxYLineEdit->setValidator((new QRegExpValidator(onlyIntrx, this)));
+    ui.plotAtoMaxZLineEdit->setValidator((new QRegExpValidator(onlyIntrx, this)));
+    ui.plotAtoMinZLineEdit->setValidator((new QRegExpValidator(onlyIntrx, this)));
+    ui.plotAtoRotLineEdit->setValidator((new QRegExpValidator(threeIntrx, this)));
+    ui.fmoleLineEdit->setValidator((new QRegExpValidator(noNegIntrx, this)));
+    QRegExp decOrErx("[-+]?[0-9]*[.]?[0-9]+([eE][-+]?[0-9]+)?");
+    ui.atoTetherTolLineEdit->setValidator((new QRegExpValidator(decOrErx, this)));
+    ui.temperatureLineEdit->setValidator((new QRegExpValidator(decOrErx, this)));
+    ui.vibtempLineEdit->setValidator((new QRegExpValidator(decOrErx, this)));
+    ui.angtempLineEdit->setValidator((new QRegExpValidator(decOrErx, this)));
+    ui.dihtempLineEdit->setValidator((new QRegExpValidator(decOrErx, this)));
+    ui.intraTransSSLineEdit->setValidator((new QRegExpValidator(decOrErx, this)));
+    ui.grpRotSSLineEdit->setValidator((new QRegExpValidator(decOrErx, this)));
+    ui.molRotSSLineEdit->setValidator((new QRegExpValidator(decOrErx, this)));
+    ui.molTransSSLineEdit->setValidator((new QRegExpValidator(decOrErx, this)));
+    ui.ecoreLineEdit->setValidator((new QRegExpValidator(decOrErx, this)));
+    ui.dcoreLineEdit->setValidator((new QRegExpValidator(decOrErx, this)));
+
+    //hide ss and tether Grp Boxes
+    ui.SSgrpBox->setVisible(false);
+    ui.tetherGrpBox->setVisible(false);
 
     ui.normalisationComboBox->setCurrentIndex(0);
     ui.plotComboBox1->setCurrentIndex(0);
@@ -193,7 +220,8 @@ void MainWindow::readSettings()
             if (dataLine.at(0) == "EPSRdir")
             {
                 currentDir = dataLine.at(1);
-                epsrDir_ = dataLine.at(1);
+                epsrDir_ = dataLine.at(1)+"/";
+                epsrDir_ = QDir::toNativeSeparators(epsrDir_);
             }
             if (dataLine.at(0) == "visualiser")
             {
@@ -437,9 +465,12 @@ void MainWindow::reset()
 
 void MainWindow::open()
 {
+    QString runDir;
     if (!epsrDir_.isEmpty())
     {
-        currentDir.setPath(epsrDir_);
+        runDir = epsrDir_+"run/";
+        runDir = QDir::toNativeSeparators(runDir);
+        currentDir.setPath(runDir);
     }
 
     QString newFileName = QFileDialog::getOpenFileName(this, "Choose EPSR .pro file", currentDir.path(), tr(".EPSR.pro files (*.EPSR.pro)"));
@@ -2106,7 +2137,7 @@ void MainWindow::deleteBoxAtoFile()
             ui.boxAtoAtoms->clear();
             ui.atoTetherTable->clearContents();
             ui.atoTetherTable->setRowCount(0);
-            ui.atoTetherTolLineEdit->setText(0);
+            ui.atoTetherTolLineEdit->setText("0.00000E+00");
             ui.temperatureLineEdit->clear();
             ui.vibtempLineEdit->clear();
             ui.angtempLineEdit->clear();

@@ -14,6 +14,16 @@
 
 void MainWindow::on_mixatoButton_clicked(bool checked)
 {
+    for (int i = 0; i < nMolFiles; i++)
+    {
+        if (ui.atoFileTable->item(i,2)->text().isEmpty() || ui.atoFileTable->item(i,2)->text() == "0" || ui.atoFileTable->item(i,2)->text().contains("."))
+        {
+            QMessageBox msgBox;
+            msgBox.setText("The number of one of the components to be included is missing or zero or not an integer value");
+            msgBox.exec();
+            return;
+        }
+    }
     if (ui.numberDensityLineEdit->text().isEmpty())
     {
         QMessageBox::warning(this, tr("Atomic number density is blank"),
@@ -423,7 +433,7 @@ bool MainWindow::readAtoFileBoxDetails()
 
     line = stream.readLine();
     dataLine = line.split("  ", QString::SkipEmptyParts);
-    ui.atoTetherTolLineEdit->setText(dataLine.at(0));
+    ui.atoTetherTolLineEdit->setText(dataLine.at(0).trimmed());
     ui.intraTransSSLineEdit->setText(dataLine.at(1));
     ui.grpRotSSLineEdit->setText(dataLine.at(2));
     ui.molRotSSLineEdit->setText(dataLine.at(3));
@@ -604,6 +614,31 @@ void MainWindow::on_updateAtoFileButton_clicked(bool checked)
     killTimer(changeatoFinishedTimerId_);
     changeatoFinishedTimerId_ = -1;
 
+    if (ui.temperatureLineEdit->text().isEmpty() || ui.vibtempLineEdit->text().isEmpty() || ui.angtempLineEdit->text().isEmpty() || ui.dihtempLineEdit->text().isEmpty()
+            || ui.intraTransSSLineEdit->text().isEmpty() || ui.grpRotSSLineEdit->text().isEmpty() || ui.molRotSSLineEdit->text().isEmpty()
+            || ui.molTransSSLineEdit->text().isEmpty() || ui.ecoreLineEdit->text().isEmpty() || ui.dcoreLineEdit->text().isEmpty() || ui.atoTetherTolLineEdit->text().isEmpty())
+    {
+        QMessageBox msgBox;
+        msgBox.setText("One of the parameters defining the simulation box is missing");
+        msgBox.exec();
+        return;
+    }
+
+    QRegExp noNegIntrx("^\\d*$");
+    for (int i = 0; i < ui.atoTetherTable->rowCount(); i++)
+    {
+        if (ui.atoTetherTable->item(i,1)->text().contains("T"))
+        {
+            if (ui.atoTetherTable->item(i,2)->text().isEmpty() || !noNegIntrx.exactMatch(ui.atoTetherTable->item(i,2)->text()))
+            {
+                QMessageBox msgBox;
+                msgBox.setText("Input the integer label of the atom to be tethered or use 0 for centre of mass");
+                msgBox.exec();
+                return;
+            }
+        }
+    }
+
     double atoTemp = ui.temperatureLineEdit->text().toDouble();
     double vibTemp = ui.vibtempLineEdit->text().toDouble();
     double angTemp = ui.angtempLineEdit->text().toDouble();
@@ -783,9 +818,33 @@ void MainWindow::on_fmoleButton_clicked(bool checked)
 
 void MainWindow::on_viewAtoFileButton_clicked(bool checked)
 {
+    if (ui.plotAtoCentreLineEdit->text().isEmpty())
+    {
+        QMessageBox msgBox;
+        msgBox.setText("One of the parameters required for plotting is missing");
+        msgBox.exec();
+        return;
+    }
+
+    QString maxDist;
+    QString rotCoord;
+
+    if (ui.plotAtoCentreLineEdit->text() != "0")
+    {
+        if (ui.plotAtoMaxXLineEdit->text().isEmpty() || ui.plotAtoMaxYLineEdit->text().isEmpty()
+            || ui.plotAtoMaxZLineEdit->text().isEmpty() || ui.plotAtoMinZLineEdit->text().isEmpty() || ui.plotAtoRotLineEdit->text().isEmpty()
+            || ui.plotAtoRotLineEdit->text().split(" ", QString::SkipEmptyParts).count() != 3)
+        {
+            QMessageBox msgBox;
+            msgBox.setText("One of the parameters required for plotting is missing");
+            msgBox.exec();
+            return;
+        }
+        maxDist = ui.plotAtoMaxXLineEdit->text()+" "+ui.plotAtoMaxYLineEdit->text()+" "+ui.plotAtoMinZLineEdit->text()+" "+ui.plotAtoMaxZLineEdit->text();
+        rotCoord = ui.plotAtoRotLineEdit->text();
+    }
+
     QString plotCentre = ui.plotAtoCentreLineEdit->text();
-    QString maxDist = ui.plotAtoMaxXLineEdit->text()+" "+ui.plotAtoMaxYLineEdit->text()+" "+ui.plotAtoMinZLineEdit->text()+" "+ui.plotAtoMaxZLineEdit->text();
-    QString rotCoord = ui.plotAtoRotLineEdit->text();
 
     QString listExcAtoms;
     QList<QListWidgetItem*> selectedItems = ui.atoAtomList->selectedItems();
@@ -900,4 +959,28 @@ bool MainWindow::checkBoxCharge()
     boxChargeStr.sprintf("%.4f", boxCharge);
     ui.boxAtoCharge->setText(boxChargeStr);
     return false;
+}
+
+void MainWindow::on_SSbutton_clicked(bool checked)
+{
+    if (ui.SSgrpBox->isVisible() == true)
+    {
+        ui.SSgrpBox->setVisible(false);
+    }
+    else
+    {
+        ui.SSgrpBox->setVisible(true);
+    }
+}
+
+void MainWindow::on_tetherButton_clicked(bool checked)
+{
+    if (ui.tetherGrpBox->isVisible() == true)
+    {
+        ui.tetherGrpBox->setVisible(false);
+    }
+    else
+    {
+        ui.tetherGrpBox->setVisible(true);
+    }
 }

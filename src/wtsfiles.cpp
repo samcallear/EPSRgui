@@ -367,6 +367,31 @@ void MainWindow::on_makeWtsButton_clicked(bool checked)
 
 void MainWindow::makeNwts()
 {
+    for (int i = 0; i < ui.atomWtsTable->rowCount(); i++)
+    {
+        if (ui.atomWtsTable->item(i,1)->text().isEmpty() || ui.atomWtsTable->item(i,2)->text().isEmpty() || ui.atomWtsTable->item(i,3)->text().isEmpty())
+        {
+            QMessageBox msgBox;
+            msgBox.setText("One of the parameters defining the scattering weights is missing");
+            msgBox.exec();
+            return;
+        }
+        if (!ui.atomWtsTable->item(i,4)->text().isEmpty() && ui.atomWtsTable->item(i,5)->text().isEmpty())
+        {
+            QMessageBox msgBox;
+            msgBox.setText("One of the parameters defining the isotope concentration is missing");
+            msgBox.exec();
+            return;
+        }
+        if (ui.atomWtsTable->item(i,4)->text().isEmpty() && !ui.atomWtsTable->item(i,5)->text().isEmpty())
+        {
+            QMessageBox msgBox;
+            msgBox.setText("One of the parameters defining the isotope concentration is missing");
+            msgBox.exec();
+            return;
+        }
+    }
+
     QDir::setCurrent(workingDir_);
 
     QFile fileRead(workingDir_+wtsBaseFileName_+".NWTS.dat");

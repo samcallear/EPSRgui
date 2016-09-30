@@ -1383,9 +1383,9 @@ bool MainWindow::updateMolFile()
         return false;
     }
 
-    if (ui.molAtomTable->rowCount() > 0) //only do this if there are some atom labels
+    //check there are no empty cells and that the atom types are the same in the atom types table and LJ table - this doesn't work if the atom labels are the same as the element labels******************************************************************************************
+    if (ui.molAtomTable->rowCount() > 0)
     {
-        //this doesn't work if the atom labels are the same as the element labels******************************************************************************************
         for (int i = 0; i < ui.molLJTable->rowCount(); i++)
         {
             QList<QTableWidgetItem*> atomTypeItem = ui.molAtomTable->findItems(ui.molLJTable->item(i,0)->text(), Qt::MatchExactly);
@@ -1395,6 +1395,14 @@ bool MainWindow::updateMolFile()
                 msgBox.setText("Mismatch between atom types and those listed in Lennard-Jones parameters");
                 msgBox.exec();
                 return 0;
+            }
+            if (ui.molLJTable->item(i,0)->text().isEmpty() || ui.molLJTable->item(i,1)->text().isEmpty() || ui.molLJTable->item(i,2)->text().isEmpty()
+                    || ui.molLJTable->item(i,3)->text().isEmpty() || ui.molLJTable->item(i,4)->text().isEmpty() || ui.molLJTable->item(i,5)->text().isEmpty())
+            {
+                QMessageBox msgBox;
+                msgBox.setText("One of the parameters defining the Lennard Jones potential or element type is missing");
+                msgBox.exec();
+                return false;
             }
         }
 
@@ -1410,6 +1418,108 @@ bool MainWindow::updateMolFile()
             }
         }
     }
+    if (ui.molBondTable->rowCount() != 0)
+    {
+        for (int i = 0; i < ui.molBondTable->rowCount(); ++i)
+        {
+            if (ui.molBondTable->item(i,0)->text().split(" ", QString::SkipEmptyParts).count() !=2)
+            {
+                QMessageBox msgBox;
+                msgBox.setText("The number of atoms used in the bond definition is not appropriate.");
+                msgBox.exec();
+                return false;
+            }
+            if (ui.molBondTable->item(i,1)->text().isEmpty())
+            {
+                QMessageBox msgBox;
+                msgBox.setText("One of the values for a distance restraint is missing");
+                msgBox.exec();
+                return false;
+            }
+        }
+    }
+    if (ui.molAngleTable->rowCount() != 0)
+    {
+        for (int i = 0; i < ui.molAngleTable->rowCount(); ++i)
+        {
+            if (ui.molAngleTable->item(i,0)->text().split(" ", QString::SkipEmptyParts).count() !=3)
+            {
+                QMessageBox msgBox;
+                msgBox.setText("The number of atoms used in the angle definition is not appropriate.");
+                msgBox.exec();
+                return false;
+            }
+            if (ui.molAngleTable->item(i,1)->text().isEmpty())
+            {
+                QMessageBox msgBox;
+                msgBox.setText("One of the values for an angle restraint is missing");
+                msgBox.exec();
+                return false;
+            }
+        }
+    }
+    if (ui.molDihedralTable->rowCount() != 0 )
+    {
+        for (int i = 0; i < ui.molDihedralTable->rowCount(); ++i)
+        {
+            if (ui.molDihedralTable->item(i,0)->text().split(" ", QString::SkipEmptyParts).count() !=4)
+            {
+                QMessageBox msgBox;
+                msgBox.setText("The number of atoms used in the dihedral definition is not appropriate.");
+                msgBox.exec();
+                return false;
+            }
+            if (ui.molDihedralTable->item(i,1)->text().isEmpty())
+            {
+                QMessageBox msgBox;
+                msgBox.setText("One of the values for a dihedral restraint is missing");
+                msgBox.exec();
+                return false;
+            }
+        }
+    }
+    if (ui.molRotTable->rowCount() != 0 )
+    {
+        for (int i = 0; i < ui.molRotTable->rowCount(); ++i)
+        {
+            if (ui.molRotTable->item(i,0)->text().isEmpty())
+            {
+                QMessageBox msgBox;
+                msgBox.setText("One of the atoms defining a rotational group is missing");
+                msgBox.exec();
+                return false;
+            }
+            if (ui.molRotTable->item(i,1)->text().isEmpty())
+            {
+                QMessageBox msgBox;
+                msgBox.setText("One of the atoms defining a rotational group is missing");
+                msgBox.exec();
+                return false;
+            }
+        }
+    }
+
+
+    //check all other boxes are filled in
+    if (ui.molEcoreLineEdit->text().isEmpty() || ui.molDcoreLineEdit->text().isEmpty())
+    {
+        QMessageBox msgBox;
+        msgBox.setText("One of the parameters defining ecoredcore is missing");
+        msgBox.exec();
+        return false;
+    }
+    if (ui.molTetherCheckBox->isChecked() == true)
+    {
+        if (ui.tolLineEdit->text().isEmpty() || ui.tetherAtomLineEdit->text().isEmpty() || ui.tetherCoordXLineEdit->text().isEmpty()
+                || ui.tetherCoordYLineEdit->text().isEmpty() || ui.tetherCoordZLineEdit->text().isEmpty())
+        {
+            QMessageBox msgBox;
+            msgBox.setText("One of the parameters defining the tethering is missing.");
+            msgBox.exec();
+            return false;
+        }
+    }
+
 
     QDir::setCurrent(workingDir_);
 
@@ -1459,7 +1569,12 @@ bool MainWindow::updateMolFile()
     {
         for (int i = 0; i < ui.molBondTable->rowCount(); ++i)
         {
-            streamWrite << "bond " << ui.molBondTable->item(i,0)->text() << "    " << ui.molBondTable->item(i,1)->text() << "\n";
+            QString atoms = ui.molBondTable->item(i,0)->text();
+            QString atom1 = atoms.split(" ", QString::SkipEmptyParts).at(0);
+            QString atom2 = atoms.split(" ", QString::SkipEmptyParts).at(1);
+            atom1 = atom1.rightJustified(3, '0');
+            atom2 = atom2.rightJustified(3, '0');
+            streamWrite << "bond " << atom1 << " " << atom2 << "    " << ui.molBondTable->item(i,1)->text() << "\n";
         }
     }
 
@@ -1467,7 +1582,14 @@ bool MainWindow::updateMolFile()
     {
         for (int i = 0; i < ui.molAngleTable->rowCount(); ++i)
         {
-            streamWrite << "angle " << ui.molAngleTable->item(i,0)->text() << "  " << ui.molAngleTable->item(i,1)->text() << "\n";
+            QString atoms = ui.molAngleTable->item(i,0)->text();
+            QString atom1 = atoms.split(" ", QString::SkipEmptyParts).at(0);
+            QString atom2 = atoms.split(" ", QString::SkipEmptyParts).at(1);
+            QString atom3 = atoms.split(" ", QString::SkipEmptyParts).at(2);
+            atom1 = atom1.rightJustified(3, '0');
+            atom2 = atom2.rightJustified(3, '0');
+            atom3 = atom3.rightJustified(3, '0');
+            streamWrite << "angle " << atom1 << " " << atom2 << " " << atom3 << "  " << ui.molAngleTable->item(i,1)->text() << "\n";
         }
     }
 
@@ -1475,7 +1597,16 @@ bool MainWindow::updateMolFile()
     {
         for (int i = 0; i < ui.molDihedralTable->rowCount(); ++i)
         {
-            streamWrite << "dihedral  " << ui.molDihedralTable->item(i,0)->text() << "  " << ui.molDihedralTable->item(i,1)->text() << "\n";
+            QString atoms = ui.molDihedralTable->item(i,0)->text();
+            QString atom1 = atoms.split(" ", QString::SkipEmptyParts).at(0);
+            QString atom2 = atoms.split(" ", QString::SkipEmptyParts).at(1);
+            QString atom3 = atoms.split(" ", QString::SkipEmptyParts).at(2);
+            QString atom4 = atoms.split(" ", QString::SkipEmptyParts).at(3);
+            int atom1num = atom1.toInt();
+            int atom2num = atom2.toInt();
+            int atom3num = atom3.toInt();
+            int atom4num = atom4.toInt();
+            streamWrite << "dihedral  " << QString::number(atom1num) << " " << QString::number(atom2num) << " " << QString::number(atom3num) << " " << QString::number(atom4num) << "  " << ui.molDihedralTable->item(i,1)->text() << "\n";
         }
     }
 
@@ -1483,7 +1614,11 @@ bool MainWindow::updateMolFile()
     {
         for (int i = 0; i < ui.molRotTable->rowCount(); ++i)
         {
-            streamWrite << "rot  " << ui.molRotTable->item(i,0)->text() << "  " << ui.molRotTable->item(i,1)->text() << "\n";
+            QString atom1 = ui.molRotTable->item(i,0)->text();
+            QString atom2 = ui.molRotTable->item(i,1)->text();
+            int atom1num = atom1.toInt();
+            int atom2num = atom2.toInt();
+            streamWrite << "rot  " << QString::number(atom1num) << "  " << QString::number(atom2num) << "\n";
         }
     }
 
@@ -1556,25 +1691,33 @@ bool MainWindow::updateMolFile()
     QStringList dataLineato;
     dataLineato.clear();
     QString originalato;
-    QString tetherTol = ui.tolLineEdit->text();
-    QString tether;
-    int tetherAtom = ui.tetherAtomLineEdit->text().toInt();
-    QString tetherAtomStr = QString("%1").arg(tetherAtom, 5, 10, QChar('0'));
-    QString tetherCoordX = ui.tetherCoordXLineEdit->text();
-    QString tetherCoordY = ui.tetherCoordYLineEdit->text();
-    QString tetherCoordZ = ui.tetherCoordZLineEdit->text();
+
+    //use default values assuming not tethered
+    QString tether = "F";
+    QString tetherAtomStr = "     ";
+    QString tetherTol = "0.00000E+00";
+    QString tetherCoordX = "0.00000E+00";
+    QString tetherCoordY = "0.00000E+00";
+    QString tetherCoordZ = "0.00000E+00";
+
+    //if tether check box is ticked use these values
     if (ui.molTetherCheckBox->isChecked() == true)
     {
         tether = "T";
-    }
-    else
-    {
-        tether = "F";
-        tetherAtomStr = "     ";
-        tetherTol = "0.00000E+00";
-        tetherCoordX = "0.00000E+00";
-        tetherCoordY = "0.00000E+00";
-        tetherCoordZ = "0.00000E+00";
+        tetherTol = ui.tolLineEdit->text();
+        double tetherTold = tetherTol.toDouble();
+        tetherTol = QString("%1").arg(tetherTold, 0, 'E', 5);
+        int tetherAtom = ui.tetherAtomLineEdit->text().toInt(); //if an integer  isn't typed in the box (i.e. letters or a decimal), this process assumes a 0
+        tetherAtomStr = QString("%1").arg(tetherAtom, 5, 10, QChar('0'));
+        tetherCoordX = ui.tetherCoordXLineEdit->text();
+        double tetherCoordXd = tetherCoordX.toDouble();
+        tetherTol = QString("%1").arg(tetherCoordXd, 0, 'E', 5);
+        tetherCoordY = ui.tetherCoordYLineEdit->text();
+        double tetherCoordYd = tetherCoordY.toDouble();
+        tetherTol = QString("%1").arg(tetherCoordYd, 0, 'E', 5);
+        tetherCoordZ = ui.tetherCoordZLineEdit->text();
+        double tetherCoordZd = tetherCoordZ.toDouble();
+        tetherTol = QString("%1").arg(tetherCoordZd, 0, 'E', 5);
     }
 
     QRegExp ecoredcorerx("  ([0-9]{1}[.]{1}[0-9]{5}[E+]{2}[0-9]{2})  ([0-9]{1}[.]{1}[0-9]{5}[E+]{2}[0-9]{2})");
