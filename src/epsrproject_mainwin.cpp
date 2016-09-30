@@ -241,7 +241,7 @@ void MainWindow::readSettings()
         {
             if (dataLine.at(0) == "EPSRdir")
             {
-                currentDir = dataLine.at(1);
+                currentDir = dataLine.at(1); //*******************************************************what is this used for?????????????????????****************************************************
                 epsrDir_ = dataLine.at(1)+"/";
                 epsrDir_ = QDir::toNativeSeparators(epsrDir_);
             }
@@ -271,11 +271,11 @@ void MainWindow::createNew()
 
         //set file directories
         projectName_ = createNewDialog.getEPSRname();
-        epsrDir_ = createNewDialog.getEPSRdir();
+        epsrDir_ = createNewDialog.getEPSRdir()+"/";
         epsrDir_ = QDir::toNativeSeparators(epsrDir_);
-        epsrBinDir_ = (epsrDir_+"/bin/");
+        epsrBinDir_ = (epsrDir_+"bin/");
         epsrBinDir_ = QDir::toNativeSeparators(epsrBinDir_);
-        workingDir_ = (epsrDir_+"/run/"+projectName_+"/");
+        workingDir_ = (epsrDir_+"run/"+projectName_+"/");
         workingDir_ = QDir::toNativeSeparators(workingDir_);
         if (!QDir(workingDir_).exists())
         {
