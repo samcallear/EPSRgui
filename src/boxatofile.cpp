@@ -132,8 +132,8 @@ void MainWindow::on_addatoButton_clicked(bool checked)
 
     AddAtoDialog addAtoDialog(this);
 
+    addAtoDialog.setModal(true);
     addAtoDialog.show();
-
     addAtoDialog.raise();
     addAtoDialog.activateWindow();
 

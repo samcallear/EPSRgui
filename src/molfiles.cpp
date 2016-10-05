@@ -18,6 +18,7 @@ void MainWindow::on_createMolFileButton_clicked(bool checked)
         molOptionsDialog = new MolOptionsDialog(this);
     }
 
+    molOptionsDialog->setModal(true);
     molOptionsDialog->show();
     molOptionsDialog->raise();
     molOptionsDialog->activateWindow();
@@ -311,6 +312,7 @@ void MainWindow::on_createAtomButton_clicked(bool checked)
         makeAtomDialog = new MakeAtomDialog(this);
     }
 
+    makeAtomDialog->setModal(true);
     makeAtomDialog->show();
     makeAtomDialog->raise();
     makeAtomDialog->activateWindow();
@@ -459,6 +461,7 @@ void MainWindow::on_createLatticeButton_clicked(bool checked)
         makeLatticeDialog = new MakeLatticeDialog(this);
     }
 
+    makeLatticeDialog->setModal(true);
     makeLatticeDialog->show();
     makeLatticeDialog->raise();
     makeLatticeDialog->activateWindow();
