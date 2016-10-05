@@ -13,12 +13,7 @@
 
 void MainWindow::on_createMolFileButton_clicked(bool checked)
 {
-    runMolOptions();
-}
-
-void MainWindow::runMolOptions()
-{
-    if (!molOptionsDialog)
+   if (!molOptionsDialog)
     {
         molOptionsDialog = new MolOptionsDialog(this);
     }
@@ -33,32 +28,43 @@ void MainWindow::runMolOptions()
     {
         molCharge = molOptionsDialog->getMolCharge();
         mopacOption = molOptionsDialog->getMopacOptions();
-        runjmol();
+        ui.messagesLineEdit->setText("Running Jmol");
+
+        QString program = epsrBinDir_+"Jmol.jar";
+
+        // set jmol save directory to EPSR directory
+        QDir::setCurrent(workingDir_);
+        QProcess processJmol;
+        processJmol.startDetached("java", QStringList() << "-jar" << program);
+
+        //add path to QFileSystemWatcher
+        jmolFile_.addPath(workingDir_);
     }
-}
-
-void MainWindow::runjmol()
-{
-    ui.messagesLineEdit->setText("Running Jmol");
-
-    QString program = epsrBinDir_+"Jmol.jar";
-
-    // set jmol save directory to EPSR directory
-    QDir::setCurrent(workingDir_);
-    QProcess processJmol;
-    processJmol.startDetached("java", QStringList() << "-jar" << program);
-    newJmolTimerId_ = startTimer(1000);
 }
 
 void MainWindow::makeMolFile()
 {
-    //find most recently modified *.jmol file
+    //find most recently modified file and check if it is a .jmol file
     QDir dir;
     dir.setPath(workingDir_);
     dir.setSorting(QDir::Time);
     QStringList jmolFilter;
     jmolFilter << "*.jmol";
     QStringList jmolFiles = dir.entryList(jmolFilter, QDir::Files);
+    if (jmolFiles.count() == 0)
+    {
+        return;
+    }
+
+    //check the file was modified in the last second
+    QFileInfo fi(jmolFiles.at(0));
+    if (fi.lastModified().msecsTo(QDateTime::currentDateTime()) > 1000 )
+    {
+        return;
+    }
+
+    //stop QFileSystemWatcher so don't get double ups message
+    jmolFile_.removePath(workingDir_);
 
     QString jmolFileName = jmolFiles.at(0);
 
@@ -197,6 +203,9 @@ void MainWindow::makeMolFile()
     ui.mixatoButton->setEnabled(true);
     ui.addatoButton->setEnabled(true);
     ui.loadBoxButton->setEnabled(true);
+
+    //restart QFileSystemWatcher
+    jmolFile_.addPath(workingDir_);
 
     ui.messagesLineEdit->setText("Finished making .mol and .ato files");
 }
@@ -619,14 +628,6 @@ void MainWindow::on_createLatticeButton_clicked(bool checked)
             ui.boxAtoLabel->setText(atoFileName_);
             readAtoFileAtomPairs();
             readAtoFileBoxDetails();
-            ui.atoAtomList->clear();
-
-            for (int n=0; n < atoAtomLabels.count(); ++n)
-            {
-                QListWidgetItem* item = new QListWidgetItem(atoAtomLabels.at(n));
-                item->setData(Qt::UserRole, n);
-                ui.atoAtomList->addItem(item);
-            }
 
             //update atoFileTable to contain atom .ato files
             ui.atoFileTable->setRowCount(atomTypes.count());

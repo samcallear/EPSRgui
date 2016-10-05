@@ -100,16 +100,9 @@ void MainWindow::on_mixatoButton_clicked(bool checked)
         ui.boxAtoLabel->setText(atoFileName_);
         readAtoFileAtomPairs();
         readAtoFileBoxDetails();
-        ui.atoAtomList->clear();
-        for (int n=0; n < atoAtomLabels.count(); ++n)
-        {
-            QListWidgetItem* item = new QListWidgetItem(atoAtomLabels.at(n));
-            item->setData(Qt::UserRole, n);
-            ui.atoAtomList->addItem(item);
-        }
         checkBoxCharge();
         ui.randomiseButton->setEnabled(true);
-        ui.viewAtoFileButton->setEnabled(true);
+        ui.plotBoxAct->setEnabled(true);
         ui.boxCompositionButton->setEnabled(true);
         ui.updateAtoFileButton->setEnabled(true);
         ui.fmoleButton->setEnabled(true);
@@ -122,8 +115,9 @@ void MainWindow::on_mixatoButton_clicked(bool checked)
         //save .pro file
         save();
 
-        killTimer(newJmolTimerId_);
-        newJmolTimerId_ = -1;
+        jmolFile_.removePath(workingDir_);
+//        killTimer(newJmolTimerId_);
+//        newJmolTimerId_ = -1;
     }
 }
 
@@ -255,18 +249,9 @@ void MainWindow::on_addatoButton_clicked(bool checked)
         ui.boxAtoLabel->setText(atoFileName_);
         readAtoFileAtomPairs();
         readAtoFileBoxDetails();
-        ui.atoAtomList->clear();
-
-        for (int n=0; n < atoAtomLabels.count(); ++n)
-        {
-            QListWidgetItem* item = new QListWidgetItem(atoAtomLabels.at(n));
-            item->setData(Qt::UserRole, n);
-            ui.atoAtomList->addItem(item);
-        }
-
         checkBoxCharge();
         ui.randomiseButton->setEnabled(true);
-        ui.viewAtoFileButton->setEnabled(true);
+        ui.plotBoxAct->setEnabled(true);
         ui.boxCompositionButton->setEnabled(true);
         ui.updateAtoFileButton->setEnabled(true);
         ui.fmoleButton->setEnabled(true);
@@ -279,8 +264,9 @@ void MainWindow::on_addatoButton_clicked(bool checked)
         //save .pro file
         save();
 
-        killTimer(newJmolTimerId_);
-        newJmolTimerId_ = -1;
+        jmolFile_.removePath(workingDir_);
+//        killTimer(newJmolTimerId_);
+//        newJmolTimerId_ = -1;
     }
 }
 
@@ -321,16 +307,9 @@ void MainWindow::on_loadBoxButton_clicked (bool checked)
         readAtoFileBoxDetails();
         //for each .ato file listed in atofiletable, add the number of this file in the box to column 2***************************************************
         ui.atoFileTable->item(0,2)->setText(ui.boxAtoMols->text());
-        ui.atoAtomList->clear();
-        for (int n=0; n < atoAtomLabels.count(); ++n)
-        {
-            QListWidgetItem* item = new QListWidgetItem(atoAtomLabels.at(n));
-            item->setData(Qt::UserRole, n);
-            ui.atoAtomList->addItem(item);
-        }
         checkBoxCharge();
         ui.randomiseButton->setEnabled(true);
-        ui.viewAtoFileButton->setEnabled(true);
+        ui.plotBoxAct->setEnabled(true);
         ui.boxCompositionButton->setEnabled(true);
         ui.updateAtoFileButton->setEnabled(true);
         ui.fmoleButton->setEnabled(true);
@@ -814,110 +793,6 @@ void MainWindow::on_fmoleButton_clicked(bool checked)
     ui.atoEPSRButton->setDisabled(true);
     ui.updateMolFileButton->setDisabled(true);
     ui.runMenu->setDisabled(true);
-}
-
-void MainWindow::on_viewAtoFileButton_clicked(bool checked)
-{
-    if (ui.plotAtoCentreLineEdit->text().isEmpty())
-    {
-        QMessageBox msgBox;
-        msgBox.setText("One of the parameters required for plotting is missing");
-        msgBox.exec();
-        return;
-    }
-
-    QString maxDist;
-    QString rotCoord;
-
-    if (ui.plotAtoCentreLineEdit->text() != "0")
-    {
-        if (ui.plotAtoMaxXLineEdit->text().isEmpty() || ui.plotAtoMaxYLineEdit->text().isEmpty()
-            || ui.plotAtoMaxZLineEdit->text().isEmpty() || ui.plotAtoMinZLineEdit->text().isEmpty() || ui.plotAtoRotLineEdit->text().isEmpty()
-            || ui.plotAtoRotLineEdit->text().split(" ", QString::SkipEmptyParts).count() != 3)
-        {
-            QMessageBox msgBox;
-            msgBox.setText("One of the parameters required for plotting is missing");
-            msgBox.exec();
-            return;
-        }
-        maxDist = ui.plotAtoMaxXLineEdit->text()+" "+ui.plotAtoMaxYLineEdit->text()+" "+ui.plotAtoMinZLineEdit->text()+" "+ui.plotAtoMaxZLineEdit->text();
-        rotCoord = ui.plotAtoRotLineEdit->text();
-    }
-
-    QString plotCentre = ui.plotAtoCentreLineEdit->text();
-
-    QString listExcAtoms;
-    QList<QListWidgetItem*> selectedItems = ui.atoAtomList->selectedItems();
-    if (selectedItems.count() != 0)
-    {
-        foreach(QListWidgetItem* item, selectedItems)
-        {
-            listExcAtoms.append(QString::number((item->data(Qt::UserRole).toInt())+1)+" ");
-        }
-    }
-    else
-    {
-        listExcAtoms = "0";
-    }
-
-    QString atoBaseFileName = atoFileName_.split(".",QString::SkipEmptyParts).at(0);
-#ifdef _WIN32
-    QFile jmolFile(workingDir_+"plot"+atoBaseFileName+".bat");
-#else
-    QFile jmolFile(workingDir_+"plot"+atoBaseFileName+".sh");
-#endif
-    if(!jmolFile.open(QFile::WriteOnly | QFile::Text))
-    {
-        QMessageBox msgBox;
-        msgBox.setText("Could not make Jmol plotting file.");
-        msgBox.exec();;
-    }
-#ifdef _WIN32
-    if (plotCentre == "0")
-    {
-        QTextStream stream(&jmolFile);
-        stream << "set EPSRbin=" << epsrBinDir_ << "\n"
-               << "set EPSRrun=" << workingDir_ << "\n"
-               << "%EPSRbin%plotato.exe " << workingDir_ << " plotato " << atoBaseFileName << " 3" << " "+plotCentre << " "+listExcAtoms << "\n";
-        jmolFile.close();
-    }
-    else
-    {
-        QTextStream stream(&jmolFile);
-        stream << "set EPSRbin=" << epsrBinDir_ << "\n"
-               << "set EPSRrun=" << workingDir_ << "\n"
-               << "%EPSRbin%plotato.exe " << workingDir_ << " plotato " << atoBaseFileName << " 3" << " "+plotCentre << " "+maxDist << " "+rotCoord << " "+listExcAtoms << "\n";
-        jmolFile.close();
-    }
-#else
-    if (plotCentre == "0")
-    {
-        QTextStream stream(&jmolFile);
-        stream << "export EPSRbin=" << epsrBinDir_ << "\n"
-               << "export EPSRrun=" << workingDir_ << "\n"
-               << "\"$EPSRbin\"'plotato' " << workingDir_ << " plotato " << atoBaseFileName << " 3" << " "+plotCentre << " "+listExcAtoms << "\n";
-        jmolFile.close();
-    }
-    else
-    {
-        QTextStream stream(&jmolFile);
-        stream << "export EPSRbin=" << epsrBinDir_ << "\n"
-               << "export EPSRrun=" << workingDir_ << "\n"
-               << "\"$EPSRbin\"'plotato' " << workingDir_ << " plotato " << atoBaseFileName << " 3" << " "+plotCentre << " "+maxDist << " "+rotCoord << " "+listExcAtoms << "\n";
-        jmolFile.close();
-    }
-#endif
-
-    QDir::setCurrent(workingDir_);
-
-    QProcess processplotato;
-    processplotato.setProcessChannelMode(QProcess::ForwardedChannels);
-#ifdef _WIN32
-    processplotato.startDetached("plot"+atoBaseFileName+".bat");
-#else
-    processplotato.startDetached("sh plot"+atoBaseFileName+".sh");
-#endif
-    ui.messagesLineEdit->setText("Box .ato file plotted in separate window");
 }
 
 void MainWindow::on_atoEPSRButton_clicked(bool checked)

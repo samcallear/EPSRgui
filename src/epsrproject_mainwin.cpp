@@ -10,6 +10,7 @@
 #include "addatodialog.h"
 #include "messagesdialog.h"
 #include "importdialog.h"
+#include "plotboxdialog.h"
 
 #include <QtGui>
 #include <QMainWindow>
@@ -44,16 +45,8 @@ MainWindow::MainWindow(QMainWindow *parent) : QMainWindow(parent), messagesDialo
     QRegExp numberDensityrx("^\\d*\\.?\\d*$");
     ui.numberDensityLineEdit->setValidator((new QRegExpValidator(numberDensityrx, this)));
     QRegExp noNegIntrx("^\\d*$");
-    QRegExp onlyIntrx("^\\-?\\d*$");
-    QRegExp threeIntrx("^\\d*\\ \\d*\\ \\d*$");
-    ui.plotAtoCentreLineEdit->setValidator((new QRegExpValidator(noNegIntrx, this)));
-    ui.plotAtoMaxXLineEdit->setValidator((new QRegExpValidator(onlyIntrx, this)));
-    ui.plotAtoMaxYLineEdit->setValidator((new QRegExpValidator(onlyIntrx, this)));
-    ui.plotAtoMaxZLineEdit->setValidator((new QRegExpValidator(onlyIntrx, this)));
-    ui.plotAtoMinZLineEdit->setValidator((new QRegExpValidator(onlyIntrx, this)));
-    ui.plotAtoRotLineEdit->setValidator((new QRegExpValidator(threeIntrx, this)));
-    ui.fmoleLineEdit->setValidator((new QRegExpValidator(noNegIntrx, this)));
     QRegExp decOrErx("[-+]?[0-9]*[.]?[0-9]+([eE][-+]?[0-9]+)?");
+    ui.fmoleLineEdit->setValidator((new QRegExpValidator(noNegIntrx, this)));
     ui.atoTetherTolLineEdit->setValidator((new QRegExpValidator(decOrErx, this)));
     ui.temperatureLineEdit->setValidator((new QRegExpValidator(decOrErx, this)));
     ui.vibtempLineEdit->setValidator((new QRegExpValidator(decOrErx, this)));
@@ -95,7 +88,7 @@ MainWindow::MainWindow(QMainWindow *parent) : QMainWindow(parent), messagesDialo
     connect(ui.setupOutTypeComboBox, SIGNAL(currentIndexChanged(QString)), this, SLOT(getOutputType()));
     connect(&processEPSR_, SIGNAL(readyReadStandardOutput()), this, SLOT(outputfromEPSRprocessReady()));
     connect(&epsrFinished_, SIGNAL(fileChanged(const QString &)), this, SLOT(enableButtons()));
-//    connect(&epsrRunning_, SIGNAL(fileChanged(const QString &)), this, SLOT(autoUpdate()));
+    connect(&jmolFile_, SIGNAL(directoryChanged(const QString &)), this, SLOT(makeMolFile()));
 }
 
 void MainWindow::createActions()
@@ -120,6 +113,9 @@ void MainWindow::createActions()
 
     ui.plotAct->setStatusTip(tr("Plot EPSR outputs"));
     connect(ui.plotAct, SIGNAL(triggered()), this, SLOT(plot()));
+
+    ui.plotBoxAct->setStatusTip(tr("Plot EPSR simluation box"));
+    connect(ui.plotBoxAct, SIGNAL(triggered()), this, SLOT(plotBox()));
 
     ui.plotEPSRshellAct->setStatusTip(tr("Plot EPSR using EPSRshell"));
     connect(ui.plotEPSRshellAct, SIGNAL(triggered()), this, SLOT(plotEPSRshell()));
@@ -332,7 +328,6 @@ void MainWindow::createNew()
         ui.addatoButton->setEnabled(false);
         ui.loadBoxButton->setEnabled(false);
         ui.randomiseButton->setEnabled(false);
-        ui.viewAtoFileButton->setEnabled(false);
         ui.boxCompositionButton->setEnabled(false);
         ui.updateAtoFileButton->setEnabled(false);
         ui.fmoleButton->setEnabled(false);
@@ -398,7 +393,6 @@ void MainWindow::reset()
     ui.dihtempLineEdit->setText("1");
     ui.atoTetherTable->clearContents();
     ui.atoTetherTable->setRowCount(0);
-    ui.atoAtomList->clear();
     atoFileName_.clear();
     baseFileName_.clear();
 
@@ -446,7 +440,6 @@ void MainWindow::reset()
     ui.addatoButton->setEnabled(false);
     ui.loadBoxButton->setEnabled(true);
     ui.randomiseButton->setEnabled(false);
-    ui.viewAtoFileButton->setEnabled(false);
     ui.boxCompositionButton->setEnabled(false);
     ui.updateAtoFileButton->setEnabled(false);
     ui.fmoleButton->setEnabled(false);
@@ -481,6 +474,7 @@ void MainWindow::reset()
     ui.runAct->setEnabled(false);
     ui.stopAct->setEnabled(false);
     ui.plotAct->setEnabled(false);
+    ui.plotBoxAct->setEnabled(false);
     ui.plotEPSRshellAct->setEnabled(false);
     ui.plotOutputsMenu->setEnabled(false);
     ui.epsrManualAct->setEnabled(false);
@@ -569,15 +563,9 @@ void MainWindow::open()
                     ui.boxAtoLabel->setText(atoFileName_);
                     readAtoFileAtomPairs();
                     readAtoFileBoxDetails();
-                    for (int n=0; n < atoAtomLabels.count(); ++n)
-                    {
-                        QListWidgetItem* item = new QListWidgetItem(atoAtomLabels.at(n));
-                        item->setData(Qt::UserRole, n);
-                        ui.atoAtomList->addItem(item);
-                    }
                     checkBoxCharge();
                     ui.randomiseButton->setEnabled(true);
-                    ui.viewAtoFileButton->setEnabled(true);
+                    ui.plotBoxAct->setEnabled(true);
                     ui.boxCompositionButton->setEnabled(true);
                     ui.updateAtoFileButton->setEnabled(true);
                     ui.fmoleButton->setEnabled(true);
@@ -1580,7 +1568,6 @@ void MainWindow::runEPSR()
     ui.plot2Button->setEnabled(true);
 
     //add path for auto updating in case it is switched on
-//    epsrRunning_.addPath(baseFileName_+".EPSR.out");
     epsrRunningTimerId_ = startTimer(20000);
 
     //also kill any other timers that might be still running if a setup was quit but not saved
@@ -1687,7 +1674,6 @@ void MainWindow::enableButtons()
     epsrFinished_.removePath(workingDir_+"killepsr");
 
     //remove path for auto update in case it is switched on
-//    epsrRunning_.removePath(baseFileName_+".EPSR.out");
     killTimer(epsrRunningTimerId_);
     epsrRunningTimerId_ = -1;
 
@@ -1728,6 +1714,16 @@ void MainWindow::plot()
     plotDialog.raise();
     plotDialog.activateWindow();
     plotDialog.exec();
+}
+
+void MainWindow::plotBox()
+{
+    PlotBoxDialog plotBoxDialog(this);
+
+    plotBoxDialog.show();
+    plotBoxDialog.raise();
+    plotBoxDialog.activateWindow();
+    plotBoxDialog.exec();
 }
 
 void MainWindow::plotEPSRshell()
@@ -2149,7 +2145,6 @@ void MainWindow::deleteBoxAtoFile()
             //remove box ato file, clear name and re-initialise ato tab
             file.remove();
             atoFileName_.clear();
-            ui.atoAtomList->clear();
             ui.boxAtoLabel->clear();
             ui.boxAtoCharge->clear();
             ui.boxAtoAxisA->clear();
@@ -2232,6 +2227,7 @@ void MainWindow::deleteBoxAtoFile()
                 ui.runAct->setEnabled(false);
                 ui.stopAct->setEnabled(false);
                 ui.plotAct->setEnabled(false);
+                ui.plotBoxAct->setEnabled(false);
                 ui.plot1Button->setEnabled(false);
                 ui.plot2Button->setEnabled(false);
                 ui.plotEPSRshellAct->setEnabled(false);
@@ -2246,7 +2242,6 @@ void MainWindow::deleteBoxAtoFile()
 
             //enable/disable buttons
             ui.randomiseButton->setEnabled(false);
-            ui.viewAtoFileButton->setEnabled(false);
             ui.boxCompositionButton->setEnabled(false);
             ui.updateAtoFileButton->setEnabled(false);
             ui.fmoleButton->setEnabled(false);
@@ -2409,6 +2404,8 @@ void MainWindow::timerEvent(QTimerEvent *event)
     else
     if (event->timerId() == newJmolTimerId_)
     {
+        killTimer(newJmolTimerId_);
+        newJmolTimerId_ = -1;
         QDir dir;
         dir.setPath(workingDir_);
         dir.setSorting(QDir::Time);
@@ -2422,11 +2419,12 @@ void MainWindow::timerEvent(QTimerEvent *event)
             QDateTime jmolModTime;
             jmolModTime = jmolFileInfo.lastModified();
             QDateTime dateTimeNow = QDateTime::currentDateTime();
-            if (jmolModTime > dateTimeNow.addSecs(-1))
+            if (jmolModTime > dateTimeNow.addSecs(-4))
             {
                 makeMolFile();   //timer killed in mixato and addato
             }
         }
+        newJmolTimerId_ = startTimer(1000);
     }
     else
     if (event->timerId() == molChangeatoFinishedTimerId_)

@@ -18,6 +18,7 @@ class MakeLatticeDialog;
 class BoxCompositionDialog;
 class AddAtoDialog;
 class ImportDialog;
+class PlotBoxDialog;
 
 class MainWindow : public QMainWindow
 {
@@ -40,6 +41,7 @@ private slots:
     void runEPSR();
     void runEPSRcheck();
     void plot();
+    void plotBox();
     void plotEPSRshell();
     void plotJmol();
     void splot2d();
@@ -80,7 +82,7 @@ private:
     QString dataFileExt_; //data file extension
     QString epsrInpFileName_; //filename and extension for EPSR.inp file
     QFileSystemWatcher epsrFinished_;
-    QFileSystemWatcher epsrRunning_;
+    QFileSystemWatcher jmolFile_;
     int inpEntries_;
     QByteArray messageText_;
     QProcess processEPSR_;
@@ -112,6 +114,7 @@ public slots:
     void plotZoom1(QWheelEvent *event);
     void plotZoom2(QWheelEvent *event);
     void enableButtons();
+    void makeMolFile();
 
     // Mol Files Tab
 private slots:
@@ -124,7 +127,6 @@ private slots:
     void on_molFileList_itemSelectionChanged();
     void on_viewMolFileButton_clicked(bool checked);
     void setSelectedMolFile();
-    void runMolOptions();
     void on_addLJRowAboveButton_clicked(bool checked);
     void on_addLJRowBelowButton_clicked (bool checked);
     void on_deleteLJRowButton_clicked (bool checked);
@@ -158,8 +160,6 @@ public:
     int nMolFiles;
 
 private:
-    void runjmol();
-    void makeMolFile();
     bool readMolFile();
     bool updateMolFile();
     bool readAtoFile();
@@ -174,7 +174,6 @@ private slots:
     void on_updateAtoFileButton_clicked(bool checked);
     void on_fmoleButton_clicked(bool checked);
     void on_atoEPSRButton_clicked(bool checked);
-    void on_viewAtoFileButton_clicked(bool checked);
     void on_boxCompositionButton_clicked(bool checked);
     void on_SSbutton_clicked(bool checked);
     void on_tetherButton_clicked(bool checked);

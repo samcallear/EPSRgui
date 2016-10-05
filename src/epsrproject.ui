@@ -1190,200 +1190,183 @@
            <attribute name="title">
             <string>Simulation box</string>
            </attribute>
-           <layout class="QHBoxLayout" name="horizontalLayout_31">
+           <layout class="QHBoxLayout" name="horizontalLayout_18">
             <item>
-             <layout class="QGridLayout" name="gridLayout_10" rowstretch="2,5" columnstretch="2,2">
-              <property name="spacing">
-               <number>0</number>
-              </property>
-              <item row="0" column="0">
-               <widget class="QGroupBox" name="groupBox_11">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                  <horstretch>0</horstretch>
-                  <verstretch>1</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="title">
-                 <string>Create simulation box</string>
-                </property>
-                <layout class="QGridLayout" name="gridLayout_12">
-                 <item row="0" column="0">
-                  <widget class="QTableWidget" name="atoFileTable">
-                   <property name="maximumSize">
-                    <size>
-                     <width>16777215</width>
-                     <height>2000</height>
-                    </size>
-                   </property>
-                   <property name="horizontalScrollBarPolicy">
-                    <enum>Qt::ScrollBarAlwaysOff</enum>
-                   </property>
-                   <property name="sizeAdjustPolicy">
-                    <enum>QAbstractScrollArea::AdjustIgnored</enum>
-                   </property>
-                   <property name="columnCount">
-                    <number>3</number>
-                   </property>
-                   <attribute name="horizontalHeaderVisible">
-                    <bool>false</bool>
-                   </attribute>
-                   <attribute name="horizontalHeaderDefaultSectionSize">
-                    <number>120</number>
-                   </attribute>
-                   <attribute name="verticalHeaderVisible">
-                    <bool>false</bool>
-                   </attribute>
-                   <attribute name="verticalHeaderDefaultSectionSize">
-                    <number>25</number>
-                   </attribute>
-                   <column>
-                    <property name="text">
-                     <string>Component</string>
-                    </property>
-                   </column>
-                   <column>
-                    <property name="text">
-                     <string>Charge</string>
-                    </property>
-                   </column>
-                   <column>
-                    <property name="text">
-                     <string># in box</string>
-                    </property>
-                   </column>
-                  </widget>
-                 </item>
-                 <item row="1" column="0">
-                  <layout class="QHBoxLayout" name="horizontalLayout_16">
-                   <item>
-                    <widget class="QLabel" name="label_5">
-                     <property name="text">
-                      <string>Atomic Number Density</string>
-                     </property>
-                     <property name="buddy">
-                      <cstring>numberDensityLineEdit</cstring>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QLineEdit" name="numberDensityLineEdit">
-                     <property name="inputMethodHints">
-                      <set>Qt::ImhNone</set>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QLabel" name="label">
-                     <property name="text">
-                      <string>atoms / Å&lt;sup&gt;3&lt;/sup&gt;</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <spacer name="horizontalSpacer_11">
-                     <property name="orientation">
-                      <enum>Qt::Horizontal</enum>
-                     </property>
-                     <property name="sizeHint" stdset="0">
-                      <size>
-                       <width>40</width>
-                       <height>20</height>
-                      </size>
-                     </property>
-                    </spacer>
-                   </item>
-                  </layout>
-                 </item>
-                 <item row="2" column="0">
-                  <layout class="QHBoxLayout" name="horizontalLayout_17">
-                   <item>
-                    <widget class="QLabel" name="label_2">
-                     <property name="text">
-                      <string>Create simulation box   </string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QPushButton" name="mixatoButton">
-                     <property name="text">
-                      <string>Mixato</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QLabel" name="label_3">
-                     <property name="text">
-                      <string>  or  </string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QPushButton" name="addatoButton">
-                     <property name="text">
-                      <string>Addato</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QLabel" name="label_52">
-                     <property name="text">
-                      <string>  or  </string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QPushButton" name="loadBoxButton">
-                     <property name="text">
-                      <string>Load box</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <spacer name="horizontalSpacer_9">
-                     <property name="orientation">
-                      <enum>Qt::Horizontal</enum>
-                     </property>
-                     <property name="sizeHint" stdset="0">
-                      <size>
-                       <width>40</width>
-                       <height>20</height>
-                      </size>
-                     </property>
-                    </spacer>
-                   </item>
-                  </layout>
-                 </item>
-                 <item row="3" column="0">
-                  <layout class="QHBoxLayout" name="horizontalLayout_18">
-                   <item>
-                    <widget class="QPushButton" name="randomiseButton">
-                     <property name="text">
-                      <string>Randomise</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <spacer name="horizontalSpacer_10">
-                     <property name="orientation">
-                      <enum>Qt::Horizontal</enum>
-                     </property>
-                     <property name="sizeHint" stdset="0">
-                      <size>
-                       <width>40</width>
-                       <height>20</height>
-                      </size>
-                     </property>
-                    </spacer>
-                   </item>
-                  </layout>
-                 </item>
-                </layout>
-                <zorder>atoFileTable</zorder>
-                <zorder></zorder>
-               </widget>
+             <layout class="QGridLayout" name="gridLayout_10" rowstretch="1,2">
+              <item row="0" column="1">
+               <layout class="QGridLayout" name="gridLayout_4" rowstretch="2,1,1,1,2" columnstretch="1,1,1,1">
+                <item row="1" column="2" colspan="2">
+                 <spacer name="horizontalSpacer_3">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>108</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item row="2" column="1">
+                 <widget class="QPushButton" name="fmoleButton">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>16777215</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>Run fmole</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="3">
+                 <widget class="QLabel" name="label_11">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                    <horstretch>0</horstretch>
+                    <verstretch>1</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>0</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>iterations</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="1">
+                 <widget class="QPushButton" name="randomiseButton">
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>16777215</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>Randomise</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="2">
+                 <widget class="QLineEdit" name="fmoleLineEdit">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>0</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>10000</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="3" column="2" colspan="2">
+                 <spacer name="horizontalSpacer_2">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>98</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item row="3" column="1">
+                 <widget class="QPushButton" name="atoEPSRButton">
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>16777215</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                  <property name="layoutDirection">
+                   <enum>Qt::LeftToRight</enum>
+                  </property>
+                  <property name="text">
+                   <string>Run changeato for box</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="1">
+                 <spacer name="horizontalSpacer_10">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item row="4" column="1">
+                 <spacer name="horizontalSpacer_18">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item row="3" column="0">
+                 <spacer name="horizontalSpacer_9">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>20</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
               </item>
-              <item row="0" column="1" rowspan="2">
+              <item row="1" column="0" colspan="2">
                <widget class="QGroupBox" name="detailsGrpBox">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -1394,15 +1377,54 @@
                 <property name="title">
                  <string>Simulation box details</string>
                 </property>
-                <layout class="QVBoxLayout" name="verticalLayout_7">
+                <layout class="QHBoxLayout" name="horizontalLayout_17">
                  <item>
-                  <layout class="QGridLayout" name="gridLayout_9">
-                   <item row="0" column="0">
-                    <widget class="QLabel" name="boxAtoNameLabel">
+                  <layout class="QGridLayout" name="gridLayout_9" columnstretch="4,4,4,4,4">
+                   <item row="14" column="0">
+                    <spacer name="verticalSpacer_13">
+                     <property name="orientation">
+                      <enum>Qt::Vertical</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>20</width>
+                       <height>40</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
+                   <item row="4" column="4">
+                    <widget class="QLabel" name="label_18">
                      <property name="sizePolicy">
                       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                       <horstretch>3</horstretch>
-                       <verstretch>2</verstretch>
+                       <horstretch>1</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="text">
+                      <string/>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="5" column="4">
+                    <widget class="QLabel" name="label_37">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                       <horstretch>1</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="text">
+                      <string/>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="4" column="0">
+                    <widget class="QLabel" name="boxAtoLengthLabel">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
                       </sizepolicy>
                      </property>
                      <property name="minimumSize">
@@ -1412,7 +1434,64 @@
                       </size>
                      </property>
                      <property name="text">
-                      <string>Name of box .ato file</string>
+                      <string>Box axes / Å</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="4" column="3">
+                    <widget class="QLabel" name="boxAtoLengthC">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                       <horstretch>1</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>0</width>
+                       <height>0</height>
+                      </size>
+                     </property>
+                     <property name="text">
+                      <string/>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="5" column="0">
+                    <widget class="QLabel" name="label_36">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>0</width>
+                       <height>20</height>
+                      </size>
+                     </property>
+                     <property name="text">
+                      <string>Box angles (polar) / °</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="3" column="0">
+                    <widget class="QLabel" name="boxAtoChargeLabel">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>0</width>
+                       <height>20</height>
+                      </size>
+                     </property>
+                     <property name="text">
+                      <string>Total charge of system</string>
                      </property>
                     </widget>
                    </item>
@@ -1420,8 +1499,8 @@
                     <widget class="QLabel" name="boxAtoMolsLabel">
                      <property name="sizePolicy">
                       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                       <horstretch>3</horstretch>
-                       <verstretch>2</verstretch>
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
                       </sizepolicy>
                      </property>
                      <property name="minimumSize">
@@ -1448,19 +1527,45 @@
                      </property>
                     </widget>
                    </item>
-                   <item row="2" column="3">
-                    <widget class="QPushButton" name="boxCompositionButton">
+                   <item row="2" column="1">
+                    <widget class="QLabel" name="boxAtoAtoms">
                      <property name="text">
-                      <string>Composition</string>
+                      <string/>
                      </property>
                     </widget>
                    </item>
-                   <item row="3" column="0">
-                    <widget class="QLabel" name="boxAtoChargeLabel">
+                   <item row="3" column="1">
+                    <widget class="QLabel" name="boxAtoCharge">
                      <property name="sizePolicy">
                       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                       <horstretch>3</horstretch>
-                       <verstretch>2</verstretch>
+                       <horstretch>7</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="text">
+                      <string/>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="1">
+                    <widget class="QLabel" name="boxAtoMols">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                       <horstretch>7</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="text">
+                      <string/>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="6" column="1">
+                    <widget class="QLabel" name="boxAtoVol">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                       <horstretch>1</horstretch>
+                       <verstretch>0</verstretch>
                       </sizepolicy>
                      </property>
                      <property name="minimumSize">
@@ -1470,21 +1575,59 @@
                       </size>
                      </property>
                      <property name="text">
-                      <string>Total charge of system</string>
+                      <string/>
                      </property>
                     </widget>
                    </item>
                    <item row="6" column="0">
                     <widget class="QLabel" name="label_42">
+                     <property name="minimumSize">
+                      <size>
+                       <width>0</width>
+                       <height>20</height>
+                      </size>
+                     </property>
                      <property name="text">
                       <string>Box volume</string>
                      </property>
                     </widget>
                    </item>
-                   <item row="6" column="3">
+                   <item row="6" column="2">
                     <widget class="QLabel" name="label_43">
                      <property name="text">
                       <string>Å&lt;sup&gt;3&lt;/sup&gt;</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="0" column="0">
+                    <widget class="QLabel" name="boxAtoNameLabel">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>0</width>
+                       <height>20</height>
+                      </size>
+                     </property>
+                     <property name="text">
+                      <string>Name of box .ato file</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="0" column="1">
+                    <widget class="QLabel" name="boxAtoLabel">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                       <horstretch>7</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="text">
+                      <string/>
                      </property>
                     </widget>
                    </item>
@@ -1493,25 +1636,18 @@
                      <property name="sizePolicy">
                       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                        <horstretch>0</horstretch>
-                       <verstretch>1</verstretch>
+                       <verstretch>0</verstretch>
                       </sizepolicy>
                      </property>
                      <property name="text">
-                      <string>Temperature</string>
+                      <string>Temperature / K</string>
                      </property>
                     </widget>
                    </item>
-                   <item row="7" column="1" colspan="2">
+                   <item row="7" column="1">
                     <widget class="QLineEdit" name="temperatureLineEdit">
                      <property name="text">
                       <string/>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="7" column="3">
-                    <widget class="QLabel" name="label_17">
-                     <property name="text">
-                      <string>K</string>
                      </property>
                     </widget>
                    </item>
@@ -1520,7 +1656,7 @@
                      <property name="sizePolicy">
                       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                        <horstretch>0</horstretch>
-                       <verstretch>1</verstretch>
+                       <verstretch>0</verstretch>
                       </sizepolicy>
                      </property>
                      <property name="text">
@@ -1528,7 +1664,7 @@
                      </property>
                     </widget>
                    </item>
-                   <item row="8" column="1" colspan="2">
+                   <item row="8" column="1">
                     <widget class="QLineEdit" name="vibtempLineEdit">
                      <property name="text">
                       <string/>
@@ -1540,7 +1676,7 @@
                      <property name="sizePolicy">
                       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                        <horstretch>0</horstretch>
-                       <verstretch>1</verstretch>
+                       <verstretch>0</verstretch>
                       </sizepolicy>
                      </property>
                      <property name="text">
@@ -1548,27 +1684,14 @@
                      </property>
                     </widget>
                    </item>
-                   <item row="9" column="1" colspan="2">
+                   <item row="9" column="1">
                     <widget class="QLineEdit" name="angtempLineEdit">
                      <property name="text">
                       <string/>
                      </property>
                     </widget>
                    </item>
-                   <item row="10" column="0">
-                    <widget class="QLabel" name="label_9">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                       <horstretch>0</horstretch>
-                       <verstretch>1</verstretch>
-                      </sizepolicy>
-                     </property>
-                     <property name="text">
-                      <string>Dihtemp</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="10" column="1" colspan="2">
+                   <item row="10" column="1">
                     <widget class="QLineEdit" name="dihtempLineEdit">
                      <property name="text">
                       <string/>
@@ -1580,7 +1703,7 @@
                      <property name="sizePolicy">
                       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                        <horstretch>0</horstretch>
-                       <verstretch>1</verstretch>
+                       <verstretch>0</verstretch>
                       </sizepolicy>
                      </property>
                      <property name="text">
@@ -1608,56 +1731,27 @@
                      </property>
                     </widget>
                    </item>
-                   <item row="12" column="0">
-                    <widget class="QPushButton" name="SSbutton">
+                   <item row="10" column="0">
+                    <widget class="QLabel" name="label_9">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
                      <property name="text">
-                      <string>Step sizes</string>
+                      <string>Dihtemp</string>
                      </property>
                     </widget>
                    </item>
-                   <item row="12" column="1" colspan="3">
+                   <item row="13" column="0" colspan="2">
                     <widget class="QGroupBox" name="SSgrpBox">
                      <property name="title">
                       <string/>
                      </property>
                      <layout class="QGridLayout" name="gridLayout_2">
-                      <item row="0" column="0">
-                       <widget class="QLabel" name="label_35">
-                        <property name="text">
-                         <string>Intramolecular translation step size</string>
-                        </property>
-                       </widget>
-                      </item>
-                      <item row="0" column="1">
-                       <widget class="QLineEdit" name="intraTransSSLineEdit">
-                        <property name="text">
-                         <string/>
-                        </property>
-                       </widget>
-                      </item>
-                      <item row="1" column="0">
-                       <widget class="QLabel" name="label_31">
-                        <property name="text">
-                         <string>Group rotation step size</string>
-                        </property>
-                       </widget>
-                      </item>
-                      <item row="1" column="1">
-                       <widget class="QLineEdit" name="grpRotSSLineEdit">
-                        <property name="text">
-                         <string/>
-                        </property>
-                       </widget>
-                      </item>
-                      <item row="2" column="0">
-                       <widget class="QLabel" name="label_30">
-                        <property name="text">
-                         <string>Whole molecule rotation step size</string>
-                        </property>
-                       </widget>
-                      </item>
-                      <item row="2" column="1">
-                       <widget class="QLineEdit" name="molRotSSLineEdit">
+                      <item row="3" column="1">
+                       <widget class="QLineEdit" name="molTransSSLineEdit">
                         <property name="text">
                          <string/>
                         </property>
@@ -1670,24 +1764,72 @@
                         </property>
                        </widget>
                       </item>
-                      <item row="3" column="1">
-                       <widget class="QLineEdit" name="molTransSSLineEdit">
+                      <item row="0" column="0">
+                       <widget class="QLabel" name="label_35">
+                        <property name="text">
+                         <string>Intramolecular translation step size</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="1" column="0">
+                       <widget class="QLabel" name="label_31">
+                        <property name="text">
+                         <string>Group rotation step size</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="2" column="1">
+                       <widget class="QLineEdit" name="molRotSSLineEdit">
                         <property name="text">
                          <string/>
                         </property>
                        </widget>
                       </item>
+                      <item row="2" column="0">
+                       <widget class="QLabel" name="label_30">
+                        <property name="text">
+                         <string>Whole molecule rotation step size</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="0" column="1">
+                       <widget class="QLineEdit" name="intraTransSSLineEdit">
+                        <property name="text">
+                         <string/>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="1" column="1">
+                       <widget class="QLineEdit" name="grpRotSSLineEdit">
+                        <property name="text">
+                         <string/>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="4" column="0">
+                       <spacer name="verticalSpacer_11">
+                        <property name="orientation">
+                         <enum>Qt::Vertical</enum>
+                        </property>
+                        <property name="sizeHint" stdset="0">
+                         <size>
+                          <width>20</width>
+                          <height>40</height>
+                         </size>
+                        </property>
+                       </spacer>
+                      </item>
                      </layout>
                     </widget>
                    </item>
-                   <item row="13" column="0">
+                   <item row="12" column="2">
                     <widget class="QPushButton" name="tetherButton">
                      <property name="text">
                       <string>Tethering</string>
                      </property>
                     </widget>
                    </item>
-                   <item row="13" column="1" colspan="3">
+                   <item row="13" column="2" colspan="2">
                     <widget class="QGroupBox" name="tetherGrpBox">
                      <property name="title">
                       <string/>
@@ -1747,43 +1889,25 @@
                      </layout>
                     </widget>
                    </item>
-                   <item row="15" column="0">
-                    <spacer name="horizontalSpacer_23">
-                     <property name="orientation">
-                      <enum>Qt::Horizontal</enum>
+                   <item row="12" column="1">
+                    <widget class="QPushButton" name="SSbutton">
+                     <property name="text">
+                      <string>Step sizes</string>
                      </property>
-                     <property name="sizeHint" stdset="0">
-                      <size>
-                       <width>160</width>
-                       <height>20</height>
-                      </size>
-                     </property>
-                    </spacer>
+                    </widget>
                    </item>
-                   <item row="17" column="0">
-                    <widget class="QLabel" name="label_11">
+                   <item row="12" column="0">
+                    <widget class="QPushButton" name="boxCompositionButton">
+                     <property name="text">
+                      <string>Composition</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="4" column="2">
+                    <widget class="QLabel" name="boxAtoLengthB">
                      <property name="sizePolicy">
                       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                       <horstretch>0</horstretch>
-                       <verstretch>1</verstretch>
-                      </sizepolicy>
-                     </property>
-                     <property name="minimumSize">
-                      <size>
-                       <width>0</width>
-                       <height>0</height>
-                      </size>
-                     </property>
-                     <property name="text">
-                      <string>Fmole iterations</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="17" column="1" colspan="2">
-                    <widget class="QLineEdit" name="fmoleLineEdit">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                       <horstretch>0</horstretch>
+                       <horstretch>1</horstretch>
                        <verstretch>0</verstretch>
                       </sizepolicy>
                      </property>
@@ -1794,234 +1918,25 @@
                       </size>
                      </property>
                      <property name="text">
-                      <string>10000</string>
+                      <string/>
                      </property>
                     </widget>
                    </item>
-                   <item row="17" column="3">
-                    <widget class="QPushButton" name="fmoleButton">
+                   <item row="4" column="1">
+                    <widget class="QLabel" name="boxAtoLengthA">
                      <property name="sizePolicy">
-                      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                       <horstretch>2</horstretch>
+                      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                       <horstretch>1</horstretch>
                        <verstretch>0</verstretch>
                       </sizepolicy>
                      </property>
-                     <property name="minimumSize">
-                      <size>
-                       <width>0</width>
-                       <height>0</height>
-                      </size>
-                     </property>
                      <property name="text">
-                      <string>Run fmole</string>
+                      <string/>
                      </property>
                     </widget>
                    </item>
-                   <item row="18" column="0">
-                    <spacer name="horizontalSpacer_18">
-                     <property name="orientation">
-                      <enum>Qt::Horizontal</enum>
-                     </property>
-                     <property name="sizeHint" stdset="0">
-                      <size>
-                       <width>154</width>
-                       <height>20</height>
-                      </size>
-                     </property>
-                    </spacer>
-                   </item>
-                   <item row="19" column="0">
-                    <widget class="QPushButton" name="atoEPSRButton">
-                     <property name="maximumSize">
-                      <size>
-                       <width>200</width>
-                       <height>16777215</height>
-                      </size>
-                     </property>
-                     <property name="layoutDirection">
-                      <enum>Qt::LeftToRight</enum>
-                     </property>
-                     <property name="text">
-                      <string>Run changeato for box</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="4" column="0" colspan="4">
-                    <layout class="QHBoxLayout" name="horizontalLayout_25">
-                     <item>
-                      <widget class="QLabel" name="boxAtoLengthLabel">
-                       <property name="sizePolicy">
-                        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                         <horstretch>2</horstretch>
-                         <verstretch>2</verstretch>
-                        </sizepolicy>
-                       </property>
-                       <property name="minimumSize">
-                        <size>
-                         <width>0</width>
-                         <height>20</height>
-                        </size>
-                       </property>
-                       <property name="text">
-                        <string>Box axes</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QLabel" name="boxAtoLengthA">
-                       <property name="sizePolicy">
-                        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                         <horstretch>1</horstretch>
-                         <verstretch>0</verstretch>
-                        </sizepolicy>
-                       </property>
-                       <property name="text">
-                        <string/>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QLabel" name="boxAtoLengthB">
-                       <property name="sizePolicy">
-                        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                         <horstretch>1</horstretch>
-                         <verstretch>0</verstretch>
-                        </sizepolicy>
-                       </property>
-                       <property name="minimumSize">
-                        <size>
-                         <width>0</width>
-                         <height>0</height>
-                        </size>
-                       </property>
-                       <property name="text">
-                        <string/>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QLabel" name="boxAtoLengthC">
-                       <property name="sizePolicy">
-                        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                         <horstretch>1</horstretch>
-                         <verstretch>0</verstretch>
-                        </sizepolicy>
-                       </property>
-                       <property name="minimumSize">
-                        <size>
-                         <width>0</width>
-                         <height>0</height>
-                        </size>
-                       </property>
-                       <property name="text">
-                        <string/>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QLabel" name="label_18">
-                       <property name="sizePolicy">
-                        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                         <horstretch>1</horstretch>
-                         <verstretch>0</verstretch>
-                        </sizepolicy>
-                       </property>
-                       <property name="text">
-                        <string>Å</string>
-                       </property>
-                      </widget>
-                     </item>
-                    </layout>
-                   </item>
-                   <item row="5" column="0" colspan="4">
-                    <layout class="QHBoxLayout" name="horizontalLayout_29">
-                     <item>
-                      <widget class="QLabel" name="label_36">
-                       <property name="sizePolicy">
-                        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                         <horstretch>2</horstretch>
-                         <verstretch>0</verstretch>
-                        </sizepolicy>
-                       </property>
-                       <property name="text">
-                        <string>Box angles (polar)</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QLabel" name="boxAtoAxisA">
-                       <property name="sizePolicy">
-                        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                         <horstretch>1</horstretch>
-                         <verstretch>0</verstretch>
-                        </sizepolicy>
-                       </property>
-                       <property name="minimumSize">
-                        <size>
-                         <width>0</width>
-                         <height>20</height>
-                        </size>
-                       </property>
-                       <property name="text">
-                        <string/>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QLabel" name="boxAtoAxisB">
-                       <property name="sizePolicy">
-                        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                         <horstretch>1</horstretch>
-                         <verstretch>0</verstretch>
-                        </sizepolicy>
-                       </property>
-                       <property name="minimumSize">
-                        <size>
-                         <width>0</width>
-                         <height>0</height>
-                        </size>
-                       </property>
-                       <property name="text">
-                        <string/>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QLabel" name="boxAtoAxisG">
-                       <property name="sizePolicy">
-                        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                         <horstretch>1</horstretch>
-                         <verstretch>0</verstretch>
-                        </sizepolicy>
-                       </property>
-                       <property name="minimumSize">
-                        <size>
-                         <width>0</width>
-                         <height>0</height>
-                        </size>
-                       </property>
-                       <property name="text">
-                        <string/>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QLabel" name="label_37">
-                       <property name="sizePolicy">
-                        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                         <horstretch>1</horstretch>
-                         <verstretch>0</verstretch>
-                        </sizepolicy>
-                       </property>
-                       <property name="text">
-                        <string>°</string>
-                       </property>
-                      </widget>
-                     </item>
-                    </layout>
-                   </item>
-                   <item row="6" column="1" colspan="2">
-                    <widget class="QLabel" name="boxAtoVol">
+                   <item row="5" column="1">
+                    <widget class="QLabel" name="boxAtoAxisA">
                      <property name="sizePolicy">
                       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                        <horstretch>1</horstretch>
@@ -2039,66 +1954,49 @@
                      </property>
                     </widget>
                    </item>
-                   <item row="3" column="1" colspan="2">
-                    <widget class="QLabel" name="boxAtoCharge">
+                   <item row="5" column="3">
+                    <widget class="QLabel" name="boxAtoAxisG">
                      <property name="sizePolicy">
                       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                       <horstretch>7</horstretch>
+                       <horstretch>1</horstretch>
                        <verstretch>0</verstretch>
                       </sizepolicy>
                      </property>
-                     <property name="text">
-                      <string/>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="2" column="1" colspan="2">
-                    <widget class="QLabel" name="boxAtoAtoms">
-                     <property name="text">
-                      <string/>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="1" column="1" colspan="2">
-                    <widget class="QLabel" name="boxAtoMols">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                       <horstretch>7</horstretch>
-                       <verstretch>0</verstretch>
-                      </sizepolicy>
-                     </property>
-                     <property name="text">
-                      <string/>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="0" column="1" colspan="2">
-                    <widget class="QLabel" name="boxAtoLabel">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                       <horstretch>7</horstretch>
-                       <verstretch>0</verstretch>
-                      </sizepolicy>
-                     </property>
-                     <property name="text">
-                      <string/>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="14" column="0">
-                    <spacer name="horizontalSpacer_22">
-                     <property name="orientation">
-                      <enum>Qt::Horizontal</enum>
-                     </property>
-                     <property name="sizeHint" stdset="0">
+                     <property name="minimumSize">
                       <size>
-                       <width>40</width>
-                       <height>20</height>
+                       <width>0</width>
+                       <height>0</height>
                       </size>
                      </property>
-                    </spacer>
+                     <property name="text">
+                      <string/>
+                     </property>
+                    </widget>
                    </item>
-                   <item row="15" column="1" colspan="2">
+                   <item row="5" column="2">
+                    <widget class="QLabel" name="boxAtoAxisB">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                       <horstretch>1</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>0</width>
+                       <height>0</height>
+                      </size>
+                     </property>
+                     <property name="text">
+                      <string/>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                 <item>
+                  <layout class="QVBoxLayout" name="verticalLayout_7">
+                   <item>
                     <widget class="QPushButton" name="updateAtoFileButton">
                      <property name="sizePolicy">
                       <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -2106,78 +2004,150 @@
                        <verstretch>1</verstretch>
                       </sizepolicy>
                      </property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>105</width>
+                       <height>0</height>
+                      </size>
+                     </property>
                      <property name="text">
                       <string>Update box</string>
                      </property>
                     </widget>
                    </item>
+                   <item>
+                    <spacer name="verticalSpacer_12">
+                     <property name="orientation">
+                      <enum>Qt::Vertical</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>20</width>
+                       <height>40</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
                   </layout>
-                 </item>
-                 <item>
-                  <spacer name="verticalSpacer_11">
-                   <property name="orientation">
-                    <enum>Qt::Vertical</enum>
-                   </property>
-                   <property name="sizeHint" stdset="0">
-                    <size>
-                     <width>20</width>
-                     <height>40</height>
-                    </size>
-                   </property>
-                  </spacer>
                  </item>
                 </layout>
                </widget>
               </item>
-              <item row="1" column="0">
-               <widget class="QGroupBox" name="groupBox_2">
+              <item row="0" column="0">
+               <widget class="QGroupBox" name="groupBox_11">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                   <horstretch>0</horstretch>
-                  <verstretch>5</verstretch>
+                  <verstretch>1</verstretch>
                  </sizepolicy>
                 </property>
-                <property name="minimumSize">
-                 <size>
-                  <width>0</width>
-                  <height>400</height>
-                 </size>
-                </property>
                 <property name="title">
-                 <string>Plot simulation box</string>
+                 <string>Create simulation box</string>
                 </property>
-                <layout class="QGridLayout" name="gridLayout_11">
-                 <item row="0" column="0">
-                  <widget class="QLabel" name="label_15">
-                   <property name="text">
-                    <string>Select atoms to EXCLUDE from plot:</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="1" column="0">
-                  <layout class="QHBoxLayout" name="horizontalLayout_8" stretch="2,4,2">
+                <layout class="QVBoxLayout" name="verticalLayout_19">
+                 <item>
+                  <layout class="QHBoxLayout" name="horizontalLayout_8" stretch="4,1">
                    <item>
-                    <spacer name="horizontalSpacer_2">
-                     <property name="orientation">
-                      <enum>Qt::Horizontal</enum>
-                     </property>
-                     <property name="sizeHint" stdset="0">
+                    <widget class="QTableWidget" name="atoFileTable">
+                     <property name="maximumSize">
                       <size>
-                       <width>40</width>
-                       <height>20</height>
+                       <width>16777215</width>
+                       <height>2000</height>
                       </size>
                      </property>
-                    </spacer>
+                     <property name="horizontalScrollBarPolicy">
+                      <enum>Qt::ScrollBarAlwaysOff</enum>
+                     </property>
+                     <property name="sizeAdjustPolicy">
+                      <enum>QAbstractScrollArea::AdjustIgnored</enum>
+                     </property>
+                     <property name="columnCount">
+                      <number>3</number>
+                     </property>
+                     <attribute name="horizontalHeaderVisible">
+                      <bool>false</bool>
+                     </attribute>
+                     <attribute name="horizontalHeaderDefaultSectionSize">
+                      <number>120</number>
+                     </attribute>
+                     <attribute name="verticalHeaderVisible">
+                      <bool>false</bool>
+                     </attribute>
+                     <attribute name="verticalHeaderDefaultSectionSize">
+                      <number>25</number>
+                     </attribute>
+                     <column>
+                      <property name="text">
+                       <string>Component</string>
+                      </property>
+                     </column>
+                     <column>
+                      <property name="text">
+                       <string>Charge</string>
+                      </property>
+                     </column>
+                     <column>
+                      <property name="text">
+                       <string># in box</string>
+                      </property>
+                     </column>
+                    </widget>
                    </item>
                    <item>
-                    <widget class="QListWidget" name="atoAtomList">
-                     <property name="selectionMode">
-                      <enum>QAbstractItemView::MultiSelection</enum>
+                    <layout class="QVBoxLayout" name="verticalLayout_17">
+                     <item>
+                      <widget class="QPushButton" name="mixatoButton">
+                       <property name="text">
+                        <string>Mixato</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QPushButton" name="addatoButton">
+                       <property name="text">
+                        <string>Addato</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QPushButton" name="loadBoxButton">
+                       <property name="text">
+                        <string>Load box</string>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </item>
+                  </layout>
+                 </item>
+                 <item>
+                  <layout class="QHBoxLayout" name="horizontalLayout_16">
+                   <item>
+                    <widget class="QLabel" name="label_5">
+                     <property name="text">
+                      <string>Atomic Number Density</string>
+                     </property>
+                     <property name="buddy">
+                      <cstring>numberDensityLineEdit</cstring>
                      </property>
                     </widget>
                    </item>
                    <item>
-                    <spacer name="horizontalSpacer_3">
+                    <widget class="QLineEdit" name="numberDensityLineEdit">
+                     <property name="inputMethodHints">
+                      <set>Qt::ImhNone</set>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLabel" name="label">
+                     <property name="text">
+                      <string>atoms / Å&lt;sup&gt;3&lt;/sup&gt;</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <spacer name="horizontalSpacer_11">
                      <property name="orientation">
                       <enum>Qt::Horizontal</enum>
                      </property>
@@ -2190,97 +2160,6 @@
                     </spacer>
                    </item>
                   </layout>
-                 </item>
-                 <item row="1" column="1">
-                  <widget class="QPushButton" name="viewAtoFileButton">
-                   <property name="text">
-                    <string>Plot box</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="2" column="0">
-                  <widget class="QLabel" name="label_13">
-                   <property name="text">
-                    <string>Number of component in centre (0 to plot entire box)</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="2" column="1">
-                  <widget class="QLineEdit" name="plotAtoCentreLineEdit">
-                   <property name="text">
-                    <string>0</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="3" column="0">
-                  <widget class="QLabel" name="label_14">
-                   <property name="text">
-                    <string>Maximum distance along x</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="3" column="1">
-                  <widget class="QLineEdit" name="plotAtoMaxXLineEdit">
-                   <property name="text">
-                    <string>8</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="4" column="0">
-                  <widget class="QLabel" name="label_19">
-                   <property name="text">
-                    <string>Maximum distance along y</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="4" column="1">
-                  <widget class="QLineEdit" name="plotAtoMaxYLineEdit">
-                   <property name="text">
-                    <string>8</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="5" column="0">
-                  <widget class="QLabel" name="label_20">
-                   <property name="text">
-                    <string>Minimum distance along z</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="5" column="1">
-                  <widget class="QLineEdit" name="plotAtoMinZLineEdit">
-                   <property name="text">
-                    <string>-8</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="6" column="0">
-                  <widget class="QLabel" name="label_21">
-                   <property name="text">
-                    <string>Maximum distance along z</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="6" column="1">
-                  <widget class="QLineEdit" name="plotAtoMaxZLineEdit">
-                   <property name="text">
-                    <string>8</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="7" column="0">
-                  <widget class="QLabel" name="label_22">
-                   <property name="text">
-                    <string>Phi, theta, chi rotation coordinates</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="7" column="1">
-                  <widget class="QLineEdit" name="plotAtoRotLineEdit">
-                   <property name="text">
-                    <string>0 0 0</string>
-                   </property>
-                  </widget>
                  </item>
                 </layout>
                </widget>
@@ -3184,6 +3063,7 @@
      <addaction name="plot3dAct"/>
      <addaction name="plot2dAct"/>
     </widget>
+    <addaction name="plotBoxAct"/>
     <addaction name="plotAct"/>
     <addaction name="plotEPSRshellAct"/>
     <addaction name="plotOutputsMenu"/>
@@ -3415,6 +3295,14 @@
     <string>plot2d</string>
    </property>
   </action>
+  <action name="plotBoxAct">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Plot simulation box</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
@@ -3473,7 +3361,6 @@
   <tabstop>addatoButton</tabstop>
   <tabstop>loadBoxButton</tabstop>
   <tabstop>randomiseButton</tabstop>
-  <tabstop>boxCompositionButton</tabstop>
   <tabstop>temperatureLineEdit</tabstop>
   <tabstop>vibtempLineEdit</tabstop>
   <tabstop>angtempLineEdit</tabstop>
@@ -3484,18 +3371,6 @@
   <tabstop>molTransSSLineEdit</tabstop>
   <tabstop>atoTetherTable</tabstop>
   <tabstop>atoTetherTolLineEdit</tabstop>
-  <tabstop>updateAtoFileButton</tabstop>
-  <tabstop>fmoleLineEdit</tabstop>
-  <tabstop>fmoleButton</tabstop>
-  <tabstop>atoEPSRButton</tabstop>
-  <tabstop>atoAtomList</tabstop>
-  <tabstop>viewAtoFileButton</tabstop>
-  <tabstop>plotAtoCentreLineEdit</tabstop>
-  <tabstop>plotAtoMaxXLineEdit</tabstop>
-  <tabstop>plotAtoMaxYLineEdit</tabstop>
-  <tabstop>plotAtoMinZLineEdit</tabstop>
-  <tabstop>plotAtoMaxZLineEdit</tabstop>
-  <tabstop>plotAtoRotLineEdit</tabstop>
   <tabstop>neutronDataRB</tabstop>
   <tabstop>xrayDataRB</tabstop>
   <tabstop>dataFileLineEdit</tabstop>
