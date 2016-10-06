@@ -51,6 +51,10 @@ void MakeAtomDialog::checkFiles()
             accept();
         }
     }
+    else
+    {
+        accept();
+    }
 }
 
 void MakeAtomDialog::on_cancelButton_clicked(bool checked)

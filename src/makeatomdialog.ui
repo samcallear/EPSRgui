@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Make Atom Dialog</string>
+   <string>Create a single atom</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="6" column="0">
