@@ -27,7 +27,7 @@ void MainWindow::showAvailableFiles()
     QStringList outputFilter;
     if (outputSetupFileType_== "plot3djmol")
     {
-        outputFilter << "*.cube.dat";
+        outputFilter << "*.cube.txt";
     }
     else
     if (outputSetupFileType_== "splot2d")
@@ -136,7 +136,6 @@ void MainWindow::setupOutput()
     if (!ui.setupOutNameNew->text().isEmpty())
     {
         outputFileName_ = ui.setupOutNameNew->text();
-//        ui.outputAvailableList->addItem(outputFileName_);
     }
     else
     {
@@ -144,8 +143,6 @@ void MainWindow::setupOutput()
     }
 
     ui.setupOutNameNew->clear();
-
-//    processDetachedFile_ = workingDir_+outputFileName_+"."+outputSetupFileType_+".dat";
 
     QDir::setCurrent(workingDir_);
 
@@ -157,14 +154,49 @@ void MainWindow::setupOutput()
     processSetupOutput.startDetached(epsrBinDir_+"upset", QStringList() << workingDir_ << "upset" << outputSetupFileType_ << outputFileName_);
 #endif
 
-    outputTimerId_ = startTimer(5000);
+    outputFileExt_;
+    if (outputSetupFileType_== "plot3djmol")
+    {
+        outputFileExt_ = ".CUBE.txt";
+    }
+    else
+    if (outputSetupFileType_== "plot2d")
+    {
+        outputFileExt_ = ".plot2d.txt";
+    }
+    else
+    if (outputSetupFileType_== "splot2d")
+    {
+        outputFileExt_ = ".splot2d.txt";
+    }
+    else
+    if (outputSetupFileType_== "triangles")
+    {
+        outputFileExt_ = ".TRI.dat";
+    }
+    else
+    if (outputSetupFileType_== "torangles")
+    {
+        outputFileExt_ = ".TOR.dat";
+    }
+    else
+    if (outputSetupFileType_ == "plot3d")
+    {
+        outputFileExt_ = ".plot3d.txt";
+    }
+    else
+    {
+        outputFileExt_ = "."+outputSetupFileType_.toUpper()+".dat";
+    }
+
+    outputTimerId_ = startTimer(2000);
 }
 
 void MainWindow::on_addOutputButton_clicked(bool checked)
 {
     if (ui.outputAvailableList->count() == 0) return;
     QString fileToAdd = ui.outputAvailableList->currentItem()->text();
-    ui.runOutEPSRList->addItem(fileToAdd);
+    ui.runOutEPSRList->addItem(outputSetupFileType_+": "+fileToAdd);
 }
 
 void MainWindow::on_removeOutputButton_clicked(bool checked)
@@ -176,7 +208,8 @@ void MainWindow::on_removeOutputButton_clicked(bool checked)
 
 void MainWindow::on_applyOutputsButton_clicked(bool checked)
 {
-    //make list of file names to be included
+    //make list of file types and names to be included
+    QStringList outputFileTypes;
     QStringList outputFileNames;
     outputFileNames.clear();
 
@@ -184,8 +217,10 @@ void MainWindow::on_applyOutputsButton_clicked(bool checked)
     {
         for (int i = 0; i < ui.runOutEPSRList->count(); i++)
         {
-            QString fileName = ui.runOutEPSRList->item(i)->text();
+            QString fileName = ui.runOutEPSRList->item(i)->text().split(": ", QString::SkipEmptyParts).at(1);
             outputFileNames.append(fileName);
+            QString fileType = ui.runOutEPSRList->item(i)->text().split(": ", QString::SkipEmptyParts).at(0);
+            outputFileTypes.append(fileType.toLower());
         }
     }
 
@@ -220,7 +255,7 @@ void MainWindow::on_applyOutputsButton_clicked(bool checked)
     dataLine.clear();
 
 
-    do {            // SOMETHING NOT QUITE RIGHT HERE AS ADDS AN ADDITIONAL BLANK LINE AT END OF FILE EACH TIME ADD SOMETHING TO FILE***************************************************
+    do {            // SOMETHING NOT QUITE RIGHT HERE AS ADDS AN ADDITIONAL BLANK LINE AT END OF FILE EACH TIME REMOVE ALL OUTPUTS FROM FILE***************************************************
         line = stream.readLine();
         dataLine = line.split(" ", QString::KeepEmptyParts);
         original.append(line+"\n");
@@ -258,10 +293,11 @@ void MainWindow::on_applyOutputsButton_clicked(bool checked)
                 for (int i = 0; i < outputFileNames.count(); i++)
                 {
                     QString outputFileName = outputFileNames.at(i);
+                    QString outputFileType = outputFileTypes.at(i);
 #ifdef _WIN32
-                    lineToAdd = "%EPSRbin%"+outputSetupFileType_+".exe "+workingDir_+" "+outputSetupFileType_+" "+outputFileName+"\n";
+                    lineToAdd = "%EPSRbin%"+outputFileType+".exe "+workingDir_+" "+outputFileType+" "+outputFileName+"\n";
 #else
-                    lineToAdd = "  \"$EPSRbin\"'"+outputSetupFileType_+"' "+workingDir_+" "+outputSetupFileType_+" "+outputFileName+"\n";
+                    lineToAdd = "  \"$EPSRbin\"'"+outputFileType+"' "+workingDir_+" "+outputFileType+" "+outputFileName+"\n";
 #endif
                     original.append(lineToAdd);
                 }
@@ -301,7 +337,7 @@ void MainWindow::on_applyOutputsButton_clicked(bool checked)
 #endif
                     original.append(lineToAdd);
                 }
-                original.append(line);
+                original.append(line+"\n"); //need the \n here otherwise messes up linux script
             }
         }
     } while (!line.isNull());

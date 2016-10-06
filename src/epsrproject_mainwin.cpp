@@ -2358,7 +2358,7 @@ void MainWindow::timerEvent(QTimerEvent *event)
 {
     if (event->timerId() == outputTimerId_)
     {
-        QFile file(workingDir_+outputFileName_+"."+outputSetupFileType_+".dat");
+        QFile file(workingDir_+outputFileName_+outputFileExt_);
         if (file.exists())
         {
             showAvailableFiles();

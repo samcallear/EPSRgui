@@ -3178,7 +3178,7 @@
   </action>
   <action name="settingsAct">
    <property name="text">
-    <string>EPSRProject Settings...</string>
+    <string>EPSRgui settings...</string>
    </property>
   </action>
   <action name="saveAct">

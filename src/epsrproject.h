@@ -246,6 +246,7 @@ private:
     void setupOutput();
     QString outputFileName_;
     QString outputSetupFileType_;
+    QString outputFileExt_;
     QString outputRunFileType_;
     void showAvailableFiles();
     void getOutputsRunning();
