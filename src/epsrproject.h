@@ -19,6 +19,7 @@ class BoxCompositionDialog;
 class AddAtoDialog;
 class ImportDialog;
 class PlotBoxDialog;
+class SetupOutputDialog;
 
 class MainWindow : public QMainWindow
 {
@@ -104,6 +105,9 @@ public:
     QStringList atomLabels();
     QVector<int> numberOfEachAtomLabel();
     QStringList listAtoFiles();
+    QString outputFileName();
+    QString outputSetupFileType();
+    QString outputFileExt();
     QByteArray messageText();
 
 public slots:
@@ -244,16 +248,21 @@ public:
     //epsr outputs
 private:
     void setupOutput();
+    void setupPlot();
     QString outputFileName_;
     QString outputSetupFileType_;
     QString outputFileExt_;
     QString outputRunFileType_;
+    QString plotSetupFileType_;
+    QString plotFileName_;
+    QString plotFileExt_;
     void showAvailableFiles();
     void getOutputsRunning();
 
 private slots:
     void on_setupOutButton_clicked(bool checked);
-    void getOutputType(); 
+    void on_setupPlotButton_clicked(bool checked);
+    void getOutputType();
     void on_addOutputButton_clicked(bool checked);
     void on_removeOutputButton_clicked(bool checked);
     void on_applyOutputsButton_clicked(bool checked);

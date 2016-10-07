@@ -6,6 +6,7 @@
 #include <QFile>
 
 #include "epsrproject.h"
+#include "setupoutputdialog.h"
 
 void MainWindow::on_setupOutButton_clicked(bool checked)
 {
@@ -16,25 +17,19 @@ void MainWindow::getOutputType()
 {
    outputSetupFileType_ = ui.setupOutTypeComboBox->currentText();
    outputSetupFileType_ = outputSetupFileType_.toLower();
+
+   plotSetupFileType_ = ui.setupPlotTypeComboBox->currentText();
+   plotSetupFileType_ = plotSetupFileType_.toLower();
    showAvailableFiles();
 }
 
 void MainWindow::showAvailableFiles()
 {
+    //show available outputs
     ui.outputAvailableList->clear();
 
     QDir dir;
     QStringList outputFilter;
-    if (outputSetupFileType_== "plot3djmol")
-    {
-        outputFilter << "*.cube.txt";
-    }
-    else
-    if (outputSetupFileType_== "splot2d")
-    {
-        outputFilter << "*.splot2d.txt";
-    }
-    else
     if (outputSetupFileType_== "triangles")
     {
         outputFilter << "*.tri.dat";
@@ -45,31 +40,42 @@ void MainWindow::showAvailableFiles()
         outputFilter << "*.tor.dat";
     }
     else
-    if (outputSetupFileType_ == "plot2d")
-    {
-        outputFilter << "*.plot2d.txt";
-    }
-    else
-    if (outputSetupFileType_ == "plot3d")
-    {
-        outputFilter << "*.plot3d.txt";
-    }
-    else
     {
         outputFilter << "*."+outputSetupFileType_+".dat";
     }
     QStringList files = dir.entryList(outputFilter, QDir::Files);
-    if (files.isEmpty())
+    if (!files.isEmpty())
     {
-        return;
+        for (int i = 0; i < files.count(); i++)
+        {
+            QString fileName = files.at(i).split(".",QString::SkipEmptyParts).at(0);
+            ui.outputAvailableList->addItem(fileName);
+        }
+        ui.outputAvailableList->setCurrentRow(0);
     }
 
-    for (int i = 0; i < files.count(); i++)
+    //show available plot routines
+    ui.plotsAvailableList->clear();
+
+    QStringList plotFilter;
+    if (plotSetupFileType_ == "plot3djmol")
     {
-        QString fileName = files.at(i).split(".",QString::SkipEmptyParts).at(0);
-        ui.outputAvailableList->addItem(fileName);
+        plotFilter << "*.cube.txt";
     }
-    ui.outputAvailableList->setCurrentRow(0);
+    else
+    {
+        plotFilter << "*."+plotSetupFileType_+".txt";
+    }
+    QStringList plotFiles = dir.entryList(plotFilter, QDir::Files);
+    if (!plotFiles.isEmpty())
+    {
+        for (int i = 0; i < plotFiles.count(); i++)
+        {
+            QString plotFileName = plotFiles.at(i).split(".",QString::SkipEmptyParts).at(0);
+            ui.plotsAvailableList->addItem(plotFileName);
+        }
+        ui.plotsAvailableList->setCurrentRow(0);
+    }
 }
 
 void MainWindow::getOutputsRunning()
@@ -104,14 +110,10 @@ void MainWindow::getOutputsRunning()
                 || line.contains("coord")
                 || line.contains("mapgr")
                 || line.contains("partials")
-                || line.contains("plot2d")
-                || line.contains("plot3d")
-                || line.contains("plot3djmol")
                 || line.contains("rings")
                 || line.contains("sdf")
                 || line.contains("sdfcube")
                 || line.contains("sharm")
-                || line.contains("splot2d")
                 || line.contains("torangles")
                 || line.contains("triangles")
                 || line.contains("voids"))
@@ -144,32 +146,6 @@ void MainWindow::setupOutput()
 
     ui.setupOutNameNew->clear();
 
-    QDir::setCurrent(workingDir_);
-
-    QProcess processSetupOutput;
-    processSetupOutput.setProcessChannelMode(QProcess::ForwardedChannels);
-#ifdef _WIN32
-    processSetupOutput.startDetached(epsrBinDir_+"upset.exe", QStringList() << workingDir_ << "upset" << outputSetupFileType_ << outputFileName_);
-#else
-    processSetupOutput.startDetached(epsrBinDir_+"upset", QStringList() << workingDir_ << "upset" << outputSetupFileType_ << outputFileName_);
-#endif
-
-    outputFileExt_;
-    if (outputSetupFileType_== "plot3djmol")
-    {
-        outputFileExt_ = ".CUBE.txt";
-    }
-    else
-    if (outputSetupFileType_== "plot2d")
-    {
-        outputFileExt_ = ".plot2d.txt";
-    }
-    else
-    if (outputSetupFileType_== "splot2d")
-    {
-        outputFileExt_ = ".splot2d.txt";
-    }
-    else
     if (outputSetupFileType_== "triangles")
     {
         outputFileExt_ = ".TRI.dat";
@@ -180,16 +156,18 @@ void MainWindow::setupOutput()
         outputFileExt_ = ".TOR.dat";
     }
     else
-    if (outputSetupFileType_ == "plot3d")
-    {
-        outputFileExt_ = ".plot3d.txt";
-    }
-    else
     {
         outputFileExt_ = "."+outputSetupFileType_.toUpper()+".dat";
     }
 
-    outputTimerId_ = startTimer(2000);
+    SetupOutputDialog setupOutputDialog(this);
+
+    setupOutputDialog.show();
+    setupOutputDialog.raise();
+    setupOutputDialog.activateWindow();
+    setupOutputDialog.exec();
+
+//    outputTimerId_ = startTimer(2000);
 }
 
 void MainWindow::on_addOutputButton_clicked(bool checked)
@@ -257,21 +235,17 @@ void MainWindow::on_applyOutputsButton_clicked(bool checked)
 
     do {            // SOMETHING NOT QUITE RIGHT HERE AS ADDS AN ADDITIONAL BLANK LINE AT END OF FILE EACH TIME REMOVE ALL OUTPUTS FROM FILE***************************************************
         line = stream.readLine();
-        dataLine = line.split(" ", QString::KeepEmptyParts);
+        dataLine = line.split(" ", QString::SkipEmptyParts);
         original.append(line+"\n");
         if (line.contains("chains")             //remove all entries in script file
                 || line.contains("clusters")
                 || line.contains("coord")
                 || line.contains("mapgr")
                 || line.contains("partials")
-                || line.contains("plot2d")
-                || line.contains("plot3d")
-                || line.contains("plot3djmol")
                 || line.contains("rings")
                 || line.contains("sdf")
                 || line.contains("sdfcube")
                 || line.contains("sharm")
-                || line.contains("splot2d")
                 || line.contains("torangles")
                 || line.contains("triangles")
                 || line.contains("voids")
@@ -347,4 +321,52 @@ void MainWindow::on_applyOutputsButton_clicked(bool checked)
     batFile.close();
 
     ui.messagesLineEdit->setText("script file updated");
+}
+
+void MainWindow::on_setupPlotButton_clicked(bool checked)
+{
+    setupPlot();
+}
+
+void MainWindow::setupPlot()
+{
+    if (ui.setupPlotNameNew->text().isEmpty() && ui.plotsAvailableList->count() == 0)
+    {
+        QMessageBox msgBox;
+        msgBox.setText("Type a name for the new file");
+        msgBox.exec();
+        return;
+    }
+
+    if (!ui.setupPlotNameNew->text().isEmpty())
+    {
+        plotFileName_ = ui.setupPlotNameNew->text();
+    }
+    else
+    {
+        plotFileName_ = ui.plotsAvailableList->currentItem()->text();
+    }
+
+    ui.setupPlotNameNew->clear();
+
+    QDir::setCurrent(workingDir_);
+
+    QProcess processSetupOutput;
+    processSetupOutput.setProcessChannelMode(QProcess::ForwardedChannels);
+#ifdef _WIN32
+    processSetupOutput.startDetached(epsrBinDir_+"upset.exe", QStringList() << workingDir_ << "upset" << plotSetupFileType_ << plotFileName_);
+#else
+    processSetupOutput.startDetached(epsrBinDir_+"upset", QStringList() << workingDir_ << "upset" << plotSetupFileType_ << plotFileName_);
+#endif
+
+    if (plotSetupFileType_== "plot3djmol")
+    {
+        plotFileExt_ = ".CUBE.txt";
+    }
+    else
+    {
+        plotFileExt_ = "."+plotSetupFileType_+".txt";
+    }
+
+    outputTimerId_ = startTimer(2000);
 }

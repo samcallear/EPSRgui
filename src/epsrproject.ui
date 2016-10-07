@@ -2650,21 +2650,6 @@
                    </item>
                    <item>
                     <property name="text">
-                     <string>Plot2D</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
-                     <string>Plot3D</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
-                     <string>Plot3Djmol</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
                      <string>Rings</string>
                     </property>
                    </item>
@@ -2681,11 +2666,6 @@
                    <item>
                     <property name="text">
                      <string>Sharm</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
-                     <string>Splot2D</string>
                     </property>
                    </item>
                    <item>
@@ -2788,6 +2768,90 @@
              </widget>
             </item>
             <item>
+             <widget class="QGroupBox" name="groupBox_2">
+              <property name="title">
+               <string>Setup EPSR density plots</string>
+              </property>
+              <layout class="QHBoxLayout" name="horizontalLayout_25">
+               <item>
+                <layout class="QGridLayout" name="gridLayout_11">
+                 <item row="0" column="0">
+                  <widget class="QLabel" name="label_2">
+                   <property name="text">
+                    <string>Plotting routine</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="1">
+                  <widget class="QComboBox" name="setupPlotTypeComboBox">
+                   <item>
+                    <property name="text">
+                     <string>Plot2d</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>Plot3d</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>Plot3djmol</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>Splot2d</string>
+                    </property>
+                   </item>
+                  </widget>
+                 </item>
+                 <item row="1" column="0">
+                  <widget class="QLabel" name="label_3">
+                   <property name="text">
+                    <string>Existing plotting routines</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="1" colspan="2">
+                  <widget class="QListWidget" name="plotsAvailableList"/>
+                 </item>
+                 <item row="2" column="0">
+                  <widget class="QLabel" name="label_13">
+                   <property name="text">
+                    <string>New plotting routine name</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="2" column="1">
+                  <widget class="QLineEdit" name="setupPlotNameNew"/>
+                 </item>
+                 <item row="2" column="2">
+                  <widget class="QPushButton" name="setupPlotButton">
+                   <property name="text">
+                    <string>Setup</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <spacer name="horizontalSpacer_22">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>600</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
              <spacer name="verticalSpacer_7">
               <property name="orientation">
                <enum>Qt::Vertical</enum>
@@ -2795,7 +2859,7 @@
               <property name="sizeHint" stdset="0">
                <size>
                 <width>20</width>
-                <height>454</height>
+                <height>200</height>
                </size>
               </property>
              </spacer>

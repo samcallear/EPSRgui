@@ -11,6 +11,7 @@
 #include "messagesdialog.h"
 #include "importdialog.h"
 #include "plotboxdialog.h"
+#include "setupoutputdialog.h"
 
 #include <QtGui>
 #include <QMainWindow>
@@ -86,6 +87,7 @@ MainWindow::MainWindow(QMainWindow *parent) : QMainWindow(parent), messagesDialo
     connect(ui.plot2, SIGNAL(mouseWheel(QWheelEvent*)), this, SLOT(plotZoom2(QWheelEvent*)));
 
     connect(ui.setupOutTypeComboBox, SIGNAL(currentIndexChanged(QString)), this, SLOT(getOutputType()));
+    connect(ui.setupPlotTypeComboBox, SIGNAL(currentIndexChanged(QString)), this, SLOT(getOutputType()));
     connect(&processEPSR_, SIGNAL(readyReadStandardOutput()), this, SLOT(outputfromEPSRprocessReady()));
     connect(&epsrFinished_, SIGNAL(fileChanged(const QString &)), this, SLOT(enableButtons()));
     connect(&jmolFile_, SIGNAL(directoryChanged(const QString &)), this, SLOT(makeMolFile()));
@@ -2049,6 +2051,21 @@ QStringList MainWindow::listAtoFiles()
     return atoFileList;
 }
 
+QString MainWindow::outputFileName()
+{
+    return outputFileName_;
+}
+
+QString MainWindow::outputSetupFileType()
+{
+    return outputSetupFileType_;
+}
+
+QString MainWindow::outputFileExt()
+{
+    return outputFileExt_;
+}
+
 QByteArray MainWindow::messageText()
 {
     return messageText_;
@@ -2358,8 +2375,9 @@ void MainWindow::timerEvent(QTimerEvent *event)
 {
     if (event->timerId() == outputTimerId_)
     {
-        QFile file(workingDir_+outputFileName_+outputFileExt_);
-        if (file.exists())
+        QFile outfile(workingDir_+outputFileName_+outputFileExt_);
+        QFile plotFile(workingDir_+plotFileName_+plotFileExt_);
+        if (outfile.exists() || plotFile.exists())
         {
             showAvailableFiles();
             killTimer(outputTimerId_);
