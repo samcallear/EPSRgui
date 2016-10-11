@@ -19,6 +19,10 @@ private:
     QString outputFileExt_;
     QString epsrBinDir_;
     QString workingDir_;
+    int settingEntries_;
+    int linesPerEntry_;
+    int entry_;
+//    QString header_;
     MainWindow *mainWindow_;
 
     void makeOutputSetupFile();
@@ -26,11 +30,12 @@ private:
     void updateTables();
 
 private slots:
+    void on_calcsList_itemSelectionChanged();
     void on_saveButton_clicked(bool checked);
     void writeOutputFile();
     void on_cancelButton_clicked(bool checked);
-    void on_addTabButton_clicked(bool checked);
-    void on_removeTabButton_clicked(bool checked);
+    void on_addCalcButton_clicked(bool checked);
+    void on_removeCalcButton_clicked(bool checked);
     void on_deleteOutputButton_clicked(bool checked);
 
 public:

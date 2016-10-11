@@ -167,6 +167,7 @@ void MainWindow::setupOutput()
     setupOutputDialog.activateWindow();
     setupOutputDialog.exec();
 
+    showAvailableFiles();
 //    outputTimerId_ = startTimer(2000);
 }
 

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>688</width>
-    <height>509</height>
+    <width>940</width>
+    <height>673</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -65,75 +65,73 @@
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_2">
-     <item>
-      <widget class="QTabWidget" name="calcTabWidget">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-       <property name="currentIndex">
-        <number>0</number>
-       </property>
-       <widget class="QWidget" name="tab">
-        <attribute name="title">
-         <string>1</string>
-        </attribute>
-        <layout class="QHBoxLayout" name="horizontalLayout_3">
-         <item>
-          <widget class="QTableWidget" name="outputSettingsTableTab1">
-           <column>
+    <widget class="QGroupBox" name="calcGroupBox">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="title">
+      <string>Setup Calculation</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_3">
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,0,4">
+        <item>
+         <widget class="QListWidget" name="calcsList"/>
+        </item>
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout">
+          <item>
+           <widget class="QPushButton" name="addCalcButton">
             <property name="text">
-             <string>Keyword</string>
+             <string>Add</string>
             </property>
-           </column>
-           <column>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="removeCalcButton">
             <property name="text">
-             <string>Value</string>
+             <string>Remove</string>
             </property>
-           </column>
-           <column>
-            <property name="text">
-             <string>Description</string>
+           </widget>
+          </item>
+          <item>
+           <spacer name="verticalSpacer">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
             </property>
-           </column>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-      </widget>
-     </item>
-     <item>
-      <layout class="QVBoxLayout" name="verticalLayout">
-       <item>
-        <widget class="QPushButton" name="addTabButton">
-         <property name="text">
-          <string>Add</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="removeTabButton">
-         <property name="text">
-          <string>Remove</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <spacer name="verticalSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-      </layout>
-     </item>
-    </layout>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <widget class="QTableWidget" name="calcSettingsTable">
+          <column>
+           <property name="text">
+            <string>Keyword</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Value</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Description</string>
+           </property>
+          </column>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
@@ -165,7 +163,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="deleteRoutineButton">
+      <widget class="QPushButton" name="deleteOutputButton">
        <property name="text">
         <string>Cancel and Delete</string>
        </property>
