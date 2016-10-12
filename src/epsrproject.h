@@ -108,6 +108,11 @@ public:
     QString outputFileName();
     QString outputSetupFileType();
     QString outputFileExt();
+    int showOutputType();
+    QString plotFileName();
+    QString plotSetupFileType();
+    QString plotFileExt();
+    QString coeffFileName();
     QByteArray messageText();
 
 public slots:
@@ -256,6 +261,8 @@ private:
     QString plotSetupFileType_;
     QString plotFileName_;
     QString plotFileExt_;
+    int outputType_;
+    QString coeffFileName_;
     void showAvailableFiles();
     void getOutputsRunning();
 

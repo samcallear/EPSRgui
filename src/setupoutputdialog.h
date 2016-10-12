@@ -17,6 +17,8 @@ private:
     QString outputFileName_;
     QString outputSetupFileType_;
     QString outputFileExt_;
+    int outputType_;
+    QString coeffFileName_;
     QString epsrBinDir_;
     QString workingDir_;
     int settingEntries_;
@@ -25,7 +27,6 @@ private:
 //    QString header_;
     MainWindow *mainWindow_;
 
-    void makeOutputSetupFile();
     void readOutputSetupFile();
     void updateTables();
 
@@ -37,6 +38,7 @@ private slots:
     void on_addCalcButton_clicked(bool checked);
     void on_removeCalcButton_clicked(bool checked);
     void on_deleteOutputButton_clicked(bool checked);
+    void on_browseButton_clicked(bool checked);
 
 public:
     SetupOutputDialog(MainWindow *parent = 0);

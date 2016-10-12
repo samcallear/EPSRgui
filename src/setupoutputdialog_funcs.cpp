@@ -22,11 +22,30 @@ SetupOutputDialog::SetupOutputDialog(MainWindow *parent) : QDialog(parent)
     epsrBinDir_ = mainWindow_->epsrDir()+"bin/";
     epsrBinDir_ = QDir::toNativeSeparators(epsrBinDir_);
 
-    atoFileName_ = mainWindow_->atoFileName();
-    ui.atoFileLabel->setText(atoFileName_);
-    outputFileName_ = mainWindow_->outputFileName();
-    outputSetupFileType_ = mainWindow_->outputSetupFileType();
-    outputFileExt_ = mainWindow_->outputFileExt();
+    outputType_ = mainWindow_->showOutputType();
+    if (outputType_ == 1)
+    {
+        atoFileName_ = mainWindow_->atoFileName();
+        ui.atoFileLabel->setText(atoFileName_);
+        outputFileName_ = mainWindow_->outputFileName();
+        outputSetupFileType_ = mainWindow_->outputSetupFileType();
+        outputSetupFileType_ = outputSetupFileType_.toUpper();
+        outputFileExt_ = mainWindow_->outputFileExt();
+        this->setWindowTitle("Setup Output Routine: "+outputSetupFileType_+" "+outputFileName_);
+        ui.atoORcoeffLabel->setText("Simulation box name:");
+        ui.browseButton->setDisabled(true);
+    }
+    else
+    if (outputType_ == 2)
+    {
+        coeffFileName_ = mainWindow_->coeffFileName();
+        outputFileName_ = mainWindow_->plotFileName();
+        outputSetupFileType_ = mainWindow_->plotSetupFileType();
+        outputFileExt_ = mainWindow_->plotFileExt();
+        this->setWindowTitle("Setup Plot Routine: "+outputSetupFileType_+" "+outputFileName_);
+        ui.atoORcoeffLabel->setText("Coefficients file name:");
+        ui.browseButton->setEnabled(true);
+    }
 
     settingEntries_ = 0;
     linesPerEntry_ = 0;
@@ -35,38 +54,11 @@ SetupOutputDialog::SetupOutputDialog(MainWindow *parent) : QDialog(parent)
     outputValues.clear();
     outputDescriptions.clear();
 
-    this->setWindowTitle("Setup Output Routine: "+outputSetupFileType_+" "+outputFileName_);
-
     connect(ui.saveButton, SIGNAL(clicked()), this, SLOT(writeOutputFile()));
     connect(ui.cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
 
-    QFileInfo fi(workingDir_+outputFileName_+outputFileExt_);
-    if (!fi.exists())
-    {
-        makeOutputSetupFile();
-    }
     readOutputSetupFile();
     updateTables();
-}
-
-void SetupOutputDialog::makeOutputSetupFile()
-{
-    QDir::setCurrent(workingDir_);
-
-    QProcess processSetupOutput;
-    processSetupOutput.setProcessChannelMode(QProcess::ForwardedChannels);
-#ifdef _WIN32
-    processSetupOutput.start(epsrBinDir_+"upset.exe", QStringList() << workingDir_ << "upset" << outputSetupFileType_ << outputFileName_);
-#else
-    processSetupOutput.start(epsrBinDir_+"upset", QStringList() << workingDir_ << "upset" << outputSetupFileType_ << outputFileName_);
-#endif
-    if (!processSetupOutput.waitForStarted()) return;
-
-    processSetupOutput.write(qPrintable("fnameato "+atoFileName_+"\n"));
-    processSetupOutput.write("e\n");
-    processSetupOutput.write("\n");
-
-    if (!processSetupOutput.waitForFinished(60000)) return;
 }
 
 void SetupOutputDialog::readOutputSetupFile()
@@ -75,7 +67,7 @@ void SetupOutputDialog::readOutputSetupFile()
     if (!file.open(QFile::ReadOnly | QFile::Text))
     {
         QMessageBox msgBox;
-        msgBox.setText("Could not open setup output file.");
+        msgBox.setText("Could not open setup output file "+workingDir_+outputFileName_+outputFileExt_);
         msgBox.exec();
         return;
     }
@@ -85,123 +77,176 @@ void SetupOutputDialog::readOutputSetupFile()
     QStringList dataLine;
     dataLine.clear();
 
-//    outputcalcs.clear();
     outputKeywords.clear();
     outputValues.clear();
     outputDescriptions.clear();
     QRegExp rx("^.{12}");
 
-    line = stream.readLine(); //title line
-    line = stream.readLine(); //fnameato line
-
     //read in first group of settings
-//    do {
-//        line = stream.readLine();
-//        if (line == "q") break;
-//        else
-//        if (line.isEmpty())
-//        {
-//            line = stream.readLine(); //read header line
-//            header_ = line.split(" ", QString::SkipEmptyParts).at(0);
-//            outputcalcs.append(OutputCalcs());
-//            line = stream.readLine(); //read next blank line
+    if (outputSetupFileType_ == "plot2d" || outputSetupFileType_ == "plot3d")
+    {
+        if (outputSetupFileType_ == "plot2d")
+        {
+            line = stream.readLine();
+            dataLine = line.split("               ", QString::SkipEmptyParts);
+            outputValues.append(dataLine.at(0));
+            outputDescriptions.append(dataLine.at(1));
+        }
+        line = stream.readLine();   //get name of coeff file
+        coeffFileName_ = line;
+        ui.atoFileLabel->setText(coeffFileName_);
 
-//            do {
-//               line = stream.readLine(); //read calculation lines
-//               QString start = line;
-//               start.truncate(12);
-//               outputcalcs.last().keywords=start;
-//               dataLine = line.split("               ", QString::SkipEmptyParts);
-//               QString firstPart = dataLine.at(0);
-//               outputcalcs.last().values=(firstPart.split(rx, QString::SkipEmptyParts)).at(1);
-//               outputcalcs.last().descriptions=dataLine.at(1);
-//            } while (!line.isEmpty());
-//        }
-//        else
-//        {
+        do {
+            line = stream.readLine();
+            dataLine = line.split("               ", QString::SkipEmptyParts);
+            if (dataLine.count() < 2)
+            {
+                outputValues.append(line);
+                outputDescriptions.append(" ");
+            }
+            else
+            {
+                outputValues.append(dataLine.at(0));
+                outputDescriptions.append(dataLine.at(1));
+            }
+        } while (!stream.atEnd());
+
+        //remove the ".SHARM.h01" line
+        outputValues.removeLast();
+        outputDescriptions.removeLast();
+    }
+    else
+    if (outputSetupFileType_ == "splot2d")
+    {
+//        do {
+//            line = stream.readLine();
 //            QString start = line;
 //            start.truncate(12);
 //            outputKeywords.append(start);
 //            dataLine = line.split("               ", QString::SkipEmptyParts);
-//            QString firstPart = dataLine.at(0);
-//            outputValues.append(firstPart.split(rx, QString::SkipEmptyParts));
-//            outputDescriptions.append(dataLine.at(1));
-//        }
-//    } while (line != "q");
-
-    do {
-        line = stream.readLine();
-        QString start = line;
-        start.truncate(12);
-        outputKeywords.append(start);
-        dataLine = line.split("               ", QString::SkipEmptyParts);
-        if (dataLine.count() == 0)
+//            if (dataLine.count() == 0)
+//            {
+//                outputValues.append(" ");
+//                outputDescriptions.append(" ");
+//            }
+//            else
+//            {
+//                QString firstPart = dataLine.at(0);
+//                outputValues.append(firstPart.split(rx, QString::SkipEmptyParts).at(0));
+//                outputDescriptions.append(dataLine.at(1));
+//            }
+//        } while (!stream.atEnd());
+    }
+    else
+    {
+        line = stream.readLine(); //title line
+        line = stream.readLine(); //fnameato/shcoeffs line
+        if (outputType_ == 2)
         {
-            outputValues.append(" ");
-            outputDescriptions.append(" ");
-        }
-        else
-        {
+            dataLine = line.split("               ", QString::SkipEmptyParts);
             QString firstPart = dataLine.at(0);
-            outputValues.append(firstPart.split(rx, QString::SkipEmptyParts).at(0));
-            outputDescriptions.append(dataLine.at(1));
+            coeffFileName_ = firstPart.split(rx, QString::SkipEmptyParts).at(0);
+            ui.atoFileLabel->setText(coeffFileName_);
         }
-    } while (!stream.atEnd());
+
+        do {
+            line = stream.readLine();
+            QString start = line;
+            start.truncate(12);
+            outputKeywords.append(start);
+            dataLine = line.split("               ", QString::SkipEmptyParts);
+            if (dataLine.count() < 2)
+            {
+                outputValues.append(" ");
+                outputDescriptions.append(" ");
+            }
+            else
+            {
+                QString firstPart = dataLine.at(0);
+                outputValues.append(firstPart.split(rx, QString::SkipEmptyParts).at(0));
+                outputDescriptions.append(dataLine.at(1));
+            }
+        } while (!stream.atEnd());
+
+        //remove the "q" line
+        outputKeywords.removeLast();
+        outputValues.removeLast();
+        outputDescriptions.removeLast();
+    }
     file.close();
-
-    //remove the "q" line
-    outputKeywords.removeLast();
-    outputValues.removeLast();
-    outputDescriptions.removeLast();
-
-
-    //for plot3djmol, nsphere gives number of speheres at centre of plot
-    //for sharm, sdf, only one setup is calculated
-    //format different for plot2d and plot3d and need to define sharm file to be associated first, only 1 setup 'calculated'
 }
 
 void SetupOutputDialog::updateTables()
 {
-    settingEntries_ = 0; //this is the number of entries that aren't part of calculations, and doesn't include the title line, the fnameato line or the nXXX line if present
-    for (int i = 0; i < outputKeywords.count(); i++)
+
+    if (outputSetupFileType_ == "plot2d" || outputSetupFileType_ =="plot3d")
     {
-        if (outputKeywords.at(i).contains("ndist") || outputKeywords.at(i).contains("nsphere"))
+        settingEntries_ = outputValues.count();
+
+        ui.outputSettingsTable->clear();
+        ui.outputSettingsTable->setColumnWidth(0,180);
+        ui.outputSettingsTable->setColumnWidth(1,600);
+        ui.outputSettingsTable->setColumnCount(2);
+        ui.outputSettingsTable->setRowCount(settingEntries_);
+        ui.outputSettingsTable->horizontalHeader()->setVisible(true);
+        QStringList header;
+        header << "Value" << "Description";
+        ui.outputSettingsTable->setHorizontalHeaderLabels(header);
+        ui.outputSettingsTable->verticalHeader()->setVisible(false);
+        for (int i = 0; i < settingEntries_; i++)
         {
-            break;
+            ui.outputSettingsTable->setItem(i,0, new QTableWidgetItem(outputValues.at(i)));
+            QTableWidgetItem *itemdescrip = new QTableWidgetItem(outputDescriptions.at(i));
+            itemdescrip->setFlags(itemdescrip->flags() & ~Qt::ItemIsEditable);
+            ui.outputSettingsTable->setItem(i,1, itemdescrip);
         }
-        settingEntries_++;
+        ui.outputSettingsTable->setSelectionBehavior(QAbstractItemView::SelectRows);
+        ui.outputSettingsTable->setSelectionMode(QAbstractItemView::SingleSelection);
+        ui.outputSettingsTable->setCurrentCell(settingEntries_-1,0);
     }
-
-    ui.outputSettingsTable->clear();
-    ui.outputSettingsTable->setColumnWidth(1,180);
-    ui.outputSettingsTable->setColumnWidth(2,600);
-    ui.outputSettingsTable->setRowCount(settingEntries_);
-    ui.outputSettingsTable->horizontalHeader()->setVisible(true);
-    QStringList header;
-    header << "Keyword" << "Value" << "Description";
-    ui.outputSettingsTable->setHorizontalHeaderLabels(header);
-    ui.outputSettingsTable->verticalHeader()->setVisible(false);
-    for (int i = 0; i < settingEntries_; i++)
+    else
     {
-        QTableWidgetItem *itemkeyword = new QTableWidgetItem(outputKeywords.at(i));
-        itemkeyword->setFlags(itemkeyword->flags() & ~Qt::ItemIsEditable);
-        ui.outputSettingsTable->setItem(i,0, itemkeyword);
-        ui.outputSettingsTable->setItem(i,1, new QTableWidgetItem(outputValues.at(i)));
-        QTableWidgetItem *itemdescrip = new QTableWidgetItem(outputDescriptions.at(i));
-        itemdescrip->setFlags(itemdescrip->flags() & ~Qt::ItemIsEditable);
-        ui.outputSettingsTable->setItem(i,2, itemdescrip);
-    }
-    ui.outputSettingsTable->setSelectionBehavior(QAbstractItemView::SelectRows);
-    ui.outputSettingsTable->setSelectionMode(QAbstractItemView::SingleSelection);
-    ui.outputSettingsTable->setCurrentCell(settingEntries_-1,0);
+        settingEntries_ = 0; //this is the number of entries that aren't part of calculations, and doesn't include the title line, the fnameato line or the nXXX line if present
+        for (int i = 0; i < outputKeywords.count(); i++)
+        {
+            if (outputKeywords.at(i).contains("ndist") || outputKeywords.at(i).contains("nsphere") || outputKeywords.contains("nviews"))
+            {
+                break;
+            }
+            settingEntries_++;
+        }
 
-//    const int Ncalcs = outputcalcs.count();
-//    if (Ncalcs > 0)
+        ui.outputSettingsTable->clear();
+        ui.outputSettingsTable->setColumnWidth(1,180);
+        ui.outputSettingsTable->setColumnWidth(2,600);
+        ui.outputSettingsTable->setColumnCount(3);
+        ui.outputSettingsTable->setRowCount(settingEntries_);
+        ui.outputSettingsTable->horizontalHeader()->setVisible(true);
+        QStringList header;
+        header << "Keyword" << "Value" << "Description";
+        ui.outputSettingsTable->setHorizontalHeaderLabels(header);
+        ui.outputSettingsTable->verticalHeader()->setVisible(false);
+        for (int i = 0; i < settingEntries_; i++)
+        {
+            QTableWidgetItem *itemkeyword = new QTableWidgetItem(outputKeywords.at(i));
+            itemkeyword->setFlags(itemkeyword->flags() & ~Qt::ItemIsEditable);
+            ui.outputSettingsTable->setItem(i,0, itemkeyword);
+            ui.outputSettingsTable->setItem(i,1, new QTableWidgetItem(outputValues.at(i)));
+            QTableWidgetItem *itemdescrip = new QTableWidgetItem(outputDescriptions.at(i));
+            itemdescrip->setFlags(itemdescrip->flags() & ~Qt::ItemIsEditable);
+            ui.outputSettingsTable->setItem(i,2, itemdescrip);
+        }
+        ui.outputSettingsTable->setSelectionBehavior(QAbstractItemView::SelectRows);
+        ui.outputSettingsTable->setSelectionMode(QAbstractItemView::SingleSelection);
+        ui.outputSettingsTable->setCurrentCell(settingEntries_-1,0);
+    }
+
     if (outputKeywords.count() > settingEntries_)
     {
-        int subEntries = outputValues.at(settingEntries_).toInt(); //this gets the number of subheaders
+        //find the number of subheaders
+        int subEntries = outputValues.at(settingEntries_).toInt();
+
         //find number of lines in each subsection
-//        linesPerEntry_ = outputcalcs.at(0).keywords.count();
         linesPerEntry_ = 0;
         for (int i = settingEntries_+4; i < outputKeywords.count(); i++)
         {
@@ -214,7 +259,6 @@ void SetupOutputDialog::updateTables()
 
         ui.calcGroupBox->setEnabled(true);
 
-//        for (int i = 0; i < Ncalcs; i++)
         for (int i = 0; i < subEntries; i++)
         {
             ui.calcsList->addItem(QString::number(i+1)); //change this to be an atom or something more useful?
@@ -222,7 +266,6 @@ void SetupOutputDialog::updateTables()
 
         ui.calcsList->setCurrentRow(subEntries-1);
         entry_ = ui.calcsList->currentRow();
-//        showEntryDetails();
     }
 }
 
@@ -305,13 +348,54 @@ void SetupOutputDialog::writeOutputFile()
     QString line;
     QString original;
 
-    streamWrite << outputFileName_ << "." << outputSetupFileType_.toUpper() << "               Title of this file\n"
-                << "fnameato    " << atoFileName_ << "               Name of .ato file\n";
-
-    for (int i = 0; i < settingEntries_; i++)
+    if (outputType_ == 1)
     {
-        line = ui.outputSettingsTable->item(i,0)->text()+ui.outputSettingsTable->item(i,1)->text()+"               "+ui.outputSettingsTable->item(i,2)->text()+"\n";
-        original.append(line);
+        streamWrite << outputFileName_ << "." << outputSetupFileType_.toUpper() << "               Title of this file\n"
+                    << "fnameato    " << atoFileName_ << "               Name of .ato file\n";
+
+        for (int i = 0; i < settingEntries_; i++)
+        {
+            line = ui.outputSettingsTable->item(i,0)->text()+ui.outputSettingsTable->item(i,1)->text()+"               "+ui.outputSettingsTable->item(i,2)->text()+"\n";
+            original.append(line);
+        }
+    }
+    else
+    if (outputType_ == 2)
+    {
+        if (outputSetupFileType_ == "plot2d")
+        {
+            streamWrite << ui.outputSettingsTable->item(0,0)->text() << "               " << ui.outputSettingsTable->item(0,1)->text() << "\n"
+                        << coeffFileName_ << "\n";
+
+            for (int i = 1; i < settingEntries_; i++)
+            {
+                line = ui.outputSettingsTable->item(i,0)->text()+"               "+ui.outputSettingsTable->item(i,1)->text()+"\n";
+                original.append(line);
+            }
+        }
+        else
+        if (outputSetupFileType_ == "plot3d")
+        {
+            streamWrite << coeffFileName_ << "\n";
+
+            for (int i = 0; i < settingEntries_; i++)
+            {
+                line = ui.outputSettingsTable->item(i,0)->text()+"               "+ui.outputSettingsTable->item(i,1)->text()+"\n";
+                original.append(line);
+            }
+        }
+        else
+        {
+            QString fileExt = outputFileExt_.split(".", QString::SkipEmptyParts).at(0);
+            streamWrite << outputFileName_ << "." << fileExt << "               Title of this file\n"
+                        << "shcoeffs    " << coeffFileName_ << "               Name of file containing spherical harmonic coefficients\n";
+
+            for (int i = 0; i < settingEntries_; i++)
+            {
+                line = ui.outputSettingsTable->item(i,0)->text()+ui.outputSettingsTable->item(i,1)->text()+"               "+ui.outputSettingsTable->item(i,2)->text()+"\n";
+                original.append(line);
+            }
+        }
     }
 
     if (ui.calcsList->count() > 0)
@@ -334,7 +418,14 @@ void SetupOutputDialog::writeOutputFile()
             }
         }
     }
-    original.append("q\n");
+    if (outputSetupFileType_ == "plot2d" || outputSetupFileType_ == "plot3d")
+    {
+        original.append(".SHARM.h01\n");
+    }
+    else
+    {
+        original.append("q\n");
+    }
     fileWrite.resize(0);
     streamWrite << original;
     fileWrite.close();
@@ -389,4 +480,14 @@ void SetupOutputDialog::on_deleteOutputButton_clicked(bool checked)
 {
     QFile::remove(workingDir_+outputFileName_+outputFileExt_);
     this->close();
+}
+
+void SetupOutputDialog::on_browseButton_clicked(bool checked)
+{
+    QString coeffFileName = QFileDialog::getOpenFileName(this, "Choose coefficients file", workingDir_, tr(".SHARM.h01 files (*.SHARM.h01)"));
+    if (!coeffFileName.isEmpty())
+    {
+        coeffFileName_ = coeffFileName;
+        ui.atoFileLabel->setText(coeffFileName_);
+    }
 }

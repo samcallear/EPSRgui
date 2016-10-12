@@ -60,7 +60,7 @@ void MainWindow::showAvailableFiles()
     QStringList plotFilter;
     if (plotSetupFileType_ == "plot3djmol")
     {
-        plotFilter << "*.cube.txt";
+        plotFilter << "*.CUBE.txt";
     }
     else
     {
@@ -160,6 +160,30 @@ void MainWindow::setupOutput()
         outputFileExt_ = "."+outputSetupFileType_.toUpper()+".dat";
     }
 
+    outputType_ = 1;
+
+    QFileInfo fi(workingDir_+outputFileName_+outputFileExt_);
+    if (!fi.exists())
+    {
+        QDir::setCurrent(workingDir_);
+
+        processEPSR_.setProcessChannelMode(QProcess::ForwardedChannels);
+#ifdef _WIN32
+        processEPSR_.start(epsrBinDir_+"upset.exe", QStringList() << workingDir_ << "upset" << outputSetupFileType_ << outputFileName_);
+#else
+        processEPSR_.start(epsrBinDir_+"upset", QStringList() << workingDir_ << "upset" << outputSetupFileType_ << outputFileName_);
+#endif
+        if (!processEPSR_.waitForStarted()) return;
+
+        processEPSR_.write(qPrintable("fnameato "+atoFileName_+"\n"));
+        processEPSR_.write("e\n");
+        processEPSR_.write("\n");
+        if (!processEPSR_.waitForFinished(60000)) return;
+
+        messageText_ += "\nfinished making EPSR output file "+outputFileName_+outputFileExt_+"\n";
+        messagesDialog.refreshMessages();
+    }
+
     SetupOutputDialog setupOutputDialog(this);
 
     setupOutputDialog.show();
@@ -168,6 +192,7 @@ void MainWindow::setupOutput()
     setupOutputDialog.exec();
 
     showAvailableFiles();
+    ui.messagesLineEdit->setText("EPSR output file edited");
 //    outputTimerId_ = startTimer(2000);
 }
 
@@ -350,16 +375,6 @@ void MainWindow::setupPlot()
 
     ui.setupPlotNameNew->clear();
 
-    QDir::setCurrent(workingDir_);
-
-    QProcess processSetupOutput;
-    processSetupOutput.setProcessChannelMode(QProcess::ForwardedChannels);
-#ifdef _WIN32
-    processSetupOutput.startDetached(epsrBinDir_+"upset.exe", QStringList() << workingDir_ << "upset" << plotSetupFileType_ << plotFileName_);
-#else
-    processSetupOutput.startDetached(epsrBinDir_+"upset", QStringList() << workingDir_ << "upset" << plotSetupFileType_ << plotFileName_);
-#endif
-
     if (plotSetupFileType_== "plot3djmol")
     {
         plotFileExt_ = ".CUBE.txt";
@@ -369,5 +384,48 @@ void MainWindow::setupPlot()
         plotFileExt_ = "."+plotSetupFileType_+".txt";
     }
 
-    outputTimerId_ = startTimer(2000);
+    QFileInfo fi(workingDir_+plotFileName_+plotFileExt_);
+    if (!fi.exists())
+    {
+
+        QString coeffFileName = QFileDialog::getOpenFileName(this, "Choose coefficients file", workingDir_, tr(".SHARM.h01 files (*.SHARM.h01)"));
+        if (coeffFileName.isEmpty())
+        {
+            return;
+        }
+        QFileInfo fi(coeffFileName);
+        coeffFileName_ = fi.fileName();
+
+        QDir::setCurrent(workingDir_);
+
+        processEPSR_.setProcessChannelMode(QProcess::ForwardedChannels);
+#ifdef _WIN32
+        processEPSR_.start(epsrBinDir_+"upset.exe", QStringList() << workingDir_ << "upset" << plotSetupFileType_ << plotFileName_);
+#else
+        processEPSR_.start(epsrBinDir_+"upset", QStringList() << workingDir_ << "upset" << plotSetupFileType_ << plotFileName_);
+#endif
+        if (!processEPSR_.waitForStarted()) return;
+
+        processEPSR_.write(qPrintable("shcoeffs "+coeffFileName_+"\n"));
+        processEPSR_.write("e\n");
+        processEPSR_.write("\n");
+        if (!processEPSR_.waitForFinished(60000)) return;
+
+        messageText_ += "\nfinished making EPSR output file "+plotFileName_+plotFileExt_+"\n";
+        messagesDialog.refreshMessages();
+    }
+
+    outputType_ = 2;
+
+    SetupOutputDialog setupOutputDialog(this);
+
+    setupOutputDialog.show();
+    setupOutputDialog.raise();
+    setupOutputDialog.activateWindow();
+    setupOutputDialog.exec();
+
+    showAvailableFiles();
+    ui.messagesLineEdit->setText("EPSR output file edited");
+
+//    outputTimerId_ = startTimer(2000);
 }

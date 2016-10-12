@@ -2640,11 +2640,6 @@
                    </item>
                    <item>
                     <property name="text">
-                     <string>Mapgr</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
                      <string>Partials</string>
                     </property>
                    </item>

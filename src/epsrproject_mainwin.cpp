@@ -2066,6 +2066,31 @@ QString MainWindow::outputFileExt()
     return outputFileExt_;
 }
 
+int MainWindow::showOutputType()
+{
+    return outputType_;
+}
+
+QString MainWindow::plotFileName()
+{
+    return plotFileName_;
+}
+
+QString MainWindow::plotSetupFileType()
+{
+    return plotSetupFileType_;
+}
+
+QString MainWindow::plotFileExt()
+{
+    return plotFileExt_;
+}
+
+QString MainWindow::coeffFileName()
+{
+    return coeffFileName_;
+}
+
 QByteArray MainWindow::messageText()
 {
     return messageText_;
