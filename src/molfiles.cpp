@@ -930,11 +930,11 @@ bool MainWindow::readMolFile()
             charges.append(dataLine.at(5));
             ljTypes.append(dataLine.at(6));
         }
-        if (dataLine.at(0) == "ecoredcore")
-        {
-            ecorestr=dataLine.at(1);
-            dcorestr=dataLine.at(2);
-        }
+//        if (dataLine.at(0) == "ecoredcore")
+//        {
+//            ecorestr=dataLine.at(1);
+//            dcorestr=dataLine.at(2);
+//        }
     } while (!line.isNull());
     file.close();
 
@@ -1139,9 +1139,6 @@ bool MainWindow::readMolFile()
     ui.molRotTable->setSelectionMode(QAbstractItemView::SingleSelection);
     ui.molLJTable->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui.molLJTable->setSelectionMode(QAbstractItemView::SingleSelection);
-
-    ui.molEcoreLineEdit->setText(ecorestr);
-    ui.molDcoreLineEdit->setText(dcorestr);
 
     //calculate charge for selected .mol file
     double molChargeCalcd = 0;
@@ -1644,7 +1641,11 @@ bool MainWindow::updateMolFile()
               "dihtemp  0.100000E+01\n";
 
     QString ecorestr = ui.molEcoreLineEdit->text();
+    double ecore = ecorestr.toDouble();
+    ecorestr = QString("%1").arg(ecore, 0, 'E', 5);
     QString dcorestr = ui.molDcoreLineEdit->text();
+    double dcore = dcorestr.toDouble();
+    dcorestr = QString("%1").arg(dcore, 0, 'E', 5);
 
     streamWrite << "ecoredcore    " << ecorestr << "    " << dcorestr << "\n"
               "density  0.100000E-02\n";
@@ -1655,7 +1656,7 @@ bool MainWindow::updateMolFile()
     fileWrite.rename(workingDir_+molFileName_);
     messageText_ += "finished updating mol file "+molFileName_+"\n";
 
-    //run fmole 0 times to make sure everything is consistent
+    //run fmole 0 times to make sure everything is consistent and update ato with dihedrals etc
     QDir::setCurrent(workingDir_);
 
     QString molBaseFileName = molFileName_.split(".",QString::SkipEmptyParts).at(0);

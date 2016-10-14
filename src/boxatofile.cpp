@@ -127,7 +127,7 @@ void MainWindow::on_addatoButton_clicked(bool checked)
     //NOTE
     //There are limitations to what will be read during the process - see addato.f for details
     //the atomic number density is irrelevant as the size of the container determines the size of the final box.
-    //the ecoredcore values at the bottom of the .mol files are important as they determine the atomic overlap during addato
+    //the ecoredcore values at the bottom of the .ato? files are important as they determine the atomic overlap during addato
     //tethering of molecules is also important prior to pressing addato.
 
     AddAtoDialog addAtoDialog(this);
@@ -785,6 +785,7 @@ void MainWindow::on_fmoleButton_clicked(bool checked)
 
     //disable buttons
     ui.fmoleButton->setDisabled(true);
+    ui.fmoleLineEdit->setDisabled(true);
     ui.updateAtoFileButton->setDisabled(true);
     ui.mixatoButton->setDisabled(true);
     ui.addatoButton->setDisabled(true);

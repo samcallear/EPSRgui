@@ -1556,6 +1556,7 @@ void MainWindow::runEPSR()
     ui.addOutputButton->setEnabled(false);
     ui.removeOutputButton->setEnabled(false);
     ui.dlputilsOutCheckBox->setEnabled(false);
+    ui.setupPlotButton->setEnabled(false);
 
     ui.messagesLineEdit->setText("EPSR is running in a terminal window");
     messageText_ += "\nEPSR is running in a terminal window.\n";
@@ -1663,6 +1664,7 @@ void MainWindow::enableButtons()
     ui.addOutputButton->setEnabled(true);
     ui.removeOutputButton->setEnabled(true);
     ui.dlputilsOutCheckBox->setEnabled(true);
+    ui.setupPlotButton->setEnabled(true);
 
     ui.inpSettingsTable->setEditTriggers(QAbstractItemView::AllEditTriggers);
     ui.dataFileSettingsTable->setEditTriggers(QAbstractItemView::AllEditTriggers);
