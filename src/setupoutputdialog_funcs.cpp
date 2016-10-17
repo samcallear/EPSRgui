@@ -118,24 +118,31 @@ void SetupOutputDialog::readOutputSetupFile()
     else
     if (outputSetupFileType_ == "splot2d")
     {
-//        do {
-//            line = stream.readLine();
-//            QString start = line;
-//            start.truncate(12);
-//            outputKeywords.append(start);
-//            dataLine = line.split("               ", QString::SkipEmptyParts);
-//            if (dataLine.count() == 0)
-//            {
-//                outputValues.append(" ");
-//                outputDescriptions.append(" ");
-//            }
-//            else
-//            {
-//                QString firstPart = dataLine.at(0);
-//                outputValues.append(firstPart.split(rx, QString::SkipEmptyParts).at(0));
-//                outputDescriptions.append(dataLine.at(1));
-//            }
-//        } while (!stream.atEnd());
+        line = stream.readLine(); //title line
+        line = stream.readLine(); //shcoeffs line
+        do {
+            line = stream.readLine();
+            QString start = line;
+            start.truncate(12);
+            outputKeywords.append(start);
+            dataLine = line.split("               ", QString::SkipEmptyParts);
+            if (dataLine.count() == 0)
+            {
+                outputValues.append(" ");
+                outputDescriptions.append(" ");
+            }
+            else
+            {
+                QString firstPart = dataLine.at(0);
+                outputValues.append(firstPart.split(rx, QString::SkipEmptyParts).at(0));
+                outputDescriptions.append(dataLine.at(1));
+            }
+        } while (!stream.atEnd());
+
+        //remove the "q" line
+        outputKeywords.removeLast();
+        outputValues.removeLast();
+        outputDescriptions.removeLast();
     }
     else
     {
@@ -205,6 +212,56 @@ void SetupOutputDialog::updateTables()
         ui.outputSettingsTable->setCurrentCell(settingEntries_-1,0);
     }
     else
+    if (outputSetupFileType_ == "splot2d")
+    {
+        settingEntries_ = 0; //this is the number of entries that aren't part of calculations, and doesn't include the title line, the fnameato line or the nXXX line if present
+        for (int i = 0; i < outputKeywords.count(); i++)
+        {
+            if (outputKeywords.at(i).contains("ncolour"))
+            {
+                break;
+            }
+            settingEntries_++;
+        }
+        int ncolourCalcs = outputValues.at(settingEntries_).toInt();
+
+        ui.outputSettingsTable->clear();
+        ui.outputSettingsTable->setColumnWidth(1,180);
+        ui.outputSettingsTable->setColumnWidth(2,600);
+        ui.outputSettingsTable->setColumnCount(3);
+        ui.outputSettingsTable->setRowCount(outputKeywords.count()-(5*ncolourCalcs)-1);
+        ui.outputSettingsTable->horizontalHeader()->setVisible(true);
+        QStringList header;
+        header << "Keyword" << "Value" << "Description";
+        ui.outputSettingsTable->setHorizontalHeaderLabels(header);
+        ui.outputSettingsTable->verticalHeader()->setVisible(false);
+        for (int i = 0; i < settingEntries_; i++)
+        {
+            QTableWidgetItem *itemkeyword = new QTableWidgetItem(outputKeywords.at(i));
+            itemkeyword->setFlags(itemkeyword->flags() & ~Qt::ItemIsEditable);
+            ui.outputSettingsTable->setItem(i,0, itemkeyword);
+            ui.outputSettingsTable->setItem(i,1, new QTableWidgetItem(outputValues.at(i)));
+            QTableWidgetItem *itemdescrip = new QTableWidgetItem(outputDescriptions.at(i));
+            itemdescrip->setFlags(itemdescrip->flags() & ~Qt::ItemIsEditable);
+            ui.outputSettingsTable->setItem(i,2, itemdescrip);
+        }
+
+        for (int i = settingEntries_+(5*ncolourCalcs)+1; i < outputValues.count(); i++)
+        {
+            QTableWidgetItem *itemkeyword = new QTableWidgetItem(outputKeywords.at(i));
+            itemkeyword->setFlags(itemkeyword->flags() & ~Qt::ItemIsEditable);
+            ui.outputSettingsTable->setItem(i-(5*ncolourCalcs)-1,0, itemkeyword);
+            ui.outputSettingsTable->setItem(i-(5*ncolourCalcs)-1,1, new QTableWidgetItem(outputValues.at(i)));
+            QTableWidgetItem *itemdescrip = new QTableWidgetItem(outputDescriptions.at(i));
+            itemdescrip->setFlags(itemdescrip->flags() & ~Qt::ItemIsEditable);
+            ui.outputSettingsTable->setItem(i-(5*ncolourCalcs)-1,2, itemdescrip);
+        }
+
+        ui.outputSettingsTable->setSelectionBehavior(QAbstractItemView::SelectRows);
+        ui.outputSettingsTable->setSelectionMode(QAbstractItemView::SingleSelection);
+        ui.outputSettingsTable->setCurrentCell(outputKeywords.count()-(5*ncolourCalcs)-2,0);
+    }
+    else
     {
         settingEntries_ = 0; //this is the number of entries that aren't part of calculations, and doesn't include the title line, the fnameato line or the nXXX line if present
         for (int i = 0; i < outputKeywords.count(); i++)
@@ -250,7 +307,7 @@ void SetupOutputDialog::updateTables()
         linesPerEntry_ = 0;
         for (int i = settingEntries_+4; i < outputKeywords.count(); i++)
         {
-            if (outputKeywords.at(i).isEmpty() || outputKeywords.at(i).contains("q"))
+            if (outputKeywords.at(i).isEmpty() || outputKeywords.at(i).contains("q") || outputKeywords.at(i).contains("ncontour"))
             {
                 break;
             }
@@ -418,6 +475,17 @@ void SetupOutputDialog::writeOutputFile()
             }
         }
     }
+
+    if (outputSetupFileType_ == "splot2d")
+    {
+        int ncolourCalcs = ui.calcsList->count();
+        for (int i = settingEntries_+(5*ncolourCalcs); i < outputKeywords.count()-1; i++)
+        {
+            line = ui.outputSettingsTable->item(i-(5*ncolourCalcs),0)->text()+ui.outputSettingsTable->item(i-(5*ncolourCalcs),1)->text()+"               "+ui.outputSettingsTable->item(i-(5*ncolourCalcs),2)->text()+"\n";
+            original.append(line);
+        }
+    }
+
     if (outputSetupFileType_ == "plot2d" || outputSetupFileType_ == "plot3d")
     {
         original.append(".SHARM.h01\n");
@@ -447,13 +515,27 @@ void SetupOutputDialog::on_addCalcButton_clicked(bool checked)
     int calcToAdd = ui.calcsList->count()+1;
     ui.calcsList->addItem(QString::number(calcToAdd));
 
-    int line = settingEntries_+1;
-    for (int i = 0; i < linesPerEntry_+3; i++)
+    if (outputSetupFileType_ == "splot2d")
     {
-        outputKeywords.append(outputKeywords.at(line));
-        outputValues.append(outputValues.at(line));
-        outputDescriptions.append(outputDescriptions.at(line));
-        line++;
+        int line = settingEntries_+1;
+        for (int i = 0; i < linesPerEntry_+3; i++)
+        {
+            outputKeywords.insert(line+((linesPerEntry_+3)*(calcToAdd-1)), outputKeywords.at(line));
+            outputValues.insert(line+((linesPerEntry_+3)*(calcToAdd-1)), outputValues.at(line));
+            outputDescriptions.insert(line+((linesPerEntry_+3)*(calcToAdd-1)), outputDescriptions.at(line));
+            line++;
+        }
+    }
+    else
+    {
+        int line = settingEntries_+1;
+        for (int i = 0; i < linesPerEntry_+3; i++)
+        {
+            outputKeywords.append(outputKeywords.at(line));
+            outputValues.append(outputValues.at(line));
+            outputDescriptions.append(outputDescriptions.at(line));
+            line++;
+        }
     }
 
     ui.calcsList->setCurrentRow(calcToAdd-1);
@@ -469,7 +551,6 @@ void SetupOutputDialog::on_removeCalcButton_clicked(bool checked)
     int line = settingEntries_+1+((linesPerEntry_+3)*calcToTake);
     for (int i = 0; i < linesPerEntry_+3; i++)
     {
-        //this only works if the calc removed is the last calc listed ***********************************************************************************************
         outputKeywords.removeAt(line);
         outputValues.removeAt(line);
         outputDescriptions.removeAt(line);
