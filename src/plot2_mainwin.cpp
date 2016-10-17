@@ -79,7 +79,7 @@ bool MainWindow::fqplot2()
     QFile fileM(fqmodelFileName);
     QFile fileD(fqdataFileName);
     QFile fileDF(fqdiffFileName);
-    int column;
+    int column = 0;
 
     //open and read data file to array
     if(!fileD.open(QFile::ReadOnly | QFile::Text))
@@ -98,6 +98,7 @@ bool MainWindow::fqplot2()
     xD.clear();
     columnsD.clear();
     columnsD.resize(nDataCol);
+    int nColumns = 0;
     lineD = streamD.readLine();
     do
     {
@@ -105,7 +106,7 @@ bool MainWindow::fqplot2()
         dataLineD = lineD.split(" ", QString::SkipEmptyParts);
         if (dataLineD.count() == 0) break;
         xD.append(dataLineD.at(0).toDouble());
-        int nColumns = (dataLineD.count() - 1) / 2;
+        nColumns = (dataLineD.count() - 1) / 2;
         for (column = 0; column < nColumns; ++column)
         {
             if (ui.plot2LogY->isChecked() == true)
@@ -118,6 +119,25 @@ bool MainWindow::fqplot2()
             }        }
     } while (!lineD.isNull());
     fileD.close();
+
+    //find largest and smallest values in y
+    double yMin = columnsD[column].at(0);
+    double yMax = columnsD[column].at(0);
+    for (column = 0; column < nColumns; ++column)
+    {
+        for (int j = 0; j < columnsD[column].count(); j++)
+        {
+            if (columnsD[column].at(j) < yMin)
+            {
+                yMin = columnsD[column].at(j);
+            }
+            else
+            if (columnsD[column].at(j) > yMax)
+            {
+                yMax = columnsD[column].at(j);
+            }
+        }
+    }
 
     //open and read model file to array
     if(!fileM.open(QFile::ReadOnly | QFile::Text))
@@ -143,7 +163,6 @@ bool MainWindow::fqplot2()
         dataLineM = lineM.split(" ", QString::SkipEmptyParts);
         if (dataLineM.count() == 0) break;
         xM.append(dataLineM.at(0).toDouble());
-        int nColumns = (dataLineM.count() - 1) / 2;
         for (column = 0; column < nColumns; ++column)
         {
             if (ui.plot2LogY->isChecked() == true)
@@ -156,6 +175,37 @@ bool MainWindow::fqplot2()
             }        }
     } while (!lineM.isNull());
     fileM.close();
+
+    //find largest and smallest values in x and check for y
+    double xMin = xM.at(0);
+    double xMax = xM.at(0);
+    for (int i = 0; i < xM.count(); i++)
+    {
+        if (xM.at(i) < xMin)
+        {
+            xMin = xM.at(i);
+        }
+        else
+        if (xM.at(i) > xMax)
+        {
+            xMax = xM.at(i);
+        }
+    }
+    for (column = 0; column < nColumns; ++column)
+    {
+        for (int j = 0; j < columnsM[column].count(); j++)
+        {
+            if (columnsM[column].at(j) < yMin)
+            {
+                yMin = columnsM[column].at(j);
+            }
+            else
+            if (columnsM[column].at(j) > yMax)
+            {
+                yMax = columnsM[column].at(j);
+            }
+        }
+    }
 
     //open and read difference file to array
     if(!fileDF.open(QFile::ReadOnly | QFile::Text))
@@ -181,7 +231,6 @@ bool MainWindow::fqplot2()
         dataLineDF = lineDF.split(" ", QString::SkipEmptyParts);
         if (dataLineDF.count() == 0) break;
         xDF.append(dataLineDF.at(0).toDouble());
-        int nColumns = (dataLineDF.count() - 1) / 2;
         for (column = 0; column < nColumns; ++column)
         {
             if (ui.plot2LogY->isChecked() == true)
@@ -194,6 +243,23 @@ bool MainWindow::fqplot2()
             }        }
     } while (!lineDF.isNull());
     fileDF.close();
+
+    //check for y
+    for (column = 0; column < nColumns; ++column)
+    {
+        for (int j = 0; j < columnsDF[column].count(); j++)
+        {
+            if (columnsDF[column].at(j) < yMin)
+            {
+                yMin = columnsDF[column].at(j);
+            }
+            else
+            if (columnsDF[column].at(j) > yMax)
+            {
+                yMax = columnsDF[column].at(j);
+            }
+        }
+    }
 
     // create graph and assign data to it:
     QPen pen;
@@ -217,7 +283,8 @@ bool MainWindow::fqplot2()
         ui.plot2->graph(i+2)->setName("&s difference");
         QCPItemText *dataLabel = new QCPItemText(ui.plot2);
         ui.plot2->addItem(dataLabel);
-        dataLabel->position->setCoords(20,(i/3)+0.2);
+        dataLabel->position->setCoords(xMax,(i/3)+0.2);
+        dataLabel->setPositionAlignment(Qt::AlignRight);
         datafileLabel = dataFileList.at(i/3);
         dataLabel->setText(qPrintable(datafileLabel));
     }
@@ -259,7 +326,10 @@ bool MainWindow::fqplot2()
 
     //plot
     ui.plot2->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
-    ui.plot2->rescaleAxes();
+    ui.plot2->xAxis->setRangeLower(xMin);
+    ui.plot2->xAxis->setRangeUpper(xMax);
+    ui.plot2->yAxis->setRangeLower(yMin);
+    ui.plot2->yAxis->setRangeUpper(yMax+(yMax/10));
     ui.plot2->replot();
     return 0;
 }
@@ -278,7 +348,7 @@ bool MainWindow::frplot2()
     frdataFileName = (baseFileName_+".EPSR.w01");
     QFile fileM(frmodelFileName);
     QFile fileD(frdataFileName);
-    int column;
+    int column = 0;
 
     //open and read data file to array
     if(!fileD.open(QFile::ReadOnly | QFile::Text))
@@ -297,6 +367,7 @@ bool MainWindow::frplot2()
     xD.clear();
     columnsD.clear();
     columnsD.resize(nDataCol);
+    int nColumns = 0;
     lineD = streamD.readLine();
     do
     {
@@ -304,7 +375,7 @@ bool MainWindow::frplot2()
         dataLineD = lineD.split(" ", QString::SkipEmptyParts);
         if (dataLineD.count() == 0) break;
         xD.append(dataLineD.at(0).toDouble());
-        int nColumns = (dataLineD.count() - 1) / 2;
+        nColumns = (dataLineD.count() - 1) / 2;
         for (column = 0; column < nColumns; ++column)
         {
             if (ui.plot2LogY->isChecked() == true)
@@ -317,6 +388,25 @@ bool MainWindow::frplot2()
             }        }
     } while (!lineD.isNull());
     fileD.close();
+
+    //find largest and smallest values in y
+    double yMin = columnsD[column].at(0);
+    double yMax = columnsD[column].at(0);
+    for (column = 0; column < nColumns; ++column)
+    {
+        for (int j = 0; j < columnsD[column].count(); j++)
+        {
+            if (columnsD[column].at(j) < yMin)
+            {
+                yMin = columnsD[column].at(j);
+            }
+            else
+            if (columnsD[column].at(j) > yMax)
+            {
+                yMax = columnsD[column].at(j);
+            }
+        }
+    }
 
     //open and read model file to array
     if(!fileM.open(QFile::ReadOnly | QFile::Text))
@@ -342,7 +432,6 @@ bool MainWindow::frplot2()
         dataLineM = lineM.split(" ", QString::SkipEmptyParts);
         if (dataLineM.count() == 0) break;
         xM.append(dataLineM.at(0).toDouble());
-        int nColumns = (dataLineM.count() - 1) / 2;
         for (column = 0; column < nColumns; ++column)
         {
             if (ui.plot2LogY->isChecked() == true)
@@ -355,6 +444,37 @@ bool MainWindow::frplot2()
             }        }
     } while (!lineM.isNull());
     fileM.close();
+
+    //find largest and smallest values in x and check for y
+    double xMin = xM.at(0);
+    double xMax = xM.at(0);
+    for (int i = 0; i < xM.count(); i++)
+    {
+        if (xM.at(i) < xMin)
+        {
+            xMin = xM.at(i);
+        }
+        else
+        if (xM.at(i) > xMax)
+        {
+            xMax = xM.at(i);
+        }
+    }
+    for (column = 0; column < nColumns; ++column)
+    {
+        for (int j = 0; j < columnsM[column].count(); j++)
+        {
+            if (columnsM[column].at(j) < yMin)
+            {
+                yMin = columnsM[column].at(j);
+            }
+            else
+            if (columnsM[column].at(j) > yMax)
+            {
+                yMax = columnsM[column].at(j);
+            }
+        }
+    }
 
     // create graph and assign data to it:
     QPen pen;
@@ -372,7 +492,8 @@ bool MainWindow::frplot2()
         ui.plot2->graph(i+1)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc, 3));
         QCPItemText *dataLabel = new QCPItemText(ui.plot2);
         ui.plot2->addItem(dataLabel);
-        dataLabel->position->setCoords(16,(i/2)+0.2);
+        dataLabel->position->setCoords(xMax,(i/2)+0.2);
+        dataLabel->setPositionAlignment(Qt::AlignRight);
         datafileLabel = dataFileList.at(i/2);
         dataLabel->setText(qPrintable(datafileLabel));
     }
@@ -414,7 +535,10 @@ bool MainWindow::frplot2()
 
     //plot
     ui.plot2->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
-    ui.plot2->rescaleAxes();
+    ui.plot2->xAxis->setRangeLower(xMin);
+    ui.plot2->xAxis->setRangeUpper(xMax);
+    ui.plot2->yAxis->setRangeLower(yMin);
+    ui.plot2->yAxis->setRangeUpper(yMax+(yMax/10));
     ui.plot2->replot();
     return 0;
 }

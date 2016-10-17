@@ -396,10 +396,6 @@ bool PlotDialog::datasetPlot()
     QString diffFileName;
     QString xLabel;
     QString yLabel;
-//    double xMin;
-//    double yMin;
-//    double xMax;
-//    double yMax;
 
     //Filenames and number of datasets for F(Q) plot
     if (ui.standardPlotList->currentItem()->text().contains("F(Q)"))
@@ -409,10 +405,6 @@ bool PlotDialog::datasetPlot()
         diffFileName = (baseFileName_+".EPSR.v01");
         xLabel = "Q / Å\u207B\u00B9";
         yLabel = "F(Q)";
-//        xMin = 0.0;
-//        yMin = -1.5;
-//        xMax = 30.0;
-//        yMax = nDataCol;
     }
     else //for G(r) plot
     {
@@ -421,17 +413,13 @@ bool PlotDialog::datasetPlot()
         diffFileName.clear();
         xLabel = "r / Å";
         yLabel = "G(r)";
-//        xMin = 0.0;
-//        yMin = -1.0;
-//        xMax = 20.0;
-//        yMax = nDataCol;
     }
 
     QFile fileM(modelFileName);
     QFile fileD(dataFileName);
     QFile fileDF(diffFileName);
 
-    int column;
+    int column = 0;
     double residualOffset = -0.2;
     double yZeroOffset = 0.0;
     double dataSetOffset = 1.0;
@@ -525,7 +513,6 @@ bool PlotDialog::datasetPlot()
         dataLineM = lineM.split(" ", QString::SkipEmptyParts);
         if (dataLineM.count() == 0) break;
         xM.append(dataLineM.at(0).toDouble());
-//        nColumns = (dataLineM.count() - 1) / 2;
         for (column = 0; column < nColumns; ++column)
         {
             columnsM[column].append((dataLineM.at(column*2+1).toDouble())+column/dataSetOffsetFactor+yZeroOffset);
@@ -590,7 +577,6 @@ bool PlotDialog::datasetPlot()
             dataLineDF = lineDF.split(" ", QString::SkipEmptyParts);
             if (dataLineDF.count() == 0) break;
             xDF.append(dataLineDF.at(0).toDouble());
-//            nColumns = (dataLineDF.count() - 1) / 2;
             for (column = 0; column < nColumns; ++column)
             {
                 columnsDF[column].append((dataLineDF.at(column*2+1).toDouble())+column/dataSetOffsetFactor+yZeroOffset+residualOffset);
@@ -742,21 +728,21 @@ bool PlotDialog::datasetPlot()
             ui.customPlot->xAxis->setRangeUpper(ui.xMaxLineEdit->text().toDouble());
         }
         else
-        ui.customPlot->xAxis->setRangeUpper(xMax);        //read this from data??
+        ui.customPlot->xAxis->setRangeUpper(xMax);
 
         if (!ui.yMinLineEdit->text().isEmpty())
         {
             ui.customPlot->yAxis->setRangeLower(ui.yMinLineEdit->text().toDouble());
         }
         else
-        ui.customPlot->yAxis->setRangeLower(yMin);     //read this from data!!**************************************************
+        ui.customPlot->yAxis->setRangeLower(yMin);
 
         if (!ui.yMaxLineEdit->text().isEmpty())
         {
             ui.customPlot->yAxis->setRangeUpper(ui.yMaxLineEdit->text().toDouble());
         }
         else
-        ui.customPlot->yAxis->setRangeUpper(yMax);     //read this from data!!**************************************************
+        ui.customPlot->yAxis->setRangeUpper(yMax);
     }
     ui.customPlot->replot();
     return 0;
@@ -1118,6 +1104,36 @@ bool PlotDialog::Pplot()
     }
     file.close();
 
+    //find largest and smallest values in x and y
+    double xMin = x.at(0);
+    double yMin = y.at(0);
+    double xMax = x.at(0);
+    double yMax = y.at(0);
+    for (int i = 0; i < x.count(); i++)
+    {
+        if (x.at(i) < xMin)
+        {
+            xMin = x.at(i);
+        }
+        else
+        if (x.at(i) > xMax)
+        {
+            xMax = x.at(i);
+        }
+    }
+    for (int i = 0; i < y.count(); i++)
+    {
+        if (y.at(i) < yMin)
+        {
+            yMin = y.at(i);
+        }
+        else
+        if (y.at(i) > yMax)
+        {
+            yMax = y.at(i);
+        }
+    }
+
     // create graph and assign data to it:
     ui.customPlot->addGraph();
     ui.customPlot->graph()->setData(x, y);
@@ -1158,72 +1174,40 @@ bool PlotDialog::Pplot()
 
     //plot
     ui.customPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
-    ui.customPlot->rescaleAxes();
-    ui.customPlot->replot();
-    return 0;
-}
-
-bool PlotDialog::Ereqplot()
-{
-    QString FileName;
-    FileName = (baseFileName_+".EPSR.erg");
-    QFile file(FileName);
-
-    //open and read data file to array
-    if(!file.open(QFile::ReadOnly | QFile::Text))
+    if (ui.xMinLineEdit->text().isEmpty() && ui.xMaxLineEdit->text().isEmpty() && ui.yMinLineEdit->text().isEmpty() && ui.yMaxLineEdit->text().isEmpty())
     {
-        QMessageBox msgBox;
-        msgBox.setText("Could not open .erg file.");
-        msgBox.exec();
-        return 0;
+        ui.customPlot->rescaleAxes();
     }
-    QTextStream stream(&file);
-    QString line;
-    QStringList dataLine;
-    QVector<double> x1;          //ereq
-    QVector<double> y1;         //fit quality
-    QVector<double> x2;          //fitted line x values
-    QVector<double> y2;         //fitted line showing gradient of last 50 iterations
-    dataLine.clear();
-    x1.clear();
-    x2.clear();
-    y1.clear();
-    y2.clear();
-    for (int iterations = 1; iterations < 1000000; ++iterations)
+    else
     {
-        line = stream.readLine();
-        dataLine = line.split(" ", QString::SkipEmptyParts);
-        if (dataLine.count() == 0) break;
-        if (dataLine.count() <= 6)
+        if (!ui.xMinLineEdit->text().isEmpty())
         {
-            QMessageBox msgBox;
-            msgBox.setText("This plot type is not compatible with this version of EPSR.");
-            msgBox.exec();
-            file.close();
-            return 0;
+            ui.customPlot->xAxis->setRangeLower(ui.xMinLineEdit->text().toDouble());
         }
-        x1.append(dataLine.at(5).toDouble());
-        y1.append(dataLine.at(6).toDouble());
-        x2.append(dataLine.at(7).toDouble());
-        y2.append(dataLine.at(8).toDouble());
+        else
+        ui.customPlot->xAxis->setRangeLower(xMin);
+
+        if (!ui.xMaxLineEdit->text().isEmpty())
+        {
+            ui.customPlot->xAxis->setRangeUpper(ui.xMaxLineEdit->text().toDouble());
+        }
+        else
+        ui.customPlot->xAxis->setRangeUpper(xMax);
+
+        if (!ui.yMinLineEdit->text().isEmpty())
+        {
+            ui.customPlot->yAxis->setRangeLower(ui.yMinLineEdit->text().toDouble());
+        }
+        else
+        ui.customPlot->yAxis->setRangeLower(yMin);
+
+        if (!ui.yMaxLineEdit->text().isEmpty())
+        {
+            ui.customPlot->yAxis->setRangeUpper(ui.yMaxLineEdit->text().toDouble());
+        }
+        else
+        ui.customPlot->yAxis->setRangeUpper(yMax);
     }
-    file.close();
-
-    // create graph and assign data to it:
-    ui.customPlot->addGraph();
-    ui.customPlot->graph()->setData(x1, y1);
-    ui.customPlot->addGraph();
-    ui.customPlot->graph(1)->setData(x2, y2);
-    ui.customPlot->graph(1)->setLineStyle(QCPGraph::lsNone);
-    ui.customPlot->graph(1)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc, 3));
-
-    // give the axes some labels:
-    ui.customPlot->xAxis->setLabel("ereq energy");
-    ui.customPlot->yAxis->setLabel("quality of fit");
-
-    //plot
-    ui.customPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
-    ui.customPlot->rescaleAxes();
     ui.customPlot->replot();
     return 0;
 }
@@ -1241,9 +1225,10 @@ bool PlotDialog::partialsplot()
     columnsCN.clear();
     columnsCN.resize(numberPairs+1);
     QVector<double> x;
+    int pair;
 
     //read the data for each pair in the list from the data file by looping over each pair in the list
-    for (int pair = 0; pair < numberPairs; ++pair)
+    for (pair = 0; pair < numberPairs; ++pair)
     {
         int i = iList.at(pair); // this is the row of the first atom of the pair
         int j = jList.at(pair); // this is the row of the second atom in the pair
@@ -1345,6 +1330,39 @@ bool PlotDialog::partialsplot()
         fileCN.close();
     }
 
+    //find largest and smallest values in x and check for y
+    double xMin = x.at(0);
+    double xMax = x.at(0);
+    double yMin = columns[pair].at(0);
+    double yMax = columns[pair].at(0);
+    for (int i = 0; i < x.count(); i++)
+    {
+        if (x.at(i) < xMin)
+        {
+            xMin = x.at(i);
+        }
+        else
+        if (x.at(i) > xMax)
+        {
+            xMax = x.at(i);
+        }
+    }
+    for (pair = 0; pair < numberPairs; ++pair)
+    {
+        for (int j = 0; j < columns[pair].count(); j++)
+        {
+            if (columns[pair].at(j) < yMin)
+            {
+                yMin = columns[pair].at(j);
+            }
+            else
+            if (columns[pair].at(j) > yMax)
+            {
+                yMax = columns[pair].at(j);
+            }
+        }
+    }
+
     // create graph and assign data to it:
     if (ui.CNcheckBox->isChecked())
     {
@@ -1358,7 +1376,7 @@ bool PlotDialog::partialsplot()
             ui.customPlot->graph(i)->setData(x, columns.at(i/2));
             QCPItemText *dataLabel = new QCPItemText(ui.customPlot);
             ui.customPlot->addItem(dataLabel);
-            dataLabel->position->setCoords(12,(i/2)+1.1);
+            dataLabel->position->setCoords(xMax-(xMax/10),(i/2)+1.1);
             pairLabel = ui.pairStackPlotList->item(i/2)->text();
             dataLabel->setText(qPrintable(pairLabel));
             ui.customPlot->addGraph();
@@ -1378,7 +1396,7 @@ bool PlotDialog::partialsplot()
             ui.customPlot->graph(i)->setData(x, columns.at(i));
             QCPItemText *dataLabel = new QCPItemText(ui.customPlot);
             ui.customPlot->addItem(dataLabel);
-            dataLabel->position->setCoords(12,i+1.1);
+            dataLabel->position->setCoords(xMax-(xMax/10),i+1.1);
             pairLabel = ui.pairStackPlotList->item(i)->text();
             dataLabel->setText(qPrintable(pairLabel));
         }
@@ -1388,10 +1406,36 @@ bool PlotDialog::partialsplot()
     ui.customPlot->xAxis->setLabel("r (Angstrom)");
     ui.customPlot->yAxis->setLabel("g(r)");
 
+    //plot
     ui.customPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
-    ui.customPlot->xAxis->setRange(0, 15);
-    ui.customPlot->yAxis->setRange(0, numberPairs+1);
-//    ui.customPlot->rescaleAxes();
+    if (!ui.xMinLineEdit->text().isEmpty())
+    {
+        ui.customPlot->xAxis->setRangeLower(ui.xMinLineEdit->text().toDouble());
+    }
+    else
+    ui.customPlot->xAxis->setRangeLower(xMin);
+
+    if (!ui.xMaxLineEdit->text().isEmpty())
+    {
+        ui.customPlot->xAxis->setRangeUpper(ui.xMaxLineEdit->text().toDouble());
+    }
+    else
+    ui.customPlot->xAxis->setRangeUpper(xMax);
+
+    if (!ui.yMinLineEdit->text().isEmpty())
+    {
+        ui.customPlot->yAxis->setRangeLower(ui.yMinLineEdit->text().toDouble());
+    }
+    else
+    ui.customPlot->yAxis->setRangeLower(yMin);
+
+    if (!ui.yMaxLineEdit->text().isEmpty())
+    {
+        ui.customPlot->yAxis->setRangeUpper(ui.yMaxLineEdit->text().toDouble());
+    }
+    else
+    ui.customPlot->yAxis->setRangeUpper(yMax);
+
     ui.customPlot->replot();
     return 0;
 }
@@ -1809,6 +1853,48 @@ bool PlotDialog::ereqPlot()
     }
     fileqdr.close();
 
+    //find largest and smallest values in x and y
+    double xMin = x1.at(0);
+    double yMin = y1.at(0);
+    double xMax = x1.at(0);
+    double yMax = y1.at(0);
+    for (int i = 0; i < x1.count(); i++)
+    {
+        if (x1.at(i) < xMin)
+        {
+            xMin = x1.at(i);
+        }
+        else
+        if (x1.at(i) > xMax)
+        {
+            xMax = x1.at(i);
+        }
+    }
+    for (int i = 0; i < y1.count(); i++)
+    {
+        if (y1.at(i) < yMin)
+        {
+            yMin = y1.at(i);
+        }
+        else
+        if (y1.at(i) > yMax)
+        {
+            yMax = y1.at(i);
+        }
+    }
+    for (int i = 0; i < y2.count(); i++)
+    {
+        if (y2.at(i) < yMin)
+        {
+            yMin = y2.at(i);
+        }
+        else
+        if (y2.at(i) > yMax)
+        {
+            yMax = y2.at(i);
+        }
+    }
+
     // create graph and assign data to it:
     QCPCurve *ergCurve = new QCPCurve(ui.customPlot->xAxis, ui.customPlot->yAxis);
     ui.customPlot->addPlottable(ergCurve);
@@ -1824,7 +1910,40 @@ bool PlotDialog::ereqPlot()
 
     //plot
     ui.customPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
-    ui.customPlot->rescaleAxes();
+    if (ui.xMinLineEdit->text().isEmpty() && ui.xMaxLineEdit->text().isEmpty() && ui.yMinLineEdit->text().isEmpty() && ui.yMaxLineEdit->text().isEmpty())
+    {
+        ui.customPlot->rescaleAxes();
+    }
+    else
+    {
+        if (!ui.xMinLineEdit->text().isEmpty())
+        {
+            ui.customPlot->xAxis->setRangeLower(ui.xMinLineEdit->text().toDouble());
+        }
+        else
+        ui.customPlot->xAxis->setRangeLower(xMin);
+
+        if (!ui.xMaxLineEdit->text().isEmpty())
+        {
+            ui.customPlot->xAxis->setRangeUpper(ui.xMaxLineEdit->text().toDouble());
+        }
+        else
+        ui.customPlot->xAxis->setRangeUpper(xMax);
+
+        if (!ui.yMinLineEdit->text().isEmpty())
+        {
+            ui.customPlot->yAxis->setRangeLower(ui.yMinLineEdit->text().toDouble());
+        }
+        else
+        ui.customPlot->yAxis->setRangeLower(yMin);
+
+        if (!ui.yMaxLineEdit->text().isEmpty())
+        {
+            ui.customPlot->yAxis->setRangeUpper(ui.yMaxLineEdit->text().toDouble());
+        }
+        else
+        ui.customPlot->yAxis->setRangeUpper(yMax);
+    }
     ui.customPlot->replot();
     return 0;
 }

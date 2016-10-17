@@ -67,7 +67,6 @@ public:
     bool Eplot();
     bool Rplot();
     bool Pplot();
-    bool Ereqplot();
     bool partialsplot();
     bool gofrintraplot();
     bool sqterplot();
