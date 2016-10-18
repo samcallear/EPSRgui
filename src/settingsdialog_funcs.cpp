@@ -14,7 +14,7 @@ SettingsDialog::SettingsDialog(MainWindow *parent) : QDialog(parent)
 
     mainWindow_ = parent;
 
-    connect(ui.okButton, SIGNAL(clicked()), this, SLOT(accept()));
+    connect(ui.okButton, SIGNAL(clicked()), this, SLOT(writeSettingsFile()));
     connect(ui.cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
 
     currentDir=mainWindow_->exeDir();
@@ -65,41 +65,7 @@ void SettingsDialog::readSettings()
 
 void SettingsDialog::on_okButton_clicked(bool checked)
 {
-    if (ui.epsrBinDirlineEdit->text().isEmpty())
-    {
-        QMessageBox msgBox;
-        msgBox.setText("The EPSR binaries directory needs to be specified in order to use EPSRgui.");
-        msgBox.exec();
-        return;
-    }
-    if (!ui.epsrBinDirlineEdit->text().contains("bin"))
-    {
-        QMessageBox msgBox;
-        msgBox.setText("Check that the EPSR binaries path is to the EPSR bin folder");
-        msgBox.exec();
-        return;
-    }
-    QDir dir(ui.epsrBinDirlineEdit->text());
-    if (dir.exists() == false)
-    {
-        QMessageBox msgBox;
-        msgBox.setText("Check that the EPSR binaries path is correct.");
-        msgBox.exec();
-        return;
-    }
 
-    if (!ui.epsrDirlineEdit->text().isEmpty())
-    {
-        if (!ui.epsrDirlineEdit->text().contains("run"))
-        {
-            QMessageBox msgBox;
-            msgBox.setText("Check that the EPSR run directory is correct.");
-            msgBox.exec();
-            return;
-        }
-    }
-
-    writeSettingsFile();
 }
 
 void SettingsDialog::on_cancelButton_clicked(bool checked)
@@ -149,6 +115,41 @@ void SettingsDialog::on_browseVisualiserExeButton_clicked(bool checked)
 
 void SettingsDialog::writeSettingsFile()
 {
+    if (ui.epsrBinDirlineEdit->text().isEmpty())
+    {
+        QMessageBox msgBox;
+        msgBox.setText("The EPSR binaries directory needs to be specified in order to use EPSRgui.");
+        msgBox.exec();
+        return;
+    }
+
+    if (!ui.epsrBinDirlineEdit->text().contains("bin"))
+    {
+        QMessageBox msgBox;
+        msgBox.setText("Check that the EPSR binaries path is to the EPSR bin folder");
+        msgBox.exec();
+        return;
+    }
+
+    if (QDir(ui.epsrBinDirlineEdit->text()).exists() == false)
+    {
+        QMessageBox msgBox;
+        msgBox.setText("Check that the EPSR binaries path is correct.");
+        msgBox.exec();
+        return;
+    }
+
+    if (!ui.epsrDirlineEdit->text().isEmpty())
+    {
+        if (!ui.epsrDirlineEdit->text().contains("run"))
+        {
+            QMessageBox msgBox;
+            msgBox.setText("Check that the EPSR run directory is correct.");
+            msgBox.exec();
+            return;
+        }
+    }
+
     QString settingsFile = currentDir.path()+"/settings";
     QFile file(settingsFile);
     if(!file.open(QFile::WriteOnly | QFile::Text))
@@ -172,4 +173,6 @@ void SettingsDialog::writeSettingsFile()
     }
     file.resize(0);
     file.close();
+
+    accept();
 }

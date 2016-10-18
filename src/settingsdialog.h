@@ -16,11 +16,11 @@ private:
     QDir currentDir;
     MainWindow *mainWindow_;
     void readSettings();
-    void writeSettingsFile();
 
 private slots:
     void on_okButton_clicked(bool checked);
     void on_cancelButton_clicked(bool checked);
+    void writeSettingsFile();
 
 public:
     SettingsDialog(MainWindow *parent);
