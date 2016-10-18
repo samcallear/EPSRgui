@@ -93,11 +93,11 @@ void SettingsDialog::on_browseEPSRBinDirButton_clicked(bool checked)
     QString prefEPSRbindir;
     if (ui.epsrBinDirlineEdit->text().isEmpty())
     {
-        prefEPSRbindir = QFileDialog::getExistingDirectory(this, "Choose EPSR directory", currentDir.path());
+        prefEPSRbindir = QFileDialog::getExistingDirectory(this, "Choose EPSR bin directory", currentDir.path());
     }
     else
     {
-        prefEPSRbindir = QFileDialog::getExistingDirectory(this, "Choose EPSR directory", ui.epsrBinDirlineEdit->text());
+        prefEPSRbindir = QFileDialog::getExistingDirectory(this, "Choose EPSR bin directory", ui.epsrBinDirlineEdit->text());
     }
 
     ui.epsrBinDirlineEdit->setText(prefEPSRbindir);
@@ -139,16 +139,16 @@ void SettingsDialog::writeSettingsFile()
         return;
     }
 
-    if (!ui.epsrDirlineEdit->text().isEmpty())
-    {
-        if (!ui.epsrDirlineEdit->text().contains("run"))
-        {
-            QMessageBox msgBox;
-            msgBox.setText("Check that the EPSR run directory is correct.");
-            msgBox.exec();
-            return;
-        }
-    }
+//    if (!ui.epsrDirlineEdit->text().isEmpty())
+//    {
+//        if (!ui.epsrDirlineEdit->text().contains("run"))
+//        {
+//            QMessageBox msgBox;
+//            msgBox.setText("Check that the EPSR run directory is correct.");
+//            msgBox.exec();
+//            return;
+//        }
+//    }
 
     QString settingsFile = currentDir.path()+"/settings";
     QFile file(settingsFile);

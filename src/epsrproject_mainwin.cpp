@@ -231,7 +231,7 @@ void MainWindow::readSettings()
         dataLine = line.split("  ", QString::SkipEmptyParts);
         if (dataLine.count() != 0)
         {
-            if (dataLine.at(0) == "EPSRdir")
+            if (dataLine.at(0) == "EPSRdir")    //this is actually the preferred directory that contains the working directory
             {
                 epsrDir_ = dataLine.at(1)+"/";
                 epsrDir_ = QDir::toNativeSeparators(epsrDir_);
@@ -275,10 +275,8 @@ void MainWindow::createNew()
 
         //set file directories
         projectName_ = createNewDialog.getEPSRname();
-        epsrDir_ = createNewDialog.getEPSRdir()+"/";
+        epsrDir_ = createNewDialog.getPrefDir()+"/";
         epsrDir_ = QDir::toNativeSeparators(epsrDir_);
-//        epsrBinDir_ = (epsrDir_+"bin/");
-//        epsrBinDir_ = QDir::toNativeSeparators(epsrBinDir_);
         workingDir_ = (epsrDir_+projectName_+"/");
         workingDir_ = QDir::toNativeSeparators(workingDir_);
         if (!QDir(workingDir_).exists())
@@ -300,7 +298,7 @@ void MainWindow::createNew()
         file.close();
 
         //copy important EPSR files into working directory
-        QString epsrStartupDir = epsrDir_.split("run", QString::SkipEmptyParts).at(0);
+        QString epsrStartupDir = epsrBinDir_.split("bin", QString::SkipEmptyParts).at(0);
         epsrStartupDir = epsrStartupDir+"startup/";
         epsrStartupDir = QDir::toNativeSeparators(epsrStartupDir);
         QFile::copy(epsrStartupDir+"f0_WaasKirf.dat", workingDir_+"f0_WaasKirf.dat");
@@ -519,11 +517,8 @@ void MainWindow::open()
         projectName_ = QFileInfo(newFileName).baseName();
         workingDir_ = QFileInfo(newFileName).path()+"/";
         workingDir_ = QDir::toNativeSeparators(workingDir_);
-        epsrDir_ = workingDir_.split("run",QString::SkipEmptyParts).at(0);
-        epsrDir_ = epsrDir_+"run/";
+        epsrDir_ = workingDir_.split(projectName_,QString::SkipEmptyParts).at(0);
         epsrDir_ = QDir::toNativeSeparators(epsrDir_);
-//        epsrBinDir_ = (epsrDir_+"bin/");
-//        epsrBinDir_ = QDir::toNativeSeparators(epsrBinDir_);
 
         messageText_ += "\n***************************************************************************\n";
         messageText_ += "Current EPSR project name is "+projectName_+"\n";
@@ -827,8 +822,8 @@ bool MainWindow::saveAs()
     {
         //set file directories
         QString projectNameCopy = createNewDialog.getEPSRname();
-        QString epsrDirCopy = createNewDialog.getEPSRdir();
-        QString workingDirCopy = (epsrDirCopy+projectNameCopy+"/");
+        QString epsrDirCopy = createNewDialog.getPrefDir();
+        QString workingDirCopy = (epsrDirCopy+"/"+projectNameCopy+"/");
         workingDirCopy = QDir::toNativeSeparators(workingDirCopy);
         QDir workingDir(workingDir_);
 
@@ -1060,8 +1055,6 @@ bool MainWindow::saveAs()
         messageText_ += "Current working directory is "+workingDir_+"\n";
         QDir::setCurrent(workingDir_);
         epsrDir_ = epsrDirCopy;
-//        epsrBinDir_ = (epsrDir_+"/bin/");
-//        epsrBinDir_ = QDir::toNativeSeparators(epsrBinDir_);
         messageText_ += "Current EPSR binaries directory is "+epsrBinDir_+"\n";
         if (!atoFileName_.isEmpty())
         {
@@ -1101,8 +1094,8 @@ bool MainWindow::saveCopy()
     {
         //set file directories
         QString projectNameCopy = createNewDialog.getEPSRname();
-        QString epsrDirCopy = createNewDialog.getEPSRdir();
-        QString workingDirCopy = (epsrDirCopy+projectNameCopy+"/");
+        QString epsrDirCopy = createNewDialog.getPrefDir();
+        QString workingDirCopy = (epsrDirCopy+"/"+projectNameCopy+"/");
         workingDirCopy = QDir::toNativeSeparators(workingDirCopy);
         QDir workingDir(workingDir_);
 
@@ -1513,7 +1506,7 @@ void MainWindow::runEPSR()
 #endif
 
     //show EPSR is running
-    ui.epsrRunningSign->setText("EPSR ning");
+    ui.epsrRunningSign->setText("EPSR running");
     ui.epsrRunningSign->setEnabled(true);
     ui.stopAct->setEnabled(true);
     ui.runAct->setEnabled(false);

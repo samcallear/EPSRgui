@@ -33,7 +33,7 @@ void CreateNewDialog::on_okButton_clicked(bool checked)
 void CreateNewDialog::checkProjectName()
 {
     projectName_ = ui.lineEditEPSRname->text();
-    workingDir_ = ui.lineEditEPSRdir->text()+"/run/";
+    workingDir_ = ui.lineEditEPSRdir->text()+"/";
     workingDir_ = QDir::toNativeSeparators(workingDir_);
     QString newDir = workingDir_+projectName_;
     newDir = QDir::toNativeSeparators(newDir);
@@ -56,20 +56,15 @@ void CreateNewDialog::on_cancelButton_clicked(bool checked)
 
 void CreateNewDialog::on_newBrowseButton_clicked(bool checked)
 {
-    QString newEPSRdir = QFileDialog::getExistingDirectory(this, "Choose EPSR directory", currentSettingsDir.path());
-    if (!newEPSRdir.isEmpty())
+    QString newDir = QFileDialog::getExistingDirectory(this, "Choose EPSR directory", currentSettingsDir.path());
+    if (!newDir.isEmpty())
     {
-        ui.lineEditEPSRdir->setText(newEPSRdir);
-        workingDir_ = newEPSRdir+"/run";
-        if (!QDir(workingDir_).exists())
-        {
-            QMessageBox::warning(this, tr("Error creating new EPSR project"),
-                                 tr("Check the directory is the main EPSR directory containing the 'run' folder"));
-        }
+        ui.lineEditEPSRdir->setText(newDir);
+        workingDir_ = newDir; //this is without the project name
     }
 }
 
-QString CreateNewDialog::getEPSRdir()
+QString CreateNewDialog::getPrefDir()
 {
     return ui.lineEditEPSRdir->text();
 }

@@ -25,8 +25,8 @@ private slots:
 public:
     PlotBoxDialog(MainWindow *parent = 0);
     Ui::plotBoxDialog ui;
-    QString getEPSRdir();
-    QString getEPSRname();
+//    QString getEPSRdir();
+//    QString getEPSRname();
 };
 
 #endif

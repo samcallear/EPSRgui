@@ -27,7 +27,7 @@ private slots:
 public:
     CreateNewDialog(MainWindow *parent = 0);
     Ui::createNewDialog ui;
-    QString getEPSRdir();
+    QString getPrefDir();
     QString getEPSRname();
 
 public slots:
