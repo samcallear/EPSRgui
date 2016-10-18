@@ -56,7 +56,7 @@ void CreateNewDialog::on_cancelButton_clicked(bool checked)
 
 void CreateNewDialog::on_newBrowseButton_clicked(bool checked)
 {
-    QString newDir = QFileDialog::getExistingDirectory(this, "Choose EPSR directory", currentSettingsDir.path());
+    QString newDir = QFileDialog::getExistingDirectory(this, "Choose project directory", currentSettingsDir.path());
     if (!newDir.isEmpty())
     {
         ui.lineEditEPSRdir->setText(newDir);

@@ -139,17 +139,6 @@ void SettingsDialog::writeSettingsFile()
         return;
     }
 
-//    if (!ui.epsrDirlineEdit->text().isEmpty())
-//    {
-//        if (!ui.epsrDirlineEdit->text().contains("run"))
-//        {
-//            QMessageBox msgBox;
-//            msgBox.setText("Check that the EPSR run directory is correct.");
-//            msgBox.exec();
-//            return;
-//        }
-//    }
-
     QString settingsFile = currentDir.path()+"/settings";
     QFile file(settingsFile);
     if(!file.open(QFile::WriteOnly | QFile::Text))
