@@ -19,7 +19,7 @@ SetupOutputDialog::SetupOutputDialog(MainWindow *parent) : QDialog(parent)
     mainWindow_ = parent;
 
     workingDir_ = mainWindow_->workingDir();
-    epsrBinDir_ = mainWindow_->epsrDir()+"bin/";
+    epsrBinDir_ = mainWindow_->epsrBinDir();
     epsrBinDir_ = QDir::toNativeSeparators(epsrBinDir_);
 
     outputType_ = mainWindow_->showOutputType();

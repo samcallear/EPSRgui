@@ -25,11 +25,10 @@ private slots:
 public:
     SettingsDialog(MainWindow *parent);
     Ui::settingsDialog ui;
-    QString getPrefEPSRdir();
-    QString getPrefVisExe();
 
 public slots:
     void on_browseEPSRDirButton_clicked(bool checked);
+    void on_browseEPSRBinDirButton_clicked(bool checked);
     void on_browseVisualiserExeButton_clicked(bool checked);
 
 };

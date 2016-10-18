@@ -101,14 +101,8 @@ void MainWindow::createActions()
     ui.openAct->setStatusTip(tr("Open an existing EPSR project"));
     connect(ui.openAct, SIGNAL(triggered()), this, SLOT(open()));
 
-//    ui.saveAct->setStatusTip(tr("Save the current EPSR project"));
-//    connect(ui.saveAct, SIGNAL(triggered()), this, SLOT(save()));
-
     ui.saveAsAct->setStatusTip(tr("Save the current EPSR project as a different name"));
     connect(ui.saveAsAct, SIGNAL(triggered()), this, SLOT(saveAs()));
-
-//    ui.saveCopyAct->setStatusTip(tr("Save the current EPSR project"));
-//    connect(ui.saveCopyAct, SIGNAL(triggered()), this, SLOT(saveCopy()));
 
     ui.exitAct->setStatusTip(tr("Exit the application"));
     connect(ui.exitAct, SIGNAL(triggered()), this, SLOT(close()));
@@ -239,9 +233,13 @@ void MainWindow::readSettings()
         {
             if (dataLine.at(0) == "EPSRdir")
             {
-                currentDir = dataLine.at(1); //*******************************************************what is this used for?????????????????????****************************************************
                 epsrDir_ = dataLine.at(1)+"/";
                 epsrDir_ = QDir::toNativeSeparators(epsrDir_);
+            }
+            if (dataLine.at(0) == "EPSRbindir")
+            {
+                epsrBinDir_ = dataLine.at(1)+"/";
+                epsrBinDir_ = QDir::toNativeSeparators(epsrBinDir_);
             }
             if (dataLine.at(0) == "visualiser")
             {
@@ -255,6 +253,14 @@ void MainWindow::readSettings()
 
 void MainWindow::createNew()
 {
+    if (epsrBinDir_.isEmpty())
+    {
+        QMessageBox msgBox;
+        msgBox.setText("The EPSR binaries directory needs to be defined.");
+        msgBox.exec();
+        return;
+    }
+
     CreateNewDialog createNewDialog(this);
 
     createNewDialog.show();
@@ -271,9 +277,9 @@ void MainWindow::createNew()
         projectName_ = createNewDialog.getEPSRname();
         epsrDir_ = createNewDialog.getEPSRdir()+"/";
         epsrDir_ = QDir::toNativeSeparators(epsrDir_);
-        epsrBinDir_ = (epsrDir_+"bin/");
-        epsrBinDir_ = QDir::toNativeSeparators(epsrBinDir_);
-        workingDir_ = (epsrDir_+"run/"+projectName_+"/");
+//        epsrBinDir_ = (epsrDir_+"bin/");
+//        epsrBinDir_ = QDir::toNativeSeparators(epsrBinDir_);
+        workingDir_ = (epsrDir_+projectName_+"/");
         workingDir_ = QDir::toNativeSeparators(workingDir_);
         if (!QDir(workingDir_).exists())
         {
@@ -294,17 +300,20 @@ void MainWindow::createNew()
         file.close();
 
         //copy important EPSR files into working directory
-        QFile::copy(epsrDir_+"/startup/f0_WaasKirf.dat", workingDir_+"/f0_WaasKirf.dat");
-        QFile::copy(epsrDir_+"/startup/plot_defaults.txt", workingDir_+"/plot_defaults.txt");
-        QFile::copy(epsrDir_+"/startup/vanderWaalsRadii.txt", workingDir_+"/vanderWaalsRadii.txt");
-        QFile::copy(epsrDir_+"/startup/gnubonds.txt", workingDir_+"/gnubonds.txt");
-        QFile::copy(epsrDir_+"/startup/gnuatoms.txt", workingDir_+"/gnuatoms.txt");
+        QString epsrStartupDir = epsrDir_.split("run", QString::SkipEmptyParts).at(0);
+        epsrStartupDir = epsrStartupDir+"startup/";
+        epsrStartupDir = QDir::toNativeSeparators(epsrStartupDir);
+        QFile::copy(epsrStartupDir+"f0_WaasKirf.dat", workingDir_+"f0_WaasKirf.dat");
+        QFile::copy(epsrStartupDir+"plot_defaults.txt", workingDir_+"plot_defaults.txt");
+        QFile::copy(epsrStartupDir+"vanderWaalsRadii.txt", workingDir_+"vanderWaalsRadii.txt");
+        QFile::copy(epsrStartupDir+"gnubonds.txt", workingDir_+"gnubonds.txt");
+        QFile::copy(epsrStartupDir+"gnuatoms.txt", workingDir_+"gnuatoms.txt");
 #ifdef _WIN32
-        QFile::copy(epsrDir_+"/startup/epsr.bat", workingDir_+"/epsr.bat");
-        QFile::copy(epsrDir_+"/startup/system_commands.txt", workingDir_+"/system_commands.txt");
+        QFile::copy(epsrStartupDir+"epsr.bat", workingDir_+"epsr.bat");
+        QFile::copy(epsrStartupDir+"system_commands.txt", workingDir_+"system_commands.txt");
 #else
-        QFile::copy(epsrDir_+"/startup/epsr", workingDir_+"/epsr");
-        QFile::copy(epsrDir_+"/startup/system_commands_linux.txt", workingDir_+"/system_commands.txt");
+        QFile::copy(epsrStartupDir+"epsr", workingDir_+"epsr");
+        QFile::copy(epsrStartupDir+"system_commands_linux.txt", workingDir_+"system_commands.txt");
 #endif
 
         //activate tabs
@@ -358,7 +367,7 @@ void MainWindow::reset()
     //clear tables and key names
     projectName_.clear();
     workingDir_.clear();
-    epsrBinDir_.clear();
+//    epsrBinDir_.clear();
 
     ui.molFileList->clear();
     ui.molChargeLabel->clear();
@@ -485,15 +494,22 @@ void MainWindow::reset()
 
 void MainWindow::open()
 {
-    QString runDir;
-    if (!epsrDir_.isEmpty())
+    if (epsrBinDir_.isEmpty())
     {
-        runDir = epsrDir_+"run/";
-        runDir = QDir::toNativeSeparators(runDir);
-        currentDir.setPath(runDir);
+        QMessageBox msgBox;
+        msgBox.setText("The EPSR binary folder needs to be defined.");
+        msgBox.exec();
+        return;
     }
 
-    QString newFileName = QFileDialog::getOpenFileName(this, "Choose EPSR .pro file", currentDir.path(), tr(".EPSR.pro files (*.EPSR.pro)"));
+    QString newFileName;
+    if (!epsrDir_.isEmpty())
+    {
+        newFileName = QFileDialog::getOpenFileName(this, "Choose EPSR .pro file", epsrDir_, tr(".EPSR.pro files (*.EPSR.pro)"));
+    }
+    else
+    newFileName = QFileDialog::getOpenFileName(this, "Choose EPSR .pro file", currentDir.path(), tr(".EPSR.pro files (*.EPSR.pro)"));
+
     if (!newFileName.isEmpty())
     {
         //clear all tables
@@ -504,8 +520,10 @@ void MainWindow::open()
         workingDir_ = QFileInfo(newFileName).path()+"/";
         workingDir_ = QDir::toNativeSeparators(workingDir_);
         epsrDir_ = workingDir_.split("run",QString::SkipEmptyParts).at(0);
-        epsrBinDir_ = (epsrDir_+"bin/");
-        epsrBinDir_ = QDir::toNativeSeparators(epsrBinDir_);
+        epsrDir_ = epsrDir_+"run/";
+        epsrDir_ = QDir::toNativeSeparators(epsrDir_);
+//        epsrBinDir_ = (epsrDir_+"bin/");
+//        epsrBinDir_ = QDir::toNativeSeparators(epsrBinDir_);
 
         messageText_ += "\n***************************************************************************\n";
         messageText_ += "Current EPSR project name is "+projectName_+"\n";
@@ -810,7 +828,7 @@ bool MainWindow::saveAs()
         //set file directories
         QString projectNameCopy = createNewDialog.getEPSRname();
         QString epsrDirCopy = createNewDialog.getEPSRdir();
-        QString workingDirCopy = (epsrDirCopy+"/run/"+projectNameCopy+"/");
+        QString workingDirCopy = (epsrDirCopy+projectNameCopy+"/");
         workingDirCopy = QDir::toNativeSeparators(workingDirCopy);
         QDir workingDir(workingDir_);
 
@@ -1042,8 +1060,8 @@ bool MainWindow::saveAs()
         messageText_ += "Current working directory is "+workingDir_+"\n";
         QDir::setCurrent(workingDir_);
         epsrDir_ = epsrDirCopy;
-        epsrBinDir_ = (epsrDir_+"/bin/");
-        epsrBinDir_ = QDir::toNativeSeparators(epsrBinDir_);
+//        epsrBinDir_ = (epsrDir_+"/bin/");
+//        epsrBinDir_ = QDir::toNativeSeparators(epsrBinDir_);
         messageText_ += "Current EPSR binaries directory is "+epsrBinDir_+"\n";
         if (!atoFileName_.isEmpty())
         {
@@ -1084,7 +1102,7 @@ bool MainWindow::saveCopy()
         //set file directories
         QString projectNameCopy = createNewDialog.getEPSRname();
         QString epsrDirCopy = createNewDialog.getEPSRdir();
-        QString workingDirCopy = (epsrDirCopy+"/run/"+projectNameCopy+"/");
+        QString workingDirCopy = (epsrDirCopy+projectNameCopy+"/");
         workingDirCopy = QDir::toNativeSeparators(workingDirCopy);
         QDir workingDir(workingDir_);
 
@@ -1495,7 +1513,7 @@ void MainWindow::runEPSR()
 #endif
 
     //show EPSR is running
-    ui.epsrRunningSign->setText("EPSR running");
+    ui.epsrRunningSign->setText("EPSR ning");
     ui.epsrRunningSign->setEnabled(true);
     ui.stopAct->setEnabled(true);
     ui.runAct->setEnabled(false);
@@ -2007,6 +2025,7 @@ void MainWindow::settings()
 
     if (setDialog == SettingsDialog::Accepted)
     {
+        epsrBinDir_.clear();
         epsrDir_.clear();
         visualiserExe_.clear();
         readSettings();
@@ -2031,6 +2050,11 @@ QDir MainWindow::exeDir()
 QString MainWindow::epsrDir()
 {
     return epsrDir_;
+}
+
+QString MainWindow::epsrBinDir()
+{
+    return epsrBinDir_;
 }
 
 QStringList MainWindow::atomLabels()
@@ -2334,9 +2358,18 @@ void MainWindow::outputfromEPSRprocessReady()
 
 void MainWindow::openEPSRmanual()
 {
+    if (epsrBinDir_.isEmpty())
+    {
+        QMessageBox msgBox;
+        msgBox.setText("The EPSR binaries directory needs to be defined.");
+        msgBox.exec();
+        return;
+    }
+
     QStringList filters;
     filters << "*.pdf";
-    QString docDirstr = epsrDir_+"/doc/";
+    QString docDirstr = epsrBinDir_.split("bin", QString::SkipEmptyParts).at(0);
+    docDirstr = docDirstr+"doc/";
     QDir docDir = QDir::toNativeSeparators(docDirstr);
     QStringList pdfFiles = docDir.entryList(filters, QDir::Files);
     if (pdfFiles.isEmpty())

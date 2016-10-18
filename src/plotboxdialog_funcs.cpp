@@ -11,8 +11,7 @@ PlotBoxDialog::PlotBoxDialog(MainWindow *parent) : QDialog(parent)
     atoAtomLabels_ = mainWindow_->atomLabels();
     workingDir_ = mainWindow_->workingDir();
     atoFileName_ = mainWindow_->atoFileName();
-    epsrBinDir_ = mainWindow_->epsrDir()+"bin/";
-    epsrBinDir_ = QDir::toNativeSeparators(epsrBinDir_);
+    epsrBinDir_ = mainWindow_->epsrBinDir();
 
     QRegExp noNegIntrx("^\\d*$");
     QRegExp onlyIntrx("^\\-?\\d*$");

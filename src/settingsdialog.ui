@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>360</width>
-    <height>105</height>
+    <height>136</height>
    </rect>
   </property>
   <property name="maximumSize">
@@ -21,11 +21,32 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_4">
+     <item>
+      <widget class="QLabel" name="label_3">
+       <property name="text">
+        <string>EPSR bin directory</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="epsrBinDirlineEdit"/>
+     </item>
+     <item>
+      <widget class="QPushButton" name="browseEPSRBinDirButton">
+       <property name="text">
+        <string>Browse</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <widget class="QLabel" name="label">
        <property name="text">
-        <string>Preferred EPSR directory</string>
+        <string>Preferred EPSR run directory</string>
        </property>
       </widget>
      </item>

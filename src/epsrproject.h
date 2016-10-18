@@ -72,7 +72,7 @@ private:
     QDir currentDir;
     QString projectName_; //folder name in EPSR but doesn't include path or a "/" after it
     QString workingDir_; //includes projectName and has a "/" after it
-    QString epsrDir_; //has a "/" after it
+    QString epsrDir_; //this is the run dir and has a "/" after it
     QString epsrBinDir_; //has a "/" after it
     QString baseFileName_; //use this for the name of the box and the EPSR inp files with the path and without any extensions
     QString molFileName_; //just filename and extension for selected file in molFileList (.mol or .ato), no path
@@ -102,6 +102,7 @@ public:
     QString atoFileName();
     QDir exeDir();
     QString epsrDir();
+    QString epsrBinDir();
     QStringList atomLabels();
     QVector<int> numberOfEachAtomLabel();
     QStringList listAtoFiles();
