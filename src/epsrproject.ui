@@ -2571,13 +2571,13 @@
           </widget>
           <widget class="QWidget" name="outTab">
            <attribute name="title">
-            <string>Outputs</string>
+            <string>Analysis</string>
            </attribute>
            <layout class="QVBoxLayout" name="verticalLayout_16">
             <item>
              <widget class="QGroupBox" name="groupBox_3">
               <property name="title">
-               <string>EPSR output routines</string>
+               <string> EPSR analysis routine setup</string>
               </property>
               <layout class="QHBoxLayout" name="horizontalLayout_24">
                <item>
@@ -2683,7 +2683,7 @@
                  <item row="8" column="0">
                   <widget class="QLabel" name="label_55">
                    <property name="text">
-                    <string>New output name</string>
+                    <string>New analysis routine name</string>
                    </property>
                   </widget>
                  </item>
@@ -2697,7 +2697,7 @@
                  <item row="0" column="0">
                   <widget class="QLabel" name="label_54">
                    <property name="text">
-                    <string>Output type</string>
+                    <string>Analysis routine</string>
                    </property>
                   </widget>
                  </item>
@@ -2730,7 +2730,7 @@
                  <item row="2" column="0">
                   <widget class="QLabel" name="label_56">
                    <property name="text">
-                    <string>Existing outputs</string>
+                    <string>Existing analysis routines</string>
                    </property>
                   </widget>
                  </item>
@@ -2765,7 +2765,7 @@
             <item>
              <widget class="QGroupBox" name="groupBox_2">
               <property name="title">
-               <string>Setup EPSR density plots</string>
+               <string>EPSR density plot setup</string>
               </property>
               <layout class="QHBoxLayout" name="horizontalLayout_25">
                <item>
