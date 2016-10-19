@@ -2455,6 +2455,7 @@ void MainWindow::timerEvent(QTimerEvent *event)
         {
             //reenable buttons
             ui.fmoleButton->setEnabled(true);
+            ui.fmoleLineEdit->setEnabled(true);
             ui.updateAtoFileButton->setEnabled(true);
             ui.mixatoButton->setEnabled(true);
             ui.addatoButton->setEnabled(true);
