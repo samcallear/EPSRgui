@@ -1385,6 +1385,8 @@ bool MainWindow::updateMolFile()
         return false;
     }
 
+    QRegExp rxnumbers("\\d*");
+
     //check there are no empty cells and that the atom types are the same in the atom types table and LJ table - this doesn't work if the atom labels are the same as the element labels******************************************************************************************
     if (ui.molAtomTable->rowCount() > 0)
     {
@@ -1464,6 +1466,13 @@ bool MainWindow::updateMolFile()
     {
         for (int i = 0; i < ui.molDihedralTable->rowCount(); ++i)
         {
+            if (!rxnumbers.exactMatch(ui.molDihedralTable->item(i,0)->text().split(" ", QString::SkipEmptyParts).at(0)))
+            {
+                QMessageBox msgBox;
+                msgBox.setText("The atom label must be used to define dihedral restriants (not the atom type).");
+                msgBox.exec();
+                return false;
+            }
             if (ui.molDihedralTable->item(i,0)->text().split(" ", QString::SkipEmptyParts).count() !=4)
             {
                 QMessageBox msgBox;
@@ -1484,6 +1493,13 @@ bool MainWindow::updateMolFile()
     {
         for (int i = 0; i < ui.molRotTable->rowCount(); ++i)
         {
+            if (!rxnumbers.exactMatch(ui.molRotTable->item(i,0)->text().split(" ", QString::SkipEmptyParts).at(0)))
+            {
+                QMessageBox msgBox;
+                msgBox.setText("The atom label must be used to define rotational axes (not the atom type).");
+                msgBox.exec();
+                return false;
+            }
             if (ui.molRotTable->item(i,0)->text().isEmpty())
             {
                 QMessageBox msgBox;
@@ -1574,8 +1590,11 @@ bool MainWindow::updateMolFile()
             QString atoms = ui.molBondTable->item(i,0)->text();
             QString atom1 = atoms.split(" ", QString::SkipEmptyParts).at(0);
             QString atom2 = atoms.split(" ", QString::SkipEmptyParts).at(1);
-            atom1 = atom1.rightJustified(3, '0');
-            atom2 = atom2.rightJustified(3, '0');
+            if (rxnumbers.exactMatch(atom1))
+            {
+                atom1 = atom1.rightJustified(3, '0');
+                atom2 = atom2.rightJustified(3, '0');
+            }
             streamWrite << "bond " << atom1 << " " << atom2 << "    " << ui.molBondTable->item(i,1)->text() << "\n";
         }
     }
@@ -1588,9 +1607,12 @@ bool MainWindow::updateMolFile()
             QString atom1 = atoms.split(" ", QString::SkipEmptyParts).at(0);
             QString atom2 = atoms.split(" ", QString::SkipEmptyParts).at(1);
             QString atom3 = atoms.split(" ", QString::SkipEmptyParts).at(2);
-            atom1 = atom1.rightJustified(3, '0');
-            atom2 = atom2.rightJustified(3, '0');
-            atom3 = atom3.rightJustified(3, '0');
+            if (rxnumbers.exactMatch(atom1))
+            {
+                atom1 = atom1.rightJustified(3, '0');
+                atom2 = atom2.rightJustified(3, '0');
+                atom3 = atom3.rightJustified(3, '0');
+            }
             streamWrite << "angle " << atom1 << " " << atom2 << " " << atom3 << "  " << ui.molAngleTable->item(i,1)->text() << "\n";
         }
     }
