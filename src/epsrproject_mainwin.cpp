@@ -2151,10 +2151,15 @@ void MainWindow::deleteEPSRinpFile()
             ui.minDistanceTable->clearContents();
             ui.minDistanceTable->setRowCount(0);
             epsrInpFileName_.clear();
-            ui.dataFileTable->clearContents();
-            ui.dataFileTable->setRowCount(0);
-            ui.atomWtsTable->clearContents();
-            ui.atomWtsTable->setRowCount(0);
+//            ui.dataFileTable->clearContents();
+//            ui.dataFileTable->setRowCount(0);
+//            ui.atomWtsTable->clearContents();
+//            ui.atomWtsTable->setRowCount(0);
+//            dataFileList.clear();
+//            dataFileTypeList.clear();
+//            wtsFileList.clear();
+//            normalisationList.clear();
+            ui.runOutEPSRList->clear();
             ui.dlputilsOutCheckBox->setChecked(false);
 
             //clear plots
@@ -2174,6 +2179,7 @@ void MainWindow::deleteEPSRinpFile()
             ui.plotEPSRshellAct->setEnabled(false);
             ui.dataFileBrowseButton->setEnabled(true);
             ui.removeDataFileButton->setEnabled(true);
+//            ui.setupEPSRButton->setEnabled(false);
             ui.updateInpPcofFilesButton->setEnabled(false);
             ui.reloadEPSRinpButton->setEnabled(false);
             ui.setupOutButton->setEnabled(false);

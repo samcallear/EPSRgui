@@ -796,10 +796,12 @@ bool MainWindow::Ereqplot2()
     QString lineerg;
     QStringList dataLineerg;
     QVector<double> x1;          //ereq
+    QVector<double> x2;          //ereq
     QVector<double> y1;         //fit quality
     QVector<double> y2;         //fitted line showing gradient of last 50 iterations
     dataLineerg.clear();
     x1.clear();
+    x2.clear();
     y1.clear();
     y2.clear();
     for (int iterations = 1; iterations < 1000000; ++iterations)
@@ -850,6 +852,7 @@ bool MainWindow::Ereqplot2()
             fileqdr.close();
             return 0;
         }
+        x2.append(dataLineqdr.at(3).toDouble());
         y2.append(dataLineqdr.at(4).toDouble());
     }
     fileqdr.close();
@@ -859,7 +862,7 @@ bool MainWindow::Ereqplot2()
     ui.plot2->addPlottable(ergCurve);
     ergCurve->setData(x1, y1);
     ui.plot2->addGraph();
-    ui.plot2->graph(0)->setData(x1, y2);
+    ui.plot2->graph(0)->setData(x2, y2);
     ui.plot2->graph(0)->setLineStyle(QCPGraph::lsNone);
     ui.plot2->graph(0)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc, 3));
 
