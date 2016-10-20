@@ -1247,6 +1247,19 @@ bool PlotDialog::partialsplot()
     QVector<double> x;
     int pair;
 
+    //get any offsets from the dialog window
+    double yZeroOffset = 0.0;
+    double dataSetOffset = 1.0;
+    if (!ui.yZeroOffsetLineEdit->text().isEmpty())
+    {
+        yZeroOffset = ui.yZeroOffsetLineEdit->text().toDouble();
+    }
+    if (!ui.manOffsetLineEdit->text().isEmpty() && ui.manOffsetRB->isChecked())
+    {
+        dataSetOffset = ui.manOffsetLineEdit->text().toDouble();
+    }
+    double dataSetOffsetFactor = 1/dataSetOffset;
+
     //read the data for each pair in the list from the data file by looping over each pair in the list
     for (pair = 0; pair < numberPairs; ++pair)
     {
@@ -1323,7 +1336,7 @@ bool PlotDialog::partialsplot()
             dataLine = line.split(" ", QString::SkipEmptyParts);
             if (dataLine.count() == 0) break;
             x.append(dataLine.at(0).toDouble());
-            columns[pair].append(dataLine.at(atompair_index*2+1).toDouble()+pair);
+            columns[pair].append(dataLine.at(atompair_index*2+1).toDouble()+pair/dataSetOffsetFactor+yZeroOffset);
         } while (!line.isNull());
         file.close();
 
@@ -1345,7 +1358,7 @@ bool PlotDialog::partialsplot()
             lineCN = streamCN.readLine();
             dataLineCN = lineCN.split(" ", QString::SkipEmptyParts);
             if (dataLineCN.count() == 0) break;
-            columnsCN[pair].append(dataLineCN.at(CNpair_column).toDouble()+pair);
+            columnsCN[pair].append(dataLineCN.at(CNpair_column).toDouble()+pair/dataSetOffsetFactor+yZeroOffset);
         } while (!lineCN.isNull());
         fileCN.close();
     }
@@ -1396,7 +1409,7 @@ bool PlotDialog::partialsplot()
             ui.customPlot->graph(i)->setData(x, columns.at(i/2));
             QCPItemText *dataLabel = new QCPItemText(ui.customPlot);
             ui.customPlot->addItem(dataLabel);
-            dataLabel->position->setCoords(xMax-(xMax/10),(i/2)+1.1);
+            dataLabel->position->setCoords(xMax-(xMax/10),((i/2)/dataSetOffsetFactor)+yZeroOffset+1.1);
             pairLabel = ui.pairStackPlotList->item(i/2)->text();
             dataLabel->setText(qPrintable(pairLabel));
             ui.customPlot->addGraph();
@@ -1416,7 +1429,7 @@ bool PlotDialog::partialsplot()
             ui.customPlot->graph(i)->setData(x, columns.at(i));
             QCPItemText *dataLabel = new QCPItemText(ui.customPlot);
             ui.customPlot->addItem(dataLabel);
-            dataLabel->position->setCoords(xMax-(xMax/10),i+1.1);
+            dataLabel->position->setCoords(xMax-(xMax/10),(i/dataSetOffsetFactor)+yZeroOffset+1.1);
             pairLabel = ui.pairStackPlotList->item(i)->text();
             dataLabel->setText(qPrintable(pairLabel));
         }
@@ -1470,6 +1483,19 @@ bool PlotDialog::gofrintraplot()
     columns.clear();
     columns.resize(numberPairs+1);
     QVector<double> x;
+
+    //get any offsets from the dialog window
+    double yZeroOffset = 0.0;
+    double dataSetOffset = 1.0;
+    if (!ui.yZeroOffsetLineEdit->text().isEmpty())
+    {
+        yZeroOffset = ui.yZeroOffsetLineEdit->text().toDouble();
+    }
+    if (!ui.manOffsetLineEdit->text().isEmpty() && ui.manOffsetRB->isChecked())
+    {
+        dataSetOffset = ui.manOffsetLineEdit->text().toDouble();
+    }
+    double dataSetOffsetFactor = 1/dataSetOffset;
 
     //read the data for each pair in the list from the data file by looping over each pair in the list
     for (int pair = 0; pair < numberPairs; ++pair)
@@ -1559,9 +1585,42 @@ bool PlotDialog::gofrintraplot()
             dataLine = line.split(" ", QString::SkipEmptyParts);
             if (dataLine.count() == 0) break;
             x.append(dataLine.at(0).toDouble());
-            columns[pair].append(dataLine.at(atompair_index*2+1).toDouble()+pair);
+            columns[pair].append(dataLine.at(atompair_index*2+1).toDouble()+pair/dataSetOffsetFactor+yZeroOffset);
         } while (!line.isNull());
         file.close();
+    }
+
+    //find largest and smallest values in x and check for y
+    double xMin = x.at(0);
+    double xMax = x.at(0);
+    double yMin = columns[0].at(0);
+    double yMax = columns[0].at(0);
+    for (int i = 0; i < x.count(); i++)
+    {
+        if (x.at(i) < xMin)
+        {
+            xMin = x.at(i);
+        }
+        else
+        if (x.at(i) > xMax)
+        {
+            xMax = x.at(i);
+        }
+    }
+    for (int pair = 0; pair < numberPairs; ++pair)
+    {
+        for (int j = 0; j < columns[pair].count(); j++)
+        {
+            if (columns[pair].at(j) < yMin)
+            {
+                yMin = columns[pair].at(j);
+            }
+            else
+            if (columns[pair].at(j) > yMax)
+            {
+                yMax = columns[pair].at(j);
+            }
+        }
     }
 
     // create graph and assign data to it:
@@ -1575,7 +1634,7 @@ bool PlotDialog::gofrintraplot()
         ui.customPlot->graph(i)->setData(x, columns.at(i));
         QCPItemText *dataLabel = new QCPItemText(ui.customPlot);
         ui.customPlot->addItem(dataLabel);
-        dataLabel->position->setCoords(12,i+0.1);
+        dataLabel->position->setCoords(12,(i/dataSetOffsetFactor)+yZeroOffset+0.2);
         pairLabel = ui.pairStackPlotList->item(i)->text();
         dataLabel->setText(qPrintable(pairLabel));
     }
@@ -1584,10 +1643,36 @@ bool PlotDialog::gofrintraplot()
     ui.customPlot->xAxis->setLabel("r (Angstrom)");
     ui.customPlot->yAxis->setLabel("g(r)");
 
+    //plot
     ui.customPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
-    ui.customPlot->rescaleAxes();
-//    ui.customPlot->xAxis->setRange(0, 15);
-//    ui.customPlot->yAxis->setRange(0, numberPairs+1);
+    if (!ui.xMinLineEdit->text().isEmpty())
+    {
+        ui.customPlot->xAxis->setRangeLower(ui.xMinLineEdit->text().toDouble());
+    }
+    else
+    ui.customPlot->xAxis->setRangeLower(xMin);
+
+    if (!ui.xMaxLineEdit->text().isEmpty())
+    {
+        ui.customPlot->xAxis->setRangeUpper(ui.xMaxLineEdit->text().toDouble());
+    }
+    else
+    ui.customPlot->xAxis->setRangeUpper(xMax);
+
+    if (!ui.yMinLineEdit->text().isEmpty())
+    {
+        ui.customPlot->yAxis->setRangeLower(ui.yMinLineEdit->text().toDouble());
+    }
+    else
+    ui.customPlot->yAxis->setRangeLower(yMin);
+
+    if (!ui.yMaxLineEdit->text().isEmpty())
+    {
+        ui.customPlot->yAxis->setRangeUpper(ui.yMaxLineEdit->text().toDouble());
+    }
+    else
+    ui.customPlot->yAxis->setRangeUpper(yMax);
+
     ui.customPlot->replot();
     return 0;
 }
@@ -1602,6 +1687,19 @@ bool PlotDialog::sqterplot()
     columns.clear();
     columns.resize(numberPairs+1);
     QVector<double> x;
+
+    //get any offsets from the dialog window
+    double yZeroOffset = 0.0;
+    double dataSetOffset = 1.0;
+    if (!ui.yZeroOffsetLineEdit->text().isEmpty())
+    {
+        yZeroOffset = ui.yZeroOffsetLineEdit->text().toDouble();
+    }
+    if (!ui.manOffsetLineEdit->text().isEmpty() && ui.manOffsetRB->isChecked())
+    {
+        dataSetOffset = ui.manOffsetLineEdit->text().toDouble();
+    }
+    double dataSetOffsetFactor = 1/dataSetOffset;
 
     //read the data for each pair in the list from the data file by looping over each pair in the list
     for (int pair = 0; pair < numberPairs; ++pair)
@@ -1661,9 +1759,42 @@ bool PlotDialog::sqterplot()
             dataLine = line.split(" ", QString::SkipEmptyParts);
             if (dataLine.count() == 0) break;
             x.append(dataLine.at(0).toDouble());
-            columns[pair].append(dataLine.at(atompair_index*2+1).toDouble()+pair);
+            columns[pair].append(dataLine.at(atompair_index*2+1).toDouble()+pair/dataSetOffsetFactor+yZeroOffset);
         } while (!line.isNull());
         file.close();
+    }
+
+    //find largest and smallest values in x and check for y
+    double xMin = x.at(0);
+    double xMax = x.at(0);
+    double yMin = columns[0].at(0);
+    double yMax = columns[0].at(0);
+    for (int i = 0; i < x.count(); i++)
+    {
+        if (x.at(i) < xMin)
+        {
+            xMin = x.at(i);
+        }
+        else
+        if (x.at(i) > xMax)
+        {
+            xMax = x.at(i);
+        }
+    }
+    for (int pair = 0; pair < numberPairs; ++pair)
+    {
+        for (int j = 0; j < columns[pair].count(); j++)
+        {
+            if (columns[pair].at(j) < yMin)
+            {
+                yMin = columns[pair].at(j);
+            }
+            else
+            if (columns[pair].at(j) > yMax)
+            {
+                yMax = columns[pair].at(j);
+            }
+        }
     }
 
     // create graph and assign data to it:
@@ -1677,7 +1808,7 @@ bool PlotDialog::sqterplot()
         ui.customPlot->graph(i)->setData(x, columns.at(i));
         QCPItemText *dataLabel = new QCPItemText(ui.customPlot);
         ui.customPlot->addItem(dataLabel);
-        dataLabel->position->setCoords(18,i+0.1);
+        dataLabel->position->setCoords(18,(i/dataSetOffsetFactor)+yZeroOffset+0.2);
         pairLabel = ui.pairStackPlotList->item(i)->text();
         dataLabel->setText(qPrintable(pairLabel));
     }
@@ -1686,10 +1817,36 @@ bool PlotDialog::sqterplot()
     ui.customPlot->xAxis->setLabel("r (Angstrom)");
     ui.customPlot->yAxis->setLabel("g(r)");
 
+    //plot
     ui.customPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
-//    ui.customPlot->xAxis->setRange(0, 15);
-//    ui.customPlot->yAxis->setRange(0, numberPairs+1);
-    ui.customPlot->rescaleAxes();
+    if (!ui.xMinLineEdit->text().isEmpty())
+    {
+        ui.customPlot->xAxis->setRangeLower(ui.xMinLineEdit->text().toDouble());
+    }
+    else
+    ui.customPlot->xAxis->setRangeLower(xMin);
+
+    if (!ui.xMaxLineEdit->text().isEmpty())
+    {
+        ui.customPlot->xAxis->setRangeUpper(ui.xMaxLineEdit->text().toDouble());
+    }
+    else
+    ui.customPlot->xAxis->setRangeUpper(xMax);
+
+    if (!ui.yMinLineEdit->text().isEmpty())
+    {
+        ui.customPlot->yAxis->setRangeLower(ui.yMinLineEdit->text().toDouble());
+    }
+    else
+    ui.customPlot->yAxis->setRangeLower(yMin);
+
+    if (!ui.yMaxLineEdit->text().isEmpty())
+    {
+        ui.customPlot->yAxis->setRangeUpper(ui.yMaxLineEdit->text().toDouble());
+    }
+    else
+    ui.customPlot->yAxis->setRangeUpper(yMax);
+
     ui.customPlot->replot();
     return 0;
 
@@ -1705,6 +1862,19 @@ bool PlotDialog::sqtraplot()
     columns.clear();
     columns.resize(numberPairs+1);
     QVector<double> x;
+
+    //get any offsets from the dialog window
+    double yZeroOffset = 0.0;
+    double dataSetOffset = 1.0;
+    if (!ui.yZeroOffsetLineEdit->text().isEmpty())
+    {
+        yZeroOffset = ui.yZeroOffsetLineEdit->text().toDouble();
+    }
+    if (!ui.manOffsetLineEdit->text().isEmpty() && ui.manOffsetRB->isChecked())
+    {
+        dataSetOffset = ui.manOffsetLineEdit->text().toDouble();
+    }
+    double dataSetOffsetFactor = 1/dataSetOffset;
 
     //read the data for each pair in the list from the data file by looping over each pair in the list
     for (int pair = 0; pair < numberPairs; ++pair)
@@ -1764,9 +1934,42 @@ bool PlotDialog::sqtraplot()
             dataLine = line.split(" ", QString::SkipEmptyParts);
             if (dataLine.count() == 0) break;
             x.append(dataLine.at(0).toDouble());
-            columns[pair].append(dataLine.at(atompair_index*2+1).toDouble()+pair);
+            columns[pair].append(dataLine.at(atompair_index*2+1).toDouble()+pair/dataSetOffsetFactor+yZeroOffset);
         } while (!line.isNull());
         file.close();
+    }
+
+    //find largest and smallest values in x and check for y
+    double xMin = x.at(0);
+    double xMax = x.at(0);
+    double yMin = columns[0].at(0);
+    double yMax = columns[0].at(0);
+    for (int i = 0; i < x.count(); i++)
+    {
+        if (x.at(i) < xMin)
+        {
+            xMin = x.at(i);
+        }
+        else
+        if (x.at(i) > xMax)
+        {
+            xMax = x.at(i);
+        }
+    }
+    for (int pair = 0; pair < numberPairs; ++pair)
+    {
+        for (int j = 0; j < columns[pair].count(); j++)
+        {
+            if (columns[pair].at(j) < yMin)
+            {
+                yMin = columns[pair].at(j);
+            }
+            else
+            if (columns[pair].at(j) > yMax)
+            {
+                yMax = columns[pair].at(j);
+            }
+        }
     }
 
     // create graph and assign data to it:
@@ -1780,7 +1983,7 @@ bool PlotDialog::sqtraplot()
         ui.customPlot->graph(i)->setData(x, columns.at(i));
         QCPItemText *dataLabel = new QCPItemText(ui.customPlot);
         ui.customPlot->addItem(dataLabel);
-        dataLabel->position->setCoords(18,(i)+0.1);
+        dataLabel->position->setCoords(18,(i/dataSetOffsetFactor)+yZeroOffset+0.2);
         pairLabel = ui.pairStackPlotList->item(i)->text();
         dataLabel->setText(qPrintable(pairLabel));
     }
@@ -1789,10 +1992,36 @@ bool PlotDialog::sqtraplot()
     ui.customPlot->xAxis->setLabel("q (Angstrom-1)");
     ui.customPlot->yAxis->setLabel("s(q)");
 
+    //plot
     ui.customPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
-//    ui.customPlot->xAxis->setRange(0, 15);
-//    ui.customPlot->yAxis->setRange(0, numberPairs+1);
-    ui.customPlot->rescaleAxes();
+    if (!ui.xMinLineEdit->text().isEmpty())
+    {
+        ui.customPlot->xAxis->setRangeLower(ui.xMinLineEdit->text().toDouble());
+    }
+    else
+    ui.customPlot->xAxis->setRangeLower(xMin);
+
+    if (!ui.xMaxLineEdit->text().isEmpty())
+    {
+        ui.customPlot->xAxis->setRangeUpper(ui.xMaxLineEdit->text().toDouble());
+    }
+    else
+    ui.customPlot->xAxis->setRangeUpper(xMax);
+
+    if (!ui.yMinLineEdit->text().isEmpty())
+    {
+        ui.customPlot->yAxis->setRangeLower(ui.yMinLineEdit->text().toDouble());
+    }
+    else
+    ui.customPlot->yAxis->setRangeLower(yMin);
+
+    if (!ui.yMaxLineEdit->text().isEmpty())
+    {
+        ui.customPlot->yAxis->setRangeUpper(ui.yMaxLineEdit->text().toDouble());
+    }
+    else
+    ui.customPlot->yAxis->setRangeUpper(yMax);
+
     ui.customPlot->replot();
     return 0;
 }
