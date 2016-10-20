@@ -754,6 +754,8 @@ void MainWindow::on_updateAtoFileButton_clicked(bool checked)
     QFile::remove(workingDir_+atoFileName_);
     QFile::rename(workingDir_+"temp.txt", workingDir_+atoFileName_);
 
+    readAtoFileBoxDetails();
+
     messageText_ += "\nbox .ato file updated\n";
     messagesDialog.refreshMessages();
     ui.messagesLineEdit->setText("Finished updating box .ato file");
