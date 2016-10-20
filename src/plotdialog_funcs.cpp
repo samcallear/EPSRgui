@@ -448,11 +448,12 @@ bool PlotDialog::datasetPlot()
     QTextStream streamD(&fileD);
     QString lineD;
     QStringList dataLineD;
-    QVector<double> xD;
+    QVector< QVector<double> >  xD;
     QVector< QVector<double> > columnsD;
     dataLineD.clear();
     xD.clear();
     columnsD.clear();
+    xD.resize(nDataCol);
     columnsD.resize(nDataCol);
     lineD = streamD.readLine();
     int nColumns = 0;
@@ -461,18 +462,22 @@ bool PlotDialog::datasetPlot()
         lineD = streamD.readLine();
         dataLineD = lineD.split(" ", QString::SkipEmptyParts);
         if (dataLineD.count() == 0) break;
-        xD.append(dataLineD.at(0).toDouble());
         nColumns = (dataLineD.count() - 1) / 2;
         for (column = 0; column < nColumns; ++column)
         {
-            columnsD[column].append((dataLineD.at(column*2+1).toDouble())+column/dataSetOffsetFactor+yZeroOffset);
+            double yval = dataLineD.at(column*2+1).toDouble();
+            if (yval != 0.0)
+            {
+                xD[column].append(dataLineD.at(0).toDouble());
+                columnsD[column].append((dataLineD.at(column*2+1).toDouble())+column/dataSetOffsetFactor+yZeroOffset);
+            }
         }
     } while (!lineD.isNull());
     fileD.close();
 
     //find largest and smallest values in y
-    double yMin = columnsD[column].at(0);
-    double yMax = columnsD[column].at(0);
+    double yMin = columnsD[0].at(0);
+    double yMax = columnsD[0].at(0);
     for (column = 0; column < nColumns; ++column)
     {
         for (int j = 0; j < columnsD[column].count(); j++)
@@ -500,11 +505,12 @@ bool PlotDialog::datasetPlot()
     QTextStream streamM(&fileM);
     QString lineM;
     QStringList dataLineM;
-    QVector<double> xM;
+    QVector< QVector<double> > xM;
     QVector< QVector<double> > columnsM;
     dataLineM.clear();
     xM.clear();
     columnsM.clear();
+    xM.resize(nDataCol);
     columnsM.resize(nDataCol);
     lineM = streamM.readLine();
     do
@@ -512,29 +518,37 @@ bool PlotDialog::datasetPlot()
         lineM = streamM.readLine();
         dataLineM = lineM.split(" ", QString::SkipEmptyParts);
         if (dataLineM.count() == 0) break;
-        xM.append(dataLineM.at(0).toDouble());
         for (column = 0; column < nColumns; ++column)
         {
-            columnsM[column].append((dataLineM.at(column*2+1).toDouble())+column/dataSetOffsetFactor+yZeroOffset);
+            double yval = dataLineM.at(column*2+1).toDouble();
+            if (yval != 0.0)
+            {
+                xM[column].append(dataLineM.at(0).toDouble());
+                columnsM[column].append((dataLineM.at(column*2+1).toDouble())+column/dataSetOffsetFactor+yZeroOffset);
+            }
         }
     } while (!lineM.isNull());
     fileM.close();
 
     //find largest and smallest values in x and check for y
-    double xMin = xM.at(0);
-    double xMax = xM.at(0);
-    for (int i = 0; i < xM.count(); i++)
+    double xMin = xM[0].at(0);
+    double xMax = xM[0].at(0);
+    for (column = 0; column < nColumns; ++column)
     {
-        if (xM.at(i) < xMin)
+        for (int i = 0; i < xM[column].count(); i++)
         {
-            xMin = xM.at(i);
-        }
-        else
-        if (xM.at(i) > xMax)
-        {
-            xMax = xM.at(i);
+            if (xM[column].at(i) < xMin)
+            {
+                xMin = xM[column].at(i);
+            }
+            else
+            if (xM[column].at(i) > xMax)
+            {
+                xMax = xM[column].at(i);
+            }
         }
     }
+
     for (column = 0; column < nColumns; ++column)
     {
         for (int j = 0; j < columnsM[column].count(); j++)
@@ -551,10 +565,11 @@ bool PlotDialog::datasetPlot()
         }
     }
 
-    QVector<double> xDF;
+    QVector< QVector<double> > xDF;
     QVector< QVector<double> > columnsDF;
     xDF.clear();
     columnsDF.clear();
+    xDF.resize(nDataCol);
     columnsDF.resize(nDataCol);
     //for F(Q) open and read difference file to array
     if (ui.standardPlotList->currentItem()->text().contains("F(Q)"))
@@ -576,29 +591,34 @@ bool PlotDialog::datasetPlot()
             lineDF = streamDF.readLine();
             dataLineDF = lineDF.split(" ", QString::SkipEmptyParts);
             if (dataLineDF.count() == 0) break;
-            xDF.append(dataLineDF.at(0).toDouble());
             for (column = 0; column < nColumns; ++column)
             {
-                columnsDF[column].append((dataLineDF.at(column*2+1).toDouble())+column/dataSetOffsetFactor+yZeroOffset+residualOffset);
+                double yval = dataLineDF.at(column*2+1).toDouble();
+                if (yval != 0.0)
+                {
+                    xDF[column].append(dataLineDF.at(0).toDouble());
+                    columnsDF[column].append((dataLineDF.at(column*2+1).toDouble())+column/dataSetOffsetFactor+yZeroOffset+residualOffset);
+                }
             }
         } while (!lineDF.isNull());
         fileDF.close();
     }
     else //for G(r) create a difference array from model and data arrays
     {
-        if (columnsM.count() != columnsD.count() || columnsM[0].count() != columnsD[0].count())
+        for (column = 0; column < nColumns; ++column)
         {
-            QMessageBox msgBox;
-            msgBox.setText("The number of data points in the data and model files is not equal.");
-            msgBox.exec();
-            return 0;
-        }
-        for (int i = 0; i < columnsM[0].count(); i++)
-        {
-            xDF.append(xM.at(i));
-            for (column = 0; column < nDataCol; ++column)
+            for (int i = 0; i < xM[column].count(); i++) //iterate through xM for given column looking to see if xVal is same as any xVal in xD
             {
-                columnsDF[column].append(columnsM[column].at(i)-columnsD[column].at(i)+column/dataSetOffsetFactor+yZeroOffset+residualOffset); //diff = model-data -offset
+                double xValM = xM[column].at(i);
+                for (int j = 0; j < xD[column].count(); j++)
+                {
+                    double xValD = xD[column].at(j);
+                    if (xValM == xValD) //if x values are the same, then append to xDF and append calcd difference to columnsDF
+                    {
+                        xDF[column].append(xValM);
+                        columnsDF[column].append(columnsM[column].at(i)-columnsD[column].at(i)+column/dataSetOffsetFactor+yZeroOffset+residualOffset); //diff = model-data -offset
+                    }
+                }
             }
         }
     }
@@ -636,7 +656,7 @@ bool PlotDialog::datasetPlot()
             ui.customPlot->addGraph();
             pen.setColor(QColor(qSin(i*0.3)*100+100, qSin(i*0.6+0.7)*100+100, qSin(i*0.4+0.6)*100+100));
             ui.customPlot->graph(i)->setPen(pen);
-            ui.customPlot->graph(i)->setData(xM, columnsM.at(i/3));
+            ui.customPlot->graph(i)->setData(xM.at(i/3), columnsM.at(i/3));
             QCPItemText *dataLabel = new QCPItemText(ui.customPlot);
             ui.customPlot->addItem(dataLabel);
             dataLabel->position->setCoords(0.7*xMax,((i/3)/dataSetOffsetFactor)+yZeroOffset+0.2);
@@ -644,11 +664,11 @@ bool PlotDialog::datasetPlot()
             dataLabel->setText(qPrintable(datafileLabel));
             ui.customPlot->addGraph();
             ui.customPlot->graph(i+1)->setPen(pen);
-            ui.customPlot->graph(i+1)->setData(xD, columnsD.at(i/3));
+            ui.customPlot->graph(i+1)->setData(xD.at(i/3), columnsD.at(i/3));
             ui.customPlot->graph(i+1)->setLineStyle(QCPGraph::lsNone);
             ui.customPlot->graph(i+1)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc, 3));
             ui.customPlot->addGraph();
-            ui.customPlot->graph(i+2)->setData(xDF, columnsDF.at(i/3));
+            ui.customPlot->graph(i+2)->setData(xDF.at(i/3), columnsDF.at(i/3));
             ui.customPlot->graph(i+2)->setPen(QPen(Qt::gray));
         }
     }
@@ -659,7 +679,7 @@ bool PlotDialog::datasetPlot()
             ui.customPlot->addGraph();
             pen.setColor(QColor(qSin(i*0.3)*100+100, qSin(i*0.6+0.7)*100+100, qSin(i*0.4+0.6)*100+100));
             ui.customPlot->graph(i)->setPen(pen);
-            ui.customPlot->graph(i)->setData(xM, columnsM.at(i/2));
+            ui.customPlot->graph(i)->setData(xM.at(i/2), columnsM.at(i/2));
             QCPItemText *dataLabel = new QCPItemText(ui.customPlot);
             ui.customPlot->addItem(dataLabel);
             dataLabel->position->setCoords(0.7*xMax,((i/2)/dataSetOffsetFactor)+yZeroOffset+0.2);
@@ -667,7 +687,7 @@ bool PlotDialog::datasetPlot()
             dataLabel->setText(qPrintable(datafileLabel));
             ui.customPlot->addGraph();
             ui.customPlot->graph(i+1)->setPen(pen);
-            ui.customPlot->graph(i+1)->setData(xD, columnsD.at(i/2));
+            ui.customPlot->graph(i+1)->setData(xD.at(i/2), columnsD.at(i/2));
             ui.customPlot->graph(i+1)->setLineStyle(QCPGraph::lsNone);
             ui.customPlot->graph(i+1)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc, 3));
         }

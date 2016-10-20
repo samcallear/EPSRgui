@@ -318,7 +318,9 @@ bool MainWindow::readXwtsSetup()
     ui.atomWtsTable->horizontalHeader()->setVisible(true);
     for (int i = 0; i < N_components; ++i)
     {
-        ui.atomWtsTable->setItem(i,0, new QTableWidgetItem(wtscomponents.at(i).atom));
+        QTableWidgetItem *item = new QTableWidgetItem(wtscomponents.at(i).atom);
+        item->setFlags(item->flags() & ~Qt::ItemIsEditable);
+        ui.atomWtsTable->setItem(i,0, item);
     }
     ui.atomWtsTable->setSelectionMode(QAbstractItemView::SingleSelection);
 

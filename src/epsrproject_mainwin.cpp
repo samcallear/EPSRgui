@@ -225,6 +225,7 @@ void MainWindow::readSettings()
     QStringList dataLine;
     dataLine.clear();
 
+    ui.epsrManualAct->setEnabled(false);
     do
     {
         line = stream.readLine();
@@ -240,6 +241,7 @@ void MainWindow::readSettings()
             {
                 epsrBinDir_ = dataLine.at(1)+"/";
                 epsrBinDir_ = QDir::toNativeSeparators(epsrBinDir_);
+                ui.epsrManualAct->setEnabled(true);
             }
             if (dataLine.at(0) == "visualiser")
             {
@@ -1426,8 +1428,6 @@ void MainWindow::runEPSRcheck()
     // kill any other timers that might be still running if a setup was quit but not saved
     killTimer(outputTimerId_);
     outputTimerId_ = -1;
-    killTimer(newJmolTimerId_);
-    newJmolTimerId_ = -1;
     killTimer(molChangeatoFinishedTimerId_);
     molChangeatoFinishedTimerId_ = -1;
     killTimer(changeatoFinishedTimerId_);
@@ -1587,8 +1587,6 @@ void MainWindow::runEPSR()
     //also kill any other timers that might be still running if a setup was quit but not saved
     killTimer(outputTimerId_);
     outputTimerId_ = -1;
-    killTimer(newJmolTimerId_);
-    newJmolTimerId_ = -1;
     killTimer(molChangeatoFinishedTimerId_);
     molChangeatoFinishedTimerId_ = -1;
     killTimer(changeatoFinishedTimerId_);
@@ -2480,31 +2478,6 @@ void MainWindow::timerEvent(QTimerEvent *event)
         }
     }
     else
-    if (event->timerId() == newJmolTimerId_)
-    {
-        killTimer(newJmolTimerId_);
-        newJmolTimerId_ = -1;
-        QDir dir;
-        dir.setPath(workingDir_);
-        dir.setSorting(QDir::Time);
-        QStringList jmolFilter;
-        jmolFilter << "*.jmol";
-        QStringList jmolFiles = dir.entryList(jmolFilter, QDir::Files);
-        if (!jmolFiles.isEmpty())
-        {
-            QString jmolFileName = jmolFiles.at(0);
-            QFileInfo jmolFileInfo(jmolFileName);
-            QDateTime jmolModTime;
-            jmolModTime = jmolFileInfo.lastModified();
-            QDateTime dateTimeNow = QDateTime::currentDateTime();
-            if (jmolModTime > dateTimeNow.addSecs(-4))
-            {
-                makeMolFile();   //timer killed in mixato and addato
-            }
-        }
-        newJmolTimerId_ = startTimer(1000);
-    }
-    else
     if (event->timerId() == molChangeatoFinishedTimerId_)
     {
         QString atoFileName = molFileName_.split(".", QString::SkipEmptyParts).at(0)+".ato";
@@ -2527,8 +2500,6 @@ void MainWindow::timerEvent(QTimerEvent *event)
         QFileInfo fi(workingDir_+atoFileName_);
         if (fi.lastModified() > atoLastMod_)
         {
-
-
             messageText_ += "\nBox .ato file updated\n";
             messagesDialog.refreshMessages();
             ui.messagesLineEdit->setText("Box .ato file updated");

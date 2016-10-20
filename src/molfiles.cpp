@@ -235,6 +235,43 @@ void MainWindow::on_molFileLoadButton_clicked(bool checked)
             }
         }
 
+        //check if .mol file is an EPSR .mol file (and not an MDL .mol file)
+        QFile file(molFile);
+        if(!file.open(QFile::ReadOnly | QFile::Text))
+        {
+            QMessageBox msgBox;
+            msgBox.setText("Could not open .mol file");
+            msgBox.exec();
+            return;
+        }
+        QTextStream stream(&file);
+        QString line;
+        QStringList dataLine;
+        dataLine.clear();
+
+        int molFormat = 0;
+        do
+        {
+            line = stream.readLine();
+            dataLine = line.split(" ", QString::SkipEmptyParts);
+            if (dataLine.count() != 0)
+            {
+                if (dataLine.at(0).contains("potential"))
+                {
+                    molFormat = 1;
+                }
+            }
+        } while (!line.isNull());
+        file.close();
+
+        if (molFormat == 0)
+        {
+            QMessageBox msgBox;
+            msgBox.setText("This .mol file is not in the EPSR format.");
+            msgBox.exec();
+            return;
+        }
+
         //if necessary, copy to workingDir_ (question if a file of the same name is already present there)
         if (molFilePath != workingDir_)
         {
@@ -872,8 +909,8 @@ bool MainWindow::readMolFile()
     QStringList masses;
     QStringList charges;
     QStringList ljTypes;
-    QString ecorestr;
-    QString dcorestr;
+//    QString ecorestr;
+//    QString dcorestr;
     atomLabels.clear();
     atomTypes.clear();
     bondAtoms.clear();
@@ -1144,6 +1181,7 @@ bool MainWindow::readMolFile()
     double molChargeCalcd = 0;
     for (int i = 0; i < ljAtoms.count(); i++)
     {
+        //count number of atom type i present
         int ctr = 0;
         for (int n = 0; n < atomTypes.count(); n++)
         {
@@ -1152,11 +1190,14 @@ bool MainWindow::readMolFile()
                 ctr++;
             }
         }
+        //get charge for atom type i
         QString atomTypeChargeStr = charges.at(i);
         double atomTypeCharge = QString(atomTypeChargeStr).toDouble();
+        //get total charge contributed by atom type i by multiplying the number of i with its charge and add it to the overall charge
         molChargeCalcd = molChargeCalcd+(ctr*atomTypeCharge);
     }
-    if (atomLabels.isEmpty())
+    QRegExp rxnumbers("\\d*");
+    if (atomLabels.isEmpty() || !rxnumbers.exactMatch(atomLabels.at(0)))
     {
         ui.molChargeLabel->setText("not available");
         QTableWidgetItem *item = new QTableWidgetItem("n/a");
@@ -2095,21 +2136,30 @@ void MainWindow::on_updateMolFileButton_clicked(bool checked)
 
 void MainWindow::on_molChangeAtobutton_clicked(bool checked)
 {
-    QDir::setCurrent(workingDir_);
+    QMessageBox::StandardButton msgBox;
+    msgBox  = QMessageBox::question(this, "Warning", "This will run changeato for the component in a terminal window.\nProceed?", QMessageBox::Ok|QMessageBox::Cancel);
+    if (msgBox == QMessageBox::Cancel)
+    {
+        return;
+    }
+    else
+    {
+        QDir::setCurrent(workingDir_);
 
-    QString atoBaseFileName = molFileName_.split(".",QString::SkipEmptyParts).at(0);
+        QString atoBaseFileName = molFileName_.split(".",QString::SkipEmptyParts).at(0);
 
-    QProcess processEditAto;
-    processEditAto.setProcessChannelMode(QProcess::ForwardedChannels);
-#ifdef _WIN32
-    processEditAto.startDetached(epsrBinDir_+"changeato.exe", QStringList() << workingDir_ << "changeato" << atoBaseFileName);
-#else
-    processEditAto.startDetached(epsrBinDir_+"changeato", QStringList() << workingDir_ << "changeato" << atoBaseFileName);
-#endif
-    ui.messagesLineEdit->setText("Changeato opened in separate window");
+        QProcess processEditAto;
+        processEditAto.setProcessChannelMode(QProcess::ForwardedChannels);
+    #ifdef _WIN32
+        processEditAto.startDetached(epsrBinDir_+"changeato.exe", QStringList() << workingDir_ << "changeato" << atoBaseFileName);
+    #else
+        processEditAto.startDetached(epsrBinDir_+"changeato", QStringList() << workingDir_ << "changeato" << atoBaseFileName);
+    #endif
+        ui.messagesLineEdit->setText("Changeato opened in separate window");
 
-    molChangeatoFinishedTimerId_ = startTimer(2000);
-    atoLastMod_ = QDateTime::currentDateTime();
+        molChangeatoFinishedTimerId_ = startTimer(2000);
+        atoLastMod_ = QDateTime::currentDateTime();
+    }
 }
 
 void MainWindow::on_molFmoleButton_clicked(bool checked)
@@ -2138,26 +2188,44 @@ void MainWindow::on_molFmoleButton_clicked(bool checked)
 
 void MainWindow::on_dockatoButton_clicked(bool checked)
 {
-    QDir::setCurrent(workingDir_);
+    QMessageBox::StandardButton msgBox;
+    msgBox  = QMessageBox::question(this, "Warning", "This will run changeato for the simulation box in a terminal window.\nProceed?", QMessageBox::Ok|QMessageBox::Cancel);
+    if (msgBox == QMessageBox::Cancel)
+    {
+        return;
+    }
+    else
+    {
+        QDir::setCurrent(workingDir_);
 
-    QProcess processDockato;
-    processDockato.setProcessChannelMode(QProcess::ForwardedChannels);
-#ifdef _WIN32
-    processDockato.startDetached(epsrBinDir_+"dockato.exe", QStringList() << workingDir_ << "dockato");
-#else
-    processDockato.startDetached(epsrBinDir_+"dockato", QStringList() << workingDir_ << "dockato");
-#endif
+        QProcess processDockato;
+        processDockato.setProcessChannelMode(QProcess::ForwardedChannels);
+    #ifdef _WIN32
+        processDockato.startDetached(epsrBinDir_+"dockato.exe", QStringList() << workingDir_ << "dockato");
+    #else
+        processDockato.startDetached(epsrBinDir_+"dockato", QStringList() << workingDir_ << "dockato");
+    #endif
+    }
 }
 
 void MainWindow::on_makelatticeatoButton_clicked(bool checked)
 {
-    QDir::setCurrent(workingDir_);
+    QMessageBox::StandardButton msgBox;
+    msgBox  = QMessageBox::question(this, "Warning", "This will run changeato for the simulation box in a terminal window.\nProceed?", QMessageBox::Ok|QMessageBox::Cancel);
+    if (msgBox == QMessageBox::Cancel)
+    {
+        return;
+    }
+    else
+    {
+        QDir::setCurrent(workingDir_);
 
-    QProcess processMakelatticeato;
-    processMakelatticeato.setProcessChannelMode(QProcess::ForwardedChannels);
-#ifdef _WIN32
-    processMakelatticeato.startDetached(epsrBinDir_+"makelatticeato.exe", QStringList() << workingDir_ << "makelatticeato");
-#else
-    processMakelatticeato.startDetached(epsrBinDir_+"makelatticeato", QStringList() << workingDir_ << "makelatticeato");
-#endif
+        QProcess processMakelatticeato;
+        processMakelatticeato.setProcessChannelMode(QProcess::ForwardedChannels);
+    #ifdef _WIN32
+        processMakelatticeato.startDetached(epsrBinDir_+"makelatticeato.exe", QStringList() << workingDir_ << "makelatticeato");
+    #else
+        processMakelatticeato.startDetached(epsrBinDir_+"makelatticeato", QStringList() << workingDir_ << "makelatticeato");
+    #endif
+    }
 }

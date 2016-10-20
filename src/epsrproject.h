@@ -91,7 +91,6 @@ private:
     int epsrRunningTimerId_;
     int fmoleFinishedTimerId_;
     QDateTime atoLastMod_;
-    int newJmolTimerId_;
     int molChangeatoFinishedTimerId_;
     int changeatoFinishedTimerId_;
 

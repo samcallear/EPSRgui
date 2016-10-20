@@ -92,11 +92,12 @@ bool MainWindow::fqplot1()
     QTextStream streamD(&fileD);
     QString lineD;
     QStringList dataLineD;
-    QVector<double> xD;
+    QVector< QVector<double> > xD;
     QVector< QVector<double> > columnsD;
     dataLineD.clear();
     xD.clear();
     columnsD.clear();
+    xD.resize(nDataCol);
     columnsD.resize(nDataCol);
     int nColumns = 0;
     lineD = streamD.readLine();
@@ -105,17 +106,21 @@ bool MainWindow::fqplot1()
         lineD = streamD.readLine();
         dataLineD = lineD.split(" ", QString::SkipEmptyParts);
         if (dataLineD.count() == 0) break;
-        xD.append(dataLineD.at(0).toDouble());
         nColumns = (dataLineD.count() - 1) / 2;
         for (column = 0; column < nColumns; ++column)
         {
-            if (ui.plot1LogY->isChecked() == true)
+            double yval = dataLineD.at(column*2+1).toDouble();
+            if (yval != 0.0)
             {
-                columnsD[column].append((dataLineD.at(column*2+1).toDouble())+column+1);
-            }
-            else
-            {
-                columnsD[column].append((dataLineD.at(column*2+1).toDouble())+column);
+                xD[column].append(dataLineD.at(0).toDouble());
+                if (ui.plot1LogY->isChecked() == true)
+                {
+                    columnsD[column].append((dataLineD.at(column*2+1).toDouble())+column+1);
+                }
+                else
+                {
+                    columnsD[column].append((dataLineD.at(column*2+1).toDouble())+column);
+                }
             }
         }
     } while (!lineD.isNull());
@@ -151,11 +156,12 @@ bool MainWindow::fqplot1()
     QTextStream streamM(&fileM);
     QString lineM;
     QStringList dataLineM;
-    QVector<double> xM;
+    QVector< QVector<double> > xM;
     QVector< QVector<double> > columnsM;
     dataLineM.clear();
     xM.clear();
     columnsM.clear();
+    xM.resize(nDataCol);
     columnsM.resize(nDataCol);
     lineM = streamM.readLine();
     do
@@ -163,34 +169,41 @@ bool MainWindow::fqplot1()
         lineM = streamM.readLine();
         dataLineM = lineM.split(" ", QString::SkipEmptyParts);
         if (dataLineM.count() == 0) break;
-        xM.append(dataLineM.at(0).toDouble());
         for (column = 0; column < nColumns; ++column)
         {
-            if (ui.plot1LogY->isChecked() == true)
+            double yval = dataLineM.at(column*2+1).toDouble();
+            if (yval != 0.0)
             {
-                columnsM[column].append((dataLineM.at(column*2+1).toDouble())+column+1);
-            }
-            else
-            {
-                columnsM[column].append((dataLineM.at(column*2+1).toDouble())+column);
+                xM[column].append(dataLineM.at(0).toDouble());
+                if (ui.plot1LogY->isChecked() == true)
+                {
+                    columnsM[column].append((dataLineM.at(column*2+1).toDouble())+column+1);
+                }
+                else
+                {
+                    columnsM[column].append((dataLineM.at(column*2+1).toDouble())+column);
+                }
             }
         }
     } while (!lineM.isNull());
     fileM.close();
 
     //find largest and smallest values in x and check for y
-    double xMin = xM.at(0);
-    double xMax = xM.at(0);
-    for (int i = 0; i < xM.count(); i++)
+    double xMin = xM[0].at(0);
+    double xMax = xM[0].at(0);
+    for (column = 0; column < nColumns; ++column)
     {
-        if (xM.at(i) < xMin)
+        for (int i = 0; i < xM[column].count(); i++)
         {
-            xMin = xM.at(i);
-        }
-        else
-        if (xM.at(i) > xMax)
-        {
-            xMax = xM.at(i);
+            if (xM[column].at(i) < xMin)
+            {
+                xMin = xM[column].at(i);
+            }
+            else
+            if (xM[column].at(i) > xMax)
+            {
+                xMax = xM[column].at(i);
+            }
         }
     }
     for (column = 0; column < nColumns; ++column)
@@ -219,31 +232,36 @@ bool MainWindow::fqplot1()
     }
     QTextStream streamDF(&fileDF);
     QString lineDF;
-    QStringList dataNames;
+//    QStringList dataNames;
     QStringList dataLineDF;
-    QVector<double> xDF;
+    QVector< QVector<double> > xDF;
     QVector< QVector<double> > columnsDF;
     dataLineDF.clear();
     xDF.clear();
     columnsDF.clear();
+    xDF.resize(nDataCol);
     columnsDF.resize(nDataCol);
     lineDF = streamDF.readLine();
-    dataNames = lineDF.split(" ", QString::SkipEmptyParts);
+//    dataNames = lineDF.split(" ", QString::SkipEmptyParts);
     do
     {
         lineDF = streamDF.readLine();
         dataLineDF = lineDF.split(" ", QString::SkipEmptyParts);
         if (dataLineDF.count() == 0) break;
-        xDF.append(dataLineDF.at(0).toDouble());
         for (column = 0; column < nColumns; ++column)
         {
-            if (ui.plot1LogY->isChecked() == true)
+            double yval = dataLineDF.at(column*2+1).toDouble();
+            if (yval != 0.0)
             {
-                columnsDF[column].append((dataLineDF.at(column*2+1).toDouble())+column+1-0.2);
-            }
-            else
-            {
-                columnsDF[column].append((dataLineDF.at(column*2+1).toDouble())+column-0.2);
+                xDF[column].append(dataLineDF.at(0).toDouble());
+                if (ui.plot1LogY->isChecked() == true)
+                {
+                    columnsDF[column].append((dataLineDF.at(column*2+1).toDouble())+column+1-0.2);
+                }
+                else
+                {
+                    columnsDF[column].append((dataLineDF.at(column*2+1).toDouble())+column-0.2);
+                }
             }
         }
     } while (!lineDF.isNull());
@@ -274,14 +292,14 @@ bool MainWindow::fqplot1()
         ui.plot1->addGraph();
         pen.setColor(QColor(qSin(i*0.3)*100+100, qSin(i*0.6+0.7)*100+100, qSin(i*0.4+0.6)*100+100));
         ui.plot1->graph(i)->setPen(pen);
-        ui.plot1->graph(i)->setData(xM, columnsM.at(i/3));
+        ui.plot1->graph(i)->setData(xM.at(i/3), columnsM.at(i/3));
         ui.plot1->addGraph();
         ui.plot1->graph(i+1)->setPen(pen);
-        ui.plot1->graph(i+1)->setData(xD, columnsD.at(i/3));
+        ui.plot1->graph(i+1)->setData(xD.at(i/3), columnsD.at(i/3));
         ui.plot1->graph(i+1)->setLineStyle(QCPGraph::lsNone);
         ui.plot1->graph(i+1)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc, 3));
         ui.plot1->addGraph();
-        ui.plot1->graph(i+2)->setData(xDF, columnsDF.at(i/3));
+        ui.plot1->graph(i+2)->setData(xDF.at(i/3), columnsDF.at(i/3));
         ui.plot1->graph(i+2)->setPen(QPen(Qt::gray));
         QCPItemText *dataLabel = new QCPItemText(ui.plot1);
         ui.plot1->addItem(dataLabel);
@@ -366,11 +384,12 @@ bool MainWindow::frplot1()
     QTextStream streamD(&fileD);
     QString lineD;
     QStringList dataLineD;
-    QVector<double> xD;
+    QVector< QVector<double> >  xD;
     QVector< QVector<double> > columnsD;
     dataLineD.clear();
     xD.clear();
     columnsD.clear();
+    xD.resize(nDataCol);
     columnsD.resize(nDataCol);
     int nColumns = 0;
     lineD = streamD.readLine();
@@ -379,17 +398,21 @@ bool MainWindow::frplot1()
         lineD = streamD.readLine();
         dataLineD = lineD.split(" ", QString::SkipEmptyParts);
         if (dataLineD.count() == 0) break;
-        xD.append(dataLineD.at(0).toDouble());
         nColumns = (dataLineD.count() - 1) / 2;
         for (column = 0; column < nColumns; ++column)
         {
-            if (ui.plot1LogY->isChecked() == true)
+            double yval = dataLineD.at(column*2+1).toDouble();
+            if (yval != 0.0)
             {
-                columnsD[column].append((dataLineD.at(column*2+1).toDouble())+column+1);
-            }
-            else
-            {
-                columnsD[column].append((dataLineD.at(column*2+1).toDouble())+column);
+                xD[column].append(dataLineD.at(0).toDouble());
+                if (ui.plot1LogY->isChecked() == true)
+                {
+                    columnsD[column].append((dataLineD.at(column*2+1).toDouble())+column+1);
+                }
+                else
+                {
+                    columnsD[column].append((dataLineD.at(column*2+1).toDouble())+column);
+                }
             }
         }
     } while (!lineD.isNull());
@@ -425,11 +448,12 @@ bool MainWindow::frplot1()
     QTextStream streamM(&fileM);
     QString lineM;
     QStringList dataLineM;
-    QVector<double> xM;
+    QVector< QVector<double> > xM;
     QVector< QVector<double> > columnsM;
     dataLineM.clear();
     xM.clear();
     columnsM.clear();
+    xM.resize(nDataCol);
     columnsM.resize(nDataCol);
     lineM = streamM.readLine();
     do
@@ -437,34 +461,41 @@ bool MainWindow::frplot1()
         lineM = streamM.readLine();
         dataLineM = lineM.split(" ", QString::SkipEmptyParts);
         if (dataLineM.count() == 0) break;
-        xM.append(dataLineM.at(0).toDouble());
         for (column = 0; column < nColumns; ++column)
         {
-            if (ui.plot1LogY->isChecked() == true)
+            double yval = dataLineM.at(column*2+1).toDouble();
+            if (yval != 0.0)
             {
-                columnsM[column].append((dataLineM.at(column*2+1).toDouble())+column+1);
-            }
-            else
-            {
-                columnsM[column].append((dataLineM.at(column*2+1).toDouble())+column);
+                xM[column].append(dataLineM.at(0).toDouble());
+                if (ui.plot1LogY->isChecked() == true)
+                {
+                    columnsM[column].append((dataLineM.at(column*2+1).toDouble())+column+1);
+                }
+                else
+                {
+                    columnsM[column].append((dataLineM.at(column*2+1).toDouble())+column);
+                }
             }
         }
     } while (!lineM.isNull());
     fileM.close();
 
     //find largest and smallest values in x and check for y
-    double xMin = xM.at(0);
-    double xMax = xM.at(0);
-    for (int i = 0; i < xM.count(); i++)
+    double xMin = xM[0].at(0);
+    double xMax = xM[0].at(0);
+    for (column = 0; column < nColumns; ++column)
     {
-        if (xM.at(i) < xMin)
+        for (int i = 0; i < xM[column].count(); i++)
         {
-            xMin = xM.at(i);
-        }
-        else
-        if (xM.at(i) > xMax)
-        {
-            xMax = xM.at(i);
+            if (xM[column].at(i) < xMin)
+            {
+                xMin = xM[column].at(i);
+            }
+            else
+            if (xM[column].at(i) > xMax)
+            {
+                xMax = xM[column].at(i);
+            }
         }
     }
     for (column = 0; column < nColumns; ++column)
@@ -491,10 +522,10 @@ bool MainWindow::frplot1()
         ui.plot1->addGraph();
         pen.setColor(QColor(qSin(i*0.3)*100+100, qSin(i*0.6+0.7)*100+100, qSin(i*0.4+0.6)*100+100));
         ui.plot1->graph(i)->setPen(pen);
-        ui.plot1->graph(i)->setData(xM, columnsM.at(i/2));
+        ui.plot1->graph(i)->setData(xM.at(i/2), columnsM.at(i/2));
         ui.plot1->addGraph();
         ui.plot1->graph(i+1)->setPen(pen);
-        ui.plot1->graph(i+1)->setData(xD, columnsD.at(i/2));
+        ui.plot1->graph(i+1)->setData(xD.at(i/2), columnsD.at(i/2));
         ui.plot1->graph(i+1)->setLineStyle(QCPGraph::lsNone);
         ui.plot1->graph(i+1)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc, 3));
         QCPItemText *dataLabel = new QCPItemText(ui.plot1);

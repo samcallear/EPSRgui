@@ -116,8 +116,6 @@ void MainWindow::on_mixatoButton_clicked(bool checked)
         save();
 
         jmolFile_.removePath(workingDir_);
-//        killTimer(newJmolTimerId_);
-//        newJmolTimerId_ = -1;
     }
 }
 
@@ -127,7 +125,7 @@ void MainWindow::on_addatoButton_clicked(bool checked)
     //NOTE
     //There are limitations to what will be read during the process - see addato.f for details
     //the atomic number density is irrelevant as the size of the container determines the size of the final box.
-    //the ecoredcore values at the bottom of the .ato? files are important as they determine the atomic overlap during addato
+    //the ecoredcore values at the bottom of the .ato files are important as they determine the atomic overlap during addato
     //tethering of molecules is also important prior to pressing addato.
 
     AddAtoDialog addAtoDialog(this);
@@ -265,13 +263,17 @@ void MainWindow::on_addatoButton_clicked(bool checked)
         save();
 
         jmolFile_.removePath(workingDir_);
-//        killTimer(newJmolTimerId_);
-//        newJmolTimerId_ = -1;
     }
 }
 
 void MainWindow::on_loadBoxButton_clicked (bool checked)
 {
+    QMessageBox msgBox;
+    msgBox.setText("In the following dialog window, choose the .ato file to be used as the simulation box.\nEnsure it has the components listed at the bottom of the file, instead of moltypeXX."
+                   "\nThe number of each component in the box will need to be entered into the table manually.");
+    msgBox.exec();
+    return;
+
     //note in manual that need to manually change moltypeXX to the name of the associated .mol file
     QString atoFile = QFileDialog::getOpenFileName(this, "Choose EPSR box .ato file", workingDir_, tr(".ato files (*.ato)"));
     if (!atoFile.isEmpty())
@@ -305,9 +307,9 @@ void MainWindow::on_loadBoxButton_clicked (bool checked)
         ui.boxAtoLabel->setText(atoFileName_);
         readAtoFileAtomPairs();
         readAtoFileBoxDetails();
-        //for each .ato file listed in atofiletable, add the number of this file in the box to column 2***************************************************
-        ui.atoFileTable->item(0,2)->setText(ui.boxAtoMols->text());
-        checkBoxCharge();
+//        //for each .ato file listed in atofiletable, calculate the number of this file in the box and add to column 2 ********************************************************
+//        ui.atoFileTable->item(0,2)->setText(ui.boxAtoMols->text());
+//        checkBoxCharge();
         ui.randomiseButton->setEnabled(true);
         ui.plotBoxAct->setEnabled(true);
         ui.boxCompositionButton->setEnabled(true);
@@ -797,22 +799,31 @@ void MainWindow::on_fmoleButton_clicked(bool checked)
 }
 
 void MainWindow::on_atoEPSRButton_clicked(bool checked)
-{
-    QDir::setCurrent(workingDir_);
+{   
+    QMessageBox::StandardButton msgBox;
+    msgBox  = QMessageBox::question(this, "Warning", "This will run changeato for the simulation box in a terminal window.\nProceed?", QMessageBox::Ok|QMessageBox::Cancel);
+    if (msgBox == QMessageBox::Cancel)
+    {
+        return;
+    }
+    else
+    {
+        QDir::setCurrent(workingDir_);
 
-    QString atoBaseFileName = atoFileName_.split(".",QString::SkipEmptyParts).at(0);
+        QString atoBaseFileName = atoFileName_.split(".",QString::SkipEmptyParts).at(0);
 
-    QProcess processEditAto;
-    processEditAto.setProcessChannelMode(QProcess::ForwardedChannels);
-#ifdef _WIN32
-    processEditAto.startDetached(epsrBinDir_+"changeato.exe", QStringList() << workingDir_ << "changeato" << atoBaseFileName);
-#else
-    processEditAto.startDetached(epsrBinDir_+"changeato", QStringList() << workingDir_ << "changeato" << atoBaseFileName);
-#endif
-    ui.messagesLineEdit->setText("Changeato opened in separate window");
+        QProcess processEditAto;
+        processEditAto.setProcessChannelMode(QProcess::ForwardedChannels);
+    #ifdef _WIN32
+        processEditAto.startDetached(epsrBinDir_+"changeato.exe", QStringList() << workingDir_ << "changeato" << atoBaseFileName);
+    #else
+        processEditAto.startDetached(epsrBinDir_+"changeato", QStringList() << workingDir_ << "changeato" << atoBaseFileName);
+    #endif
+        ui.messagesLineEdit->setText("Changeato opened in separate window");
 
-    changeatoFinishedTimerId_ = startTimer(2000);
-    atoLastMod_ = QDateTime::currentDateTime();
+        changeatoFinishedTimerId_ = startTimer(2000);
+        atoLastMod_ = QDateTime::currentDateTime();
+    }
 }
 
 bool MainWindow::checkBoxCharge()
