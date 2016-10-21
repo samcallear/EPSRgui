@@ -107,10 +107,12 @@ void MainWindow::makeMolFile()
 #ifdef _WIN32
         stream << "set EPSRbin=" << epsrBinDir_ << "\n"
                << "set EPSRrun=" << workingDir_ << "\n"
+               << "CD " << workingDir_ << "\n"
                << "%EPSRbin%readmole.exe " << workingDir_ << " readmole .jmol " << jmolBaseFileName << "\n";
 #else
         stream << "export EPSRbin=" << epsrBinDir_ << "\n"
                << "export EPSRrun=" << workingDir_ << "\n"
+               << "cd " << workingDir_ << "\n"
                << "\"$EPSRbin\"'readmole' " << workingDir_ << " readmole .jmol " << jmolBaseFileName << "\n";
 #endif
         jmolBatFile.close();
