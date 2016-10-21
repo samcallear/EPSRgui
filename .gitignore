@@ -7,6 +7,7 @@ EPSRgui.pro.user
 ui_*
 *.o
 moc_*
+qrc_*
 settings
 
 release/

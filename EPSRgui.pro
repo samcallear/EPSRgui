@@ -6,8 +6,15 @@
 CONFIG += c++11
 QT += core gui widgets printsupport
 TEMPLATE = app
+
 TARGET = EPSRgui
+
 INCLUDEPATH += src/
+DEPENDPATH += src/
+OBJECTS_DIR = src/
+MOC_DIR = src/
+RCC_DIR = src/
+UI_DIR = src/
 
 # Input
 FORMS += src/addatodialog.ui \
