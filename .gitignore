@@ -5,6 +5,8 @@ object_script.EPSRgui.Debug
 object_script.EPSRgui.Release
 EPSRgui.pro.user
 ui_*
+*.o
+moc_*
 settings
 
 release/
