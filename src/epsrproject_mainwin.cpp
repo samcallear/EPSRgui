@@ -310,7 +310,7 @@ void MainWindow::createNew()
         QFile::copy(epsrStartupDir+"gnuatoms.txt", workingDir_+"gnuatoms.txt");
 #ifdef _WIN32
         QFile::copy(epsrStartupDir+"epsr.bat", workingDir_+"epsr.bat");
-        QFile::copy(epsrStartupDir+"system_commands.txt", workingDir_+"system_commands.txt");
+        QFile::copy(epsrStartupDir+"system_commands_windows.txt", workingDir_+"system_commands.txt");
 #else
         QFile::copy(epsrStartupDir+"epsr", workingDir_+"epsr");
         QFile::copy(epsrStartupDir+"system_commands_linux.txt", workingDir_+"system_commands.txt");
