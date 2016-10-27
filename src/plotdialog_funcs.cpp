@@ -1814,8 +1814,8 @@ bool PlotDialog::sqterplot()
     }
 
     // give the axes some labels:
-    ui.customPlot->xAxis->setLabel("r (Angstrom)");
-    ui.customPlot->yAxis->setLabel("g(r)");
+    ui.customPlot->xAxis->setLabel("q (Angstrom-1)");
+    ui.customPlot->yAxis->setLabel("s(q)");
 
     //plot
     ui.customPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
