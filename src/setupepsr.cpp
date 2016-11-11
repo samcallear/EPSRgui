@@ -88,6 +88,7 @@ void MainWindow::on_setupEPSRButton_clicked(bool checked)
     ui.updateInpPcofFilesButton->setEnabled(true);
     ui.reloadEPSRinpButton->setEnabled(true);
     ui.setupOutButton->setEnabled(true);
+    ui.setupPlotButton->setEnabled(true);
     ui.applyOutputsButton->setEnabled(true);
     ui.dlputilsOutCheckBox->setEnabled(true);
     ui.deleteEPSRinpFileAct->setEnabled(true);
