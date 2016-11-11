@@ -1244,6 +1244,9 @@ bool PlotDialog::partialsplot()
     QVector< QVector<double> > columnsCN;
     columnsCN.clear();
     columnsCN.resize(numberPairs+1);
+    QVector< QVector<double> > columnsD; //this is the g(r) dervived from the data
+    columnsD.clear();
+    columnsD.resize(numberPairs+1);
     QVector<double> x;
     int pair;
 
@@ -1268,6 +1271,7 @@ bool PlotDialog::partialsplot()
         int atompair_index = ij.ref(i,j);
         QString partialsFileName;
         QString CNFileName;
+        QString DFileName;
 
         //the first file contains 100 pairs (even columns from 2 to 200) and atompair_indexes from 0 - 99
         if (atompair_index < 100)
@@ -1279,12 +1283,14 @@ bool PlotDialog::partialsplot()
             }
             else {  partialsFileName = (baseFileName_+".EPSR.g01");}
             CNFileName = (baseFileName_+".EPSR.z01");
+            DFileName = (baseFileName_+".EPSR.r01");
         }
         else
         if (99 < atompair_index && atompair_index < 200)
         {
             partialsFileName = (baseFileName_+".EPSR.g02");
             CNFileName = (baseFileName_+".EPSR.z02");
+            DFileName = (baseFileName_+".EPSR.r01");
             atompair_index = atompair_index-100;
         }
         else
@@ -1292,6 +1298,7 @@ bool PlotDialog::partialsplot()
         {
             partialsFileName = (baseFileName_+".EPSR.g03");
             CNFileName = (baseFileName_+".EPSR.z03");
+            DFileName = (baseFileName_+".EPSR.r01");
             atompair_index = atompair_index-200;
         }
         else
@@ -1299,6 +1306,7 @@ bool PlotDialog::partialsplot()
         {
             partialsFileName = (baseFileName_+".EPSR.g04");
             CNFileName = (baseFileName_+".EPSR.z04");
+            DFileName = (baseFileName_+".EPSR.r01");
             atompair_index = atompair_index-300;
         }
         else
@@ -1306,6 +1314,7 @@ bool PlotDialog::partialsplot()
         {
             partialsFileName = (baseFileName_+".EPSR.g05");
             CNFileName = (baseFileName_+".EPSR.z05");
+            DFileName = (baseFileName_+".EPSR.r01");
             atompair_index = atompair_index-400;
         }
 
@@ -1361,6 +1370,28 @@ bool PlotDialog::partialsplot()
             columnsCN[pair].append(dataLineCN.at(CNpair_column).toDouble()+pair/dataSetOffsetFactor+yZeroOffset);
         } while (!lineCN.isNull());
         fileCN.close();
+
+        QFile fileD(DFileName);
+        if(!fileD.open(QFile::ReadOnly | QFile::Text))
+        {
+            QMessageBox msgBox;
+            msgBox.setText("Could not open .r0# file.");
+            msgBox.exec();
+            return 0;
+        }
+        QTextStream streamD(&fileD);
+        QString lineD;
+        QStringList dataLineD;
+        dataLineD.clear();
+        lineD = streamD.readLine();
+        do
+        {
+            lineD = streamD.readLine();
+            dataLineD = lineD.split(" ", QString::SkipEmptyParts);
+            if (dataLineD.count() == 0) break;
+            columnsD[pair].append(dataLineD.at(atompair_index*2+1).toDouble()+pair/dataSetOffsetFactor+yZeroOffset);
+        } while (!lineD.isNull());
+        fileD.close();
     }
 
     //find largest and smallest values in x and check for y
@@ -1397,7 +1428,56 @@ bool PlotDialog::partialsplot()
     }
 
     // create graph and assign data to it:
-    if (ui.CNcheckBox->isChecked())
+    if (ui.datagrcheckBox->isChecked() && ui.CNcheckBox->isChecked())
+    {
+        QPen pen;
+        QString pairLabel;
+        for (int i=0; i < numberPairs*3; i += 3)
+        {
+            ui.customPlot->addGraph();
+            pen.setColor(QColor(qSin(i*0.3)*100+100, qSin(i*0.6+0.7)*100+100, qSin(i*0.4+0.6)*100+100));
+            ui.customPlot->graph(i)->setPen(pen);
+            ui.customPlot->graph(i)->setData(x, columns.at(i/3));
+            QCPItemText *dataLabel = new QCPItemText(ui.customPlot);
+            ui.customPlot->addItem(dataLabel);
+            dataLabel->position->setCoords(xMax-(xMax/10),((i/3)/dataSetOffsetFactor)+yZeroOffset+1.1);
+            pairLabel = ui.pairStackPlotList->item(i/3)->text();
+            dataLabel->setText(qPrintable(pairLabel));
+            ui.customPlot->addGraph();
+            ui.customPlot->graph(i+1)->setPen(QPen(Qt::gray));
+            ui.customPlot->graph(i+1)->setData(x, columnsCN.at(i/3));
+            ui.customPlot->addGraph();
+            ui.customPlot->graph(i+2)->setPen(pen);
+            ui.customPlot->graph(i+2)->setLineStyle(QCPGraph::lsNone);
+            ui.customPlot->graph(i+2)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc, 3));
+            ui.customPlot->graph(i+2)->setData(x, columnsD.at(i/3));
+        }
+    }
+    else
+    if (ui.datagrcheckBox->isChecked() && ui.CNcheckBox->isChecked() == false)
+    {
+        QPen pen;
+        QString pairLabel;
+        for (int i=0; i < numberPairs*2; i += 2)
+        {
+            ui.customPlot->addGraph();
+            pen.setColor(QColor(qSin(i*0.3)*100+100, qSin(i*0.6+0.7)*100+100, qSin(i*0.4+0.6)*100+100));
+            ui.customPlot->graph(i)->setPen(pen);
+            ui.customPlot->graph(i)->setData(x, columns.at(i/2));
+            QCPItemText *dataLabel = new QCPItemText(ui.customPlot);
+            ui.customPlot->addItem(dataLabel);
+            dataLabel->position->setCoords(xMax-(xMax/10),((i/2)/dataSetOffsetFactor)+yZeroOffset+1.1);
+            pairLabel = ui.pairStackPlotList->item(i/2)->text();
+            dataLabel->setText(qPrintable(pairLabel));
+            ui.customPlot->addGraph();
+            ui.customPlot->graph(i+1)->setPen(pen);
+            ui.customPlot->graph(i+1)->setLineStyle(QCPGraph::lsNone);
+            ui.customPlot->graph(i+1)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc, 3));
+            ui.customPlot->graph(i+1)->setData(x, columnsD.at(i/2));
+        }
+    }
+    else
+    if (ui.CNcheckBox->isChecked() && ui.datagrcheckBox->isChecked() == false)
     {
         QPen pen;
         QString pairLabel;

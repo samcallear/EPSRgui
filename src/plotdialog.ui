@@ -546,6 +546,16 @@
                 </widget>
                </item>
                <item>
+                <widget class="QCheckBox" name="datagrcheckBox">
+                 <property name="text">
+                  <string>include data g(r) (only inter g(r))</string>
+                 </property>
+                 <property name="checked">
+                  <bool>false</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
                 <widget class="QLabel" name="label_8">
                  <property name="text">
                   <string>Select calculation to be plotted:</string>
