@@ -137,7 +137,7 @@ void SetupOutputDialog::readOutputSetupFile()
                 outputValues.append(firstPart.split(rx, QString::SkipEmptyParts).at(0));
                 outputDescriptions.append(dataLine.at(1));
             }
-        } while (!stream.atEnd());
+        } while (line != "q");
 
         //remove the "q" line
         outputKeywords.removeLast();
@@ -173,7 +173,7 @@ void SetupOutputDialog::readOutputSetupFile()
                 outputValues.append(firstPart.split(rx, QString::SkipEmptyParts).at(0));
                 outputDescriptions.append(dataLine.at(1));
             }
-        } while (!stream.atEnd());
+        } while (line != "q");
 
         //remove the "q" line
         outputKeywords.removeLast();
