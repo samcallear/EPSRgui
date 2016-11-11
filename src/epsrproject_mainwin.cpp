@@ -350,6 +350,7 @@ void MainWindow::createNew()
         ui.updateInpPcofFilesButton->setEnabled(false);
         ui.reloadEPSRinpButton->setEnabled(false);
         ui.setupOutButton->setEnabled(false);
+        ui.setupPlotButton->setEnabled(false);
         ui.applyOutputsButton->setEnabled(false);
 
         //Activate available outputs list
@@ -435,6 +436,8 @@ void MainWindow::reset()
     ui.dlputilsOutCheckBox->setChecked(false);
 
     //enable/disable buttons
+    ui.tabWidget->setCurrentIndex(0);
+    ui.molFileTabWidget->setCurrentIndex(0);
     ui.molFileTabWidget->setEnabled(false);
     ui.createMolFileButton->setEnabled(true);
     ui.molFileLoadButton->setEnabled(true);
@@ -459,10 +462,14 @@ void MainWindow::reset()
     ui.removeDataFileButton->setEnabled(false);
     ui.makeWtsButton->setEnabled(false);
     ui.setupEPSRButton->setEnabled(false);
+    ui.ESPRtabWidget->setCurrentIndex(0);
     ui.updateInpPcofFilesButton->setEnabled(false);
     ui.reloadEPSRinpButton->setEnabled(false);
+    ui.setupOutTypeComboBox->setCurrentIndex(0);
     ui.setupOutButton->setEnabled(false);
+    ui.setupPlotTypeComboBox->setCurrentIndex(0);
     ui.applyOutputsButton->setEnabled(false);
+    ui.setupPlotButton->setEnabled(false);
     ui.dlputilsOutCheckBox->setEnabled(false);
     ui.plot1Button->setEnabled(false);
     ui.plot2Button->setEnabled(false);
@@ -622,6 +629,7 @@ void MainWindow::open()
                     ui.updateInpPcofFilesButton->setEnabled(true);
                     ui.reloadEPSRinpButton->setEnabled(true);
                     ui.setupOutButton->setEnabled(true);
+                    ui.setupPlotButton->setEnabled(true);
                     ui.applyOutputsButton->setEnabled(true);
                     ui.dlputilsOutCheckBox->setEnabled(true);
                     ui.deleteBoxAtoFileAct->setEnabled(true);
@@ -1408,6 +1416,7 @@ void MainWindow::runEPSRcheck()
     ui.setupEPSRButton->setEnabled(false);
     ui.updateInpPcofFilesButton->setEnabled(false);
     ui.setupOutButton->setEnabled(false);
+    ui.setupPlotButton->setEnabled(false);
     ui.applyOutputsButton->setEnabled(false);
     ui.addOutputButton->setEnabled(false);
     ui.removeOutputButton->setEnabled(false);
@@ -2181,6 +2190,7 @@ void MainWindow::deleteEPSRinpFile()
             ui.updateInpPcofFilesButton->setEnabled(false);
             ui.reloadEPSRinpButton->setEnabled(false);
             ui.setupOutButton->setEnabled(false);
+            ui.setupPlotButton->setEnabled(false);
             ui.applyOutputsButton->setEnabled(false);
             ui.dlputilsOutCheckBox->setEnabled(false);
 
@@ -2301,6 +2311,7 @@ void MainWindow::deleteBoxAtoFile()
                 ui.updateInpPcofFilesButton->setEnabled(false);
                 ui.reloadEPSRinpButton->setEnabled(false);
                 ui.setupOutButton->setEnabled(false);
+                ui.setupPlotButton->setEnabled(false);
                 ui.applyOutputsButton->setEnabled(false);
                 ui.dlputilsOutCheckBox->setEnabled(false);
             }
@@ -2318,6 +2329,7 @@ void MainWindow::deleteBoxAtoFile()
             ui.updateInpPcofFilesButton->setEnabled(false);
             ui.reloadEPSRinpButton->setEnabled(false);
             ui.setupOutButton->setEnabled(false);
+            ui.setupPlotButton->setEnabled(false);
             ui.applyOutputsButton->setEnabled(false);
             ui.dlputilsOutCheckBox->setEnabled(false);
 
