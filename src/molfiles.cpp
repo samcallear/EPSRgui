@@ -1826,9 +1826,10 @@ bool MainWindow::updateMolFile()
     do {
         lineato = streamatoR.readLine();
         originalato.append(lineato+"\n");
-        if (ecoredcorerx.exactMatch(lineato))
+        dataLineato = lineato.split(" ",QString::SkipEmptyParts);
+        if (dataLineato.count() == 2 && ecoredcorerx.exactMatch(lineato))
         {
-            originalato.remove(lineato+"\n");
+            originalato.remove(originalato.count()-27,originalato.count());
             originalato.append("  "+ecorestr+"  "+dcorestr+"\n");
         }
         if (lineato.contains("moltype01"))
@@ -1951,7 +1952,7 @@ bool MainWindow::updateAtoFile()
         }
         if (ecoredcorerx.exactMatch(line))
         {
-            original.remove(line+"\n");
+            original.remove(original.count()-27,original.count());
             original.append("  "+ecorestr+"  "+dcorestr+"\n");
         }
     }while(!line.isNull());
