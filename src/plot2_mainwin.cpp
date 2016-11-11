@@ -238,9 +238,9 @@ bool MainWindow::fqplot2()
     dataLineDF.clear();
     xDF.clear();
     columnsDF.clear();
+    xDF.resize(nDataCol);
     columnsDF.resize(nDataCol);
     lineDF = streamDF.readLine();
-//    dataNames = lineDF.split(" ", QString::SkipEmptyParts);
     do
     {
         lineDF = streamDF.readLine();
