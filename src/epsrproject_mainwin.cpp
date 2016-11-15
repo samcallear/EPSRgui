@@ -104,6 +104,9 @@ void MainWindow::createActions()
     ui.saveAsAct->setStatusTip(tr("Save the current EPSR project as a different name"));
     connect(ui.saveAsAct, SIGNAL(triggered()), this, SLOT(saveAs()));
 
+    ui.importAct->setStatusTip(tr("Import an existing EPSR simulation"));
+    connect(ui.importAct, SIGNAL(triggered()), this, SLOT(import()));
+
     ui.exitAct->setStatusTip(tr("Exit the application"));
     connect(ui.exitAct, SIGNAL(triggered()), this, SLOT(close()));
 
@@ -719,9 +722,7 @@ void MainWindow::open()
         ui.tabWidget->setEnabled(true);
 
         //activate menu options
-//        ui.saveAct->setEnabled(true);
         ui.saveAsAct->setEnabled(true);
-//        ui.saveCopyAct->setEnabled(true);
         ui.epsrManualAct->setEnabled(true);
 
         //change window title to contain projectName
@@ -1341,6 +1342,389 @@ bool MainWindow::saveCopy()
     return false;
 }
 
+void MainWindow::import()
+{
+    if (epsrBinDir_.isEmpty())
+    {
+        QMessageBox msgBox;
+        msgBox.setText("The EPSR binaries directory needs to be defined.");
+        msgBox.exec();
+        return;
+    }
+
+    ImportDialog importDialog(this);
+
+    importDialog.show();
+    importDialog.raise();
+    importDialog.activateWindow();
+
+    newImportDialog = importDialog.exec();
+
+    if (newImportDialog == ImportDialog::Accepted)
+    {
+        reset();
+
+        //set file directories
+        projectName_ = importDialog.getProjectName();
+        workingDir_ = (epsrDir_+projectName_+"/");
+        workingDir_ = QDir::toNativeSeparators(workingDir_);
+
+        messageText_ += "\n***************************************************************************\n";
+        messageText_ += "Imported existing simulation "+projectName_+" into EPSRgui\n";
+        messageText_ += "Current EPSR project name is "+projectName_+"\n";
+        messageText_ += "Current working directory is "+workingDir_+"\n";
+        messageText_ += "Current EPSR binaries directory is "+epsrBinDir_+"\n";
+
+        QDir::setCurrent(workingDir_);
+
+        //copy important EPSR files into working directory
+        QString epsrStartupDir = epsrBinDir_.split("bin", QString::SkipEmptyParts).at(0);
+        epsrStartupDir = epsrStartupDir+"startup/";
+        epsrStartupDir = QDir::toNativeSeparators(epsrStartupDir);
+        QFile::copy(epsrStartupDir+"f0_WaasKirf.dat", workingDir_+"f0_WaasKirf.dat");
+        QFile::copy(epsrStartupDir+"plot_defaults.txt", workingDir_+"plot_defaults.txt");
+        QFile::copy(epsrStartupDir+"vanderWaalsRadii.txt", workingDir_+"vanderWaalsRadii.txt");
+        QFile::copy(epsrStartupDir+"gnubonds.txt", workingDir_+"gnubonds.txt");
+        QFile::copy(epsrStartupDir+"gnuatoms.txt", workingDir_+"gnuatoms.txt");
+#ifdef _WIN32
+        QFile::copy(epsrStartupDir+"epsr.bat", workingDir_+"epsr.bat");
+        QFile::copy(epsrStartupDir+"system_commands_windows.txt", workingDir_+"system_commands.txt");
+#else
+        QFile::copy(epsrStartupDir+"epsr", workingDir_+"epsr");
+        QFile::copy(epsrStartupDir+"system_commands_linux.txt", workingDir_+"system_commands.txt");
+#endif
+
+        //read in EPSR pro file
+        QString epsrProFile = workingDir_+"/"+projectName_+".EPSR.pro";
+        epsrProFile = QDir::toNativeSeparators(epsrProFile);
+        QFile file(epsrProFile);
+        if(!file.open(QFile::ReadOnly | QFile::Text))
+        {
+            QMessageBox msgBox;
+            msgBox.setText("Could not open EPSR pro file");
+            msgBox.exec();
+            return;
+        }
+        QTextStream stream(&file);
+        QString line;
+        QStringList dataLine;
+        dataLine.clear();
+
+        QStringList molFileList;
+        QStringList numberMolList;
+        molFileList.clear();
+        numberMolList.clear();
+        dataFileList.clear();
+        wtsFileList.clear();
+        dataFileTypeList.clear();
+        normalisationList.clear();
+
+        do
+        {
+            line = stream.readLine();
+            dataLine = line.split(" ", QString::SkipEmptyParts);
+            if (dataLine.count() != 0)
+            {
+                if (dataLine.at(0) == "mol")
+                {
+                    molFileList.append(dataLine.at(1));
+                    numberMolList.append(dataLine.at(2));
+                }
+                if (dataLine.at(0) == "boxAtoFileName")
+                {
+                    atoFileName_ = dataLine.at(1);
+                    messageText_ += "Box .ato filename is "+atoFileName_+"\n";
+                    ui.boxAtoLabel->setText(atoFileName_);
+                }
+                if (dataLine.at(0) == "data")
+                {
+                    dataFileTypeList.append(dataLine.at(1));
+                    dataFileList.append(dataLine.at(2));
+                    normalisationList.append(dataLine.at(3));
+                    ui.makeWtsButton->setEnabled(true);
+                }
+                if (dataLine.at(0) == "wts")
+                {
+                    if (dataLine.count() == 2)
+                    {
+                        wtsFileList.append(dataLine.at(1));
+                        ui.setupEPSRButton->setEnabled(true);
+                    }
+                    else
+                    {
+                        wtsFileList.append(" ");
+                    }
+                }
+                if (dataLine.at(0) == "EPSRinp")
+                {
+                    epsrInpFileName_ = dataLine.at(1)+".EPSR.inp";
+                    messageText_ += "EPSR inp filename is "+epsrInpFileName_+"\n";
+                    ui.epsrInpFileName->setText(epsrInpFileName_);
+                }
+            }
+        } while (!stream.atEnd());
+        file.close();
+
+        QDir::setCurrent(workingDir_);
+
+        //fill out components tables
+        if (molFileList.count() != 0)
+        {
+            nMolFiles = molFileList.count();
+            ui.atoFileTable->setRowCount(nMolFiles);
+            for (int i = 0; i < molFileList.count(); i++)
+            {
+                ui.molFileList->QListWidget::addItem(molFileList.at(i));
+                QStringList filename = molFileList.at(i).split(".", QString::SkipEmptyParts);
+                QTableWidgetItem *item = new QTableWidgetItem(filename.at(0)+".ato");
+                item->setFlags(item->flags() & ~Qt::ItemIsEditable);
+                ui.atoFileTable->setItem(i,0, item);
+                ui.atoFileTable->setItem(i,2, new QTableWidgetItem(numberMolList.at(i)));
+                if (filename.at(1) == "ato")
+                {
+                    ui.mixatoButton->setDisabled(true);
+                    ui.loadBoxButton->setDisabled(true);
+                }
+#ifdef _WIN32
+                processEPSR_.start(epsrBinDir_+"fmole.exe", QStringList() << workingDir_ << "fmole" << filename.at(0) << "0");
+#else
+                processEPSR_.start(epsrBinDir_+"fmole", QStringList() << workingDir_ << "fmole" << filename.at(0) << "0");
+#endif
+                if (!processEPSR_.waitForStarted()) return;
+                if (!processEPSR_.waitForFinished(60000)) return;
+                ui.molFileList->setCurrentRow(i);
+            }
+
+            ui.viewMolFileButton->setEnabled(true);
+            ui.removeMolFileButton->setEnabled(true);
+            ui.molFileTabWidget->setEnabled(true);
+            ui.updateMolFileButton->setEnabled(true);
+            ui.mixatoButton->setEnabled(true);
+            ui.addatoButton->setEnabled(true);
+            ui.loadBoxButton->setEnabled(true);
+        }
+
+        //get box details
+        if (!atoFileName_.isEmpty())
+        {
+            QString atoBaseFileName = atoFileName_.split(".", QString::SkipEmptyParts).at(0);
+#ifdef _WIN32
+            processEPSR_.start(epsrBinDir_+"fmole.exe", QStringList() << workingDir_ << "fmole" << atoBaseFileName << "0");
+#else
+            processEPSR_.start(epsrBinDir_+"fmole", QStringList() << workingDir_ << "fmole" << atoBaseFileName << "0");
+#endif
+            if (!processEPSR_.waitForStarted()) return;
+            if (!processEPSR_.waitForFinished(60000)) return;
+
+            readAtoFileAtomPairs();
+            readAtoFileBoxDetails();
+            checkBoxCharge();
+            ui.randomiseButton->setEnabled(true);
+            ui.plotBoxAct->setEnabled(true);
+            ui.boxCompositionButton->setEnabled(true);
+            ui.updateAtoFileButton->setEnabled(true);
+            ui.fmoleButton->setEnabled(true);
+            ui.atoEPSRButton->setEnabled(true);
+            ui.dataFileBrowseButton->setEnabled(true);
+            ui.removeDataFileButton->setEnabled(true);
+            ui.deleteBoxAtoFileAct->setEnabled(true);
+        }
+
+        // fill out wts table
+        ui.dataFileTable->setColumnCount(4);
+        QStringList datafileheader;
+        datafileheader << "Data File" << "Data File Type" << "Normalisation" << "Wts File";
+        ui.dataFileTable->setHorizontalHeaderLabels(datafileheader);
+        ui.dataFileTable->verticalHeader()->setVisible(false);
+        ui.dataFileTable->horizontalHeader()->setVisible(true);
+
+        if (!dataFileList.isEmpty())
+        {
+            ui.dataFileTable->setRowCount(dataFileList.count());
+            for (int i = 0; i < dataFileList.count(); i++)
+            {
+                QTableWidgetItem *itemdata = new QTableWidgetItem(dataFileList.at(i));
+                itemdata->setFlags(itemdata->flags() & ~Qt::ItemIsEditable);
+                ui.dataFileTable->setItem(i,0, itemdata);
+                ui.dataFileTable->setItem(i,1, new QTableWidgetItem(dataFileTypeList.at(i)));
+                QTableWidgetItem *itemnorm = new QTableWidgetItem(normalisationList.at(i));
+                itemnorm->setFlags(itemnorm->flags() & ~Qt::ItemIsEditable);
+                ui.dataFileTable->setItem(i,2, itemnorm);
+                QTableWidgetItem *itemwts = new QTableWidgetItem(wtsFileList.at(i));
+                itemwts->setFlags(itemwts->flags() & ~Qt::ItemIsEditable);
+                ui.dataFileTable->setItem(i,3, itemwts);
+            }
+            ui.dataFileTable->setColumnWidth(0, 200);
+            ui.dataFileTable->setColumnWidth(1, 90);
+            ui.dataFileTable->setColumnWidth(2, 90);
+            ui.dataFileTable->setColumnWidth(3, 200);
+
+            ui.dataFileTable->setSelectionBehavior(QAbstractItemView::SelectRows);
+            ui.dataFileTable->setSelectionMode(QAbstractItemView::SingleSelection);
+            ui.dataFileTable->setCurrentCell(dataFileList.count()-1,0);
+        }
+        if (!wtsFileList.isEmpty())
+        for (int i = 0; i < dataFileList.count(); i++)
+        {
+            ui.dataFileTable->setItem(i,3, new QTableWidgetItem(wtsFileList.at(i)));
+        }
+
+        //fill out input file tab
+        if (!epsrInpFileName_.isEmpty())
+        {
+            messageText_ += "here";
+            messagesDialog.refreshMessages();
+            QString baseFileName = epsrInpFileName_.split(".", QString::SkipEmptyParts).at(0);
+    #ifdef _WIN32
+            processEPSR_.start(epsrBinDir_+"upset.exe", QStringList() << workingDir_ << "upset" << "epsr" << baseFileName);
+    #else
+            processEPSR_.start(epsrBinDir_+"upset", QStringList() << workingDir_ << "upset" << "epsr" << baseFileName);
+    #endif
+            if (!processEPSR_.waitForStarted()) return;
+            processEPSR_.write("e\n");
+            processEPSR_.write("\n");
+             processEPSR_.write("y\n");
+            if (!processEPSR_.waitForFinished(60000)) return;
+
+            readEPSRinpFile();
+            updateInpFileTables();
+            readEPSRpcofFile();
+            updatePcofFileTables();
+            ui.updateInpPcofFilesButton->setEnabled(true);
+            ui.reloadEPSRinpButton->setEnabled(true);
+            ui.setupOutButton->setEnabled(true);
+            ui.setupPlotButton->setEnabled(true);
+            ui.applyOutputsButton->setEnabled(true);
+            ui.dlputilsOutCheckBox->setEnabled(true);
+            ui.deleteBoxAtoFileAct->setEnabled(true);
+            ui.plot1Button->setEnabled(true);
+            ui.plot2Button->setEnabled(true);
+            ui.dataFileBrowseButton->setDisabled(true);
+            ui.removeDataFileButton->setEnabled(false);
+            ui.checkAct->setEnabled(true);
+            ui.runAct->setEnabled(true);
+            ui.plotAct->setEnabled(true);
+            ui.plotEPSRshellAct->setEnabled(true);
+            ui.plotOutputsMenu->setEnabled(true);
+            ui.plot1Button->setEnabled(true);
+            ui.plot2Button->setEnabled(true);
+            ui.deleteEPSRinpFileAct->setEnabled(true);
+
+            //Activate available outputs list
+            getOutputType();
+
+            //open .bat file to check which analyses are being run at the same time as epsr
+            QString scriptFile = importDialog.getScriptFile();
+            if (!scriptFile.isEmpty())
+            {
+                QFile batFile(workingDir_+scriptFile);
+
+                QTextStream batstream(&batFile);
+                QString batline;
+                QStringList batdataLine;
+                batdataLine.clear();
+                if (batFile.exists() == true)
+                {
+                    if (batFile.open(QFile::ReadWrite | QFile::Text))
+                    {
+                        do {
+                            batline = batstream.readLine();
+                            if (batline.contains("chains")
+                                    || batline.contains("clusters")
+                                    || batline.contains("coord")
+                                    || batline.contains("mapgr")
+                                    || batline.contains("partials")
+                                    || batline.contains("rings")
+                                    || batline.contains("sdf")
+                                    || batline.contains("sdfcube")
+                                    || batline.contains("sharm")
+                                    || batline.contains("torangles")
+                                    || batline.contains("triangles")
+                                    || batline.contains("voids"))
+                            {
+                                batdataLine = batline.split(" ", QString::SkipEmptyParts);
+                                ui.runOutEPSRList->addItem(batdataLine.at(2)+": "+batdataLine.at(3));
+                            }
+                            if (batline.contains("writexyz"))
+                            {
+                                ui.dlputilsOutCheckBox->setChecked(true);
+                            }
+                        }while (!batline.isNull());
+                        batFile.close();
+                    }
+                }
+            }
+        }
+
+        //activate tabs
+        ui.tabWidget->setEnabled(true);
+
+        //activate menu options
+        ui.saveAsAct->setEnabled(true);
+        ui.epsrManualAct->setEnabled(true);
+
+        //change window title to contain projectName
+        this->setWindowTitle("EPSRgui: "+projectName_);
+
+        //plot data if present
+        if (!epsrInpFileName_.isEmpty())
+        {
+            QString atoBaseFileName = atoFileName_.split(".",QString::SkipEmptyParts).at(0);
+            if (QFile::exists(atoBaseFileName+".EPSR.u01")) //this was also included but not sure why: && !dataFileList.isEmpty())
+            {
+                plot1();
+            }
+            if (QFile::exists(atoBaseFileName+".EPSR.erg"))
+            {
+                plot2();
+            }
+        }
+
+        //make run script file and include any analyses
+        QString baseFileName = epsrInpFileName_.split(".",QString::SkipEmptyParts).at(0);
+
+#ifdef _WIN32
+        QFile writebatFile(workingDir_+"run"+baseFileName+".bat");
+#else
+        QFile writebatFile(workingDir_+"run"+baseFileName+".sh");
+#endif
+
+        if(!writebatFile.open(QFile::WriteOnly | QFile::Text))
+        {
+            QMessageBox msgBox;
+            msgBox.setText("Could not write to script file.");
+            msgBox.exec();
+            return;
+        }
+
+        //write script file to run epsr
+        QTextStream writebatstream(&writebatFile);
+#ifdef _WIN32
+        writebatstream << "set EPSRbin=" << epsrBinDir_ << "\n"
+                << "set EPSRrun=" << workingDir_ << "\n"
+                << ":loop\n"
+                << "%EPSRbin%epsr.exe " << workingDir_ << " epsr " << baseFileName << "\n"
+                << "if not exist %EPSRrun%killepsr ( goto loop ) else del %EPSRrun%killepsr\n";
+#else
+        writebatstream << "export EPSRbin=" << epsrBinDir_ << "\n"
+                << "export EPSRrun=" << workingDir_ << "\n"
+                << "while :\n"
+                << "do\n"
+                << "  \"$EPSRbin\"'epsr' " << workingDir_ << " epsr " << baseFileName << "\n"
+                << "  if ([ -e " << workingDir_ << "killepsr ])\n"
+                << "  then break\n"
+                << "  fi\n"
+                << "done\n"
+                << "rm -r " << workingDir_ << "killepsr\n";
+#endif
+        writebatFile.close();
+        addOutputsToScript();
+
+        messagesDialog.refreshMessages();
+        ui.messagesLineEdit->setText("New project "+projectName_+" imported");
+    }
+}
+
 void MainWindow::runEPSRcheck()
 {
     updateInpFile();
@@ -1461,12 +1845,12 @@ void MainWindow::runEPSR()
     updateInpFile();
     updatePcofFile();
 
-    QString atoBaseFileName = atoFileName_.split(".",QString::SkipEmptyParts).at(0);
+    QString baseFileName = epsrInpFileName_.split(".",QString::SkipEmptyParts).at(0);
 
 #ifdef _WIN32
-    QFile batFile(workingDir_+"run"+atoBaseFileName+".bat");
+    QFile batFile(workingDir_+"run"+baseFileName+".bat");
 #else
-    QFile batFile(workingDir_+"run"+atoBaseFileName+".sh");
+    QFile batFile(workingDir_+"run"+baseFileName+".sh");
 #endif
 
     // if script file already exists, don't overwrite it
@@ -1486,14 +1870,14 @@ void MainWindow::runEPSR()
         stream << "set EPSRbin=" << epsrBinDir_ << "\n"
                 << "set EPSRrun=" << workingDir_ << "\n"
                 << ":loop\n"
-                << "%EPSRbin%epsr.exe " << workingDir_ << " epsr " << atoBaseFileName << "\n"
+                << "%EPSRbin%epsr.exe " << workingDir_ << " epsr " << baseFileName << "\n"
                 << "if not exist %EPSRrun%killepsr ( goto loop ) else del %EPSRrun%killepsr\n";
     #else
             stream << "export EPSRbin=" << epsrBinDir_ << "\n"
                     << "export EPSRrun=" << workingDir_ << "\n"
                     << "while :\n"
                     << "do\n"
-                    << "  \"$EPSRbin\"'epsr' " << workingDir_ << " epsr " << atoBaseFileName << "\n"
+                    << "  \"$EPSRbin\"'epsr' " << workingDir_ << " epsr " << baseFileName << "\n"
                     << "  if ([ -e " << workingDir_ << "killepsr ])\n"
                     << "  then break\n"
                     << "  fi\n"
@@ -1509,9 +1893,9 @@ void MainWindow::runEPSR()
     QProcess processrunEPSRscript;
     processrunEPSRscript.setProcessChannelMode(QProcess::ForwardedChannels);
 #ifdef _WIN32
-    processrunEPSRscript.startDetached("run"+atoBaseFileName+".bat");
+    processrunEPSRscript.startDetached("run"+baseFileName+".bat");
 #else
-    processrunEPSRscript.startDetached("sh run"+atoBaseFileName+".sh");
+    processrunEPSRscript.startDetached("sh run"+baseFileName+".sh");
 #endif
 
     //show EPSR is running

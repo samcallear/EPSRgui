@@ -3085,6 +3085,7 @@
     <addaction name="newAct"/>
     <addaction name="openAct"/>
     <addaction name="saveAsAct"/>
+    <addaction name="importAct"/>
     <addaction name="separator"/>
     <addaction name="exitAct"/>
    </widget>
@@ -3360,6 +3361,14 @@
    </property>
    <property name="text">
     <string>Plot simulation box</string>
+   </property>
+  </action>
+  <action name="importAct">
+   <property name="text">
+    <string>Import...</string>
+   </property>
+   <property name="toolTip">
+    <string>Import an exisiting simulation</string>
    </property>
   </action>
  </widget>

@@ -29,6 +29,7 @@ public:
     MainWindow(QMainWindow *parent = 0);
     Ui::MainWindow ui;
     int newDialog;
+    int newImportDialog;
     int setDialog;
 
 protected:
@@ -39,6 +40,7 @@ private slots:
     bool save();
     bool saveAs();
     bool saveCopy();
+    void import();
     void runEPSR();
     void runEPSRcheck();
     void plot();
@@ -70,7 +72,7 @@ private:
 
     QDir exeDir_;
     QDir currentDir;
-    QString projectName_; //folder name in EPSR but doesn't include path or a "/" after it
+    QString projectName_; //folder name for simulation but doesn't include path or a "/" after it
     QString workingDir_; //includes projectName and has a "/" after it
     QString epsrDir_; //this is the preferred dir that projects are saved in and has a "/" after it
     QString epsrBinDir_; //has a "/" after it
@@ -265,6 +267,7 @@ private:
     QString coeffFileName_;
     void showAvailableFiles();
     void getOutputsRunning();
+    void addOutputsToScript();
 
 private slots:
     void on_setupOutButton_clicked(bool checked);

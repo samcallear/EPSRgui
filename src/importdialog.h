@@ -13,7 +13,13 @@ class ImportDialog : public QDialog
 
 private:
     QString workingDir_;
+    QString newWorkingDir_;
     MainWindow *mainWindow_;
+    QString epsrDir_;
+    QString projectName_;
+    QString atoFileName_;
+    QString epsrInpFileName_;
+    QString scriptFile_;
 
 private slots:
     void on_importButton_clicked(bool checked);
@@ -23,14 +29,21 @@ private slots:
 public:
     ImportDialog(MainWindow *parent = 0);
     Ui::importDialog ui;
+    QString getWorkingDir();
     QString getProjectName();
-    QString getAtoFileName();
-    QString getEpsrInpName();
+    QString getScriptFile();
+//    QString getAtoFileName();
+//    QString getEpsrInpName();
 
 public slots:
-    void on_projectNameBrowseButton_clicked(bool checked);
-    void on_boxAtoBrowseButton_clicked(bool checked);
-    void on_epsrInpBrowseButton_clicked(bool checked);
+    void on_browseFolderButton_clicked(bool checked);
+    void on_browseBoxButton_clicked(bool checked);
+    void on_browseInpButton_clicked(bool checked);
+    void on_browseScriptButton_clicked(bool checked);
+    void on_addComponentButton_clicked(bool checked);
+    void on_removeComponentButton_clicked(bool checked);
+    void on_browseNewFolderButton_clicked(bool checked);
+
 };
 
 #endif
