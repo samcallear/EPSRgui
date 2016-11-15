@@ -262,8 +262,8 @@ void MainWindow::updateInpFileTables()
 
 bool MainWindow::readEPSRpcofFile()
 {
-    QString atoBaseFileName = atoFileName_.split(".",QString::SkipEmptyParts).at(0);
-    QString epsrpcofFileName = workingDir_+atoBaseFileName+".pcof";
+    QString baseFileName = epsrInpFileName_.split(".",QString::SkipEmptyParts).at(0);
+    QString epsrpcofFileName = workingDir_+baseFileName+".pcof";
     QFile file(epsrpcofFileName);
     if(!file.open(QFile::ReadOnly | QFile::Text))
     {

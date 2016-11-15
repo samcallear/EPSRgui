@@ -80,11 +80,11 @@ void MainWindow::showAvailableFiles()
 
 void MainWindow::getOutputsRunning()
 {
-    QString atoBaseFileName = atoFileName_.split(".",QString::SkipEmptyParts).at(0);
+    QString baseFileName = epsrInpFileName_.split(".",QString::SkipEmptyParts).at(0);
 #ifdef _WIN32
-    QFile file(workingDir_+"run"+atoBaseFileName+".bat");
+    QFile file(workingDir_+"run"+baseFileName+".bat");
 #else
-    QFile file(workingDir_+"run"+atoBaseFileName+".sh");
+    QFile file(workingDir_+"run"+baseFileName+".sh");
 #endif
     if (file.exists() == false)
     {
@@ -212,6 +212,11 @@ void MainWindow::on_removeOutputButton_clicked(bool checked)
 
 void MainWindow::on_applyOutputsButton_clicked(bool checked)
 {
+    addOutputsToScript();
+}
+
+void MainWindow::addOutputsToScript()
+{
     //make list of file types and names to be included
     QStringList outputFileTypes;
     QStringList outputFileNames;
@@ -229,12 +234,12 @@ void MainWindow::on_applyOutputsButton_clicked(bool checked)
     }
 
     //open .bat file
-    QString atoBaseFileName = atoFileName_.split(".",QString::SkipEmptyParts).at(0);
+    QString baseFileName = epsrInpFileName_.split(".",QString::SkipEmptyParts).at(0);
 
 #ifdef _WIN32
-    QFile batFile(workingDir_+"run"+atoBaseFileName+".bat");
+    QFile batFile(workingDir_+"run"+baseFileName+".bat");
 #else
-    QFile batFile(workingDir_+"run"+atoBaseFileName+".sh");
+    QFile batFile(workingDir_+"run"+baseFileName+".sh");
 #endif
     if (batFile.exists() == false)
     {
@@ -330,6 +335,7 @@ void MainWindow::on_applyOutputsButton_clicked(bool checked)
                     QString halfboxLengthAStr = QString::number(halfboxLengthA);
                     QString halfboxLengthBStr = QString::number(halfboxLengthB);
                     QString halfboxLengthCStr = QString::number(halfboxLengthC);
+                    QString atoBaseFileName = atoFileName_.split(".",QString::SkipEmptyParts).at(0);
 #ifdef _WIN32
                     lineToAdd = "%EPSRbin%writexyz.exe "+workingDir_+" writexyz "+atoBaseFileName+" y 0 "+halfboxLengthAStr+" "+halfboxLengthBStr+" -"+halfboxLengthCStr+" "+halfboxLengthCStr+" 0 0 0 0\n";
 #else
