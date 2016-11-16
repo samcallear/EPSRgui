@@ -1612,9 +1612,11 @@ void MainWindow::import()
             ui.dataFileTable->setCurrentCell(dataFileList.count()-1,0);
         }
         if (!wtsFileList.isEmpty())
-        for (int i = 0; i < dataFileList.count(); i++)
         {
-            ui.dataFileTable->setItem(i,3, new QTableWidgetItem(wtsFileList.at(i)));
+            for (int i = 0; i < dataFileList.count(); i++)
+            {
+                ui.dataFileTable->setItem(i,3, new QTableWidgetItem(wtsFileList.at(i)));
+            }
         }
 
         //fill out input file tab
@@ -1623,11 +1625,11 @@ void MainWindow::import()
             messageText_ += "here";
             messagesDialog.refreshMessages();
             QString baseFileName = epsrInpFileName_.split(".", QString::SkipEmptyParts).at(0);
-    #ifdef _WIN32
+#ifdef _WIN32
             processEPSR_.start(epsrBinDir_+"upset.exe", QStringList() << workingDir_ << "upset" << "epsr" << baseFileName);
-    #else
+#else
             processEPSR_.start(epsrBinDir_+"upset", QStringList() << workingDir_ << "upset" << "epsr" << baseFileName);
-    #endif
+#endif
             if (!processEPSR_.waitForStarted()) return;
             processEPSR_.write("e\n");
             processEPSR_.write("\n");
@@ -1726,47 +1728,46 @@ void MainWindow::import()
             {
                 plot2();
             }
-        }
-
-        //make run script file and include any analyses
-        QString baseFileName = epsrInpFileName_.split(".",QString::SkipEmptyParts).at(0);
+            //make run script file and include any analyses
+            QString baseFileName = epsrInpFileName_.split(".",QString::SkipEmptyParts).at(0);
 
 #ifdef _WIN32
-        QFile writebatFile(workingDir_+"run"+baseFileName+".bat");
+            QFile writebatFile(workingDir_+"run"+baseFileName+".bat");
 #else
-        QFile writebatFile(workingDir_+"run"+baseFileName+".sh");
+            QFile writebatFile(workingDir_+"run"+baseFileName+".sh");
 #endif
 
-        if(!writebatFile.open(QFile::WriteOnly | QFile::Text))
-        {
-            QMessageBox msgBox;
-            msgBox.setText("Could not write to script file.");
-            msgBox.exec();
-            return;
-        }
+            if(!writebatFile.open(QFile::WriteOnly | QFile::Text))
+            {
+                QMessageBox msgBox;
+                msgBox.setText("Could not write to script file.");
+                msgBox.exec();
+                return;
+            }
 
-        //write script file to run epsr
-        QTextStream writebatstream(&writebatFile);
+            //write script file to run epsr
+            QTextStream writebatstream(&writebatFile);
 #ifdef _WIN32
-        writebatstream << "set EPSRbin=" << epsrBinDir_ << "\n"
-                << "set EPSRrun=" << workingDir_ << "\n"
-                << ":loop\n"
-                << "%EPSRbin%epsr.exe " << workingDir_ << " epsr " << baseFileName << "\n"
-                << "if not exist %EPSRrun%killepsr ( goto loop ) else del %EPSRrun%killepsr\n";
+            writebatstream << "set EPSRbin=" << epsrBinDir_ << "\n"
+                    << "set EPSRrun=" << workingDir_ << "\n"
+                    << ":loop\n"
+                    << "%EPSRbin%epsr.exe " << workingDir_ << " epsr " << baseFileName << "\n"
+                    << "if not exist %EPSRrun%killepsr ( goto loop ) else del %EPSRrun%killepsr\n";
 #else
-        writebatstream << "export EPSRbin=" << epsrBinDir_ << "\n"
-                << "export EPSRrun=" << workingDir_ << "\n"
-                << "while :\n"
-                << "do\n"
-                << "  \"$EPSRbin\"'epsr' " << workingDir_ << " epsr " << baseFileName << "\n"
-                << "  if ([ -e " << workingDir_ << "killepsr ])\n"
-                << "  then break\n"
-                << "  fi\n"
-                << "done\n"
-                << "rm -r " << workingDir_ << "killepsr\n";
+            writebatstream << "export EPSRbin=" << epsrBinDir_ << "\n"
+                    << "export EPSRrun=" << workingDir_ << "\n"
+                    << "while :\n"
+                    << "do\n"
+                    << "  \"$EPSRbin\"'epsr' " << workingDir_ << " epsr " << baseFileName << "\n"
+                    << "  if ([ -e " << workingDir_ << "killepsr ])\n"
+                    << "  then break\n"
+                    << "  fi\n"
+                    << "done\n"
+                    << "rm -r " << workingDir_ << "killepsr\n";
 #endif
-        writebatFile.close();
-        addOutputsToScript();
+            writebatFile.close();
+            addOutputsToScript();
+        }
 
         save();
 
