@@ -198,6 +198,7 @@ public:
     int atoaddDialog;
     QStringList atoAtomLabels;
     QVector<int> numberAtomLabels;
+    QVector<int> numberComponentAtomLabels;
     int nPartials;
     Array2D<int> ij;
     QStringList atoFileList;

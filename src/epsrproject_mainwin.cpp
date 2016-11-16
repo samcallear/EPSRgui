@@ -1467,6 +1467,8 @@ void MainWindow::import()
 
         QDir::setCurrent(workingDir_);
 
+        QStringList firstAtomTypes;
+        QList<int> numberFirstAtomTypes;
         //fill out components tables
         if (molFileList.count() != 0)
         {
@@ -1493,6 +1495,8 @@ void MainWindow::import()
                 if (!processEPSR_.waitForStarted()) return;
                 if (!processEPSR_.waitForFinished(60000)) return;
                 ui.molFileList->setCurrentRow(i);
+                firstAtomTypes.append(ui.molLJTable->item(0,0)->text());
+                numberFirstAtomTypes.append(numberComponentAtomLabels.at(0));
             }
 
             ui.viewMolFileButton->setEnabled(true);
@@ -1515,6 +1519,50 @@ void MainWindow::import()
 #endif
             if (!processEPSR_.waitForStarted()) return;
             if (!processEPSR_.waitForFinished(60000)) return;
+
+            //populate atoTable with correct number of each component in box
+            QFile fileato(workingDir_+atoFileName_);
+            if(!fileato.open(QFile::ReadOnly | QFile::Text))
+            {
+                QMessageBox msgBox;
+                msgBox.setText("Could not open .ato file.");
+                msgBox.exec();
+                return;
+            }
+            QTextStream streamato(&fileato);
+            QString lineato;
+            QStringList dataLineato;
+            dataLineato.clear();
+
+            QVector<int> numberComponent;
+            numberComponent.clear();
+            numberComponent.resize(molFileList.count());
+            QRegExp atomLabelrx(" ([A-Z][A-Za-z0-9 ]{2})   ([0-9 ]{1,4})      0");
+            do {
+                lineato = streamato.readLine();
+                if (atomLabelrx.exactMatch(lineato))
+                {
+                    dataLineato = lineato.split("  ", QString::SkipEmptyParts);
+                    QString trimmeddataLine = dataLineato.at(0).trimmed();
+                    for (int i = 0; i < firstAtomTypes.count(); i++)
+                    {
+                        if (trimmeddataLine == firstAtomTypes.at(i))
+                        {
+                            //add 1 to label 'counter' each time find each label (therefore order is the same as ljAtoms)
+                            numberComponent.operator [](i)++;
+                        }
+                    }
+                }
+            } while (!lineato.isNull());
+            fileato.close();
+
+            //for each mol file, divide numberInstances by numberFirstAtomTypes
+            for (int i = 0; i < nMolFiles; i++)
+            {
+                int nComponents = numberComponent.at(i)/numberFirstAtomTypes.at(i);
+                QString nComponentsStr = QString::number(nComponents);
+                ui.atoFileTable->setItem(i,2, new QTableWidgetItem(nComponentsStr));
+            }
 
             readAtoFileAtomPairs();
             readAtoFileBoxDetails();
@@ -1719,6 +1767,8 @@ void MainWindow::import()
 #endif
         writebatFile.close();
         addOutputsToScript();
+
+        save();
 
         messagesDialog.refreshMessages();
         ui.messagesLineEdit->setText("New project "+projectName_+" imported");

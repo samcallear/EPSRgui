@@ -1074,9 +1074,26 @@ bool MainWindow::readMolFile()
         ui.tetherAtomLineEdit->clear();
     }
 
+    numberComponentAtomLabels.clear();
+    numberComponentAtomLabels.resize(ljAtoms.count());
+    QRegExp atomLabelrx(" ([A-Z][A-Za-z0-9 ]{2})   ([0-9 ]{1,4})      0");
     QRegExp ecoredcorerx("  ([0-9]{1}[.]{1}[0-9]{5}[E+]{2}[0-9]{2})  ([0-9]{1}[.]{1}[0-9]{5}[E+]{2}[0-9]{2})");
     do {
         lineato = streamato.readLine();
+        if (atomLabelrx.exactMatch(lineato))
+        {
+            dataLineato = lineato.split("  ", QString::SkipEmptyParts);
+            QString data = dataLineato.at(0).trimmed();
+            for (int i = 0; i < ljAtoms.count(); i++)
+            {
+                if (data == ljAtoms.at(i))
+                {
+                    //add 1 to label 'counter' each time find each label (therefore order is the same as ljAtoms)
+                    numberComponentAtomLabels.operator [](i)++;
+                }
+            }
+            //include way to get the number (atomLabel) for each atom even if a changelabel section isn't listed as this is useful for analyses**********************************************************
+        }
         if (ecoredcorerx.exactMatch(lineato))
         {
             dataLineato = lineato.split("  ", QString::SkipEmptyParts);
@@ -1142,6 +1159,7 @@ bool MainWindow::readMolFile()
 
     if (atomTypes.count() < 1)
     {
+        //if no atomTypes are listed (ie. no changelabel section, then make ljatom uneditable
         for (int i = 0; i < N_LJparam; ++i)
         {
             QTableWidgetItem *item = new QTableWidgetItem(ljAtoms.at(i));
@@ -1181,42 +1199,22 @@ bool MainWindow::readMolFile()
 
     //calculate charge for selected .mol file
     double molChargeCalcd = 0;
+    //iterate over each atom in the LJ parameters (as these are present even if the changelabel section isn't)
     for (int i = 0; i < ljAtoms.count(); i++)
     {
-        //count number of atom type i present
-        int ctr = 0;
-        for (int n = 0; n < atomTypes.count(); n++)
-        {
-            if (atomTypes.at(n) == ljAtoms.at(i))
-            {
-                ctr++;
-            }
-        }
         //get charge for atom type i
         QString atomTypeChargeStr = charges.at(i);
         double atomTypeCharge = QString(atomTypeChargeStr).toDouble();
         //get total charge contributed by atom type i by multiplying the number of i with its charge and add it to the overall charge
-        molChargeCalcd = molChargeCalcd+(ctr*atomTypeCharge);
+        molChargeCalcd = molChargeCalcd+(numberComponentAtomLabels.at(i)*atomTypeCharge);
     }
-    QRegExp rxnumbers("\\d*");
-    if (atomLabels.isEmpty() || !rxnumbers.exactMatch(atomLabels.at(0)))
-    {
-        ui.molChargeLabel->setText("not available");
-        QTableWidgetItem *item = new QTableWidgetItem("n/a");
-        item->setFlags(item->flags() & ~Qt::ItemIsEditable);
-        int row = ui.molFileList->currentRow();
-        ui.atoFileTable->setItem(row,1, item);
-    }
-    else
-    {
-        QString molChargeCalcdStr;
-        molChargeCalcdStr.sprintf("%.4f", molChargeCalcd);
-        ui.molChargeLabel->setText(molChargeCalcdStr);
-        QTableWidgetItem *item = new QTableWidgetItem(molChargeCalcdStr);
-        item->setFlags(item->flags() & ~Qt::ItemIsEditable);
-        int row = ui.molFileList->currentRow();
-        ui.atoFileTable->setItem(row,1, item);
-    }
+    QString molChargeCalcdStr;
+    molChargeCalcdStr.sprintf("%.4f", molChargeCalcd);
+    ui.molChargeLabel->setText(molChargeCalcdStr);
+    QTableWidgetItem *item = new QTableWidgetItem(molChargeCalcdStr);
+    item->setFlags(item->flags() & ~Qt::ItemIsEditable);
+    int row = ui.molFileList->currentRow();
+    ui.atoFileTable->setItem(row,1, item);
 
     return true;
 }
@@ -1329,16 +1327,15 @@ bool MainWindow::readAtoFile()
     charges.clear();
     ljTypes.clear();
 
-    QRegExp atomLabelrx(" ([A-Z][A-Za-z0-9 ]{2}) ([A-Za-z ]{1,2})   ([0-1]{1})");
+    QRegExp ljAtomLabelrx(" ([A-Z][A-Za-z0-9 ]{2}) ([A-Za-z ]{1,2})   ([0-1]{1})");
     QRegExp ecoredcorerx("  ([0-9]{1}[.]{1}[0-9]{5}[E+]{2}[0-9]{2})  ([0-9]{1}[.]{1}[0-9]{5}[E+]{2}[0-9]{2})");
 
     do
     {
         line = stream.readLine();
-        if (atomLabelrx.exactMatch(line))
+        if (ljAtomLabelrx.exactMatch(line))
         {
             dataLine = line.split("  ", QString::SkipEmptyParts);
-            atomTypes.append(dataLine.at(0));
             ljAtoms.append(dataLine.at(0));
             ljTypes.append(dataLine.at(1));
 
@@ -1358,11 +1355,36 @@ bool MainWindow::readAtoFile()
     } while (!line.isNull());
     file.close();
 
+    //re-open and stream file to get number of each ljatom present in file
+    file.open(QFile::ReadOnly | QFile::Text);
+    numberComponentAtomLabels.clear();
+    numberComponentAtomLabels.resize(ljAtoms.count());
+    QRegExp atomLabelrx(" ([A-Z][A-Za-z0-9 ]{2})   ([0-9 ]{1,4})      0");
+    do {
+        line = stream.readLine();
+        if (atomLabelrx.exactMatch(line))
+        {
+            dataLine = line.split("  ", QString::SkipEmptyParts);
+            atomTypes.append(dataLine.at(0));
+            atomLabels.append(dataLine.at(1));
+            for (int i = 0; i < ljAtoms.count(); i++)
+            {
+                if (dataLine.at(0) == ljAtoms.at(i))
+                {
+                    //add 1 to label 'counter' each time find each label (therefore order is the same as ljAtoms)
+                    numberComponentAtomLabels.operator [](i)++;
+                }
+            }
+        }
+    } while (!line.isNull());
+    file.close();
+
     //show data in Tables
     ui.molAtomTable->setRowCount(atomTypes.count());
     ui.molAtomTable->verticalHeader()->setVisible(false);
     for (int i = 0; i < atomTypes.count(); ++i)
     {
+        ui.molAtomTable->setItem(i,0, new QTableWidgetItem(atomLabels.at(i)));
         ui.molAtomTable->setItem(i,1, new QTableWidgetItem(atomTypes.at(i)));
     }
 
@@ -1383,40 +1405,24 @@ bool MainWindow::readAtoFile()
     ui.molLJTable->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui.molLJTable->setSelectionMode(QAbstractItemView::SingleSelection);
 
-    //display charge for selected .ato file
+    //calculate charge for selected .ato file
     double molChargeCalcd = 0;
+    //iterate over each atom in the LJ parameters (as these are present even if the changelabel section isn't)
     for (int i = 0; i < ljAtoms.count(); i++)
     {
-        int ctr = 0;
-        for (int n = 0; n < atomTypes.count(); n++)
-        {
-            if (atomTypes.at(n) == ljAtoms.at(i))
-            {
-                ctr++;
-            }
-        }
+        //get charge for atom type i
         QString atomTypeChargeStr = charges.at(i);
         double atomTypeCharge = QString(atomTypeChargeStr).toDouble();
-        molChargeCalcd = molChargeCalcd+(ctr*atomTypeCharge);
+        //get total charge contributed by atom type i by multiplying the number of i with its charge and add it to the overall charge
+        molChargeCalcd = molChargeCalcd+(numberComponentAtomLabels.at(i)*atomTypeCharge);
     }
-    if (ljAtoms.isEmpty())
-    {
-        ui.molChargeLabel->setText("not available");
-        QTableWidgetItem *item = new QTableWidgetItem("n/a");
-        item->setFlags(item->flags() & ~Qt::ItemIsEditable);
-        int row = ui.molFileList->currentRow();
-        ui.atoFileTable->setItem(row,1, item);
-    }
-    else
-    {
-        QString molChargeCalcdStr;
-        molChargeCalcdStr.sprintf("%.4f", molChargeCalcd);
-        ui.molChargeLabel->setText(molChargeCalcdStr);
-        QTableWidgetItem *item = new QTableWidgetItem(molChargeCalcdStr);
-        item->setFlags(item->flags() & ~Qt::ItemIsEditable);
-        int row = ui.molFileList->currentRow();
-        ui.atoFileTable->setItem(row,1, new QTableWidgetItem(molChargeCalcdStr));
-    }
+    QString molChargeCalcdStr;
+    molChargeCalcdStr.sprintf("%.4f", molChargeCalcd);
+    ui.molChargeLabel->setText(molChargeCalcdStr);
+    QTableWidgetItem *item = new QTableWidgetItem(molChargeCalcdStr);
+    item->setFlags(item->flags() & ~Qt::ItemIsEditable);
+    int row = ui.molFileList->currentRow();
+    ui.atoFileTable->setItem(row,1, item);
 
     return true;
 }
