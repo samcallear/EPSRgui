@@ -355,12 +355,12 @@ void MainWindow::on_makeWtsButton_clicked(bool checked)
     if (QFile::exists(workingDir_+wtsBaseFileName_+".NWTS.dat"))
     {
         makeNwts();
-        ui.messagesLineEdit->setText("NWTS wts file created");
+//        ui.messagesLineEdit->setText("NWTS wts file created");
     }
     if (QFile::exists(workingDir_+wtsBaseFileName_+".XWTS.dat"))
     {
         makeXwts();
-        ui.messagesLineEdit->setText("XWTS wts file created");
+//        ui.messagesLineEdit->setText("XWTS wts file created");
     }
 
     //save .pro file
@@ -491,6 +491,18 @@ void MainWindow::makeNwts()
 #endif
     if (!processEPSR_.waitForStarted()) return;
     if (!processEPSR_.waitForFinished()) return;
+
+    //check file was created (need to check if modification actually works too***********************)
+    QFile wtsfile(workingDir_+wtsBaseFileName_+".NWTStot.wts");
+    if (!wtsfile.exists())
+    {
+        QMessageBox msgBox;
+        msgBox.setText("Could not make wts file");
+        msgBox.exec();
+        return;
+    }
+
+    wtsFileList.replace(row, wtsBaseFileName_+".NWTS.wts");
     messageText_ += "\nfinished making wts file\n";
     messagesDialog.refreshMessages();
     refreshDataFileTable();
@@ -521,7 +533,9 @@ void MainWindow::makeXwts()
     //read normalisation from combo box and write to table
     int dataNormType = ui.normalisationComboBox->currentIndex();
     QString dataNormTypeStr = QString::number(dataNormType);
-    ui.dataFileTable->item((ui.dataFileTable->currentRow()),2)->setText(dataNormTypeStr);
+    int row = ui.dataFileTable->currentRow();
+
+    ui.dataFileTable->item(row,2)->setText(dataNormTypeStr);
 
     //make normalisationList consistent with dataFileTable normalisation column
     normalisationList.clear();
@@ -587,6 +601,18 @@ void MainWindow::makeXwts()
 #endif
     if (!processEPSR_.waitForStarted()) return;
     if (!processEPSR_.waitForFinished()) return;
+
+    //check file was created (need to check if modification actually works too***********************)
+    QFile wtsfile(workingDir_+wtsBaseFileName_+".XWTS.wts");
+    if (!wtsfile.exists())
+    {
+        QMessageBox msgBox;
+        msgBox.setText("Could not make wts file");
+        msgBox.exec();
+        return;
+    }
+
+    wtsFileList.replace(row, wtsBaseFileName_+".XWTS.wts");
     messageText_ += "\nfinished making wts file\n";
     messagesDialog.refreshMessages();
     refreshDataFileTable();
@@ -595,31 +621,9 @@ void MainWindow::makeXwts()
 void MainWindow::refreshDataFileTable()
 {
     ui.dataFileTable->clearContents();
-    int lastDataFile = dataFileList.count();
-
-    wtsFileList.clear();
-    for (int file = 0; file < lastDataFile; file++)
-    {
-        QString wholeDataFileName = dataFileList.at(file);
-        QString dataFileName = wholeDataFileName.split(".",QString::SkipEmptyParts).at(0);
-        if (!QFile::exists(dataFileName+".NWTStot.wts") && !QFile::exists(dataFileName+".XWTS.wts"))
-        {
-            wtsFileList.append(" ");
-        }
-        else
-        if (QFile::exists(dataFileName+".NWTStot.wts"))
-        {
-            wtsFileList.append(dataFileName+".NWTStot.wts");
-        }
-        else
-        if (QFile::exists(dataFileName+".XWTS.wts"))
-        {
-            wtsFileList.append(dataFileName+".XWTS.wts");
-        }
-    }
-
+    int nDataFiles = dataFileList.count();
     ui.dataFileTable->setColumnCount(4);
-    ui.dataFileTable->setRowCount(lastDataFile);
+    ui.dataFileTable->setRowCount(nDataFiles);
     QStringList datafileheader;
     datafileheader << "Data File" << "Data File Type" << "Normalisation" << "Wts File";
     ui.dataFileTable->setHorizontalHeaderLabels(datafileheader);
@@ -631,7 +635,7 @@ void MainWindow::refreshDataFileTable()
     ui.dataFileTable->setColumnWidth(2, 90);
     ui.dataFileTable->setColumnWidth(3, 200);
 
-    for (int i = 0; i <lastDataFile; i++)
+    for (int i = 0; i <nDataFiles; i++)
     {
         QTableWidgetItem *itemdata = new QTableWidgetItem(dataFileList.at(i));
         itemdata->setFlags(itemdata->flags() & ~Qt::ItemIsEditable);
@@ -646,7 +650,7 @@ void MainWindow::refreshDataFileTable()
     }
     ui.dataFileTable->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui.dataFileTable->setSelectionMode(QAbstractItemView::SingleSelection);
-    ui.dataFileTable->setCurrentCell(lastDataFile-1,0);
+    ui.dataFileTable->setCurrentCell(nDataFiles-1,0);
 }
 
 void MainWindow::on_dataFileTable_itemSelectionChanged()
@@ -662,10 +666,10 @@ void MainWindow::setSelectedDataFile()
 {
     int row = ui.dataFileTable->currentRow();
     QString dataFileName = dataFileList.at(row);
-    QFileInfo fileInfo(dataFileName);
+    QString wtsFileName = wtsFileList.at(row);
+    QFileInfo fileInfo(wtsFileName);
     QString justFileName = fileInfo.fileName();
     wtsBaseFileName_ = justFileName.split(".",QString::SkipEmptyParts).at(0);
-//    dataFileExt_ = justFileName.split(".",QString::SkipEmptyParts).at(1);
     dataFileName_ = dataFileName;
 
     if (QFile::exists(workingDir_+wtsBaseFileName_+".NWTS.dat"))
