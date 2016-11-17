@@ -1805,6 +1805,7 @@ void MainWindow::runEPSRcheck()
     ui.openAct->setEnabled(false);
     ui.saveAsAct->setEnabled(false);
     ui.saveCopyAct->setEnabled(false);
+    ui.importAct->setEnabled(false);
     ui.exitAct->setEnabled(false);
     ui.deleteBoxAtoFileAct->setEnabled(false);
     ui.deleteEPSRinpFileAct->setEnabled(false);
@@ -1961,6 +1962,7 @@ void MainWindow::runEPSR()
     ui.openAct->setEnabled(false);
     ui.saveAsAct->setEnabled(false);
     ui.saveCopyAct->setEnabled(false);
+    ui.importAct->setEnabled(false);
     ui.exitAct->setEnabled(false);
     ui.deleteBoxAtoFileAct->setEnabled(false);
     ui.deleteEPSRinpFileAct->setEnabled(false);
@@ -2067,6 +2069,7 @@ void MainWindow::enableButtons()
     ui.openAct->setEnabled(true);
     ui.saveAsAct->setEnabled(true);
     ui.saveCopyAct->setEnabled(true);
+    ui.importAct->setEnabled(true);
     ui.exitAct->setEnabled(true);
     ui.deleteBoxAtoFileAct->setEnabled(true);
     ui.deleteEPSRinpFileAct->setEnabled(true);
