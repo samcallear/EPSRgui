@@ -77,18 +77,20 @@ void MainWindow::on_dataFileBrowseButton_clicked(bool checked)
         dataFileName_ = dataFileName;
         if (ui.neutronDataRB->isChecked())
         {
+            normalisationList.append("0");
             makeNwtsSetup();
+            wtsFileList.append("  ");
             readNwtsSetup();
             refreshDataFileTable();
-            setSelectedDataFile();
         }
         else
         if (ui.xrayDataRB->isChecked())
         {
+            normalisationList.append("2");
             makeXwtsSetup();
+            wtsFileList.append("  ");
             readXwtsSetup();
             refreshDataFileTable();
-            setSelectedDataFile();
         }
     }
     ui.makeWtsButton->setEnabled(true);
@@ -126,7 +128,6 @@ bool MainWindow::makeNwtsSetup()
     }
 
     //read values in NWTS.dat file and write to table and combobox
-    normalisationList.append("0");
     messagesDialog.refreshMessages();
     ui.messagesLineEdit->setText("NWTS setup file created");
     return true;
@@ -155,7 +156,6 @@ bool MainWindow::makeXwtsSetup()
         if (!processEPSR_.waitForFinished()) return false;
         messageText_ += "\nfinished making wts setup file\n";
     }
-    normalisationList.append("2");
     messagesDialog.refreshMessages();
     ui.messagesLineEdit->setText("XWTS setup file created");
     return true;
@@ -621,36 +621,38 @@ void MainWindow::makeXwts()
 void MainWindow::refreshDataFileTable()
 {
     ui.dataFileTable->clearContents();
-    int nDataFiles = dataFileList.count();
     ui.dataFileTable->setColumnCount(4);
-    ui.dataFileTable->setRowCount(nDataFiles);
     QStringList datafileheader;
     datafileheader << "Data File" << "Data File Type" << "Normalisation" << "Wts File";
     ui.dataFileTable->setHorizontalHeaderLabels(datafileheader);
     ui.dataFileTable->verticalHeader()->setVisible(false);
     ui.dataFileTable->horizontalHeader()->setVisible(true);
 
-    ui.dataFileTable->setColumnWidth(0, 200);
-    ui.dataFileTable->setColumnWidth(1, 90);
-    ui.dataFileTable->setColumnWidth(2, 90);
-    ui.dataFileTable->setColumnWidth(3, 200);
-
-    for (int i = 0; i <nDataFiles; i++)
+    if (!dataFileList.isEmpty())
     {
-        QTableWidgetItem *itemdata = new QTableWidgetItem(dataFileList.at(i));
-        itemdata->setFlags(itemdata->flags() & ~Qt::ItemIsEditable);
-        ui.dataFileTable->setItem(i,0, itemdata);
-        ui.dataFileTable->setItem(i,1, new QTableWidgetItem(dataFileTypeList.at(i)));
-        QTableWidgetItem *itemnorm = new QTableWidgetItem(normalisationList.at(i));
-        itemnorm->setFlags(itemnorm->flags() & ~Qt::ItemIsEditable);
-        ui.dataFileTable->setItem(i,2, itemnorm);
-        QTableWidgetItem *itemwts = new QTableWidgetItem(wtsFileList.at(i));
-        itemwts->setFlags(itemwts->flags() & ~Qt::ItemIsEditable);
-        ui.dataFileTable->setItem(i,3, itemwts);
+        ui.dataFileTable->setRowCount(dataFileList.count());
+        for (int i = 0; i < dataFileList.count(); i++)
+        {
+            QTableWidgetItem *itemdata = new QTableWidgetItem(dataFileList.at(i));
+            itemdata->setFlags(itemdata->flags() & ~Qt::ItemIsEditable);
+            ui.dataFileTable->setItem(i,0, itemdata);
+            ui.dataFileTable->setItem(i,1, new QTableWidgetItem(dataFileTypeList.at(i)));
+            QTableWidgetItem *itemnorm = new QTableWidgetItem(normalisationList.at(i));
+            itemnorm->setFlags(itemnorm->flags() & ~Qt::ItemIsEditable);
+            ui.dataFileTable->setItem(i,2, itemnorm);
+            QTableWidgetItem *itemwts = new QTableWidgetItem(wtsFileList.at(i));
+            itemwts->setFlags(itemwts->flags() & ~Qt::ItemIsEditable);
+            ui.dataFileTable->setItem(i,3, itemwts);
+        }
+        ui.dataFileTable->setColumnWidth(0, 200);
+        ui.dataFileTable->setColumnWidth(1, 90);
+        ui.dataFileTable->setColumnWidth(2, 90);
+        ui.dataFileTable->setColumnWidth(3, 200);
+
+        ui.dataFileTable->setSelectionBehavior(QAbstractItemView::SelectRows);
+        ui.dataFileTable->setSelectionMode(QAbstractItemView::SingleSelection);
+        ui.dataFileTable->setCurrentCell(dataFileList.count()-1,0);
     }
-    ui.dataFileTable->setSelectionBehavior(QAbstractItemView::SelectRows);
-    ui.dataFileTable->setSelectionMode(QAbstractItemView::SingleSelection);
-    ui.dataFileTable->setCurrentCell(nDataFiles-1,0);
 }
 
 void MainWindow::on_dataFileTable_itemSelectionChanged()

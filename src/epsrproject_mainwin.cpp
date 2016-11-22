@@ -679,7 +679,7 @@ void MainWindow::open()
         } while (!stream.atEnd());
         file.close();
 
-        // fill out wts table
+        // fill out datafile table
         ui.dataFileTable->setColumnCount(4);
         QStringList datafileheader;
         datafileheader << "Data File" << "Data File Type" << "Normalisation" << "Wts File";
@@ -712,10 +712,14 @@ void MainWindow::open()
             ui.dataFileTable->setSelectionMode(QAbstractItemView::SingleSelection);
             ui.dataFileTable->setCurrentCell(dataFileList.count()-1,0);
         }
+
+        // fill out wts column
         if (!wtsFileList.isEmpty())
         for (int i = 0; i < dataFileList.count(); i++)
         {
-            ui.dataFileTable->setItem(i,3, new QTableWidgetItem(wtsFileList.at(i)));
+            QTableWidgetItem *itemwts = new QTableWidgetItem(wtsFileList.at(i));
+            itemwts->setFlags(itemwts->flags() & ~Qt::ItemIsEditable);
+            ui.dataFileTable->setItem(i,3, itemwts);
         }
 
         //activate tabs
@@ -778,15 +782,15 @@ bool MainWindow::save()
     }
 
     //data and wts files
-    if (ui.dataFileTable->rowCount() != 0)
+    if (dataFileList.count() != 0)
     {
-        for (int i = 0; i < ui.dataFileTable->rowCount(); i++)
+        for (int i = 0; i < dataFileList.count(); i++)
         {
-            streamWrite << "data " << ui.dataFileTable->item(i,1)->text() << " " << ui.dataFileTable->item(i,0)->text() << " " << ui.dataFileTable->item(i,2)->text() << "\n";
+            streamWrite << "data " << dataFileTypeList.at(i) << " " << dataFileList.at(i) << " " << normalisationList.at(i) << "\n";
         }
         for (int i = 0; i < wtsFileList.count(); i++)
         {
-            streamWrite << "wts " << ui.dataFileTable->item(i,3)->text() << "\n";
+            streamWrite << "wts " << wtsFileList.at(i) << "\n";
         }
     }
 
