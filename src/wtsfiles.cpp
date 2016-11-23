@@ -502,9 +502,10 @@ void MainWindow::makeNwts()
         return;
     }
 
-    wtsFileList.replace(row, wtsBaseFileName_+".NWTS.wts");
+    wtsFileList.replace(row, wtsBaseFileName_+".NWTStot.wts");
     messageText_ += "\nfinished making wts file\n";
     messagesDialog.refreshMessages();
+    ui.messagesLineEdit->setText("finished making wts file");
     refreshDataFileTable();
 }
 
@@ -615,6 +616,7 @@ void MainWindow::makeXwts()
     wtsFileList.replace(row, wtsBaseFileName_+".XWTS.wts");
     messageText_ += "\nfinished making wts file\n";
     messagesDialog.refreshMessages();
+    ui.messagesLineEdit->setText("finished making wts file");
     refreshDataFileTable();
 }
 
@@ -669,6 +671,10 @@ void MainWindow::setSelectedDataFile()
     int row = ui.dataFileTable->currentRow();
     QString dataFileName = dataFileList.at(row);
     QString wtsFileName = wtsFileList.at(row);
+    if (wtsFileName.contains(" "))
+    {
+        wtsFileName = dataFileName;
+    }
     QFileInfo fileInfo(wtsFileName);
     QString justFileName = fileInfo.fileName();
     wtsBaseFileName_ = justFileName.split(".",QString::SkipEmptyParts).at(0);
