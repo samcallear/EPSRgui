@@ -2689,10 +2689,15 @@ void MainWindow::deleteBoxAtoFile()
             ui.numberDensityLineEdit->clear();
 
             //remove wts files and clear data and wts tables
-            ui.dataFileTable->clearContents();
+            ui.dataFileLineEdit->clear();
             dataFileList.clear();
             wtsFileList.clear();
+            dataFileTypeList.clear();
+            normalisationList.clear();
+            ui.dataFileTable->clearContents();
+            ui.dataFileTable->setRowCount(0);
             ui.atomWtsTable->clearContents();
+            ui.atomWtsTable->setRowCount(0);
             QDir dir(workingDir_);
             dir.setNameFilters(QStringList() << "*.NWTS.dat" << "*.XWTS.dat" << "*.wts");
             dir.setFilter(QDir::Files);
