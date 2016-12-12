@@ -3,7 +3,7 @@
 
 #define MyAppName "EPSRgui"
 #define MyAppVersion "0.1"
-#define MyAppPublisher "Tristan Youngs"
+#define MyAppPublisher "Sam Callear"
 #define MyAppURL "https://www.projectaten.com/"
 #define MyAppExeName "EPSRgui.exe"
 
@@ -16,7 +16,7 @@
 ; NOTE: The value of AppId uniquely identifies this application.
 ; Do not use the same AppId value in installers for other applications.
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
-AppId={{8DF93A4D-C712-41C4-B8EE-75484080B32F}
+AppId={{1A390F02-C24F-49EC-8D80-0444EFB8CB80}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
 ;AppVerName={#MyAppName} {#MyAppVersion}
@@ -40,11 +40,8 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "..\..\build\bin\Aten.exe"; DestDir: "{app}\bin"; Flags: ignoreversion
-Source: "..\..\data\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "..\..\build\data\plugins\*"; DestDir: "{app}\plugins"; Flags: ignoreversion
-Source: "..\..\build\lib\libaten.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
-Source: "Aten.ico"; DestDir: "{app}\bin"; Flags: ignoreversion
+Source: "..\..\release\EPSRgui.exe"; DestDir: "{app}\bin"; Flags: ignoreversion
+Source: "EPSRgui.ico"; DestDir: "{app}\bin"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 ; Source: "{#GnuWinDir}\bin\freetype6.dll"; DestDir: "{app}\bin"
 ; Source: "{#GnuWinDir}\bin\readline5.dll"; DestDir: "{app}\bin"
@@ -56,7 +53,7 @@ Source: "{#MinGWDir}\bin\libstdc++-6.dll"; DestDir: "{app}\bin"
 Source: "{#MinGWDir}\bin\libwinpthread-1.dll"; DestDir: "{app}\bin"
 Source: "{#QtDir}\bin\Qt5Gui.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
 Source: "{#QtDir}\bin\Qt5Core.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
-; Source: "{#QtDir}\bin\Qt5OpenGL.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
+Source: "{#QtDir}\bin\Qt5PrintSupport.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
 Source: "{#QtDir}\bin\Qt5Svg.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
 Source: "{#QtDir}\bin\Qt5Widgets.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
 ; Source: "{#QtDir}\bin\libEGL.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
