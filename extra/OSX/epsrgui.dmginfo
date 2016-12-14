@@ -12,16 +12,16 @@ APP_NAME=EPSRgui
 APP_VERSION="0.1"
 
 # -- APP_BIN : List of binaries (space-separated, with paths) to include in the bundle
-APP_BIN="bin/EPSRgui.app/Contents/MacOS/EPSRgui"
+APP_BIN="EPSRgui.app/Contents/MacOS/EPSRgui"
 
 # -- APP_PLIST : Specify the Info.plist file to use in the bundle
-APP_PLIST="bin/EPSRgui.app/Contents/Info.plist"
+APP_PLIST="EPSRgui.app/Contents/Info.plist"
 
 # -- APP_ICON : A 1024x1024 png file from which to create an icon set
-APP_ICON="../extra/aten1024.png"
+APP_ICON="extra/epsrgui1024.png"
 
 # -- APP_LICENSE : License information file to put in the bundle
-APP_LICENSE="../COPYING"
+APP_LICENSE="COPYING"
 
 # -- APP_EXTRA : Directory containing additional files to contain in bundle (or NONE)
 APP_EXTRA="NONE"
