@@ -255,7 +255,7 @@ bool MainWindow::readNwtsSetup()
     int selectedRow = ui.dataFileTable->currentRow();
     if (selectedRow != -1)
     {
-        normalisationList.at(selectedRow) == normdataTypeStr;
+        normalisationList.replace(selectedRow, normdataTypeStr);
     }
 
     return true;
