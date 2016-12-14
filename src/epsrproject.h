@@ -8,6 +8,7 @@
 #include "datafilesettings.h"
 #include "array.h"
 #include "messagesdialog.h"
+#include "notesdialog.h"
 
 class CreateNewDialog;
 class PlotDialog;
@@ -20,6 +21,7 @@ class AddAtoDialog;
 class ImportDialog;
 class PlotBoxDialog;
 class SetupOutputDialog;
+class NotesDialog;
 
 class MainWindow : public QMainWindow
 {
@@ -55,6 +57,7 @@ private slots:
     void deleteEPSRinpFile();
     void deleteBoxAtoFile();
     void showMessages();
+    void showNotes();
     void openEPSRmanual();
     void openEPSRguiManual();
     void outputfromEPSRprocessReady();

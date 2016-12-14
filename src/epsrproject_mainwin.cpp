@@ -12,6 +12,7 @@
 #include "importdialog.h"
 #include "plotboxdialog.h"
 #include "setupoutputdialog.h"
+#include "notesdialog.h"
 
 #include <QtGui>
 #include <QMainWindow>
@@ -151,6 +152,9 @@ void MainWindow::createActions()
 
     ui.showMessagesAct->setStatusTip(tr("Show messages from EPSR"));
     connect(ui.showMessagesAct, SIGNAL(triggered()), this, SLOT(showMessages()));
+
+    ui.notesAct->setStatusTip(tr("Write or view project notes"));
+    connect(ui.notesAct, SIGNAL(triggered()), this, SLOT(showNotes()));
 
     ui.epsrManualAct->setStatusTip(tr("Open EPSR manual"));
     connect(ui.epsrManualAct, SIGNAL(triggered()), this, SLOT(openEPSRmanual()));
@@ -323,10 +327,9 @@ void MainWindow::createNew()
         ui.tabWidget->setEnabled(true);
 
         //activate menu options
-//        ui.saveAct->setEnabled(true);
         ui.saveAsAct->setEnabled(true);
-//        ui.saveCopyAct->setEnabled(true);
         ui.epsrManualAct->setEnabled(true);
+        ui.notesAct->setEnabled(true);
 
         //activate buttons (in case disabled from previous project)
         ui.createMolFileButton->setEnabled(true);
@@ -363,6 +366,9 @@ void MainWindow::createNew()
         this->setWindowTitle("EPSRgui: "+projectName_);
         messagesDialog.refreshMessages();
         ui.messagesLineEdit->setText("New project "+projectName_+" created");
+
+        //close any dialog windows open *******************************************************************************************************TO DO
+
     }
 }
 
@@ -371,7 +377,6 @@ void MainWindow::reset()
     //clear tables and key names
     projectName_.clear();
     workingDir_.clear();
-//    epsrBinDir_.clear();
 
     ui.molFileList->clear();
     ui.molChargeLabel->clear();
@@ -488,9 +493,7 @@ void MainWindow::reset()
     ui.plot2->replot();
 
     //disable menu actions
-//    ui.saveAct->setEnabled(false);
     ui.saveAsAct->setEnabled(false);
-//    ui.saveCopyAct->setEnabled(false);
     ui.checkAct->setEnabled(false);
     ui.runAct->setEnabled(false);
     ui.stopAct->setEnabled(false);
@@ -522,6 +525,8 @@ void MainWindow::open()
 
     if (!newFileName.isEmpty())
     {
+        ui.messagesLineEdit->setText("Please wait: opening project "+projectName_);
+
         //clear all tables
         reset();
 
@@ -728,6 +733,7 @@ void MainWindow::open()
         //activate menu options
         ui.saveAsAct->setEnabled(true);
         ui.epsrManualAct->setEnabled(true);
+        ui.notesAct->setEnabled(true);
 
         //change window title to contain projectName
         this->setWindowTitle("EPSRgui: "+projectName_);
@@ -801,17 +807,8 @@ bool MainWindow::save()
         streamWrite << "EPSRinp " << atoBaseFileName << "\n";
     }
 
-//    //Additional options
-//    if (ui.dlputilsOutCheckBox->isChecked())
-//    {
-//        streamWrite << "dlputils" << "\n";
-//    }
-
     file.close();
 
-//    messageText_ += "Current EPSR project settings saved to "+projectName_+".EPSR.pro\n";
-//    messagesDialog.refreshMessages();
-//    ui.messagesLineEdit->setText("Saved current EPSR project");
     return false;
 
     if (!epsrInpFileName_.isEmpty())
@@ -841,6 +838,9 @@ bool MainWindow::saveAs()
         QString workingDirCopy = (epsrDirCopy+"/"+projectNameCopy+"/");
         workingDirCopy = QDir::toNativeSeparators(workingDirCopy);
         QDir workingDir(workingDir_);
+
+        ui.messagesLineEdit->setText("Please wait: saving to project "+projectNameCopy);
+        ui.tabWidget->setDisabled(true);
 
         //make new directory and make a list of everything in the current directory
         QDir().mkdir(workingDirCopy);
@@ -1088,6 +1088,7 @@ bool MainWindow::saveAs()
 
         //change window title to contain projectName
         this->setWindowTitle("EPSRgui: "+projectName_);
+        ui.tabWidget->setDisabled(false);
 
         messagesDialog.refreshMessages();
         ui.messagesLineEdit->setText("EPSR project saved to "+workingDirCopy);
@@ -1372,6 +1373,9 @@ void MainWindow::import()
         projectName_ = importDialog.getProjectName();
         workingDir_ = (epsrDir_+projectName_+"/");
         workingDir_ = QDir::toNativeSeparators(workingDir_);
+
+        ui.messagesLineEdit->setText("Please wait: importing project "+projectName_);
+        ui.tabWidget->setDisabled(true);
 
         messageText_ += "\n***************************************************************************\n";
         messageText_ += "Imported existing simulation "+projectName_+" into EPSRgui\n";
@@ -1775,6 +1779,7 @@ void MainWindow::import()
 
         save();
 
+        ui.tabWidget->setDisabled(false);
         messagesDialog.refreshMessages();
         ui.messagesLineEdit->setText("New project "+projectName_+" imported");
     }
@@ -2174,6 +2179,8 @@ void MainWindow::plot()
 {
     PlotDialog plotDialog(this);
 
+    plotDialog.setWindowTitle("EPSRgui plotting: "+projectName_);
+
     plotDialog.show();
     plotDialog.raise();
     plotDialog.activateWindow();
@@ -2459,6 +2466,7 @@ void MainWindow::settings()
 {
     SettingsDialog settingsDialog(this);
 
+    settingsDialog.setModal(true);
     settingsDialog.show();
     settingsDialog.raise();
     settingsDialog.activateWindow();
@@ -2578,6 +2586,9 @@ void MainWindow::deleteEPSRinpFile()
         }
         else
         {
+            ui.messagesLineEdit->setText("Please wait: deleting EPSR inp file");
+            ui.tabWidget->setDisabled(true);
+
             QDir dir(workingDir_);
 #ifdef _WIN32
             dir.setNameFilters(QStringList() << "*.EPSR.*" << "run*.bat");
@@ -2600,14 +2611,6 @@ void MainWindow::deleteEPSRinpFile()
             ui.minDistanceTable->clearContents();
             ui.minDistanceTable->setRowCount(0);
             epsrInpFileName_.clear();
-//            ui.dataFileTable->clearContents();
-//            ui.dataFileTable->setRowCount(0);
-//            ui.atomWtsTable->clearContents();
-//            ui.atomWtsTable->setRowCount(0);
-//            dataFileList.clear();
-//            dataFileTypeList.clear();
-//            wtsFileList.clear();
-//            normalisationList.clear();
             ui.runOutEPSRList->clear();
             ui.dlputilsOutCheckBox->setChecked(false);
 
@@ -2628,7 +2631,6 @@ void MainWindow::deleteEPSRinpFile()
             ui.plotEPSRshellAct->setEnabled(false);
             ui.dataFileBrowseButton->setEnabled(true);
             ui.removeDataFileButton->setEnabled(true);
-//            ui.setupEPSRButton->setEnabled(false);
             ui.updateInpPcofFilesButton->setEnabled(false);
             ui.reloadEPSRinpButton->setEnabled(false);
             ui.setupOutButton->setEnabled(false);
@@ -2641,6 +2643,7 @@ void MainWindow::deleteEPSRinpFile()
             ui.messagesLineEdit->setText("EPSR .inp file deleted");
 
             save();
+            ui.tabWidget->setDisabled(false);
         }
     }
     return;
@@ -2659,6 +2662,9 @@ void MainWindow::deleteBoxAtoFile()
         }
         else
         {
+            ui.messagesLineEdit->setText("Please wait: deleting box, wts and inp files");
+            ui.tabWidget->setDisabled(true);
+
             //remove box ato file, clear name and re-initialise ato tab
             file.remove();
             atoFileName_.clear();
@@ -2790,6 +2796,7 @@ void MainWindow::deleteBoxAtoFile()
 
             save();
 
+            ui.tabWidget->setDisabled(false);
             messageText_ += "box .ato file deleted\n";
             messagesDialog.refreshMessages();
             ui.messagesLineEdit->setText("box .ato file deleted");
@@ -2804,6 +2811,16 @@ void MainWindow::showMessages()
     messagesDialog.raise();
     messagesDialog.activateWindow();
     messagesDialog.exec();
+}
+
+void MainWindow::showNotes()
+{
+    NotesDialog notesDialog(this);
+
+    notesDialog.show();
+    notesDialog.raise();
+    notesDialog.activateWindow();
+    notesDialog.exec();
 }
 
 void MainWindow::outputfromEPSRprocessReady()

@@ -92,7 +92,7 @@
                     </sizepolicy>
                    </property>
                    <property name="text">
-                    <string>Create new .mol file</string>
+                    <string>Create new</string>
                    </property>
                   </widget>
                  </item>
@@ -105,7 +105,7 @@
                     </sizepolicy>
                    </property>
                    <property name="text">
-                    <string>Load existing .mol file</string>
+                    <string>Load existing</string>
                    </property>
                   </widget>
                  </item>
@@ -192,7 +192,7 @@
                  <item>
                   <widget class="QPushButton" name="makeMolExtButton">
                    <property name="text">
-                    <string>Make .mol in preferred visualiser</string>
+                    <string>Make component externally</string>
                    </property>
                   </widget>
                  </item>
@@ -1188,7 +1188,7 @@
           </widget>
           <widget class="QWidget" name="buildBoxTab">
            <attribute name="title">
-            <string>Simulation box</string>
+            <string>Simulation Box</string>
            </attribute>
            <layout class="QHBoxLayout" name="horizontalLayout_18">
             <item>
@@ -2170,7 +2170,7 @@
           </widget>
           <widget class="QWidget" name="setupWtsTab">
            <attribute name="title">
-            <string>Weights files</string>
+            <string>Data and Weights</string>
            </attribute>
            <layout class="QVBoxLayout" name="verticalLayout_12">
             <item>
@@ -2372,7 +2372,7 @@
           </widget>
           <widget class="QWidget" name="setupEPSRTab">
            <attribute name="title">
-            <string>EPSR input file</string>
+            <string>EPSR Input File</string>
            </attribute>
            <layout class="QVBoxLayout" name="verticalLayout_13">
             <item>
@@ -3134,6 +3134,7 @@
     </property>
     <addaction name="settingsAct"/>
     <addaction name="showMessagesAct"/>
+    <addaction name="notesAct"/>
    </widget>
    <widget class="QMenu" name="helpMenu">
     <property name="title">
@@ -3283,7 +3284,7 @@
   </action>
   <action name="showMessagesAct">
    <property name="text">
-    <string>Show messages</string>
+    <string>EPSR messages</string>
    </property>
   </action>
   <action name="epsrManualAct">
@@ -3368,7 +3369,18 @@
     <string>Import...</string>
    </property>
    <property name="toolTip">
-    <string>Import an exisiting simulation</string>
+    <string>Import an existing simulation</string>
+   </property>
+  </action>
+  <action name="notesAct">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Project notes</string>
+   </property>
+   <property name="toolTip">
+    <string>Write or view project notes</string>
    </property>
   </action>
  </widget>
