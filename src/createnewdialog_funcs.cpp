@@ -32,9 +32,31 @@ void CreateNewDialog::on_okButton_clicked(bool checked)
 
 void CreateNewDialog::checkProjectName()
 {
+    if (ui.lineEditEPSRname->text().isEmpty())
+    {
+        QMessageBox::warning(this, tr("Error creating new EPSR project"),
+                             tr("The project name is missing"));
+        return;
+    }
+
+    if (ui.lineEditEPSRdir->text().isEmpty())
+    {
+        QMessageBox::warning(this, tr("Error creating new EPSR project"),
+                             tr("The project directory is missing"));
+        return;
+    }
+
     projectName_ = ui.lineEditEPSRname->text();
     workingDir_ = ui.lineEditEPSRdir->text()+"/";
     workingDir_ = QDir::toNativeSeparators(workingDir_);
+
+    if (!QDir(workingDir_).exists())
+    {
+        QMessageBox::warning(this, tr("Error creating new EPSR project"),
+                             tr("The directory where the new project will be created does not exist"));
+        return;
+    }
+
     QString newDir = workingDir_+projectName_;
     newDir = QDir::toNativeSeparators(newDir);
 

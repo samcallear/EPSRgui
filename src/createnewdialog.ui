@@ -82,6 +82,13 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>okButton</tabstop>
+  <tabstop>cancelButton</tabstop>
+  <tabstop>lineEditEPSRdir</tabstop>
+  <tabstop>newBrowseButton</tabstop>
+  <tabstop>lineEditEPSRname</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
