@@ -193,7 +193,6 @@ void MainWindow::setupOutput()
 
     showAvailableFiles();
     ui.messagesLineEdit->setText("EPSR output file edited");
-//    outputTimerId_ = startTimer(2000);
 }
 
 void MainWindow::on_addOutputButton_clicked(bool checked)

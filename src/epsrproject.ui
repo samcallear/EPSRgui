@@ -3116,7 +3116,7 @@
       <bool>false</bool>
      </property>
      <property name="title">
-      <string>Plot outputs</string>
+      <string>Density plots</string>
      </property>
      <addaction name="plot3djmolAct"/>
      <addaction name="splot2dAct"/>
@@ -3160,12 +3160,12 @@
   </widget>
   <action name="openAct">
    <property name="text">
-    <string>Open...</string>
+    <string>Open</string>
    </property>
   </action>
   <action name="newAct">
    <property name="text">
-    <string>Create new project...</string>
+    <string>Create new project</string>
    </property>
   </action>
   <action name="saveCopyAct">
@@ -3210,7 +3210,7 @@
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>Run check</string>
+    <string>Run EPSR once</string>
    </property>
   </action>
   <action name="runAct">
@@ -3239,7 +3239,7 @@
   </action>
   <action name="settingsAct">
    <property name="text">
-    <string>EPSRgui settings...</string>
+    <string>EPSRgui settings</string>
    </property>
   </action>
   <action name="saveAct">
@@ -3255,7 +3255,7 @@
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>Delete EPSR.inp file</string>
+    <string>Delete EPSR input file</string>
    </property>
   </action>
   <action name="deleteBoxAtoFileAct">
@@ -3263,7 +3263,7 @@
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>Delete box .ato file</string>
+    <string>Delete simulation box</string>
    </property>
   </action>
   <action name="plotEPSRshellAct">
@@ -3279,7 +3279,7 @@
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>Save as...</string>
+    <string>Save as</string>
    </property>
   </action>
   <action name="showMessagesAct">
@@ -3366,7 +3366,7 @@
   </action>
   <action name="importAct">
    <property name="text">
-    <string>Import...</string>
+    <string>Import</string>
    </property>
    <property name="toolTip">
     <string>Import an existing simulation</string>

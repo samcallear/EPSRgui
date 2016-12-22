@@ -46,7 +46,7 @@
      <item>
       <widget class="QLabel" name="label">
        <property name="text">
-        <string>Preferred directory for projects</string>
+        <string>Default project directory</string>
        </property>
       </widget>
      </item>
@@ -67,7 +67,7 @@
      <item>
       <widget class="QLabel" name="label_2">
        <property name="text">
-        <string>Preferred visualiser .exe</string>
+        <string>Alternative visualiser</string>
        </property>
       </widget>
      </item>
