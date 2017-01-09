@@ -293,6 +293,7 @@ bool MakeLatticeDialog::saveToUnitFile()
     }
 
     QTextStream streamWrite(&file);
+    file.resize(0);
 
     QString coordType;
     if (ui.fracRadioButton->isChecked() == true)
@@ -310,12 +311,13 @@ bool MakeLatticeDialog::saveToUnitFile()
     {
         streamWrite << ui.coordTable->item(i,0)->text() << " " << ui.coordTable->item(i,1)->text() << " " << ui.coordTable->item(i,2)->text() << " " << ui.coordTable->item(i,3)->text() << "\n";
     }
-    for (int i = 0; i < 2; i++)
+    for (int i = 0; i < ui.coordTable->rowCount(); i++)
     {
         streamWrite << ui.paramTable->item(i,0)->text() << " " << ui.paramTable->item(i,1)->text() << " " << ui.paramTable->item(i,2)->text() << "\n"
                     << ui.paramTable->item(i,3)->text() << " " << ui.paramTable->item(i,4)->text() << " " << ui.paramTable->item(i,5)->text() << " " << ui.paramTable->item(i,6)->text() << " " << ui.paramTable->item(i,7)->text() << "\n";
     }
     streamWrite << ui.ecoreLineEdit->text() << " " << ui.dcoreLineEdit->text() << "\n";
+
     file.close();
     unitFileName_= workingDir_+unitFileName+".unit";
 }

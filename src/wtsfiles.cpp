@@ -229,7 +229,7 @@ bool MainWindow::readNwtsSetup()
     ui.atomWtsTable->setColumnCount(6);
     ui.atomWtsTable->setRowCount(N_components);
     QStringList wtsheader;
-    wtsheader << "Atom Label" << "Exchangeable?" << "Isotope" << "Abundance" << "Isotope" << "Abundance";
+    wtsheader << "Atom Type" << "Exchangeable?" << "Isotope" << "Abundance" << "Isotope" << "Abundance";
     ui.atomWtsTable->setHorizontalHeaderLabels(wtsheader);
     ui.atomWtsTable->verticalHeader()->setVisible(false);
     ui.atomWtsTable->horizontalHeader()->setVisible(true);
@@ -355,12 +355,10 @@ void MainWindow::on_makeWtsButton_clicked(bool checked)
     if (QFile::exists(workingDir_+wtsBaseFileName_+".NWTS.dat"))
     {
         makeNwts();
-//        ui.messagesLineEdit->setText("NWTS wts file created");
     }
     if (QFile::exists(workingDir_+wtsBaseFileName_+".XWTS.dat"))
     {
         makeXwts();
-//        ui.messagesLineEdit->setText("XWTS wts file created");
     }
 
     //save .pro file
@@ -622,10 +620,12 @@ void MainWindow::makeXwts()
 
 void MainWindow::refreshDataFileTable()
 {
+    int row = ui.dataFileTable->currentRow();
+    int nRows = ui.dataFileTable->rowCount();
     ui.dataFileTable->clearContents();
     ui.dataFileTable->setColumnCount(4);
     QStringList datafileheader;
-    datafileheader << "Data File" << "Data File Type" << "Normalisation" << "Wts File";
+    datafileheader << "Data File" << "Data File Type" << "Normalisation" << "Weights File";
     ui.dataFileTable->setHorizontalHeaderLabels(datafileheader);
     ui.dataFileTable->verticalHeader()->setVisible(false);
     ui.dataFileTable->horizontalHeader()->setVisible(true);
@@ -653,7 +653,14 @@ void MainWindow::refreshDataFileTable()
 
         ui.dataFileTable->setSelectionBehavior(QAbstractItemView::SelectRows);
         ui.dataFileTable->setSelectionMode(QAbstractItemView::SingleSelection);
-        ui.dataFileTable->setCurrentCell(dataFileList.count()-1,0);
+        if (dataFileList.count() == nRows)
+        {
+            ui.dataFileTable->setCurrentCell(row,0);
+        }
+        else
+        {
+            ui.dataFileTable->setCurrentCell(dataFileList.count()-1,0);
+        }
     }
 }
 

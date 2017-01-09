@@ -911,8 +911,6 @@ bool MainWindow::readMolFile()
     QStringList masses;
     QStringList charges;
     QStringList ljTypes;
-//    QString ecorestr;
-//    QString dcorestr;
     atomLabels.clear();
     atomTypes.clear();
     bondAtoms.clear();
@@ -1435,6 +1433,7 @@ bool MainWindow::updateMolFile()
     }
 
     QRegExp rxnumbers("\\d*");
+    QRegExp rxatomTypes("[A-Z][A-Za-z0-9]?[A-Za-z0-9]?");
 
     //check there are no empty cells and that the atom types are the same in the atom types table and LJ table - this doesn't work if the atom labels are the same as the element labels******************************************************************************************
     if (ui.molAtomTable->rowCount() > 0)
@@ -1454,6 +1453,13 @@ bool MainWindow::updateMolFile()
             {
                 QMessageBox msgBox;
                 msgBox.setText("One of the parameters defining the Lennard Jones potential or element type is missing");
+                msgBox.exec();
+                return false;
+            }
+            if (!rxatomTypes.exactMatch(ui.molLJTable->item(i,0)->text()))
+            {
+                QMessageBox msgBox;
+                msgBox.setText("At least one of the atom Type names is not compatible with EPSR.\nAtom Type names must be a maximum of 3 characters long, the first charcter is a capital letter and the remaining 2 optional characters are letters and/or numbers.");
                 msgBox.exec();
                 return false;
             }
