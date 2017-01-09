@@ -687,7 +687,7 @@ void MainWindow::open()
         // fill out datafile table
         ui.dataFileTable->setColumnCount(4);
         QStringList datafileheader;
-        datafileheader << "Data File" << "Data File Type" << "Normalisation" << "Wts File";
+        datafileheader << "Data File" << "Data File Type" << "Normalisation" << "Weights File";
         ui.dataFileTable->setHorizontalHeaderLabels(datafileheader);
         ui.dataFileTable->verticalHeader()->setVisible(false);
         ui.dataFileTable->horizontalHeader()->setVisible(true);
@@ -1476,7 +1476,10 @@ void MainWindow::import()
         QDir::setCurrent(workingDir_);
 
         QStringList firstAtomTypes;
+        firstAtomTypes.clear();
         QList<int> numberFirstAtomTypes;
+        numberFirstAtomTypes.clear();
+
         //fill out components tables
         if (molFileList.count() != 0)
         {
@@ -1589,7 +1592,7 @@ void MainWindow::import()
         // fill out wts table
         ui.dataFileTable->setColumnCount(4);
         QStringList datafileheader;
-        datafileheader << "Data File" << "Data File Type" << "Normalisation" << "Wts File";
+        datafileheader << "Data File" << "Data File Type" << "Normalisation" << "Weights File";
         ui.dataFileTable->setHorizontalHeaderLabels(datafileheader);
         ui.dataFileTable->verticalHeader()->setVisible(false);
         ui.dataFileTable->horizontalHeader()->setVisible(true);

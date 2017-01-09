@@ -30,7 +30,8 @@ FORMS += src/addatodialog.ui \
          src/importdialog.ui \
          src/plotboxdialog.ui \
          src/setupoutputdialog.ui \
-    src/notesdialog.ui
+    src/notesdialog.ui \
+    src/removecomponentdialog.ui
 HEADERS += src/addatodialog.h \
            src/array.h \
            src/boxcompositiondialog.h \
@@ -49,7 +50,8 @@ HEADERS += src/addatodialog.h \
            src/importdialog.h \
            src/plotboxdialog.h \
            src/setupoutputdialog.h \
-    src/notesdialog.h
+    src/notesdialog.h \
+    src/removecomponentdialog.h
 SOURCES += src/addatodialog_funcs.cpp \
            src/boxatofile.cpp \
            src/boxcompositiondialog_funcs.cpp \
@@ -74,5 +76,6 @@ SOURCES += src/addatodialog_funcs.cpp \
            src/importdialog_funcs.cpp \
            src/plotboxdialog_funcs.cpp \
            src/setupoutputdialog_funcs.cpp \
-    src/notesdialog_funcs.cpp
+    src/notesdialog_funcs.cpp \
+    src/removecomponentdialog_funcs.cpp
 RESOURCES += src/EPSRproject.qrc

@@ -11,6 +11,7 @@
 #include "moloptionsdialog.h"
 #include "boxcompositiondialog.h"
 #include "addatodialog.h"
+#include "removecomponentdialog.h"
 
 void MainWindow::on_mixatoButton_clicked(bool checked)
 {
@@ -341,6 +342,9 @@ bool MainWindow::readAtoFileBoxDetails()
     QString line;
     QStringList dataLine;
     dataLine.clear();
+    atoHeaderLines = 0;
+    QStringList fullFirstAtomsList;
+    fullFirstAtomsList.clear();
 
     line = stream.readLine();
     dataLine = line.split(" ", QString::SkipEmptyParts);
@@ -362,6 +366,7 @@ bool MainWindow::readAtoFileBoxDetails()
         boxVolstr.sprintf("%.2f", boxVol);
         ui.boxAtoVol->setText(boxVolstr);
         ui.temperatureLineEdit->setText(dataLine.at(2));
+        atoHeaderLines = 2;
     }
     else
     {
@@ -410,6 +415,7 @@ bool MainWindow::readAtoFileBoxDetails()
         QString boxVolstr;
         boxVolstr.sprintf("%.2f", boxVol);
         ui.boxAtoVol->setText(boxVolstr);
+        atoHeaderLines = 4;
     }
 
     line = stream.readLine();
@@ -423,24 +429,30 @@ bool MainWindow::readAtoFileBoxDetails()
     ui.angtempLineEdit->setText(dataLine.at(6));
     ui.dihtempLineEdit->setText(dataLine.at(7));
 
-    QStringList tetherMolAtoms;
+    //QStringList tetherMolAtoms;
     QStringList tetherAtoms;
     QStringList tetherList;
-    tetherMolAtoms.clear();
+    firstAtomList.clear();
     tetherAtoms.clear();
     tetherList.clear();
     int atomctr = 0;
     numberAtomLabels.clear();
     numberAtomLabels.resize(atoAtomLabels.count());
+    QList<int> fullnLinesPerComponentList;
+    fullnLinesPerComponentList.clear();
+    int lineCtr = 0;
     QRegExp atomLabelrx(" ([A-Z][A-Za-z0-9 ]{2})   ([0-9 ]{1,4})      0");
     QRegExp ecoredcorerx("  ([0-9]{1}[.]{1}[0-9]{5}[E+]{2}[0-9]{2})  ([0-9]{1}[.]{1}[0-9]{5}[E+]{2}[0-9]{2})");
     do {
         line = stream.readLine();
         dataLine = line.split(" ",QString::SkipEmptyParts);
+        lineCtr++;
         if (dataLine.count() > 9)
         {
             if (line.contains("T") == true || line.contains("F") == true)
             {
+                fullnLinesPerComponentList.append(lineCtr);
+                lineCtr = 1;
                 if (line.contains("T") == true)
                 {
                     tetherList.append("T");     //append to list that this is tethered
@@ -459,19 +471,21 @@ bool MainWindow::readAtoFileBoxDetails()
 
                 line = stream.readLine();   //move to next line to check what the first atom of the molecule is
                 dataLine = line.split(" ",QString::SkipEmptyParts);
+               // lineCtr++;
+                fullFirstAtomsList.append(dataLine.at(0).trimmed());    //get a list of every first atom in the box
                 QString tetherMol = dataLine.at(0);
-                if (tetherMolAtoms.contains(tetherMol) == true) //check if atom is already listed
+                if (firstAtomList.contains(tetherMol) == true) //check if atom is already listed
                 {
                     tetherList.removeLast();    //if it is, remove T/F and 0000X entries in lists
                     tetherAtoms.removeLast();
                 }
                 else
                 {
-                    tetherMolAtoms.append(tetherMol);   //if not, add to list
+                    firstAtomList.append(tetherMol);   //if not, add to list
                 }
             }
         }
-
+        //get number of each atom Type in box
         if (atomLabelrx.exactMatch(line))
         {
             atomctr++;
@@ -493,14 +507,48 @@ bool MainWindow::readAtoFileBoxDetails()
         }
     } while (!line.isNull());
     file.close();
+
+    //get number of each component as listed in the box .ato file
+    nInBox.clear();
+    nInBox.resize(firstAtomList.count());
+    for (int i = 0; i < fullFirstAtomsList.count(); i++)
+    {
+        for (int j = 0; j < firstAtomList.count(); j++)
+        {
+            if (fullFirstAtomsList.at(i) == firstAtomList.at(j))
+            {
+                nInBox.operator [](j)++;
+            }
+        }
+    }
+
+    //get numerical position of each component in box
+    firstInstance.clear();
+    lastInstance.clear();
+    firstInstance.append(1);
+    lastInstance.append(nInBox.at(0));
+    for (int i = 1; i < ui.molFileList->count(); i++) //write atoFileList and then change this to atoFileList******************************************
+    {
+        firstInstance.append(lastInstance.at(i-1)+1);
+        lastInstance.append(firstInstance.at(i)+nInBox.at(i)-1);
+    }
+
+    //get number of lines for each component
+    nLinesPerComponentList.clear();
+    fullnLinesPerComponentList.removeAt(0);
+    for (int i = 0; i < ui.molFileList->count(); i++) //write atoFileList and then change this to atoFileList******************************************
+    {
+        nLinesPerComponentList.append(fullnLinesPerComponentList.at(firstInstance.at(i)));
+    }
+
     QString numberAtom = QString::number(atomctr);
     ui.boxAtoMols->setText(numberMol);
     ui.boxAtoAtoms->setText(numberAtom);
 
-    ui.atoTetherTable->setRowCount(tetherMolAtoms.count());
-    for (int i = 0; i < tetherMolAtoms.count(); i++)
+    ui.atoTetherTable->setRowCount(firstAtomList.count());
+    for (int i = 0; i < firstAtomList.count(); i++)
     {
-        ui.atoTetherTable->setItem(i,0, new QTableWidgetItem(tetherMolAtoms.at(i)));
+        ui.atoTetherTable->setItem(i,0, new QTableWidgetItem(firstAtomList.at(i)));
         ui.atoTetherTable->setItem(i,1, new QTableWidgetItem(tetherList.at(i)));
         ui.atoTetherTable->setItem(i,2, new QTableWidgetItem(tetherAtoms.at(i)));
     }
@@ -642,13 +690,13 @@ void MainWindow::on_updateAtoFileButton_clicked(bool checked)
     QString ecorestr;
     QString dcorestr;
     QString tetherTolstr;
-    QStringList tetherMolAtoms;
+    //QStringList tetherMolAtoms;
     QStringList tetherAtoms;
     QStringList tetherList;
 
     for (int i = 0; i < ui.atoTetherTable->rowCount(); i++)
     {
-        tetherMolAtoms.append(ui.atoTetherTable->item(i,0)->text());
+        //tetherMolAtoms.append(ui.atoTetherTable->item(i,0)->text());
         tetherList.append(ui.atoTetherTable->item(i,1)->text());
         int tetherAtom = ui.atoTetherTable->item(i,2)->text().toInt();
         tetherAtoms.append(QString("%1").arg(tetherAtom, 5, 10, QChar('0')));
@@ -722,18 +770,43 @@ void MainWindow::on_updateAtoFileButton_clicked(bool checked)
     {
         line = streamRead.readLine();
         dataLine = line.split(" ",QString::SkipEmptyParts);
-        //if a tether line, change tethering in accordance with the atoTetherTable (so first atom matches too) **********************TO DO ***************************
+        //if a tether line, change tethering in accordance with the atoTetherTable
         if (dataLine.count() > 9)
         {
-            if (ui.atoTetherTable->item(0,1)->text() == "T" && line.contains("F") == true)
+            QString tetherline = line;
+            QString tetherLetter = dataLine.at(7);
+            line = streamRead.readLine();
+            dataLine = line.split(" ", QString::SkipEmptyParts);
+            for (int i = 0; i < firstAtomList.count(); i++)
             {
-                line = line.replace(91, 6, "T"+tetherAtoms.at(0));
+                if (dataLine.at(0) == firstAtomList.at(i))
+                {
+                    if (tetherList.at(i) == "T" && tetherLetter == "F")
+                    {
+                        tetherline = tetherline.replace(91, 6, "T"+tetherAtoms.at(0));
+                    }
+                    else
+                    if (tetherList.at(i) == "F" && tetherLetter.contains("T0") == true)
+                    {
+                        tetherline = tetherline.replace(91, 6, "F     ");
+                    }
+                }
             }
-            if (ui.atoTetherTable->item(0,1)->text() == "F" && line.contains("T0") == true)
-            {
-                line = line.replace(91, 6, "F     ");
-            }
+            original.append(tetherline+"\n"+line+"\n");
         }
+
+//        //if a tether line, change tethering in accordance with the atoTetherTable (so first atom matches too) **********************TO DO ***************************
+//        if (dataLine.count() > 9)
+//        {
+//            if (ui.atoTetherTable->item(0,1)->text() == "T" && line.contains("F") == true)
+//            {
+//                line = line.replace(91, 6, "T"+tetherAtoms.at(0));
+//            }
+//            if (ui.atoTetherTable->item(0,1)->text() == "F" && line.contains("T0") == true)
+//            {
+//                line = line.replace(91, 6, "F     ");
+//            }
+//        }
         else
         if (dataLine.count() == 2)
         {
@@ -741,9 +814,12 @@ void MainWindow::on_updateAtoFileButton_clicked(bool checked)
             {
                 line = line.replace(0, 27, "  "+ecorestr.setNum(ecore,'E',5)+"  "+dcorestr.setNum(dcore,'E',5));
             }
-
+            original.append(line+"\n");
         }
-        original.append(line+"\n");
+        else
+        {
+            original.append(line+"\n");
+        }
     }
     fileWrite.resize(0);
     streamWrite << original;
@@ -872,4 +948,193 @@ void MainWindow::on_tetherButton_clicked(bool checked)
     {
         ui.tetherGrpBox->setVisible(true);
     }
+}
+
+void MainWindow::on_reloadBoxButton_clicked(bool checked)
+{
+    readAtoFileBoxDetails();
+}
+
+void MainWindow::on_removeComponentButton_clicked(bool checked)
+{
+    if (ui.atoFileTable->rowCount() == 0)
+    {
+        return;
+    }
+
+    RemoveComponentDialog removeComponentDialog(this);
+
+    removeComponentDialog.setModal(true);
+    removeComponentDialog.show();
+    removeComponentDialog.raise();
+    removeComponentDialog.activateWindow();
+
+    componentremoveDialog = removeComponentDialog.exec();
+
+    if (componentremoveDialog == RemoveComponentDialog::Accepted)
+    {
+        //get component row
+        int componentToRemove = removeComponentDialog.returnComponent();  //row is row in atoFileList
+
+        //get range of lines to remove
+        QList<int> totlinesPerComponentList;
+        totlinesPerComponentList.clear();
+        for (int i = 0; i < ui.molFileList->count(); i++) //write atoFileList and then change this to atoFileList******************************************
+        {
+            totlinesPerComponentList.append(nLinesPerComponentList.at(i)*nInBox.at(i));
+        }
+
+        int firstLineToRemove = atoHeaderLines;
+        for (int i = 0; i < componentToRemove; i++)
+        {
+            firstLineToRemove = firstLineToRemove+totlinesPerComponentList.at(i);
+        }
+        int lastLineToRemove = atoHeaderLines;
+        for (int i = 0; i < componentToRemove+1; i++) //write atoFileList and then change this to atoFileList******************************************
+        {
+            lastLineToRemove = lastLineToRemove+totlinesPerComponentList.at(i);
+        }
+
+        //calc new number of components present
+        int nTotComponents = ui.boxAtoMols->text().toInt()-nInBox.at(componentToRemove);
+
+        QFile fileRead(workingDir_+atoFileName_);
+        QFile fileWrite(workingDir_+"temp.txt");
+
+        if(!fileRead.open(QFile::ReadOnly | QFile::Text))
+        {
+            QMessageBox msgBox;
+            msgBox.setText("Could not open box.ato file");
+            msgBox.exec();
+            return;
+        }
+        if(!fileWrite.open(QFile::WriteOnly | QFile::Text))
+        {
+            QMessageBox msgBox;
+            msgBox.setText("Could not open temporary file");
+            msgBox.exec();
+            return;
+        }
+
+        QTextStream streamRead(&fileRead);
+        QTextStream streamWrite(&fileWrite);
+        QString line;
+        QStringList dataLine;
+        dataLine.clear();
+        QString original;
+        int lineCtr = atoHeaderLines;
+        int componentCtr = 0;
+
+        //copy over header
+        line = streamRead.readLine();
+        line = line.replace(2, 6, " "+QString::number(nTotComponents)); //this isn't the correct formatting*******************************
+        streamWrite << line << "\n";
+        for (int i = 0; i < atoHeaderLines-1; i++)
+        {
+            line = streamRead.readLine();
+            streamWrite << line << "\n";
+        }
+
+        //copy over lines that aren't in the remove list
+        QRegExp atomPairrx(" ([A-Z][A-Za-z0-9 ]{2}) ([A-Za-z ]{1,2})   ([0-1]{1})");
+        do {
+            line = streamRead.readLine();
+            lineCtr++;
+            if (atomPairrx.exactMatch(line))
+            {
+                break;
+            }
+            if (lineCtr <= firstLineToRemove || lineCtr >= lastLineToRemove+1)
+            {
+                dataLine = line.split(" ", QString::SkipEmptyParts);
+                if (dataLine.count() == 10)
+                {
+                    componentCtr++;
+                    line = line.replace(109, 6, " "+QString::number(componentCtr)); //this isn't the correct formatting*******************************
+                }
+                streamWrite << line << "\n";
+            }
+        } while (!line.isNull());
+
+        //LJ param section
+        for (int i = 0; i < componentToRemove; i++)
+        {
+            streamWrite << line << "\n";
+            line = streamRead.readLine();
+            streamWrite << line << "\n";
+            line = streamRead.readLine();
+        }
+        line = streamRead.readLine();
+        for (int i = componentToRemove+1; i < ui.molFileList->count(); i++)
+        {
+            line = streamRead.readLine();
+            streamWrite << line << "\n";
+            line = streamRead.readLine();
+            streamWrite << line << "\n";
+        }
+
+        //ecordcore and random line
+        line = streamRead.readLine();
+        streamWrite << line << "\n";
+        line = streamRead.readLine();
+        streamWrite << line << "\n";
+
+        //atom list
+        int componentNum = 1;
+        for (int i = 0; i < componentToRemove; i++)
+        {
+            line = streamRead.readLine();
+            line = line.replace(0, 4, "  "+QString::number(componentNum)); //this isn't the correct formatting*******************************
+            componentNum++;
+            streamWrite << line << "\n";
+        }
+        line = streamRead.readLine();
+        for (int i = componentToRemove+1; i < ui.molFileList->count(); i++)
+        {
+            line = streamRead.readLine();
+            line = line.replace(0, 4, "  "+QString::number(componentNum)); //this isn't the correct formatting*******************************
+            componentNum++;
+            streamWrite << line << "\n";
+        }
+
+        //number density line
+        line = streamRead.readLine();
+        streamWrite << line << "\n";
+
+        //each component number density
+        for (int i = 0; i < componentToRemove; i++)
+        {
+            line = streamRead.readLine();
+            streamWrite << line << "\n";
+        }
+        line = streamRead.readLine();
+        for (int i = componentToRemove+1; i < ui.molFileList->count(); i++)
+        {
+            line = streamRead.readLine();
+            streamWrite << line << "\n";
+        }
+
+        fileRead.close();
+        fileWrite.close();
+
+        //rename temp file as box .ato file to copy over changes and delete temp file
+        QFile::remove(workingDir_+atoFileName_);
+        QFile::rename(workingDir_+"temp.txt", workingDir_+atoFileName_);
+
+        readAtoFileBoxDetails();
+
+        //update mol and ato tables with remaining components
+        ui.molFileList->takeItem(componentToRemove);
+        setSelectedMolFile();
+        ui.atoFileTable->removeRow(componentToRemove);
+        nMolFiles = ui.molFileList->count();
+
+        save();
+
+        messageText_ += "\nbox .ato file updated\n";
+        messagesDialog.refreshMessages();
+        ui.messagesLineEdit->setText("Component removed and box .ato file updated");
+    }
+
+    //make this button enabled once created box, disabled once created epsr.inp file, and re-enabled on deleting EPSR inp file.***************************************************
 }

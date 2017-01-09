@@ -900,7 +900,7 @@
                              </sizepolicy>
                             </property>
                             <property name="text">
-                             <string>ecoredcore</string>
+                             <string>ecore dcore</string>
                             </property>
                            </widget>
                           </item>
@@ -994,7 +994,7 @@
                           <item row="17" column="5" colspan="2">
                            <widget class="QPushButton" name="molFmoleButton">
                             <property name="text">
-                             <string>Run fmole on molecule</string>
+                             <string>Run fmole on component</string>
                             </property>
                            </widget>
                           </item>
@@ -1034,7 +1034,7 @@
                           <item row="14" column="1">
                            <widget class="QPushButton" name="molChangeAtobutton">
                             <property name="text">
-                             <string>Run changeato for selected file</string>
+                             <string>Run changeato on component</string>
                             </property>
                            </widget>
                           </item>
@@ -1194,20 +1194,7 @@
             <item>
              <layout class="QGridLayout" name="gridLayout_10" rowstretch="1,2">
               <item row="0" column="1">
-               <layout class="QGridLayout" name="gridLayout_4" rowstretch="2,1,1,1,2" columnstretch="1,1,1,1">
-                <item row="1" column="2" colspan="2">
-                 <spacer name="horizontalSpacer_3">
-                  <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>108</width>
-                    <height>20</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
+               <layout class="QGridLayout" name="gridLayout_4" rowstretch="0,0,0,0" columnstretch="1,1,1,1">
                 <item row="2" column="1">
                  <widget class="QPushButton" name="fmoleButton">
                   <property name="sizePolicy">
@@ -1252,6 +1239,58 @@
                   </property>
                  </widget>
                 </item>
+                <item row="1" column="2" colspan="2">
+                 <spacer name="horizontalSpacer_3">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>108</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item row="3" column="1">
+                 <spacer name="horizontalSpacer_18">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item row="0" column="1">
+                 <spacer name="horizontalSpacer_10">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item row="2" column="0">
+                 <spacer name="horizontalSpacer_9">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>20</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
                 <item row="1" column="1">
                  <widget class="QPushButton" name="randomiseButton">
                   <property name="minimumSize">
@@ -1289,80 +1328,6 @@
                    <string>10000</string>
                   </property>
                  </widget>
-                </item>
-                <item row="3" column="2" colspan="2">
-                 <spacer name="horizontalSpacer_2">
-                  <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>98</width>
-                    <height>20</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
-                <item row="3" column="1">
-                 <widget class="QPushButton" name="atoEPSRButton">
-                  <property name="minimumSize">
-                   <size>
-                    <width>0</width>
-                    <height>20</height>
-                   </size>
-                  </property>
-                  <property name="maximumSize">
-                   <size>
-                    <width>16777215</width>
-                    <height>16777215</height>
-                   </size>
-                  </property>
-                  <property name="layoutDirection">
-                   <enum>Qt::LeftToRight</enum>
-                  </property>
-                  <property name="text">
-                   <string>Run changeato for box</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="0" column="1">
-                 <spacer name="horizontalSpacer_10">
-                  <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>40</width>
-                    <height>20</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
-                <item row="4" column="1">
-                 <spacer name="horizontalSpacer_18">
-                  <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>40</width>
-                    <height>20</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
-                <item row="3" column="0">
-                 <spacer name="horizontalSpacer_9">
-                  <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>20</width>
-                    <height>20</height>
-                   </size>
-                  </property>
-                 </spacer>
                 </item>
                </layout>
               </item>
@@ -2016,6 +1981,55 @@
                     </widget>
                    </item>
                    <item>
+                    <spacer name="verticalSpacer_14">
+                     <property name="orientation">
+                      <enum>Qt::Vertical</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>20</width>
+                       <height>40</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="removeComponentButton">
+                     <property name="text">
+                      <string>Remove components</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="atoEPSRButton">
+                     <property name="minimumSize">
+                      <size>
+                       <width>0</width>
+                       <height>20</height>
+                      </size>
+                     </property>
+                     <property name="maximumSize">
+                      <size>
+                       <width>16777215</width>
+                       <height>16777215</height>
+                      </size>
+                     </property>
+                     <property name="layoutDirection">
+                      <enum>Qt::LeftToRight</enum>
+                     </property>
+                     <property name="text">
+                      <string>Run changeato for box</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="reloadBoxButton">
+                     <property name="text">
+                      <string>Reload box</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
                     <spacer name="verticalSpacer_12">
                      <property name="orientation">
                       <enum>Qt::Vertical</enum>
@@ -2182,7 +2196,7 @@
                </sizepolicy>
               </property>
               <property name="title">
-               <string>Experimental Datasets to Refine to</string>
+               <string>Data Files</string>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_3">
                <item>
@@ -2282,7 +2296,7 @@
                </sizepolicy>
               </property>
               <property name="title">
-               <string>Edit scattering weights file</string>
+               <string>Scattering weights</string>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout">
                <item>

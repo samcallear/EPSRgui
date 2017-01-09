@@ -22,6 +22,7 @@ class ImportDialog;
 class PlotBoxDialog;
 class SetupOutputDialog;
 class NotesDialog;
+class RemoveComponentDialog;
 
 class MainWindow : public QMainWindow
 {
@@ -191,6 +192,8 @@ private slots:
     void on_boxCompositionButton_clicked(bool checked);
     void on_SSbutton_clicked(bool checked);
     void on_tetherButton_clicked(bool checked);
+    void on_reloadBoxButton_clicked(bool checked);
+    void on_removeComponentButton_clicked(bool checked);
 
 private:
     bool readAtoFileBoxDetails();
@@ -199,12 +202,19 @@ private:
 
 public:
     int atoaddDialog;
-    QStringList atoAtomLabels;
-    QVector<int> numberAtomLabels;
-    QVector<int> numberComponentAtomLabels;
+    int componentremoveDialog;
+    QStringList atoAtomLabels; //atom Types as listed at bottom of box .ato file
+    QVector<int> numberAtomLabels; //number of instances of each item in atoAtomLabels in box .ato file
+    QVector<int> numberComponentAtomLabels; //number of instances of each item in ljAtoms in component .mol or .ato file
     int nPartials;
     Array2D<int> ij;
     QStringList atoFileList;
+    int atoHeaderLines; //number header lines in box .ato file
+    QStringList firstAtomList; //list of first atom Types for each component in order of ui.molFileList
+    QVector<int> nInBox; //number of instances of each component in box (in order of ui.molFileList)
+    QList<int> nLinesPerComponentList; //number of lines per each component (not group of components) in order of atoFileList
+    QList<int> firstInstance; //first instance of component in numerical listing in box ato file per component (atoFileList order)
+    QList<int> lastInstance; //last instance of component in numerical listing in box ato file per component (atoFileList order)
 
     // Wts Files Tab
 private slots:
