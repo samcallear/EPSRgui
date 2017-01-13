@@ -85,6 +85,9 @@ void MainWindow::on_setupEPSRButton_clicked(bool checked)
     ui.plotEPSRshellAct->setEnabled(true);
     ui.plotOutputsMenu->setEnabled(true);
 
+    ui.removeDataFileButton->setEnabled(false);
+    ui.removeComponentButton->setEnabled(false);
+
     ui.updateInpPcofFilesButton->setEnabled(true);
     ui.reloadEPSRinpButton->setEnabled(true);
     ui.setupOutButton->setEnabled(true);

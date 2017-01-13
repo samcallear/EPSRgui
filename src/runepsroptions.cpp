@@ -25,7 +25,13 @@ void MainWindow::getOutputType()
 
 void MainWindow::showAvailableFiles()
 {
-    //show available outputs
+    //show available analysis routines
+//    //get currently selected item, if present, then clear list
+//    int routineRow = -1;
+//    if (ui.outputAvailableList->count() >= 0)
+//    {
+//        routineRow = ui.outputAvailableList->currentRow();
+//    }
     ui.outputAvailableList->clear();
 
     QDir dir;

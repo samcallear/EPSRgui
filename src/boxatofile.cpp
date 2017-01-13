@@ -108,6 +108,8 @@ void MainWindow::on_mixatoButton_clicked(bool checked)
         ui.updateAtoFileButton->setEnabled(true);
         ui.fmoleButton->setEnabled(true);
         ui.atoEPSRButton->setEnabled(true);
+        ui.reloadBoxButton->setEnabled(true);
+        ui.removeComponentButton->setEnabled(true);
         ui.dataFileBrowseButton->setEnabled(true);
         ui.removeDataFileButton->setEnabled(true);
 
@@ -255,6 +257,8 @@ void MainWindow::on_addatoButton_clicked(bool checked)
         ui.updateAtoFileButton->setEnabled(true);
         ui.fmoleButton->setEnabled(true);
         ui.atoEPSRButton->setEnabled(true);
+        ui.reloadBoxButton->setEnabled(true);
+        ui.removeComponentButton->setEnabled(true);
         ui.dataFileBrowseButton->setEnabled(true);
         ui.removeDataFileButton->setEnabled(true);
 
@@ -317,6 +321,8 @@ void MainWindow::on_loadBoxButton_clicked (bool checked)
         ui.updateAtoFileButton->setEnabled(true);
         ui.fmoleButton->setEnabled(true);
         ui.atoEPSRButton->setEnabled(true);
+        ui.reloadBoxButton->setEnabled(true);
+        ui.removeComponentButton->setEnabled(true);
         ui.dataFileBrowseButton->setEnabled(true);
         ui.removeDataFileButton->setEnabled(true);
 
@@ -795,18 +801,6 @@ void MainWindow::on_updateAtoFileButton_clicked(bool checked)
             original.append(tetherline+"\n"+line+"\n");
         }
 
-//        //if a tether line, change tethering in accordance with the atoTetherTable (so first atom matches too) **********************TO DO ***************************
-//        if (dataLine.count() > 9)
-//        {
-//            if (ui.atoTetherTable->item(0,1)->text() == "T" && line.contains("F") == true)
-//            {
-//                line = line.replace(91, 6, "T"+tetherAtoms.at(0));
-//            }
-//            if (ui.atoTetherTable->item(0,1)->text() == "F" && line.contains("T0") == true)
-//            {
-//                line = line.replace(91, 6, "F     ");
-//            }
-//        }
         else
         if (dataLine.count() == 2)
         {
@@ -1135,6 +1129,4 @@ void MainWindow::on_removeComponentButton_clicked(bool checked)
         messagesDialog.refreshMessages();
         ui.messagesLineEdit->setText("Component removed and box .ato file updated");
     }
-
-    //make this button enabled once created box, disabled once created epsr.inp file, and re-enabled on deleting EPSR inp file.***************************************************
 }

@@ -14,13 +14,13 @@ PlotBoxDialog::PlotBoxDialog(MainWindow *parent) : QDialog(parent)
     epsrBinDir_ = mainWindow_->epsrBinDir();
 
     QRegExp noNegIntrx("^\\d*$");
-    QRegExp onlyIntrx("^\\-?\\d*$");
+    QRegExp onlyDecrx(("^\\d*\\.?\\d*$"););
     QRegExp threeIntrx("^\\d*\\ \\d*\\ \\d*$");
     ui.plotAtoCentreLineEdit->setValidator((new QRegExpValidator(noNegIntrx, this)));
-    ui.plotAtoMaxXLineEdit->setValidator((new QRegExpValidator(onlyIntrx, this)));
-    ui.plotAtoMaxYLineEdit->setValidator((new QRegExpValidator(onlyIntrx, this)));
-    ui.plotAtoMaxZLineEdit->setValidator((new QRegExpValidator(onlyIntrx, this)));
-    ui.plotAtoMinZLineEdit->setValidator((new QRegExpValidator(onlyIntrx, this)));
+    ui.plotAtoMaxXLineEdit->setValidator((new QRegExpValidator(onlyDecrx, this)));
+    ui.plotAtoMaxYLineEdit->setValidator((new QRegExpValidator(onlyDecrx, this)));
+    ui.plotAtoMaxZLineEdit->setValidator((new QRegExpValidator(onlyDecrx, this)));
+    ui.plotAtoMinZLineEdit->setValidator((new QRegExpValidator(onlyDecrx, this)));
     ui.plotAtoRotLineEdit->setValidator((new QRegExpValidator(threeIntrx, this)));
 
     ui.atoAtomList->clear();

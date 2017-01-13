@@ -331,7 +331,7 @@ void MainWindow::createNew()
         ui.epsrManualAct->setEnabled(true);
         ui.notesAct->setEnabled(true);
 
-        //activate buttons (in case disabled from previous project)
+        //activate buttons (in case disabled from previous project) **************************isn't this done during reset()?!??!*******************************************************
         ui.createMolFileButton->setEnabled(true);
         ui.molFileLoadButton->setEnabled(true);
         ui.createAtomButton->setEnabled(true);
@@ -348,6 +348,8 @@ void MainWindow::createNew()
         ui.boxCompositionButton->setEnabled(false);
         ui.updateAtoFileButton->setEnabled(false);
         ui.fmoleButton->setEnabled(false);
+        ui.reloadBoxButton->setEnabled(false);
+        ui.removeComponentButton->setEnabled(false);
         ui.atoEPSRButton->setEnabled(false);
         ui.dataFileBrowseButton->setEnabled(false);
         ui.removeDataFileButton->setEnabled(false);
@@ -466,6 +468,8 @@ void MainWindow::reset()
     ui.updateAtoFileButton->setEnabled(false);
     ui.fmoleButton->setEnabled(false);
     ui.atoEPSRButton->setEnabled(false);
+    ui.reloadBoxButton->setEnabled(false);
+    ui.removeComponentButton->setEnabled(false);
     ui.dataFileBrowseButton->setEnabled(false);
     ui.removeDataFileButton->setEnabled(false);
     ui.makeWtsButton->setEnabled(false);
@@ -602,6 +606,8 @@ void MainWindow::open()
                     ui.updateAtoFileButton->setEnabled(true);
                     ui.fmoleButton->setEnabled(true);
                     ui.atoEPSRButton->setEnabled(true);
+                    ui.reloadBoxButton->setEnabled(true);
+                    ui.removeComponentButton->setEnabled(true);
                     ui.dataFileBrowseButton->setEnabled(true);
                     ui.removeDataFileButton->setEnabled(true);
                     ui.deleteBoxAtoFileAct->setEnabled(true);
@@ -643,7 +649,8 @@ void MainWindow::open()
                     ui.deleteBoxAtoFileAct->setEnabled(true);
                     ui.plot1Button->setEnabled(true);
                     ui.plot2Button->setEnabled(true);
-                    ui.dataFileBrowseButton->setDisabled(true);
+                    ui.removeComponentButton->setEnabled(false);
+                    ui.dataFileBrowseButton->setEnabled(false);
                     ui.removeDataFileButton->setEnabled(false);
                     ui.checkAct->setEnabled(true);
                     ui.runAct->setEnabled(true);
@@ -2025,7 +2032,6 @@ void MainWindow::runEPSR()
     ui.addOutputButton->setEnabled(false);
     ui.removeOutputButton->setEnabled(false);
     ui.dlputilsOutCheckBox->setEnabled(false);
-    ui.setupPlotButton->setEnabled(false);
 
     ui.messagesLineEdit->setText("EPSR is running in a terminal window");
     messageText_ += "\nEPSR is running in a terminal window.\n";
@@ -2132,7 +2138,6 @@ void MainWindow::enableButtons()
     ui.addOutputButton->setEnabled(true);
     ui.removeOutputButton->setEnabled(true);
     ui.dlputilsOutCheckBox->setEnabled(true);
-    ui.setupPlotButton->setEnabled(true);
 
     ui.inpSettingsTable->setEditTriggers(QAbstractItemView::AllEditTriggers);
     ui.dataFileSettingsTable->setEditTriggers(QAbstractItemView::AllEditTriggers);
@@ -2634,6 +2639,7 @@ void MainWindow::deleteEPSRinpFile()
             ui.plotEPSRshellAct->setEnabled(false);
             ui.dataFileBrowseButton->setEnabled(true);
             ui.removeDataFileButton->setEnabled(true);
+            ui.removeComponentButton->setEnabled(true);
             ui.updateInpPcofFilesButton->setEnabled(false);
             ui.reloadEPSRinpButton->setEnabled(false);
             ui.setupOutButton->setEnabled(false);
@@ -2778,6 +2784,8 @@ void MainWindow::deleteBoxAtoFile()
             ui.updateAtoFileButton->setEnabled(false);
             ui.fmoleButton->setEnabled(false);
             ui.atoEPSRButton->setEnabled(false);
+            ui.reloadBoxButton->setEnabled(false);
+            ui.removeComponentButton->setEnabled(false);
             ui.dataFileBrowseButton->setEnabled(false);
             ui.removeDataFileButton->setEnabled(false);
             ui.makeWtsButton->setEnabled(false);
@@ -2945,6 +2953,8 @@ void MainWindow::timerEvent(QTimerEvent *event)
             ui.loadBoxButton->setEnabled(true);
             ui.randomiseButton->setEnabled(true);
             ui.atoEPSRButton->setEnabled(true);
+            ui.reloadBoxButton->setEnabled(true);
+            ui.removeComponentButton->setEnabled(true);
             ui.updateMolFileButton->setEnabled(true);
             ui.runMenu->setEnabled(true);
 
