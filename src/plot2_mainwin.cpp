@@ -127,8 +127,8 @@ bool MainWindow::fqplot2()
     fileD.close();
 
     //find largest and smallest values in y
-    double yMin = columnsD[column].at(0);
-    double yMax = columnsD[column].at(0);
+    double yMin = columnsD[0].at(0);
+    double yMax = columnsD[0].at(0);
     for (column = 0; column < nColumns; ++column)
     {
         for (int j = 0; j < columnsD[column].count(); j++)
@@ -417,8 +417,8 @@ bool MainWindow::frplot2()
     fileD.close();
 
     //find largest and smallest values in y
-    double yMin = columnsD[column].at(0);
-    double yMax = columnsD[column].at(0);
+    double yMin = columnsD[0].at(0);
+    double yMax = columnsD[0].at(0);
     for (column = 0; column < nColumns; ++column)
     {
         for (int j = 0; j < columnsD[column].count(); j++)

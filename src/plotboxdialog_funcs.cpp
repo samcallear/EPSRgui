@@ -14,7 +14,7 @@ PlotBoxDialog::PlotBoxDialog(MainWindow *parent) : QDialog(parent)
     epsrBinDir_ = mainWindow_->epsrBinDir();
 
     QRegExp noNegIntrx("^\\d*$");
-    QRegExp onlyDecrx(("^\\d*\\.?\\d*$"););
+    QRegExp onlyDecrx("^\\d*\\.?\\d*$");
     QRegExp threeIntrx("^\\d*\\ \\d*\\ \\d*$");
     ui.plotAtoCentreLineEdit->setValidator((new QRegExpValidator(noNegIntrx, this)));
     ui.plotAtoMaxXLineEdit->setValidator((new QRegExpValidator(onlyDecrx, this)));
