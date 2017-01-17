@@ -44,6 +44,7 @@ private slots:
     bool saveAs();
     bool saveCopy();
     void import();
+    void runEPSRonce();
     void runEPSR();
     void runEPSRcheck();
     void plot();
@@ -108,8 +109,8 @@ public:
     QDir exeDir();
     QString epsrDir();
     QString epsrBinDir();
-    QStringList atomLabels();
-    QVector<int> numberOfEachAtomLabel();
+    QStringList atomTypes();
+    QVector<int> numberOfEachAtomType();
     QStringList listAtoFiles();
     QString outputFileName();
     QString outputSetupFileType();
@@ -197,14 +198,13 @@ private slots:
 
 private:
     bool readAtoFileBoxDetails();
-    bool readAtoFileAtomPairs();
     bool checkBoxCharge();
 
 public:
     int atoaddDialog;
     int componentremoveDialog;
-    QStringList atoAtomLabels; //atom Types as listed at bottom of box .ato file
-    QVector<int> numberAtomLabels; //number of instances of each item in atoAtomLabels in box .ato file
+    QStringList atoAtomTypes; //atom Types as listed from start of box .ato file
+    QVector<int> numberAtomTypes; //number of instances of each item in atoAtomTypes in box .ato file
     QVector<int> numberComponentAtomLabels; //number of instances of each item in ljAtoms in component .mol or .ato file
     int nPartials;
     Array2D<int> ij;

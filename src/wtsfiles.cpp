@@ -106,9 +106,22 @@ bool MainWindow::makeNwtsSetup()
 {
     QDir::setCurrent(workingDir_);
     QString atoBaseFileName = atoFileName_.split(".",QString::SkipEmptyParts).at(0);
+    QFile file(workingDir_+wtsBaseFileName_+".NWTS.dat");
+
+    //check if wtsBaseFileName_.NWTS.dat already exists
+    if (file.exists() == true)
+    {
+        QMessageBox::StandardButton msgBox;
+        msgBox  = QMessageBox::question(this, "Warning", "A weights setup file for this dataset is already present in the project folder.\n"
+                                                         "To make a new weights setup file click Ok, or to use the existing file click Cancel", QMessageBox::Ok|QMessageBox::Cancel);
+        if (msgBox == QMessageBox::Ok)
+        {
+            file.remove();
+        }
+    }
 
     //create wtsBaseFileName_.NWTS.dat if it doesn't already exist
-    if (QFile::exists(workingDir_+wtsBaseFileName_+".NWTS.dat") == 0)
+    if (file.exists() == false)
     {
 #ifdef _WIN32
         processEPSR_.start(epsrBinDir_+"upset.exe", QStringList() << workingDir_ << "upset" << "nwts" << wtsBaseFileName_);
@@ -135,10 +148,24 @@ bool MainWindow::makeNwtsSetup()
 
 bool MainWindow::makeXwtsSetup()
 {
-    // if wtsBaseFileName_.xwts.dat already exists don't do the following, but do import it into the table
     QDir::setCurrent(workingDir_);
     QString atoBaseFileName = atoFileName_.split(".",QString::SkipEmptyParts).at(0);
-    if (QFile::exists(workingDir_+wtsBaseFileName_+".XWTS.dat") == 0)
+    QFile file(workingDir_+wtsBaseFileName_+".XWTS.dat");
+
+    //check if wtsBaseFileName_.XWTS.dat already exists
+    if (file.exists() == true)
+    {
+        QMessageBox::StandardButton msgBox;
+        msgBox  = QMessageBox::question(this, "Warning", "A weights setup file for this dataset is already present in the project folder.\n"
+                                                         "To make a new weights setup file click Ok, or to use the existing file click Cancel", QMessageBox::Ok|QMessageBox::Cancel);
+        if (msgBox == QMessageBox::Ok)
+        {
+            file.remove();
+        }
+    }
+
+    //create wtsBaseFileName_.XWTS.dat if it doesn't already exist
+    if (file.exists() == false)
     {
 #ifdef _WIN32
         processEPSR_.start(epsrBinDir_+"upset.exe", QStringList() << workingDir_ << "upset" << "xwts" << wtsBaseFileName_);

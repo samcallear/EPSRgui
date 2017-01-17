@@ -228,7 +228,7 @@
      <item row="11" column="0" colspan="4">
       <widget class="QLabel" name="label">
        <property name="text">
-        <string>Number of cells along each axes to form lattice:</string>
+        <string>Number of cells along each axis to form lattice:</string>
        </property>
       </widget>
      </item>

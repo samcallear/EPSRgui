@@ -668,7 +668,6 @@ void MainWindow::on_createLatticeButton_clicked(bool checked)
             atoFileName_ = projectName_+"box.ato";
 
             ui.boxAtoLabel->setText(atoFileName_);
-            readAtoFileAtomPairs();
             readAtoFileBoxDetails();
 
             //update atoFileTable to contain atom .ato files
@@ -679,7 +678,7 @@ void MainWindow::on_createLatticeButton_clicked(bool checked)
                 item->setFlags(item->flags() & ~Qt::ItemIsEditable);
                 ui.atoFileTable->setItem(i,0, item);
                 ui.atoFileTable->setItem(i,1, new QTableWidgetItem(atomCharges.at(i)));
-                ui.atoFileTable->setItem(i,2, new QTableWidgetItem(QString::number(numberAtomLabels.at(i))));
+                ui.atoFileTable->setItem(i,2, new QTableWidgetItem(QString::number(numberAtomTypes.at(i))));
             }
             checkBoxCharge();                      
         }
@@ -687,28 +686,42 @@ void MainWindow::on_createLatticeButton_clicked(bool checked)
         // otherwise use lattice as a component **NB** This is the only workflow that doesn't use a .mol file.
         else
         {
-            //add .ato to molFileList **********************THis doesn't check if the .ato is already listed*******************************************************
+            //check .ato file doesn't already exist and if not, add .ato to molFileList
+            if (ui.molFileList->count() > 0)
+            {
+                for (int i = 0; i < ui.molFileList->count(); i++)
+                {
+                    if (ui.atoFileTable->item(i,0)->text() == atoFileName)
+                    {
+                        QMessageBox msgBox;
+                        msgBox.setText("A component with this name is already listed.\n This process will be aborted. Remake the lattice with a different name.");
+                        msgBox.exec();
+                        return;
+                    }
+                }
+            }
             ui.molFileList->addItem(atoFileName);
+            nMolFiles = ui.molFileList->count();
 
             //add .ato to atoFileTable
-            int row = ui.molFileList->count();
-            ui.atoFileTable->setRowCount(row);
+            ui.atoFileTable->setRowCount(nMolFiles);
             if (nMolFiles > 0)
             {
                 QTableWidgetItem *item = new QTableWidgetItem(atoFileName);
                 item->setFlags(item->flags() & ~Qt::ItemIsEditable);
-                ui.atoFileTable->setItem(row-1,0, item);
+                ui.atoFileTable->setItem(nMolFiles-1,0, item);
 
-                //calculate charge for ato file
-                QString lattCharge = makeLatticeDialog->charge();    //THIS ISNT WORKING **********************************************************************************
-                QTableWidgetItem *item1 = new QTableWidgetItem(lattCharge);
+//                //calculate charge for ato file
+//                QString lattCharge = makeLatticeDialog->charge();    //THIS ISNT WORKING **********************************************************************************
+//                QTableWidgetItem *item1 = new QTableWidgetItem(lattCharge);
+                QTableWidgetItem *item1 = new QTableWidgetItem("0");
                 item1->setFlags(item1->flags() & ~Qt::ItemIsEditable);
-                ui.atoFileTable->setItem(row-1,1, item1);
+                ui.atoFileTable->setItem(nMolFiles-1,1, item1);
 
                 //put 1 in 'number in box' column and disable
                 QTableWidgetItem *item2 = new QTableWidgetItem("1");
                 item2->setFlags(item2->flags() & ~Qt::ItemIsEditable);
-                ui.atoFileTable->setItem(row-1,2, item2);
+                ui.atoFileTable->setItem(nMolFiles-1,2, item2);
                 //disable mixato, only allow addato
                 ui.mixatoButton->setDisabled(true);
                 ui.loadBoxButton->setDisabled(true);

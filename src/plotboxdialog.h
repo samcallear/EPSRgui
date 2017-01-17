@@ -15,7 +15,7 @@ class PlotBoxDialog : public QDialog
 private:
     QString atoFileName_;
     QString workingDir_;
-    QStringList atoAtomLabels_;
+    QStringList atoAtomTypes_;
     QString epsrBinDir_;
     MainWindow *mainWindow_;
 

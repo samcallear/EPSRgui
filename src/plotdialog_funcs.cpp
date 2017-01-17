@@ -213,7 +213,7 @@ bool PlotDialog::readatofile()
     QTextStream stream(&file);
     QString line;
     QRegExp atomlabelrx(" ([A-Z][A-Za-z0-9 ]{2}) ([A-Za-z ]{1,2})   ([0-1]{1})");
-    if (!atomlabelrx.isValid()) printf("REGEXP is not valid.\n");
+//    if (!atomlabelrx.isValid()) printf("REGEXP is not valid.\n");
     atomLabels.clear();
 
     do {

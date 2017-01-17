@@ -135,13 +135,13 @@ void MainWindow::createActions()
     ui.settingsAct->setStatusTip(tr("Change EPSRgui settings"));
     connect(ui.settingsAct, SIGNAL(triggered()), this, SLOT(settings()));
 
-    ui.checkAct->setStatusTip(tr("Run EPSR once to check everything works"));
-    connect(ui.checkAct, SIGNAL(triggered()), this, SLOT(runEPSRcheck()));
+    ui.checkAct->setStatusTip(tr("Run EPSR once"));
+    connect(ui.checkAct, SIGNAL(triggered()), this, SLOT(runEPSRonce()));
 
     ui.runAct->setStatusTip(tr("Run EPSR"));
     connect(ui.runAct, SIGNAL(triggered()), this, SLOT(runEPSR()));
 
-    ui.stopAct->setStatusTip(tr("Run EPSR"));
+    ui.stopAct->setStatusTip(tr("Stop EPSR"));
     connect(ui.stopAct, SIGNAL(triggered()), this, SLOT(stopEPSR()));
 
     ui.deleteEPSRinpFileAct->setStatusTip(tr("Delete the existing EPSR .inp file"));
@@ -597,7 +597,6 @@ void MainWindow::open()
                     atoFileName_ = dataLine.at(1);
                     messageText_ += "Box .ato filename is "+atoFileName_+"\n";
                     ui.boxAtoLabel->setText(atoFileName_);
-                    readAtoFileAtomPairs();
                     readAtoFileBoxDetails();
                     checkBoxCharge();
                     ui.randomiseButton->setEnabled(true);
@@ -618,13 +617,13 @@ void MainWindow::open()
                     dataFileList.append(dataLine.at(2));
                     normalisationList.append(dataLine.at(3));
                     ui.makeWtsButton->setEnabled(true);
+                    ui.setupEPSRButton->setEnabled(true); //a wts file is checked for on clicking this button
                 }
                 if (dataLine.at(0) == "wts")
                 {
                     if (dataLine.count() == 2)
                     {
                         wtsFileList.append(dataLine.at(1));
-                        ui.setupEPSRButton->setEnabled(true);
                     }
                     else
                     {
@@ -1582,7 +1581,6 @@ void MainWindow::import()
                 ui.atoFileTable->setItem(i,2, new QTableWidgetItem(nComponentsStr));
             }
 
-            readAtoFileAtomPairs();
             readAtoFileBoxDetails();
             checkBoxCharge();
             ui.randomiseButton->setEnabled(true);
@@ -1909,6 +1907,12 @@ void MainWindow::runEPSRcheck()
     file.close();
     epsrFinished_.addPath(workingDir_+"killepsr");
     file.remove();
+}
+
+void MainWindow::runEPSRonce()
+{
+    runEPSR();
+    stopEPSR();
 }
 
 void MainWindow::runEPSR()
@@ -2515,14 +2519,14 @@ QString MainWindow::epsrBinDir()
     return epsrBinDir_;
 }
 
-QStringList MainWindow::atomLabels()
+QStringList MainWindow::atomTypes()
 {
-    return atoAtomLabels;
+    return atoAtomTypes;
 }
 
-QVector<int> MainWindow::numberOfEachAtomLabel()
+QVector<int> MainWindow::numberOfEachAtomType()
 {
-    return numberAtomLabels;
+    return numberAtomTypes;
 }
 
 QStringList MainWindow::listAtoFiles()

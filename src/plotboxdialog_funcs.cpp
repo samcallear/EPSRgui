@@ -8,7 +8,8 @@ PlotBoxDialog::PlotBoxDialog(MainWindow *parent) : QDialog(parent)
     ui.setupUi(this);
 
     mainWindow_ = parent;
-    atoAtomLabels_ = mainWindow_->atomLabels();
+    atoAtomTypes_.clear();
+    atoAtomTypes_ = mainWindow_->atomTypes();
     workingDir_ = mainWindow_->workingDir();
     atoFileName_ = mainWindow_->atoFileName();
     epsrBinDir_ = mainWindow_->epsrBinDir();
@@ -24,9 +25,9 @@ PlotBoxDialog::PlotBoxDialog(MainWindow *parent) : QDialog(parent)
     ui.plotAtoRotLineEdit->setValidator((new QRegExpValidator(threeIntrx, this)));
 
     ui.atoAtomList->clear();
-    for (int n=0; n < atoAtomLabels_.count(); ++n)
+    for (int n=0; n < atoAtomTypes_.count(); ++n)
     {
-        QListWidgetItem* item = new QListWidgetItem(atoAtomLabels_.at(n));
+        QListWidgetItem* item = new QListWidgetItem(atoAtomTypes_.at(n));
         item->setData(Qt::UserRole, n);
         ui.atoAtomList->addItem(item);
     }

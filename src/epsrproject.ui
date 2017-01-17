@@ -1996,7 +1996,7 @@
                    <item>
                     <widget class="QPushButton" name="removeComponentButton">
                      <property name="text">
-                      <string>Remove components</string>
+                      <string>Remove component</string>
                      </property>
                     </widget>
                    </item>

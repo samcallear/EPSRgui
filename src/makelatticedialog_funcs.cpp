@@ -62,7 +62,6 @@ void MakeLatticeDialog::on_okButton_clicked(bool checked)
 
 void MakeLatticeDialog::checkEntries()
 {
-    QString fileName = workingDir_+ui.fileNameLineEdit->text()+".ato";
     //if anything not filled in give error message
     if (ui.fileNameLineEdit->text().isEmpty()
         || ui.aLineEdit->text().isEmpty()
@@ -81,7 +80,7 @@ void MakeLatticeDialog::checkEntries()
             tr("All fields need to be completed before proceeding."));
     }
     else
-    if (QFile::exists(fileName) == true)
+    if (QFile::exists(workingDir_+ui.fileNameLineEdit->text()+".ato") == true)
     {
         QMessageBox::StandardButton msgBox;
         msgBox  = QMessageBox::question(this, "Warning", "This will overwrite the lattice file already present in the project folder with the same name.\nProceed?", QMessageBox::Ok|QMessageBox::Cancel);
@@ -293,7 +292,6 @@ bool MakeLatticeDialog::saveToUnitFile()
     }
 
     QTextStream streamWrite(&file);
-    file.resize(0);
 
     QString coordType;
     if (ui.fracRadioButton->isChecked() == true)
@@ -311,7 +309,7 @@ bool MakeLatticeDialog::saveToUnitFile()
     {
         streamWrite << ui.coordTable->item(i,0)->text() << " " << ui.coordTable->item(i,1)->text() << " " << ui.coordTable->item(i,2)->text() << " " << ui.coordTable->item(i,3)->text() << "\n";
     }
-    for (int i = 0; i < ui.coordTable->rowCount(); i++)
+    for (int i = 0; i < ui.paramTable->rowCount(); i++)
     {
         streamWrite << ui.paramTable->item(i,0)->text() << " " << ui.paramTable->item(i,1)->text() << " " << ui.paramTable->item(i,2)->text() << "\n"
                     << ui.paramTable->item(i,3)->text() << " " << ui.paramTable->item(i,4)->text() << " " << ui.paramTable->item(i,5)->text() << " " << ui.paramTable->item(i,6)->text() << " " << ui.paramTable->item(i,7)->text() << "\n";

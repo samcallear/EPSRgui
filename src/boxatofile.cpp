@@ -99,7 +99,7 @@ void MainWindow::on_mixatoButton_clicked(bool checked)
         ui.messagesLineEdit->setText("Finished writing box .ato file");
 
         ui.boxAtoLabel->setText(atoFileName_);
-        readAtoFileAtomPairs();
+        //readAtoFileAtomPairs();
         readAtoFileBoxDetails();
         checkBoxCharge();
         ui.randomiseButton->setEnabled(true);
@@ -127,7 +127,7 @@ void MainWindow::on_addatoButton_clicked(bool checked)
     //*****************
     //NOTE
     //There are limitations to what will be read during the process - see addato.f for details
-    //the atomic number density is irrelevant as the size of the container determines the size of the final box.
+    //the atomic number density is calculated after addato as the size of the container determines the size of the final box.
     //the ecoredcore values at the bottom of the .ato files are important as they determine the atomic overlap during addato
     //tethering of molecules is also important prior to pressing addato.
 
@@ -248,7 +248,7 @@ void MainWindow::on_addatoButton_clicked(bool checked)
         }
 
         ui.boxAtoLabel->setText(atoFileName_);
-        readAtoFileAtomPairs();
+       //readAtoFileAtomPairs();
         readAtoFileBoxDetails();
         checkBoxCharge();
         ui.randomiseButton->setEnabled(true);
@@ -277,7 +277,6 @@ void MainWindow::on_loadBoxButton_clicked (bool checked)
     msgBox.setText("In the following dialog window, choose the .ato file to be used as the simulation box.\nEnsure it has the components listed at the bottom of the file, instead of moltypeXX."
                    "\nThe number of each component in the box will need to be entered into the table manually.");
     msgBox.exec();
-    return;
 
     //note in manual that need to manually change moltypeXX to the name of the associated .mol file
     QString atoFile = QFileDialog::getOpenFileName(this, "Choose EPSR box .ato file", workingDir_, tr(".ato files (*.ato)"));
@@ -310,11 +309,10 @@ void MainWindow::on_loadBoxButton_clicked (bool checked)
         }
 
         ui.boxAtoLabel->setText(atoFileName_);
-        readAtoFileAtomPairs();
         readAtoFileBoxDetails();
 //        //for each .ato file listed in atofiletable, calculate the number of this file in the box and add to column 2 ********************************************************
 //        ui.atoFileTable->item(0,2)->setText(ui.boxAtoMols->text());
-//        checkBoxCharge();
+//        checkBoxCharge
         ui.randomiseButton->setEnabled(true);
         ui.plotBoxAct->setEnabled(true);
         ui.boxCompositionButton->setEnabled(true);
@@ -435,15 +433,14 @@ bool MainWindow::readAtoFileBoxDetails()
     ui.angtempLineEdit->setText(dataLine.at(6));
     ui.dihtempLineEdit->setText(dataLine.at(7));
 
-    //QStringList tetherMolAtoms;
     QStringList tetherAtoms;
     QStringList tetherList;
     firstAtomList.clear();
     tetherAtoms.clear();
     tetherList.clear();
     int atomctr = 0;
-    numberAtomLabels.clear();
-    numberAtomLabels.resize(atoAtomLabels.count());
+    atoAtomTypes.clear();
+    numberAtomTypes.clear();
     QList<int> fullnLinesPerComponentList;
     fullnLinesPerComponentList.clear();
     int lineCtr = 0;
@@ -497,11 +494,32 @@ bool MainWindow::readAtoFileBoxDetails()
             atomctr++;
             dataLine = line.split("  ", QString::SkipEmptyParts);
             QString data = dataLine.at(0).trimmed();
-            for (int i = 0; i < atoAtomLabels.count(); i++)
+            if (atoAtomTypes.isEmpty())
             {
-                if (data == atoAtomLabels.at(i))
+                atoAtomTypes.append(data);
+                numberAtomTypes.resize(atoAtomTypes.count());
+            }
+            else
+            {
+                int test = 0;
+                for (int i = 0; i < atoAtomTypes.count(); i++)
                 {
-                    numberAtomLabels.operator [](i)++; //add 1 to label 'counter' each time find each label
+                    if (data == atoAtomTypes.at(i))
+                    {
+                        test = 1;
+                    }
+                }
+                if (test == 0)
+                {
+                    atoAtomTypes.append(data);
+                    numberAtomTypes.resize(atoAtomTypes.count());
+                }
+            }
+            for (int i = 0; i < atoAtomTypes.count(); i++)
+            {
+                if (data == atoAtomTypes.at(i))
+                {
+                    numberAtomTypes.operator [](i)++; //add 1 to 'counter' each time find each atom type
                 }
             }
         }
@@ -566,44 +584,14 @@ bool MainWindow::readAtoFileBoxDetails()
     QString numberDensityStr;
     numberDensityStr.sprintf("%.6f", numberDensity);
     ui.numberDensityLineEdit->setText(numberDensityStr);
-}
 
-bool MainWindow::readAtoFileAtomPairs()
-{
-    QFile file(workingDir_+atoFileName_);
-    if(!file.open(QFile::ReadOnly | QFile::Text))
-    {
-        QMessageBox msgBox;
-        msgBox.setText("Could not open .ato file.");
-        msgBox.exec();
-        return false;
-    }
-    QTextStream stream(&file);
-    QString line;
-    QRegExp atomPairrx(" ([A-Z][A-Za-z0-9 ]{2}) ([A-Za-z ]{1,2})   ([0-1]{1})");
-    atoAtomLabels.clear();
-
-    do {
-        line = stream.readLine();
-        if (atomPairrx.exactMatch(line))
-        {
-            atoAtomLabels << atomPairrx.cap(1).trimmed();
-        }
-
-    } while (!line.isNull());
-    file.close();
-
-    //number of entries in atomLabels list
-    const int N_atoAtomLabels = atoAtomLabels.count();
-
-    // Declare and initialise matrix for column to find atom pair partial in...
-    ij.initialise(N_atoAtomLabels,N_atoAtomLabels);
-
-    // Populate it
+    //make partials array so can get number of atom pair combinations
+    const int NatoAtomTypes = atoAtomTypes.count();
+    ij.initialise(NatoAtomTypes,NatoAtomTypes);
     int count = 0;
-    for (int i = 0; i < N_atoAtomLabels; ++i)
+    for (int i = 0; i < NatoAtomTypes; ++i)
     {
-        for (int j = i; j < N_atoAtomLabels; ++j)
+        for (int j = i; j < NatoAtomTypes; ++j)
         {
             ij.ref(i,j) = count;
             ij.ref(j,i) = count;
@@ -611,7 +599,6 @@ bool MainWindow::readAtoFileAtomPairs()
         }
     }
     nPartials = count;
-    return false;
 }
 
 void MainWindow::on_boxCompositionButton_clicked(bool checked)
@@ -956,6 +943,10 @@ void MainWindow::on_removeComponentButton_clicked(bool checked)
         return;
     }
 
+    QMessageBox msgBox;
+    msgBox.setText("After removing a component the weights files MUST be remade.");
+    msgBox.exec();
+
     RemoveComponentDialog removeComponentDialog(this);
 
     removeComponentDialog.setModal(true);
@@ -989,6 +980,32 @@ void MainWindow::on_removeComponentButton_clicked(bool checked)
             lastLineToRemove = lastLineToRemove+totlinesPerComponentList.at(i);
         }
 
+        //get list of atomTypesToRemove from component.ato file
+        QFile fileCompRead(workingDir_+ui.atoFileTable->item(componentToRemove,0)->text());
+        if(!fileCompRead.open(QFile::ReadOnly | QFile::Text))
+        {
+            QMessageBox msgBox;
+            msgBox.setText("Could not open component.ato file");
+            msgBox.exec();
+            return;
+        }
+
+        QTextStream streamCompRead(&fileCompRead);
+        QString lineComp;
+        QRegExp atomlabelrx(" ([A-Z][A-Za-z0-9 ]{2}) ([A-Za-z ]{1,2})   ([0-1]{1})");
+        QStringList atomTypesToRemove;
+        atomTypesToRemove.clear();
+
+        do {
+            lineComp = streamCompRead.readLine();
+            if (atomlabelrx.exactMatch(lineComp))
+            {
+                atomTypesToRemove << atomlabelrx.cap(1).trimmed();
+            }
+
+        } while (!lineComp.isNull());
+        fileCompRead.close();
+
         //calc new number of components present
         int nTotComponents = ui.boxAtoMols->text().toInt()-nInBox.at(componentToRemove);
 
@@ -1015,7 +1032,6 @@ void MainWindow::on_removeComponentButton_clicked(bool checked)
         QString line;
         QStringList dataLine;
         dataLine.clear();
-        QString original;
         int lineCtr = atoHeaderLines;
         int componentCtr = 0;
 
@@ -1051,24 +1067,31 @@ void MainWindow::on_removeComponentButton_clicked(bool checked)
         } while (!line.isNull());
 
         //LJ param section
-        for (int i = 0; i < componentToRemove; i++)
+        for (int i = 0; i < atoAtomTypes.count(); i++)
         {
-            streamWrite << line << "\n";
+            dataLine = line.split(" ", QString::SkipEmptyParts);
+            int test = 0;
+            for (int j = 0; j < atomTypesToRemove.count(); j++)
+            {
+                if (dataLine.at(0) == atomTypesToRemove.at(j))
+                {
+                    test = 1;
+                }
+            }
+            if (test == 0)
+            {
+                streamWrite << line << "\n";
+                line = streamRead.readLine();
+                streamWrite << line << "\n";
+            }
+            else
+            {
+                line = streamRead.readLine();
+            }
             line = streamRead.readLine();
-            streamWrite << line << "\n";
-            line = streamRead.readLine();
-        }
-        line = streamRead.readLine();
-        for (int i = componentToRemove+1; i < ui.molFileList->count(); i++)
-        {
-            line = streamRead.readLine();
-            streamWrite << line << "\n";
-            line = streamRead.readLine();
-            streamWrite << line << "\n";
         }
 
         //ecordcore and random line
-        line = streamRead.readLine();
         streamWrite << line << "\n";
         line = streamRead.readLine();
         streamWrite << line << "\n";
@@ -1095,7 +1118,7 @@ void MainWindow::on_removeComponentButton_clicked(bool checked)
         line = streamRead.readLine();
         streamWrite << line << "\n";
 
-        //each component number density
+        //each component number density ****************this isn't correct but its recalculated when EPSR is run********************************
         for (int i = 0; i < componentToRemove; i++)
         {
             line = streamRead.readLine();
