@@ -128,7 +128,7 @@ void MainWindow::on_addatoButton_clicked(bool checked)
     //NOTE
     //There are limitations to what will be read during the process - see addato.f for details
     //the atomic number density is calculated after addato as the size of the container determines the size of the final box.
-    //the ecoredcore values at the bottom of the .ato files are important as they determine the atomic overlap during addato
+    //the atomic overlap during addato is determined by sigma and epsilon.
     //tethering of molecules is also important prior to pressing addato.
 
     AddAtoDialog addAtoDialog(this);
@@ -944,7 +944,7 @@ void MainWindow::on_removeComponentButton_clicked(bool checked)
     }
 
     QMessageBox msgBox;
-    msgBox.setText("After removing a component the weights files MUST be remade.");
+    msgBox.setText("After removing a component any weights files will need to be remade.");
     msgBox.exec();
 
     RemoveComponentDialog removeComponentDialog(this);

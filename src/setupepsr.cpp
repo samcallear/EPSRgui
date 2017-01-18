@@ -10,12 +10,15 @@
 void MainWindow::on_setupEPSRButton_clicked(bool checked)
 {
     //check the number of wts files is the same as the number of datafiles
-    if (wtsFileList.contains(" ") == true)
+    for (int i = 0; i < wtsFileList.count(); i++)
     {
-        QMessageBox msgBox;
-        msgBox.setText("Check that weights files have been created for each data file.");
-        msgBox.exec();
-        return;
+        if (!wtsFileList.at(i).contains("."))
+        {
+            QMessageBox msgBox;
+            msgBox.setText("Check that weights files have been created for each data file.");
+            msgBox.exec();
+            return;
+        }
     }
 
     //set epsrInpFileName_

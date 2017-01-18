@@ -2027,6 +2027,7 @@ void MainWindow::runEPSR()
     ui.mixatoButton->setEnabled(false);
     ui.addatoButton->setEnabled(false);
     ui.loadBoxButton->setEnabled(false);
+    ui.removeComponentButton->setEnabled(false);
     ui.dataFileBrowseButton->setEnabled(false);
     ui.removeDataFileButton->setEnabled(false);
     ui.setupEPSRButton->setEnabled(false);
@@ -2133,6 +2134,7 @@ void MainWindow::enableButtons()
     ui.mixatoButton->setEnabled(true);
     ui.addatoButton->setEnabled(true);
     ui.loadBoxButton->setEnabled(true);
+    ui.removeComponentButton->setEnabled(true);
     ui.dataFileBrowseButton->setEnabled(true);
     ui.removeDataFileButton->setEnabled(true);
     ui.setupEPSRButton->setEnabled(true);

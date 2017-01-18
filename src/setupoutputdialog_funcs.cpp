@@ -266,11 +266,6 @@ void SetupOutputDialog::updateTables()
         settingEntries_ = 0; //this is the number of entries that aren't part of calculations, and doesn't include the title line, the fnameato line or the nXXX line if present
         for (int i = 0; i < outputKeywords.count(); i++)
         {
-            if (outputSetupFileType_ == "partials") //partials contains ndist but it isn't used and can actually only have 1 distribution calculated per setup file.
-            {
-                break;
-            }
-            else
             if (outputKeywords.at(i).contains("ndist") || outputKeywords.at(i).contains("nsphere") || outputKeywords.contains("nviews"))
             {
                 break;
@@ -303,7 +298,7 @@ void SetupOutputDialog::updateTables()
         ui.outputSettingsTable->setCurrentCell(settingEntries_-1,0);
     }
 
-    if (outputKeywords.count() > settingEntries_)
+    if (outputSetupFileType_ != "PARTIALS" && outputKeywords.count() > settingEntries_) //partials has ndist but actually only 1 distribution is allowed per file.
     {
         //find the number of subheaders
         int subEntries = outputValues.at(settingEntries_).toInt();
@@ -494,6 +489,12 @@ void SetupOutputDialog::writeOutputFile()
     if (outputSetupFileType_ == "plot2d" || outputSetupFileType_ == "plot3d")
     {
         original.append(".SHARM.h01\n");
+    }
+    else
+    if (outputSetupFileType_ == "PARTIALS")
+    {
+        original.append("ndist       1               Number of site-site distributions\n");
+        original.append("q\n");
     }
     else
     {
