@@ -142,6 +142,9 @@ void MainWindow::on_addatoButton_clicked(bool checked)
 
     if (atoaddDialog == AddAtoDialog::Accepted)
     {
+        //in case Addato doesn't work, make a copy of the simulation box ato file first
+        QFile::copy(workingDir_+atoFileName_, workingDir_+atoFileName_+".copy");
+
         QString container = addAtoDialog.getContainer();
         QStringList atoFilesToAdd = addAtoDialog.getAtoFiles();
         QStringList numberOfMolecules = addAtoDialog.getNumberMols();
@@ -220,9 +223,45 @@ void MainWindow::on_addatoButton_clicked(bool checked)
 
         if (!processEPSR_.waitForFinished(1800000)) return;
 
-        messageText_ += "\nfinished writing "+atoFileName_+" file\n";
+        //read ato file to check what has happened
+        readAtoFileBoxDetails();
+
+        //if the number of first atoms is different to the number of components in the atofiletable, then assume unsuccessful
+        if (firstAtomList.count() != ui.atoFileTable->rowCount())
+        {
+            //roll back to previous box.ato file
+            QFile::remove(workingDir_+atoFileName_);
+            QFile::rename(workingDir_+atoFileName_+".copy", workingDir_+atoFileName_);
+
+            //set number in box for atoFilesToAdd to 0;
+            for (int i = 0; i < ui.atoFileTable->rowCount(); i++)
+            {
+                for (int j = 0; j < atoFilesToAdd.count(); j++)
+                {
+                    if (atoFilesToAdd.at(j) == ui.atoFileTable->item(i,0)->text())
+                    {
+                        ui.atoFileTable->item(i,2)->setText("0");
+                    }
+                }
+            }
+
+            messageText_ += "\nAddato unsuccessful\n";
+            messagesDialog.refreshMessages();
+            ui.messagesLineEdit->setText("Addato unsuccessful");
+
+            QMessageBox msgBox;
+            msgBox.setText("Addato unsuccessful - check Settings->EPSR messages for details.");
+            msgBox.exec();
+            return;
+        }
+
+        //otherwise update everything accordingly
+        messageText_ += "\nAddato successful - finished writing "+atoFileName_+" file\n";
         messagesDialog.refreshMessages();
-        ui.messagesLineEdit->setText("Finished writing box .ato file");
+        ui.messagesLineEdit->setText("Addato successful - Finished writing box .ato file");
+
+        //roll back to previous box.ato file
+        QFile::remove(workingDir_+atoFileName_+".copy");
 
         //update ui.atoFileTable to include number of mols added for relevant .ato files
         if (container != atoFileName_)
@@ -248,8 +287,6 @@ void MainWindow::on_addatoButton_clicked(bool checked)
         }
 
         ui.boxAtoLabel->setText(atoFileName_);
-       //readAtoFileAtomPairs();
-        readAtoFileBoxDetails();
         checkBoxCharge();
         ui.randomiseButton->setEnabled(true);
         ui.plotBoxAct->setEnabled(true);
@@ -268,6 +305,14 @@ void MainWindow::on_addatoButton_clicked(bool checked)
         save();
 
         jmolFile_.removePath(workingDir_);
+
+        BoxCompositionDialog boxCompositionDialog(this);
+
+        boxCompositionDialog.show();
+        boxCompositionDialog.raise();
+        boxCompositionDialog.activateWindow();
+
+        boxCompositionDialog.exec();
     }
 }
 
@@ -944,8 +989,10 @@ void MainWindow::on_removeComponentButton_clicked(bool checked)
     }
 
     QMessageBox msgBox;
-    msgBox.setText("After removing a component any weights files will need to be remade.");
+    msgBox.setText("After removing a component weights files may need to be remade.");
     msgBox.exec();
+
+    readAtoFileBoxDetails();
 
     RemoveComponentDialog removeComponentDialog(this);
 
