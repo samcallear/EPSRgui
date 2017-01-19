@@ -342,6 +342,12 @@ void PlotDialog::getplottype()
             //ereq plot
             ereqPlot();
         }
+        else
+        if (ptType == 9)
+        {
+            //empirical potentials
+            empPotPlot();
+        }
     }
     else
     {
@@ -857,7 +863,7 @@ bool PlotDialog::yPlot()
     ui.customPlot->xAxis->setLabel("iteration");
     if (dataColumn_ == 0)
     {
-        ui.customPlot->yAxis->setLabel("Energy");
+        ui.customPlot->yAxis->setLabel("Energy / kJ mol\u207B\u00B9");
     }
     else
     if (dataColumn_ == 2)
@@ -1290,7 +1296,7 @@ bool PlotDialog::partialsplot()
         {
             partialsFileName = (baseFileName_+".EPSR.g02");
             CNFileName = (baseFileName_+".EPSR.z02");
-            DFileName = (baseFileName_+".EPSR.r01");
+            DFileName = (baseFileName_+".EPSR.r02");
             atompair_index = atompair_index-100;
         }
         else
@@ -1298,7 +1304,7 @@ bool PlotDialog::partialsplot()
         {
             partialsFileName = (baseFileName_+".EPSR.g03");
             CNFileName = (baseFileName_+".EPSR.z03");
-            DFileName = (baseFileName_+".EPSR.r01");
+            DFileName = (baseFileName_+".EPSR.r03");
             atompair_index = atompair_index-200;
         }
         else
@@ -1306,7 +1312,7 @@ bool PlotDialog::partialsplot()
         {
             partialsFileName = (baseFileName_+".EPSR.g04");
             CNFileName = (baseFileName_+".EPSR.z04");
-            DFileName = (baseFileName_+".EPSR.r01");
+            DFileName = (baseFileName_+".EPSR.r04");
             atompair_index = atompair_index-300;
         }
         else
@@ -1314,7 +1320,7 @@ bool PlotDialog::partialsplot()
         {
             partialsFileName = (baseFileName_+".EPSR.g05");
             CNFileName = (baseFileName_+".EPSR.z05");
-            DFileName = (baseFileName_+".EPSR.r01");
+            DFileName = (baseFileName_+".EPSR.r05");
             atompair_index = atompair_index-400;
         }
 
@@ -1516,7 +1522,7 @@ bool PlotDialog::partialsplot()
     }
 
     // give the axes some labels:
-    ui.customPlot->xAxis->setLabel("r (Angstrom)");
+    ui.customPlot->xAxis->setLabel("r / Å");
     ui.customPlot->yAxis->setLabel("g(r)");
 
     //plot
@@ -1714,13 +1720,13 @@ bool PlotDialog::gofrintraplot()
         ui.customPlot->graph(i)->setData(x, columns.at(i));
         QCPItemText *dataLabel = new QCPItemText(ui.customPlot);
         ui.customPlot->addItem(dataLabel);
-        dataLabel->position->setCoords(12,(i/dataSetOffsetFactor)+yZeroOffset+0.2);
+        dataLabel->position->setCoords(xMax-(xMax/10),(i/dataSetOffsetFactor)+yZeroOffset+0.2);
         pairLabel = ui.pairStackPlotList->item(i)->text();
         dataLabel->setText(qPrintable(pairLabel));
     }
 
     // give the axes some labels:
-    ui.customPlot->xAxis->setLabel("r (Angstrom)");
+    ui.customPlot->xAxis->setLabel("r / Å");
     ui.customPlot->yAxis->setLabel("g(r)");
 
     //plot
@@ -1894,7 +1900,7 @@ bool PlotDialog::sqterplot()
     }
 
     // give the axes some labels:
-    ui.customPlot->xAxis->setLabel("q (Angstrom-1)");
+    ui.customPlot->xAxis->setLabel("q / Å\u207B\u00B9");
     ui.customPlot->yAxis->setLabel("s(q)");
 
     //plot
@@ -2069,7 +2075,7 @@ bool PlotDialog::sqtraplot()
     }
 
     // give the axes some labels:
-    ui.customPlot->xAxis->setLabel("q (Angstrom-1)");
+    ui.customPlot->xAxis->setLabel("q / Å\u207B\u00B9");
     ui.customPlot->yAxis->setLabel("s(q)");
 
     //plot
@@ -2158,7 +2164,7 @@ bool PlotDialog::ereqPlot()
     if(!fileqdr.open(QFile::ReadOnly | QFile::Text))
     {
         QMessageBox msgBox;
-        msgBox.setText("Could not open .erg file.");
+        msgBox.setText("Could not open .qdr file.");
         msgBox.exec();
         return 0;
     }
@@ -2237,7 +2243,7 @@ bool PlotDialog::ereqPlot()
     ui.customPlot->graph(0)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc, 3));
 
     // give the axes some labels:
-    ui.customPlot->xAxis->setLabel("ereq energy");
+    ui.customPlot->xAxis->setLabel("ereq energy / kJ mol\u207B\u00B9");
     ui.customPlot->yAxis->setLabel("quality of fit");
 
     //plot
@@ -2276,6 +2282,181 @@ bool PlotDialog::ereqPlot()
         else
         ui.customPlot->yAxis->setRangeUpper(yMax);
     }
+    ui.customPlot->replot();
+    return 0;
+}
+
+bool PlotDialog::empPotPlot()
+{
+    //this is the number of pairs to be plotted
+    int numberPairs = iList.count();
+
+    //this is the QVector of QVectors where the data from the pairs listed above will be stored
+    QVector< QVector<double> > columns;
+    columns.clear();
+    columns.resize(numberPairs+1);
+    QVector<double> x;
+    int pair;
+
+    //get any offsets from the dialog window
+    double yZeroOffset = 0.0;
+    double dataSetOffset = 1.0;
+    if (!ui.yZeroOffsetLineEdit->text().isEmpty())
+    {
+        yZeroOffset = ui.yZeroOffsetLineEdit->text().toDouble();
+    }
+    if (!ui.manOffsetLineEdit->text().isEmpty() && ui.manOffsetRB->isChecked())
+    {
+        dataSetOffset = ui.manOffsetLineEdit->text().toDouble();
+    }
+    double dataSetOffsetFactor = 1/dataSetOffset;
+
+    //read the data for each pair in the list from the data file by looping over each pair in the list
+    for (pair = 0; pair < numberPairs; ++pair)
+    {
+        int i = iList.at(pair); // this is the row of the first atom of the pair
+        int j = jList.at(pair); // this is the row of the second atom in the pair
+        int atompair_index = ij.ref(i,j);
+        QString dataFileName;
+
+        //the first file contains 100 pairs (even columns from 2 to 200) and atompair_indexes from 0 - 99
+        if (atompair_index < 100)
+        {
+            dataFileName = (baseFileName_+".EPSR.p01");
+        }
+        else
+        if (99 < atompair_index && atompair_index < 200)
+        {
+            dataFileName = (baseFileName_+".EPSR.p02");
+            atompair_index = atompair_index-100;
+        }
+        else
+        if (199 < atompair_index && atompair_index < 300)
+        {
+            dataFileName = (baseFileName_+".EPSR.p03");
+            atompair_index = atompair_index-200;
+        }
+        else
+        if (299 < atompair_index && atompair_index < 400)
+        {
+            dataFileName = (baseFileName_+".EPSR.p04");
+            atompair_index = atompair_index-300;
+        }
+        else
+        if (399 < atompair_index && atompair_index < 500)
+        {
+            dataFileName = (baseFileName_+".EPSR.p05");
+            atompair_index = atompair_index-400;
+        }
+
+        QFile file(dataFileName);
+        if(!file.open(QFile::ReadOnly | QFile::Text))
+        {
+            QMessageBox msgBox;
+            msgBox.setText("Could not open .p0# file.");
+            msgBox.exec();
+            return 0;
+        }
+        QTextStream stream(&file);
+        QString line;
+        QStringList dataLine;
+        dataLine.clear();
+        x.clear();
+        line = stream.readLine();
+        do
+        {
+            line = stream.readLine();
+            dataLine = line.split(" ", QString::SkipEmptyParts);
+            if (dataLine.count() == 0) break;
+            x.append(dataLine.at(0).toDouble());
+            columns[pair].append(dataLine.at(atompair_index*2+1).toDouble()+pair/dataSetOffsetFactor+yZeroOffset);
+        } while (!line.isNull());
+        file.close();
+    }
+
+    //find largest and smallest values in x and check for y
+    double xMin = x.at(0);
+    double xMax = x.at(0);
+    double yMin = columns[0].at(0);
+    double yMax = columns[0].at(0);
+    for (int i = 0; i < x.count(); i++)
+    {
+        if (x.at(i) < xMin)
+        {
+            xMin = x.at(i);
+        }
+        else
+        if (x.at(i) > xMax)
+        {
+            xMax = x.at(i);
+        }
+    }
+    for (pair = 0; pair < numberPairs; ++pair)
+    {
+        for (int j = 0; j < columns[pair].count(); j++)
+        {
+            if (columns[pair].at(j) < yMin)
+            {
+                yMin = columns[pair].at(j);
+            }
+            else
+            if (columns[pair].at(j) > yMax)
+            {
+                yMax = columns[pair].at(j);
+            }
+        }
+    }
+
+    // create graph and assign data to it:
+    QPen pen;
+    QString pairLabel;
+    for (int i=0; i < numberPairs; ++i)
+    {
+        ui.customPlot->addGraph();
+        pen.setColor(QColor(qSin(i*0.3)*100+100, qSin(i*0.6+0.7)*100+100, qSin(i*0.4+0.6)*100+100));
+        ui.customPlot->graph(i)->setPen(pen);
+        ui.customPlot->graph(i)->setData(x, columns.at(i));
+        QCPItemText *dataLabel = new QCPItemText(ui.customPlot);
+        ui.customPlot->addItem(dataLabel);
+        dataLabel->position->setCoords(xMax-(xMax/10),(i/dataSetOffsetFactor)+yZeroOffset+1.1);
+        pairLabel = ui.pairStackPlotList->item(i)->text();
+        dataLabel->setText(qPrintable(pairLabel));
+    }
+
+    // give the axes some labels:
+    ui.customPlot->xAxis->setLabel("r / Å");
+    ui.customPlot->yAxis->setLabel("Empirical potential, u(r) / kJ mol\u207B\u00B9");
+
+    //plot
+    ui.customPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
+    if (!ui.xMinLineEdit->text().isEmpty())
+    {
+        ui.customPlot->xAxis->setRangeLower(ui.xMinLineEdit->text().toDouble());
+    }
+    else
+    ui.customPlot->xAxis->setRangeLower(xMin);
+
+    if (!ui.xMaxLineEdit->text().isEmpty())
+    {
+        ui.customPlot->xAxis->setRangeUpper(ui.xMaxLineEdit->text().toDouble());
+    }
+    else
+    ui.customPlot->xAxis->setRangeUpper(xMax);
+
+    if (!ui.yMinLineEdit->text().isEmpty())
+    {
+        ui.customPlot->yAxis->setRangeLower(ui.yMinLineEdit->text().toDouble());
+    }
+    else
+    ui.customPlot->yAxis->setRangeLower(yMin);
+
+    if (!ui.yMaxLineEdit->text().isEmpty())
+    {
+        ui.customPlot->yAxis->setRangeUpper(ui.yMaxLineEdit->text().toDouble());
+    }
+    else
+    ui.customPlot->yAxis->setRangeUpper(yMax);
+
     ui.customPlot->replot();
     return 0;
 }

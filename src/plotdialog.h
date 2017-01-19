@@ -72,6 +72,7 @@ public:
     bool sqterplot();
     bool sqtraplot();
     bool ereqPlot();
+    bool empPotPlot();
 
     //plotting
     QCustomPlot customPlot;
