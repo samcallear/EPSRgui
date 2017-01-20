@@ -33,7 +33,8 @@ MainWindow::MainWindow(QMainWindow *parent) : QMainWindow(parent), messagesDialo
 {
     ui.setupUi(this);
 
-    exeDir_ = QDir::currentPath();
+    //QDir::currentPath();
+    exeDir_ = QApplication::applicationDirPath();
 
     createActions();
 
