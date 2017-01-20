@@ -523,10 +523,10 @@ void MainWindow::open()
     QString newFileName;
     if (!epsrDir_.isEmpty())
     {
-        newFileName = QFileDialog::getOpenFileName(this, "Choose EPSR .pro file", epsrDir_, tr(".EPSR.pro files (*.EPSR.pro)"));
+        newFileName = QFileDialog::getOpenFileName(this, "Choose EPSR .pro file", epsrDir_, tr(".EPSR.pro files (*.pro)"));
     }
     else
-    newFileName = QFileDialog::getOpenFileName(this, "Choose EPSR .pro file", currentDir.path(), tr(".EPSR.pro files (*.EPSR.pro)"));
+    newFileName = QFileDialog::getOpenFileName(this, "Choose EPSR .pro file", currentDir.path(), tr(".EPSR.pro files (*.pro)"));
 
     if (!newFileName.isEmpty())
     {

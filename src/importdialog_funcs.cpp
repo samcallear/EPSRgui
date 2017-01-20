@@ -68,7 +68,7 @@ void ImportDialog::on_browseInpButton_clicked(bool checked)
     QString inpFileName;
     if (!workingDir_.isEmpty())
     {
-        inpFileName = QFileDialog::getOpenFileName(this, "Choose simulation input file", workingDir_, tr(".EPSR.inp files (*.EPSR.inp)"));
+        inpFileName = QFileDialog::getOpenFileName(this, "Choose simulation input file", workingDir_, tr(".EPSR.inp files (*.inp)"));
         epsrInpFileName_ = QFileInfo(inpFileName).fileName();
         ui.inpLineEdit->setText(epsrInpFileName_);
     }
