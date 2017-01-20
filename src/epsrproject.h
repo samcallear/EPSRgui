@@ -205,6 +205,7 @@ public:
     int atoaddDialog;
     int mollattDialog;
     int componentremoveDialog;
+    QStringList atoComponentList; //lists components in order found in ato file (theoretically the same as molFileList and atoFileTable, but used when don't know what is in the box
     QStringList atoAtomTypes; //atom Types as listed from start of box .ato file
     QVector<int> numberAtomTypes; //number of instances of each item in atoAtomTypes in box .ato file
     QVector<int> numberComponentAtomLabels; //number of instances of each item in ljAtoms in component .mol or .ato file

@@ -319,12 +319,12 @@ void MainWindow::on_addatoButton_clicked(bool checked)
 
 void MainWindow::on_loadBoxButton_clicked (bool checked)
 {
+    //must manually change moltypeXX to the name of the associated .mol file at the bottom of the box.ato file bfore starting load box
     QMessageBox msgBox;
     msgBox.setText("In the following dialog window, choose the .ato file to be used as the simulation box.\nEnsure it has the components listed at the bottom of the file, instead of moltypeXX."
                    "\nThe number of each component in the box will need to be entered into the table manually.");
     msgBox.exec();
 
-    //note in manual that need to manually change moltypeXX to the name of the associated .mol file
     QString atoFile = QFileDialog::getOpenFileName(this, "Choose EPSR box .ato file", workingDir_, tr(".ato files (*.ato)"));
     if (!atoFile.isEmpty())
     {
@@ -354,11 +354,41 @@ void MainWindow::on_loadBoxButton_clicked (bool checked)
             }
         }
 
-        ui.boxAtoLabel->setText(atoFileName_);
+        //get all the details from the box .ato file
         readAtoFileBoxDetails();
-//        //for each .ato file listed in atofiletable, calculate the number of this file in the box and add to column 2 ********************************************************
-//        ui.atoFileTable->item(0,2)->setText(ui.boxAtoMols->text());
-//        checkBoxCharge
+
+        //check if the component .mol files are in the project folder
+        for (int i = 0; i < atoComponentList.count(); i++)
+        {
+            QFile checkFile(workingDir_+atoComponentList.at(i)+".mol");
+            if (!checkFile.exists())
+            {
+                QMessageBox msgBox;
+                msgBox.setText("Could not open find one of the component .mol files.\nCheck all component .mol and .ato files are in the project folder and that the box does not have moltypeXX at the bottom and try again.");
+                msgBox.exec();
+                return;
+            }
+        }
+
+        //clear molFileList and atoFileTable
+        ui.molFileList->clear();
+        ui.atoFileTable->clearContents();
+
+        //update molFilList and atoFileTable
+        nMolFiles = atoComponentList.count();
+        ui.atoFileTable->setRowCount(nMolFiles);
+        for (int i = 0; i < nMolFiles; i++)
+        {
+            ui.molFileList->addItem(atoComponentList.at(i)+".mol");
+            QTableWidgetItem *item = new QTableWidgetItem(atoComponentList.at(i)+".ato");
+            item->setFlags(item->flags() & ~Qt::ItemIsEditable);
+            ui.atoFileTable->setItem(i,0, item);
+            ui.atoFileTable->setItem(i,2, new QTableWidgetItem(QString::number(nInBox.at(i))));
+            ui.molFileList->setCurrentRow(i);
+        }
+
+        ui.boxAtoLabel->setText(atoFileName_);
+        checkBoxCharge();
         ui.randomiseButton->setEnabled(true);
         ui.plotBoxAct->setEnabled(true);
         ui.boxCompositionButton->setEnabled(true);
@@ -369,11 +399,10 @@ void MainWindow::on_loadBoxButton_clicked (bool checked)
         ui.removeComponentButton->setEnabled(true);
         ui.dataFileBrowseButton->setEnabled(true);
         ui.removeDataFileButton->setEnabled(true);
+        ui.deleteBoxAtoFileAct->setEnabled(true);
 
         //save .pro file
         save();
-
-        ui.deleteBoxAtoFileAct->setEnabled(true);
     }
 }
 
@@ -588,6 +617,7 @@ bool MainWindow::readAtoFileBoxDetails()
     tetherAtoms.clear();
     tetherList.clear();
     int atomctr = 0;
+    atoComponentList.clear();
     atoAtomTypes.clear();
     numberAtomTypes.clear();
     QList<int> fullnLinesPerComponentList;
@@ -672,13 +702,21 @@ bool MainWindow::readAtoFileBoxDetails()
                 }
             }
         }
-        if (ecoredcorerx.exactMatch(line))
-        {
-            dataLine = line.split("  ", QString::SkipEmptyParts);
-            ui.ecoreLineEdit->setText(dataLine.at(0));
-            ui.dcoreLineEdit->setText(dataLine.at(1));
-        }
+    } while (!ecoredcorerx.exactMatch(line));
+
+    dataLine = line.split("  ", QString::SkipEmptyParts);
+    ui.ecoreLineEdit->setText(dataLine.at(0));
+    ui.dcoreLineEdit->setText(dataLine.at(1));
+
+    line = stream.readLine(); //this is the line of random(?) large numbers
+    do {
+        line = stream.readLine();
+        dataLine = line.split(" ", QString::SkipEmptyParts);
+        if (dataLine.count() == 0) break;
+        if (dataLine.at(0) == "Atomic") break;
+        atoComponentList.append(dataLine.at(1));
     } while (!line.isNull());
+
     file.close();
 
     //get number of each component as listed in the box .ato file
