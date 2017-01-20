@@ -23,6 +23,7 @@ class PlotBoxDialog;
 class SetupOutputDialog;
 class NotesDialog;
 class RemoveComponentDialog;
+class MakeMolLattDialog;
 
 class MainWindow : public QMainWindow
 {
@@ -164,7 +165,6 @@ private slots:
     void on_makeMolExtButton_clicked(bool checked);
     void on_molFmoleButton_clicked(bool checked);
     void on_dockatoButton_clicked(bool checked);
-    void on_makelatticeatoButton_clicked(bool checked);
 
 public:
     QList<IntraMolecular> bonds;
@@ -186,6 +186,7 @@ private slots:
     void on_mixatoButton_clicked(bool checked);
     void on_addatoButton_clicked(bool checked);
     void on_loadBoxButton_clicked (bool checked);
+    void on_makelatticeatoButton_clicked(bool checked);
     void on_randomiseButton_clicked(bool checked);
     void on_updateAtoFileButton_clicked(bool checked);
     void on_fmoleButton_clicked(bool checked);
@@ -202,6 +203,7 @@ private:
 
 public:
     int atoaddDialog;
+    int mollattDialog;
     int componentremoveDialog;
     QStringList atoAtomTypes; //atom Types as listed from start of box .ato file
     QVector<int> numberAtomTypes; //number of instances of each item in atoAtomTypes in box .ato file

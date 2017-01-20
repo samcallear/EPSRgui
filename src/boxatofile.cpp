@@ -12,6 +12,7 @@
 #include "boxcompositiondialog.h"
 #include "addatodialog.h"
 #include "removecomponentdialog.h"
+#include "makemollattdialog.h"
 
 void MainWindow::on_mixatoButton_clicked(bool checked)
 {
@@ -190,11 +191,11 @@ void MainWindow::on_addatoButton_clicked(bool checked)
 
         QString projDir = workingDir_;
         projDir = QDir::toNativeSeparators(projDir);
-    #ifdef _WIN32
+#ifdef _WIN32
         processEPSR_.start(epsrBinDir_+"addato.exe", QStringList() << projDir << "addato");
-    #else
+#else
         processEPSR_.start(epsrBinDir_+"addato", QStringList() << projDir << "addato");
-    #endif
+#endif
         if (!processEPSR_.waitForStarted()) return;
 
         processEPSR_.write(qPrintable(QString::number(nIndex)+"\n"));
@@ -373,6 +374,109 @@ void MainWindow::on_loadBoxButton_clicked (bool checked)
         save();
 
         ui.deleteBoxAtoFileAct->setEnabled(true);
+    }
+}
+
+void MainWindow::on_makelatticeatoButton_clicked(bool checked)
+{
+    if (ui.atoFileTable->rowCount() == 0)
+    {
+        return;
+    }
+
+    if (ui.atoFileTable->rowCount() >= 2)
+    {
+        QMessageBox msgBox;
+        msgBox.setText("Only one component can be made into a molecular lattice.\nAfter the molecular lattice has been created, use Addato to add additional components.");
+        msgBox.exec();
+        return;
+    }
+
+    MakeMolLattDialog makeMolLattDialog(this);
+
+    //makeMolLattDialog.setModal(true);
+    makeMolLattDialog.show();
+    makeMolLattDialog.raise();
+    makeMolLattDialog.activateWindow();
+
+    mollattDialog = makeMolLattDialog.exec();
+
+    if (mollattDialog == MakeMolLattDialog::Accepted)
+    {
+        //list ato files in folder alphabetically and get the one that is listed in EPSRgui as a component
+        QDir::setCurrent(workingDir_);
+        QString baseMolFileName = molFileName_.split(".", QString::SkipEmptyParts).at(0);
+        QString atoFileName = baseMolFileName+".ato";
+
+        QDir dir;
+        QStringList atoFilter;
+        atoFilter << "*.ato";
+        QStringList atoFiles = dir.entryList(atoFilter, QDir::Files, QDir::Name|QDir::IgnoreCase);
+        QString atoFileIndex = QString::number(atoFiles.indexOf(atoFileName));
+        if (atoFileIndex == "-1")
+        {
+            QMessageBox msgBox;
+            msgBox.setText("The component .ato file could not be found in the working directory.\n");
+            msgBox.exec();
+            return;
+        }
+
+        //get number of cells to multiply along each axis from dialog
+        int aCells = makeMolLattDialog.aCells();
+        int bCells = makeMolLattDialog.bCells();
+        int cCells = makeMolLattDialog.cCells();
+
+        QString projDir = workingDir_;
+        projDir = QDir::toNativeSeparators(projDir);
+#ifdef _WIN32
+        processEPSR_.start(epsrBinDir_+"makelatticeato.exe", QStringList() << projDir << "makelatticeato");
+#else
+        processEPSR_.start(epsrBinDir_+"makelatticeato", QStringList() << projDir << "makelatticeato");
+#endif
+        if (!processEPSR_.waitForStarted()) return;
+
+        // press enter to get to ato file listed in the table that will be added to the container
+        int newlines = atoFileIndex.toInt();
+        for (int nl = 0; nl < newlines; nl++)
+        {
+            processEPSR_.write("\n");
+        }
+        processEPSR_.write("y\n");
+
+        processEPSR_.write(qPrintable(QString::number(aCells)+" "+QString::number(bCells)+" "+QString::number(cCells)+"\n"));
+
+        processEPSR_.write(qPrintable(projectName_+"box\n"));
+
+        processEPSR_.write("n\n");
+
+        if (!processEPSR_.waitForFinished(1800000)) return;
+
+        messageText_ += "\nMolecular lattice made\n";
+        messagesDialog.refreshMessages();
+        ui.messagesLineEdit->setText("Molecular lattice made");
+
+        atoFileName_ = projectName_+"box.ato";
+
+        ui.boxAtoLabel->setText(atoFileName_);
+        readAtoFileBoxDetails();
+        checkBoxCharge();
+        ui.randomiseButton->setEnabled(true);
+        ui.plotBoxAct->setEnabled(true);
+        ui.boxCompositionButton->setEnabled(true);
+        ui.updateAtoFileButton->setEnabled(true);
+        ui.fmoleButton->setEnabled(true);
+        ui.atoEPSRButton->setEnabled(true);
+        ui.reloadBoxButton->setEnabled(true);
+        ui.removeComponentButton->setEnabled(true);
+        ui.dataFileBrowseButton->setEnabled(true);
+        ui.removeDataFileButton->setEnabled(true);
+
+        ui.deleteBoxAtoFileAct->setEnabled(true);
+
+        //save .pro file
+        save();
+
+        jmolFile_.removePath(workingDir_);
     }
 }
 

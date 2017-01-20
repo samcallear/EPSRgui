@@ -78,6 +78,7 @@ void MakeLatticeDialog::checkEntries()
     {
         QMessageBox::warning(this, tr("Error making .unit file"),
             tr("All fields need to be completed before proceeding."));
+        return;
     }
     else
     if (QFile::exists(workingDir_+ui.fileNameLineEdit->text()+".ato") == true)

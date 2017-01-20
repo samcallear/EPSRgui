@@ -203,13 +203,6 @@
                    </property>
                   </widget>
                  </item>
-                 <item>
-                  <widget class="QPushButton" name="makelatticeatoButton">
-                   <property name="text">
-                    <string>Run makelatticeato</string>
-                   </property>
-                  </widget>
-                 </item>
                 </layout>
                </item>
                <item>
@@ -2117,6 +2110,13 @@
                        </property>
                       </widget>
                      </item>
+                     <item>
+                      <widget class="QPushButton" name="makelatticeatoButton">
+                       <property name="text">
+                        <string>Create molecular lattice</string>
+                       </property>
+                      </widget>
+                     </item>
                     </layout>
                    </item>
                   </layout>
@@ -3009,10 +3009,19 @@
             </item>
            </widget>
           </item>
-          <item row="2" column="1">
-           <widget class="QPushButton" name="plot2Button">
-            <property name="text">
-             <string>Plot</string>
+          <item row="3" column="0" colspan="5">
+           <widget class="QCustomPlot" name="plot2" native="true">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>400</width>
+              <height>0</height>
+             </size>
             </property>
            </widget>
           </item>
@@ -3030,6 +3039,32 @@
             </property>
            </widget>
           </item>
+          <item row="2" column="1">
+           <widget class="QPushButton" name="plot2Button">
+            <property name="text">
+             <string>Plot</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="4">
+           <widget class="QPushButton" name="epsrRunningSign">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="font">
+             <font>
+              <weight>75</weight>
+              <bold>true</bold>
+             </font>
+            </property>
+            <property name="text">
+             <string>EPSR not running</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0" colspan="4">
+           <widget class="QLineEdit" name="messagesLineEdit"/>
+          </item>
           <item row="2" column="4">
            <widget class="QLabel" name="mousecoord2">
             <property name="minimumSize">
@@ -3046,41 +3081,6 @@
             </property>
             <property name="text">
              <string/>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="0" colspan="5">
-           <widget class="QCustomPlot" name="plot2" native="true">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="minimumSize">
-             <size>
-              <width>400</width>
-              <height>0</height>
-             </size>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="0" colspan="4">
-           <widget class="QLineEdit" name="messagesLineEdit"/>
-          </item>
-          <item row="4" column="4">
-           <widget class="QPushButton" name="epsrRunningSign">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="font">
-             <font>
-              <weight>75</weight>
-              <bold>true</bold>
-             </font>
-            </property>
-            <property name="text">
-             <string>EPSR not running</string>
             </property>
            </widget>
           </item>

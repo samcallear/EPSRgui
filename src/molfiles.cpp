@@ -2216,8 +2216,13 @@ void MainWindow::on_molFmoleButton_clicked(bool checked)
 
 void MainWindow::on_dockatoButton_clicked(bool checked)
 {
+    QMessageBox msgBox1;
+    msgBox1.setText("This is not currently implemented. Use EPSRshell to create the component.");
+    msgBox1.exec();
+    return;
+
     QMessageBox::StandardButton msgBox;
-    msgBox  = QMessageBox::question(this, "Warning", "This will run changeato for the simulation box in a terminal window.\nProceed?", QMessageBox::Ok|QMessageBox::Cancel);
+    msgBox  = QMessageBox::question(this, "Warning", "This will run dockato in a terminal window.\nProceed?", QMessageBox::Ok|QMessageBox::Cancel);
     if (msgBox == QMessageBox::Cancel)
     {
         return;
@@ -2232,28 +2237,6 @@ void MainWindow::on_dockatoButton_clicked(bool checked)
         processDockato.startDetached(epsrBinDir_+"dockato.exe", QStringList() << workingDir_ << "dockato");
     #else
         processDockato.startDetached(epsrBinDir_+"dockato", QStringList() << workingDir_ << "dockato");
-    #endif
-    }
-}
-
-void MainWindow::on_makelatticeatoButton_clicked(bool checked)
-{
-    QMessageBox::StandardButton msgBox;
-    msgBox  = QMessageBox::question(this, "Warning", "This will run changeato for the simulation box in a terminal window.\nProceed?", QMessageBox::Ok|QMessageBox::Cancel);
-    if (msgBox == QMessageBox::Cancel)
-    {
-        return;
-    }
-    else
-    {
-        QDir::setCurrent(workingDir_);
-
-        QProcess processMakelatticeato;
-        processMakelatticeato.setProcessChannelMode(QProcess::ForwardedChannels);
-    #ifdef _WIN32
-        processMakelatticeato.startDetached(epsrBinDir_+"makelatticeato.exe", QStringList() << workingDir_ << "makelatticeato");
-    #else
-        processMakelatticeato.startDetached(epsrBinDir_+"makelatticeato", QStringList() << workingDir_ << "makelatticeato");
     #endif
     }
 }
