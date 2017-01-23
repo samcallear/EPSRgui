@@ -26,11 +26,11 @@ void ImportDialog::on_browseFolderButton_clicked(bool checked)
         QString baseDir = newDir.split(projName, QString::SkipEmptyParts).at(0);
 
         //check if an <project name>.EPSR.pro file already exists in folder
-        QFile file(newDir+"/"+projName+".EPSR.inp");
+        QFile file(newDir+"/"+projName+".EPSR.pro");
         if (file.exists())
         {
             QMessageBox msgBox;
-            msgBox.setText("An EPSR.pro file already exists for this simulation.");
+            msgBox.setText("An EPSR.pro file already exists for this simulation.\n");
             msgBox.exec();
             return;
         }
@@ -38,6 +38,7 @@ void ImportDialog::on_browseFolderButton_clicked(bool checked)
         //assign directories etc
         workingDir_ = newDir+"/";
         workingDir_ = QDir::toNativeSeparators(workingDir_);
+        baseDir = QDir::toNativeSeparators(baseDir);
         ui.folderLineEdit->setText(workingDir_);
         ui.importToFolderLineEdit->setText(baseDir);
         projectName_ = projName;
@@ -111,19 +112,9 @@ void ImportDialog::on_removeComponentButton_clicked(bool checked)
 
 void ImportDialog::on_browseNewFolderButton_clicked(bool checked)
 {
-    QString newProjectName = ui.newProjectNameLineEdit->text();
     QString newDir = QFileDialog::getExistingDirectory(this, "Choose directory for simulation to be imported to", epsrDir_);
     if (!newDir.isEmpty())
     {
-        //check if a folder named projectName_ already exists in folder
-        if (QDir(newDir+"/"+newProjectName).exists())
-        {
-            QMessageBox msgBox;
-            msgBox.setText("A folder already exists in this directory for this simulation.");
-            msgBox.exec();
-            return;
-        }
-
         //assign directories etc
         newWorkingDir_ = newDir+"/";
         newWorkingDir_ = QDir::toNativeSeparators(newWorkingDir_);
@@ -145,7 +136,9 @@ void ImportDialog::import()
 {
     //get original simultion directory and new simulation directory
     workingDir_ = ui.folderLineEdit->text();
-    newWorkingDir_ = ui.importToFolderLineEdit->text()+"/"+ui.newProjectNameLineEdit->text()+"/";
+    workingDir_ = QDir::toNativeSeparators(workingDir_);
+    projectName_ = ui.newProjectNameLineEdit->text();
+    newWorkingDir_ = ui.importToFolderLineEdit->text()+projectName_+"/";
     newWorkingDir_ = QDir::toNativeSeparators(newWorkingDir_);
 
     //check original simulation directory path is correct
@@ -157,10 +150,20 @@ void ImportDialog::import()
         return;
     }
 
+    //check if an EPSR.pro file is already in the directory
+    QFile proFile(workingDir_+projectName_+".EPSR.pro");
+    QFile newProFile(newWorkingDir_+projectName_+".EPSR.pro");
+    if (proFile.exists() || newProFile.exists())
+    {
+        QMessageBox msgBox;
+        msgBox.setText("An EPSR.pro file already exists for this simulation.");
+        msgBox.exec();
+        return;
+    }
+
     if (newWorkingDir_ != workingDir_) //this can be a change in path or projectName_
     {
         //check destination path is viable i.e. a simulation of the same name doesn't already exist there
-        //(this is checked twice in case the projectName is altered after the path is changed)
         if (QDir(newWorkingDir_).exists())
         {
             QMessageBox msgBox;
@@ -183,8 +186,6 @@ void ImportDialog::import()
         //make the newWorkingDir_ the workingDir_
         workingDir_ = newWorkingDir_;
     }
-
-    projectName_ = ui.newProjectNameLineEdit->text();
 
     QRegExp ecoredcorerx("  ([0-9]{1}[.]{1}[0-9]{5}[E+]{2}[0-9]{2})  ([0-9]{1}[.]{1}[0-9]{5}[E+]{2}[0-9]{2})");
     QStringList molFileList;
@@ -327,8 +328,8 @@ void ImportDialog::import()
     //EPSR.inp and .pcof files
     if (!epsrInpFileName_.isEmpty())
     {
-        QString atoBaseFileName = atoFileName_.split(".",QString::SkipEmptyParts).at(0);
-        streamWrite << "EPSRinp " << atoBaseFileName << "\n";
+        QString inpBaseFileName = epsrInpFileName_.split(".",QString::SkipEmptyParts).at(0);
+        streamWrite << "EPSRinp " << inpBaseFileName << "\n";
     }
 
     file.resize(0);

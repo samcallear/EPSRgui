@@ -539,8 +539,11 @@ void MainWindow::open()
         projectName_ = QFileInfo(newFileName).baseName();
         workingDir_ = QFileInfo(newFileName).path()+"/";
         workingDir_ = QDir::toNativeSeparators(workingDir_);
-        epsrDir_ = workingDir_.split(projectName_,QString::SkipEmptyParts).at(0);
-        epsrDir_ = QDir::toNativeSeparators(epsrDir_);
+        if (epsrDir_.isEmpty())
+        {
+            epsrDir_ = workingDir_.split(projectName_,QString::SkipEmptyParts).at(0);
+            epsrDir_ = QDir::toNativeSeparators(epsrDir_);
+        }
 
         messageText_ += "\n***************************************************************************\n";
         messageText_ += "Current EPSR project name is "+projectName_+"\n";
@@ -748,12 +751,12 @@ void MainWindow::open()
         //plot data if present
         if (!epsrInpFileName_.isEmpty())
         {
-            QString atoBaseFileName = atoFileName_.split(".",QString::SkipEmptyParts).at(0);
-            if (QFile::exists(atoBaseFileName+".EPSR.u01")) //this was also included but not sure why: && !dataFileList.isEmpty())
+            QString atoBaseFileName = epsrInpFileName_.split(".",QString::SkipEmptyParts).at(0);
+            if (QFile::exists(workingDir_+atoBaseFileName+".EPSR.u01")) //this was also included but not sure why: && !dataFileList.isEmpty())
             {
                 plot1();
             }
-            if (QFile::exists(atoBaseFileName+".EPSR.erg"))
+            if (QFile::exists(workingDir_+atoBaseFileName+".EPSR.erg"))
             {
                 plot2();
             }
@@ -1380,6 +1383,11 @@ void MainWindow::import()
         projectName_ = importDialog.getProjectName();
         workingDir_ = (epsrDir_+projectName_+"/");
         workingDir_ = QDir::toNativeSeparators(workingDir_);
+        if (epsrDir_.isEmpty())
+        {
+            epsrDir_ = workingDir_.split(projectName_,QString::SkipEmptyParts).at(0);
+            epsrDir_ = QDir::toNativeSeparators(epsrDir_);
+        }
 
         ui.messagesLineEdit->setText("Please wait: importing project "+projectName_);
         ui.tabWidget->setDisabled(true);
@@ -1410,7 +1418,7 @@ void MainWindow::import()
 #endif
 
         //read in EPSR pro file
-        QString epsrProFile = workingDir_+"/"+projectName_+".EPSR.pro";
+        QString epsrProFile = workingDir_+projectName_+".EPSR.pro";
         epsrProFile = QDir::toNativeSeparators(epsrProFile);
         QFile file(epsrProFile);
         if(!file.open(QFile::ReadOnly | QFile::Text))
@@ -1639,8 +1647,6 @@ void MainWindow::import()
         //fill out input file tab
         if (!epsrInpFileName_.isEmpty())
         {
-            messageText_ += "here";
-            messagesDialog.refreshMessages();
             QString baseFileName = epsrInpFileName_.split(".", QString::SkipEmptyParts).at(0);
 #ifdef _WIN32
             processEPSR_.start(epsrBinDir_+"upset.exe", QStringList() << workingDir_ << "upset" << "epsr" << baseFileName);
@@ -1685,41 +1691,50 @@ void MainWindow::import()
             if (!scriptFile.isEmpty())
             {
                 QFile batFile(workingDir_+scriptFile);
-
                 QTextStream batstream(&batFile);
                 QString batline;
                 QStringList batdataLine;
                 batdataLine.clear();
-                if (batFile.exists() == true)
+                if (batFile.exists() == false)
                 {
-                    if (batFile.open(QFile::ReadWrite | QFile::Text))
-                    {
-                        do {
-                            batline = batstream.readLine();
-                            if (batline.contains("chains")
-                                    || batline.contains("clusters")
-                                    || batline.contains("coord")
-                                    || batline.contains("mapgr")
-                                    || batline.contains("partials")
-                                    || batline.contains("rings")
-                                    || batline.contains("sdf")
-                                    || batline.contains("sdfcube")
-                                    || batline.contains("sharm")
-                                    || batline.contains("torangles")
-                                    || batline.contains("triangles")
-                                    || batline.contains("voids"))
-                            {
-                                batdataLine = batline.split(" ", QString::SkipEmptyParts);
-                                ui.runOutEPSRList->addItem(batdataLine.at(2)+": "+batdataLine.at(3));
-                            }
-                            if (batline.contains("writexyz"))
-                            {
-                                ui.dlputilsOutCheckBox->setChecked(true);
-                            }
-                        }while (!batline.isNull());
-                        batFile.close();
-                    }
+                    QMessageBox msgBox;
+                    msgBox.setText("Could not find script file.");
+                    msgBox.exec();
+                    return;
                 }
+
+                if (!batFile.open(QFile::ReadOnly | QFile::Text))
+                    {
+                        QMessageBox msgBox;
+                        msgBox.setText("Could not open script file.");
+                        msgBox.exec();
+                        return;
+                    }
+
+                do {
+                    batline = batstream.readLine();
+                    if (batline.contains("chains")
+                            || batline.contains("clusters")
+                            || batline.contains("coord")
+                            || batline.contains("mapgr")
+                            || batline.contains("partials")
+                            || batline.contains("rings")
+                            || batline.contains("sdf")
+                            || batline.contains("sdfcube")
+                            || batline.contains("sharm")
+                            || batline.contains("torangles")
+                            || batline.contains("triangles")
+                            || batline.contains("voids"))
+                    {
+                        batdataLine = batline.split(" ", QString::SkipEmptyParts);
+                        ui.runOutEPSRList->addItem(batdataLine.at(0)+": "+batdataLine.at(1));
+                    }
+                    if (batline.contains("writexyz"))
+                    {
+                        ui.dlputilsOutCheckBox->setChecked(true);
+                    }
+                }while (!batline.isNull());
+                batFile.close();
             }
         }
 
@@ -1736,7 +1751,7 @@ void MainWindow::import()
         //plot data if present
         if (!epsrInpFileName_.isEmpty())
         {
-            QString atoBaseFileName = atoFileName_.split(".",QString::SkipEmptyParts).at(0);
+            QString atoBaseFileName = epsrInpFileName_.split(".",QString::SkipEmptyParts).at(0);
             if (QFile::exists(atoBaseFileName+".EPSR.u01")) //this was also included but not sure why: && !dataFileList.isEmpty())
             {
                 plot1();
@@ -1745,6 +1760,7 @@ void MainWindow::import()
             {
                 plot2();
             }
+
             //make run script file and include any analyses
             QString baseFileName = epsrInpFileName_.split(".",QString::SkipEmptyParts).at(0);
 
@@ -1783,6 +1799,7 @@ void MainWindow::import()
                     << "rm -r " << workingDir_ << "killepsr\n";
 #endif
             writebatFile.close();
+
             addOutputsToScript();
         }
 
@@ -2262,7 +2279,7 @@ void MainWindow::plotEPSRshell()
 
 void MainWindow::plotJmol()
 {
-    QString jmolFile = QFileDialog::getOpenFileName(this, "Choose .CUBE.txt file", workingDir_, tr(".CUBE.txt files (*.CUBE.txt)"));
+    QString jmolFile = QFileDialog::getOpenFileName(this, "Choose .CUBE.txt file", workingDir_, tr(".CUBE.txt files (*.txt)"));
     if (!jmolFile.isEmpty())
     {
         QFileInfo fi(jmolFile);
@@ -2505,6 +2522,11 @@ QString MainWindow::workingDir()
 QString MainWindow::atoFileName()
 {
     return atoFileName_;
+}
+
+QString MainWindow::epsrInpFileName()
+{
+    return epsrInpFileName_;
 }
 
 QDir MainWindow::exeDir()

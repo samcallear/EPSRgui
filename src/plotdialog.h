@@ -18,6 +18,7 @@ private:
     QDir currentDir;
     QString workingDir_;
     QString atoFileName_;
+    QString epsrInpFileName_;
     QString baseFileName_;
     MainWindow *mainWindow_;
     QString plotFileExt_;

@@ -107,6 +107,7 @@ private:
 public:
     QString workingDir();
     QString atoFileName();
+    QString epsrInpFileName();
     QDir exeDir();
     QString epsrDir();
     QString epsrBinDir();

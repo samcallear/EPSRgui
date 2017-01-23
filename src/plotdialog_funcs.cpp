@@ -19,7 +19,8 @@ PlotDialog::PlotDialog(MainWindow *parent) : QDialog(parent)
 
     workingDir_ = mainWindow_->workingDir();
     atoFileName_ = mainWindow_->atoFileName();
-    baseFileName_ = workingDir_+atoFileName_.split(".").at(0);
+    epsrInpFileName_ = mainWindow_->epsrInpFileName();
+    baseFileName_ = workingDir_+epsrInpFileName_.split(".").at(0);
 
     ui.standardPlotList->setCurrentRow(0);
     connect(ui.closeButton, SIGNAL(clicked()), this, SLOT(reject()));

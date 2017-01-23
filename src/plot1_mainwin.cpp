@@ -69,7 +69,7 @@ bool MainWindow::fqplot1()
     int nDatasets = dataFileList.count();
     int nDataCol = nDatasets*2+1;
 
-    baseFileName_= (workingDir_+atoFileName_).split(".").at(0);
+    baseFileName_= (workingDir_+epsrInpFileName_).split(".").at(0);
     QString fqmodelFileName;
     fqmodelFileName = (baseFileName_+".EPSR.u01");
     QString fqdataFileName;
@@ -364,7 +364,7 @@ bool MainWindow::frplot1()
     int nDatasets = dataFileList.count();
     int nDataCol = nDatasets*2+1;
 
-    baseFileName_= (workingDir_+atoFileName_).split(".").at(0);
+    baseFileName_= (workingDir_+epsrInpFileName_).split(".").at(0);
     QString frmodelFileName;
     frmodelFileName = (baseFileName_+".EPSR.x01");
     QString frdataFileName;
@@ -583,7 +583,7 @@ bool MainWindow::frplot1()
 
 bool MainWindow::Eplot1()
 {
-    baseFileName_= (workingDir_+atoFileName_).split(".").at(0);
+    baseFileName_= (workingDir_+epsrInpFileName_).split(".").at(0);
     QString FileName;
     FileName = (baseFileName_+".EPSR.erg");
     QFile file(FileName);
@@ -661,7 +661,7 @@ bool MainWindow::Eplot1()
 
 bool MainWindow::Rplot1()
 {
-    baseFileName_= (workingDir_+atoFileName_).split(".").at(0);
+    baseFileName_= (workingDir_+epsrInpFileName_).split(".").at(0);
     QString FileName;
     FileName = (baseFileName_+".EPSR.erg");
     QFile file(FileName);
@@ -739,7 +739,7 @@ bool MainWindow::Rplot1()
 
 bool MainWindow::Pplot1()
 {
-    baseFileName_= (workingDir_+atoFileName_).split(".").at(0);
+    baseFileName_= (workingDir_+epsrInpFileName_).split(".").at(0);
     QString FileName;
     FileName = (baseFileName_+".EPSR.erg");
     QFile file(FileName);
@@ -817,7 +817,7 @@ bool MainWindow::Pplot1()
 
 bool MainWindow::Ereqplot1()
 {
-    baseFileName_= (workingDir_+atoFileName_).split(".").at(0);
+    baseFileName_= (workingDir_+epsrInpFileName_).split(".").at(0);
     QString FileNameerg;
     FileNameerg = (baseFileName_+".EPSR.erg");
     QFile fileerg(FileNameerg);
@@ -885,7 +885,7 @@ bool MainWindow::Ereqplot1()
         if (dataLineqdr.count() <= 6)
         {
             QMessageBox msgBox;
-            msgBox.setText("This plot type is not compatible with this version of EPSR.");
+            msgBox.setText("This plot type is not compatible with the version of EPSR this simulation was last run with.");
             msgBox.exec();
             fileqdr.close();
             return 0;
