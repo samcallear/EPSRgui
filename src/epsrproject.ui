@@ -1185,7 +1185,7 @@
            </attribute>
            <layout class="QHBoxLayout" name="horizontalLayout_18">
             <item>
-             <layout class="QGridLayout" name="gridLayout_10" rowstretch="1,2">
+             <layout class="QGridLayout" name="gridLayout_10" rowstretch="1,2" columnstretch="4,3">
               <item row="0" column="1">
                <layout class="QGridLayout" name="gridLayout_4" rowstretch="2,0,0,2" columnstretch="1,1,1,1">
                 <item row="2" column="1">

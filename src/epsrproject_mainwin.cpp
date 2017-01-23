@@ -667,11 +667,11 @@ void MainWindow::open()
                     getOutputType();
                     getOutputsRunning();
                     //open .bat file to check if dlputils line is in there
-                    QString atoBaseFileName = atoFileName_.split(".",QString::SkipEmptyParts).at(0);
+                    QString inpBaseFileName = epsrInpFileName_.split(".",QString::SkipEmptyParts).at(0);
                 #ifdef _WIN32
-                    QFile batFile(workingDir_+"run"+atoBaseFileName+".bat");
+                    QFile batFile(workingDir_+"run"+inpBaseFileName+".bat");
                 #else
-                    QFile batFile(workingDir_+"run"+atoBaseFileName+".sh");
+                    QFile batFile(workingDir_+"run"+inpBaseFileName+".sh");
                 #endif
                     if (batFile.exists() == true)
                     {
@@ -813,7 +813,7 @@ bool MainWindow::save()
     //EPSR.inp and .pcof files
     if (!epsrInpFileName_.isEmpty())
     {
-        QString atoBaseFileName = atoFileName_.split(".",QString::SkipEmptyParts).at(0);
+        QString atoBaseFileName = epsrInpFileName_.split(".",QString::SkipEmptyParts).at(0);
         streamWrite << "EPSRinp " << atoBaseFileName << "\n";
     }
 
@@ -1369,6 +1369,7 @@ void MainWindow::import()
 
     ImportDialog importDialog(this);
 
+    importDialog.setModal(true);
     importDialog.show();
     importDialog.raise();
     importDialog.activateWindow();
