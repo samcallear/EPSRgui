@@ -53,14 +53,14 @@ void MainWindow::makeMolFile()
     jmolFilter << "*.jmol";
     QStringList jmolFiles = dir.entryList(jmolFilter, QDir::Files);
 
-    QMessageBox msgBox;
-    msgBox.setText("here");
-    msgBox.exec();
-
     if (jmolFiles.count() == 0)
     {
         return;
     }
+
+    QMessageBox msgBox;
+    msgBox.setText(jmolFiles.at(0)+" "+jmolFiles.at(1));
+    msgBox.exec();
 
     //check the file was modified in the last second
     QFileInfo fi(jmolFiles.at(0));
