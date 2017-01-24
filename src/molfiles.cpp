@@ -52,6 +52,11 @@ void MainWindow::makeMolFile()
     QStringList jmolFilter;
     jmolFilter << "*.jmol";
     QStringList jmolFiles = dir.entryList(jmolFilter, QDir::Files);
+
+    QMessageBox msgBox;
+    msgBox.setText("here");
+    msgBox.exec();
+
     if (jmolFiles.count() == 0)
     {
         return;
