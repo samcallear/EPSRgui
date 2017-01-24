@@ -33,6 +33,31 @@ MainWindow::MainWindow(QMainWindow *parent) : QMainWindow(parent), messagesDialo
 {
     ui.setupUi(this);
 
+#ifdef Q_OS_MAC
+    QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+    QStringList envlist = env.toStringList();
+
+    for(int i=0; i < envlist.size(); i++)
+    {
+        QString entry = envlist[i];
+
+        if(entry.startsWith("PATH="))
+        {
+            int index = entry.indexOf("=");
+
+            if(index != -1)
+            {
+                QString value = entry.right(entry.length() - (index+1));
+                value += ":/usr/texbin:/usr/local/bin";
+
+                setenv("PATH", value.toLatin1().constData(), true);
+            }
+
+            break;
+        }
+    }
+#endif
+
     //QDir::currentPath();
     exeDir_ = QApplication::applicationDirPath();
 
