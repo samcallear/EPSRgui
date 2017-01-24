@@ -68,9 +68,6 @@ void MainWindow::makeMolFile()
     //stop QFileSystemWatcher so don't get double ups message
     jmolFile_.removePath(workingDir_);
 
-    QMessageBox msgBox;
-    msgBox.setText("here");
-    msgBox.exec();
     QString jmolFileName = jmolFiles.at(0);
 
     //check if a .mol file of the same name is already listed as a component
