@@ -60,7 +60,7 @@ void MainWindow::makeMolFile()
 
     //check the file was modified in the last second
     QFileInfo fi(jmolFiles.at(0));
-    if (fi.lastModified().msecsTo(QDateTime::currentDateTime()) > 1000 )
+    if (fi.lastModified().msecsTo(QDateTime::currentDateTime()) > 2000 )
     {
         return;
     }
