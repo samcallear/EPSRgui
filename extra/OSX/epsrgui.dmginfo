@@ -9,13 +9,13 @@
 APP_NAME=EPSRgui
 
 # -- APP_VERSION : Should contain the version / revision number of the package (for renaming purposes)
-APP_VERSION="0.1"
+APP_VERSION="1.0"
 
 # -- APP_BIN : List of binaries (space-separated, with paths) to include in the bundle
-APP_BIN="EPSRgui.app/Contents/MacOS/EPSRgui"
+APP_BIN="EPSRgui.app/Contents/MacOS/EPSRgui extra/OSX/runEPSRgui"
 
 # -- APP_PLIST : Specify the Info.plist file to use in the bundle
-APP_PLIST="EPSRgui.app/Contents/Info.plist"
+APP_PLIST="extra/OSX/Info.plist"
 
 # -- APP_ICON : A 1024x1024 png file from which to create an icon set
 APP_ICON="extra/epsrgui1024.png"
