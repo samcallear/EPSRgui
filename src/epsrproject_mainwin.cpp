@@ -1685,6 +1685,39 @@ void MainWindow::import()
              processEPSR_.write("y\n");
             if (!processEPSR_.waitForFinished(60000)) return;
 
+            //find pcof file - if can't find one with correct name, copy to correct name
+            QString atobaseFileName = atoFileName_.split(".",QString::SkipEmptyParts).at(0);
+            QString epsrpcofFileName = workingDir_+atobaseFileName+".pcof";
+            QFile file(epsrpcofFileName);
+            if (!file.exists())
+            {
+                QDir dir;
+                dir.setPath(workingDir_);
+                QStringList pcofFilter;
+                pcofFilter << "*.pcof";
+                QStringList pcofFiles = dir.entryList(pcofFilter, QDir::Files);
+                if (pcofFiles.count() == 0)
+                {
+                    QMessageBox msgBox;
+                    msgBox.setText("Could not find a .pcof file.");
+                    msgBox.exec();
+                    return;
+                }
+                else
+                if (pcofFiles.count() >= 2)
+                {
+                    QMessageBox msgBox;
+                    msgBox.setText("Multiple .pcof files found in folder.");
+                    msgBox.exec();
+                    return;
+                }
+                else
+                {
+                    file.rename(workingDir_+pcofFiles.at(0), workingDir_+atobaseFileName+".pcof");
+                    file.remove(workingDir_+pcofFiles.at(0));
+                }
+            }
+
             readEPSRinpFile();
             updateInpFileTables();
             readEPSRpcofFile();
