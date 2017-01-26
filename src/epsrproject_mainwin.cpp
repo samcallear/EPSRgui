@@ -1673,22 +1673,10 @@ void MainWindow::import()
         //fill out input file tab
         if (!epsrInpFileName_.isEmpty())
         {
-            QString baseFileName = epsrInpFileName_.split(".", QString::SkipEmptyParts).at(0);
-#ifdef _WIN32
-            processEPSR_.start(epsrBinDir_+"upset.exe", QStringList() << workingDir_ << "upset" << "epsr" << baseFileName);
-#else
-            processEPSR_.start(epsrBinDir_+"upset", QStringList() << workingDir_ << "upset" << "epsr" << baseFileName);
-#endif
-            if (!processEPSR_.waitForStarted()) return;
-            processEPSR_.write("e\n");
-            processEPSR_.write("\n");
-             processEPSR_.write("y\n");
-            if (!processEPSR_.waitForFinished(60000)) return;
-
             //find pcof file - if can't find one with correct name, copy to correct name
             QString atobaseFileName = atoFileName_.split(".",QString::SkipEmptyParts).at(0);
-            QString epsrpcofFileName = workingDir_+atobaseFileName+".pcof";
-            QFile file(epsrpcofFileName);
+            QString pcofFileName = workingDir_+atobaseFileName+".pcof";
+            QFile file(pcofFileName);
             if (!file.exists())
             {
                 QDir dir;
@@ -1713,11 +1701,65 @@ void MainWindow::import()
                 }
                 else
                 {
-                    file.rename(workingDir_+pcofFiles.at(0), workingDir_+atobaseFileName+".pcof");
-                    file.remove(workingDir_+pcofFiles.at(0));
+                    QFile::rename(workingDir_+pcofFiles.at(0), pcofFileName);
+                    QFile::remove(workingDir_+pcofFiles.at(0));
                 }
+
+                //write name of pcof file to EPSR.inp file
+                QFile epsrfile(workingDir_+epsrInpFileName_);
+                QFile fileWrite(workingDir_+"temp.txt");
+                if (!epsrfile.open(QFile::ReadOnly | QFile::Text))
+                {
+                    QMessageBox msgBox;
+                    msgBox.setText("Could not open .EPSR.inp file.");
+                    msgBox.exec();
+                    return;
+                }
+                if(!fileWrite.open(QFile::WriteOnly | QFile::Text))
+                {
+                    QMessageBox msgBox;
+                    msgBox.setText("Could not open temporary file");
+                    msgBox.exec();
+                    return;
+                }
+                QTextStream streamepsr(&epsrfile);
+                QTextStream streamWrite(&fileWrite);
+                QString lineepsr;
+                QStringList dataLineepsr;
+                dataLineepsr.clear();
+
+                do
+                {
+                    lineepsr = streamepsr.readLine();
+                    if (lineepsr.contains("fnamepcof"))
+                    {
+                        lineepsr.clear();
+                        lineepsr = "fnamepcof   "+atobaseFileName+".pcof               Name of potential coefficients file.";
+                    }
+                    streamWrite << lineepsr << "\n";
+                } while (!lineepsr.isNull());
+
+                fileWrite.close();
+                epsrfile.close();
+                QFile::remove(workingDir_+epsrInpFileName_);
+                QFile::rename(workingDir_+"temp.txt", workingDir_+epsrInpFileName_);
             }
 
+            //run setup epsr fromat correctly
+            QDir::setCurrent(workingDir_);
+            QString baseFileName = epsrInpFileName_.split(".", QString::SkipEmptyParts).at(0);
+#ifdef _WIN32
+            processEPSR_.start(epsrBinDir_+"upset.exe", QStringList() << workingDir_ << "upset" << "epsr" << baseFileName);
+#else
+            processEPSR_.start(epsrBinDir_+"upset", QStringList() << workingDir_ << "upset" << "epsr" << baseFileName);
+#endif
+            if (!processEPSR_.waitForStarted()) return;
+            processEPSR_.write("e\n");
+            processEPSR_.write("\n");
+             processEPSR_.write("y\n");
+            if (!processEPSR_.waitForFinished(60000)) return;
+
+            //read in files
             readEPSRinpFile();
             updateInpFileTables();
             readEPSRpcofFile();
