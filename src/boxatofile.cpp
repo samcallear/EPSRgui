@@ -423,7 +423,7 @@ void MainWindow::on_makelatticeatoButton_clicked(bool checked)
 
     MakeMolLattDialog makeMolLattDialog(this);
 
-    //makeMolLattDialog.setModal(true);
+    makeMolLattDialog.setModal(true);
     makeMolLattDialog.show();
     makeMolLattDialog.raise();
     makeMolLattDialog.activateWindow();

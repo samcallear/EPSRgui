@@ -298,6 +298,7 @@ void MainWindow::createNew()
 
     CreateNewDialog createNewDialog(this);
 
+    createNewDialog.setModal(true);
     createNewDialog.show();
     createNewDialog.raise();
     createNewDialog.activateWindow();
