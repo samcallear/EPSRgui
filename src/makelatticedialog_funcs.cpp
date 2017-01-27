@@ -25,8 +25,6 @@ MakeLatticeDialog::MakeLatticeDialog(MainWindow *parent) : QDialog(parent)
     ui.beLineEdit->setValidator(new QRegExpValidator(numberrx, this));
     ui.cLineEdit->setValidator(new QRegExpValidator(numberrx, this));
     ui.gaLineEdit->setValidator(new QRegExpValidator(numberrx, this));
-    ui.ecoreLineEdit->setValidator(new QRegExpValidator(numberrx, this));
-    ui.dcoreLineEdit->setValidator(new QRegExpValidator(numberrx, this));
     QRegExp integerrx("^\\d*$");
     ui.aLattLineEdit->setValidator(new QRegExpValidator(integerrx, this));
     ui.bLattLineEdit->setValidator(new QRegExpValidator(integerrx, this));
@@ -70,8 +68,6 @@ void MakeLatticeDialog::checkEntries()
         || ui.beLineEdit->text().isEmpty()
         || ui.cLineEdit->text().isEmpty()
         || ui.gaLineEdit->text().isEmpty()
-        || ui.ecoreLineEdit->text().isEmpty()
-        || ui.dcoreLineEdit->text().isEmpty()
         || ui.aLattLineEdit->text().isEmpty()
         || ui.bLattLineEdit->text().isEmpty()
         || ui.cLattLineEdit->text().isEmpty())
@@ -193,8 +189,6 @@ bool MakeLatticeDialog::readUnitFile()
     }
     line = stream.readLine();
     dataLine = line.split(" ", QString::SkipEmptyParts);
-    ui.ecoreLineEdit->setText(dataLine.at(0));
-    ui.dcoreLineEdit->setText(dataLine.at(1));
 
     file.close();
 }
@@ -315,7 +309,7 @@ bool MakeLatticeDialog::saveToUnitFile()
         streamWrite << ui.paramTable->item(i,0)->text() << " " << ui.paramTable->item(i,1)->text() << " " << ui.paramTable->item(i,2)->text() << "\n"
                     << ui.paramTable->item(i,3)->text() << " " << ui.paramTable->item(i,4)->text() << " " << ui.paramTable->item(i,5)->text() << " " << ui.paramTable->item(i,6)->text() << " " << ui.paramTable->item(i,7)->text() << "\n";
     }
-    streamWrite << ui.ecoreLineEdit->text() << " " << ui.dcoreLineEdit->text() << "\n";
+    streamWrite << "0.0" << " " << "0.0" << "\n";
 
     file.close();
     unitFileName_= workingDir_+unitFileName+".unit";
