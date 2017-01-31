@@ -64,10 +64,6 @@ MainWindow::MainWindow(QMainWindow *parent) : QMainWindow(parent), messagesDialo
     exeDir_ = QApplication::applicationDirPath(); //QDir::currentPath() doesn't work on OSX
 #endif
 
-    QMessageBox msgBox;
-    msgBox.setText("exeDir_ "+exeDir_.absolutePath());
-    msgBox.exec();
-
     createActions();
 
     ui.tabWidget->setEnabled(false);
