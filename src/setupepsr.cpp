@@ -115,7 +115,7 @@ void MainWindow::on_reloadEPSRinpButton_clicked(bool checked)
     ui.messagesLineEdit->setText("EPSR .inp and .pcof files reloaded");
 }
 
-void MainWindow::readEPSRinpFile()
+bool MainWindow::readEPSRinpFile()
 {
     QFile file(workingDir_+epsrInpFileName_);
     if(!file.open(QFile::ReadOnly | QFile::Text))
@@ -123,7 +123,7 @@ void MainWindow::readEPSRinpFile()
         QMessageBox msgBox;
         msgBox.setText("Could not open EPSR.inp file");
         msgBox.exec();
-        return;
+        return false;
     }
 
     QTextStream stream(&file);
@@ -193,6 +193,8 @@ void MainWindow::readEPSRinpFile()
         inpValue = inp1stcolumns.at(i).split(inpFilerx, QString::SkipEmptyParts).at(0);
         inpValues.append(inpValue);
     }
+
+    return true;
 }
 
 void MainWindow::updateInpFileTables()

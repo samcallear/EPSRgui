@@ -760,6 +760,7 @@ void MainWindow::on_removeDataFileButton_clicked(bool checked)
         ui.dataFileTable->removeRow(0);
         ui.makeWtsButton->setEnabled(false);
         ui.setupEPSRButton->setEnabled(false);
+        ui.dataFileLineEdit->clear();
     }
 
     //save .pro file

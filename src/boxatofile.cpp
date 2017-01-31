@@ -100,7 +100,6 @@ void MainWindow::on_mixatoButton_clicked(bool checked)
         ui.messagesLineEdit->setText("Finished writing box .ato file");
 
         ui.boxAtoLabel->setText(atoFileName_);
-        //readAtoFileAtomPairs();
         readAtoFileBoxDetails();
         checkBoxCharge();
         ui.randomiseButton->setEnabled(true);
@@ -515,7 +514,7 @@ bool MainWindow::readAtoFileBoxDetails()
     if(!file.open(QFile::ReadOnly | QFile::Text))
     {
         QMessageBox msgBox;
-        msgBox.setText("Could not open .ato file.");
+        msgBox.setText("Could not open box .ato file.");
         msgBox.exec();
         return false;
     }
