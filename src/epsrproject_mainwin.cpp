@@ -58,8 +58,11 @@ MainWindow::MainWindow(QMainWindow *parent) : QMainWindow(parent), messagesDialo
     }
 #endif
 
-    //QDir::currentPath();
-    exeDir_ = QApplication::applicationDirPath();
+#ifdef _WIN32
+    exeDir_ = QDir::currentPath(); //QApplication::applicationDirPath() doesn't work on Windows10
+#else
+    exeDir_ = QApplication::applicationDirPath(); //QDir::currentPath() doesn't work on OSX
+#endif
 
     createActions();
 
@@ -2730,9 +2733,9 @@ void MainWindow::deleteEPSRinpFile()
 
             QDir dir(workingDir_);
 #ifdef _WIN32
-            dir.setNameFilters(QStringList() << "*.EPSR.*" << "run*.bat");
+            dir.setNameFilters(QStringList() << "*.EPSR.*" << "run*.bat" << "*.pcof");
 #else
-            dir.setNameFilters(QStringList() << "*.EPSR.*" << "run*.sh");
+            dir.setNameFilters(QStringList() << "*.EPSR.*" << "run*.sh" << "*.pcof");
 #endif
             dir.setFilter(QDir::Files);
             foreach (QString EPSRfile, dir.entryList())
@@ -2765,9 +2768,10 @@ void MainWindow::deleteEPSRinpFile()
             ui.runAct->setEnabled(false);
             ui.stopAct->setEnabled(false);
             ui.plotAct->setEnabled(false);
+            ui.plotEPSRshellAct->setEnabled(false);
+            ui.plot3dAct->setEnabled(false);
             ui.plot1Button->setEnabled(false);
             ui.plot2Button->setEnabled(false);
-            ui.plotEPSRshellAct->setEnabled(false);
             ui.dataFileBrowseButton->setEnabled(true);
             ui.removeDataFileButton->setEnabled(true);
             ui.removeComponentButton->setEnabled(true);
@@ -2778,9 +2782,9 @@ void MainWindow::deleteEPSRinpFile()
             ui.applyOutputsButton->setEnabled(false);
             ui.dlputilsOutCheckBox->setEnabled(false);
 
-            messageText_ += "EPSR .inp file deleted\n";
+            messageText_ += "EPSR.inp and associated files deleted\n";
             messagesDialog.refreshMessages();
-            ui.messagesLineEdit->setText("EPSR .inp file deleted");
+            ui.messagesLineEdit->setText("EPSR.inp file deleted");
 
             save();
             ui.tabWidget->setDisabled(false);
@@ -2791,7 +2795,12 @@ void MainWindow::deleteEPSRinpFile()
 
 void MainWindow::deleteBoxAtoFile()
 {
-    QFile file(atoFileName_);
+    if (!epsrInpFileName_.isEmpty())
+    {
+        deleteEPSRinpFile();
+    }
+
+    QFile file(workingDir_+atoFileName_);
     if(file.exists() == true)
     {
         QMessageBox::StandardButton msgBox;
@@ -2802,7 +2811,7 @@ void MainWindow::deleteBoxAtoFile()
         }
         else
         {
-            ui.messagesLineEdit->setText("Please wait: deleting box, wts and inp files");
+            ui.messagesLineEdit->setText("Please wait: deleting box and associated files");
             ui.tabWidget->setDisabled(true);
 
             //remove box ato file, clear name and re-initialise ato tab
@@ -2844,6 +2853,9 @@ void MainWindow::deleteBoxAtoFile()
             ui.dataFileTable->setRowCount(0);
             ui.atomWtsTable->clearContents();
             ui.atomWtsTable->setRowCount(0);
+            QMessageBox msgBox;
+            msgBox.setText("here");
+            msgBox.exec();
             QDir dir(workingDir_);
             dir.setNameFilters(QStringList() << "*.NWTS.dat" << "*.XWTS.dat" << "*.wts");
             dir.setFilter(QDir::Files);
@@ -2851,21 +2863,22 @@ void MainWindow::deleteBoxAtoFile()
             {
                 dir.remove(dirFile);
             }
-
+/*
             //remove inp file and clear name if exists
-            if (epsrInpFileName_.isEmpty() == false)
+            if (!epsrInpFileName_.isEmpty())
             {
-                QDir dir(workingDir_);
+                QDir dir2(workingDir_);
     #ifdef _WIN32
-                dir.setNameFilters(QStringList() << "*.EPSR.*" << "run*.bat");
+                dir2.setNameFilters(QStringList() << "*.EPSR.*" << "run*.bat" << "*.pcof");
     #else
-                dir.setNameFilters(QStringList() << "*.EPSR.*" << "run*.sh");
+                dir2.setNameFilters(QStringList() << "*.EPSR.*" << "run*.sh" << "*.pcof");
     #endif
-                dir.setFilter(QDir::Files);
-                foreach (QString EPSRfile, dir.entryList())
+                dir2.setFilter(QDir::Files);
+                foreach (QString EPSRfile, dir2.entryList())
                 {
-                    dir.remove(EPSRfile);
+                    dir2.remove(EPSRfile);
                 }
+
                 epsrInpFileName_.clear();
                 ui.epsrInpFileName->clear();
                 ui.inpSettingsTable->clearContents();
@@ -2895,10 +2908,11 @@ void MainWindow::deleteBoxAtoFile()
                 ui.runAct->setEnabled(false);
                 ui.stopAct->setEnabled(false);
                 ui.plotAct->setEnabled(false);
+                ui.plotEPSRshellAct->setEnabled(false);
+                ui.plot3dAct->setEnabled(false);
                 ui.plotBoxAct->setEnabled(false);
                 ui.plot1Button->setEnabled(false);
                 ui.plot2Button->setEnabled(false);
-                ui.plotEPSRshellAct->setEnabled(false);
                 ui.dataFileBrowseButton->setEnabled(true);
                 ui.removeDataFileButton->setEnabled(true);
                 ui.updateInpPcofFilesButton->setEnabled(false);
@@ -2908,7 +2922,7 @@ void MainWindow::deleteBoxAtoFile()
                 ui.applyOutputsButton->setEnabled(false);
                 ui.dlputilsOutCheckBox->setEnabled(false);
             }
-
+*/
             //enable/disable buttons
             ui.randomiseButton->setEnabled(false);
             ui.boxCompositionButton->setEnabled(false);

@@ -579,6 +579,9 @@ void MainWindow::on_createLatticeButton_clicked(bool checked)
             QStringList atomCharges;
             atomCharges.clear();
 
+            //clear molFileList as it won't already be in the box
+            ui.molFileList->clear();
+
             for (int i = 0; i < atomTypes.count(); i++)
             {
                 QString molFileName = atomTypes.at(i);
@@ -611,7 +614,7 @@ void MainWindow::on_createLatticeButton_clicked(bool checked)
                             << "vibtemp  0.650000E+02\n"
                             << "angtemp  0.100000E+01\n"
                             << "dihtemp  0.100000E+02\n"
-                            << "ecoredcore    0.00000    1.00000\n"
+                            << "ecoredcore    0.00000    0.00000\n"
                             << "density  0.1\n";
                 fileWrite.close();          
 
@@ -625,7 +628,7 @@ void MainWindow::on_createLatticeButton_clicked(bool checked)
                 if (!processEPSR_.waitForStarted()) return;
                 if (!processEPSR_.waitForFinished()) return;
 
-                ui.molFileList->addItem(molFileName+".mol"); //**********************THis doesn't check if the .mol is already listed*******************************************************
+                ui.molFileList->addItem(molFileName+".mol");
             }
             file.close();
 
@@ -1414,6 +1417,11 @@ bool MainWindow::readAtoFile()
         ui.molLJTable->setItem(i,5, new QTableWidgetItem(ljTypes.at(i)));
     }
 
+    ui.molBondTable->setRowCount(0);
+    ui.molAngleTable->setRowCount(0);
+    ui.molDihedralTable->setRowCount(0);
+    ui.molRotTable->setRowCount(0);
+
     ui.molLJTable->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui.molLJTable->setSelectionMode(QAbstractItemView::SingleSelection);
 
@@ -1994,9 +2002,60 @@ bool MainWindow::updateAtoFile()
     //read mol file back into tables and update charge on mol file
     readAtoFile();
 
-    //if boxAtoFile exist, update box charge too
+    //if boxAtoFile exist, apply changes to box ato file and update box charge
     if (!atoFileName_.isEmpty())
     {
+        QFile fileBARead(workingDir_+atoFileName_);
+        QFile fileBAWrite(workingDir_+"temp.txt");
+
+        if(!fileBARead.open(QFile::ReadOnly | QFile::Text))
+        {
+            QMessageBox msgBox;
+            msgBox.setText("Could not open box .ato file");
+            msgBox.exec();
+            return false;
+        }
+        if(!fileBAWrite.open(QFile::WriteOnly | QFile::Text))
+        {
+            QMessageBox msgBox;
+            msgBox.setText("Could not open temporary file");
+            msgBox.exec();
+            return false;
+        }
+
+        QTextStream streamBAR(&fileBARead);
+        QTextStream streamBAW(&fileBAWrite);
+        QString lineBA;
+        QStringList dataLineBA;
+        dataLineBA.clear();
+        QString originalBA;
+        QRegExp atomLabelrx(" ([A-Z][A-Za-z0-9 ]{2}) ([A-Za-z ]{1,2})   ([0-1]{1})");
+
+        do
+        {
+            lineBA = streamBAR.readLine();
+            originalBA.append(lineBA+"\n");
+            if (atomLabelrx.exactMatch(lineBA))
+            {
+                for (int i = 0; i < ui.molLJTable->rowCount(); i++)
+                {
+                    if (lineBA.contains(ui.molLJTable->item(i,0)->text()))
+                    {
+                        lineBA = streamBAR.readLine();
+                        originalBA.append("  "+ui.molLJTable->item(i,1)->text()+"  "+ui.molLJTable->item(i,2)->text()+"  "+ui.molLJTable->item(i,3)->text()+" "+ui.molLJTable->item(i,4)->text()+"  0.00000E+00\n");
+                    }
+                }
+            }
+        } while (!lineBA.isNull());
+        fileBARead.close();
+
+        fileBAWrite.resize(0);
+        streamBAW << originalBA;
+        fileBAWrite.close();
+
+        fileBARead.remove();
+        fileBAWrite.rename(workingDir_+atoFileName_);
+
         checkBoxCharge();
     }
 

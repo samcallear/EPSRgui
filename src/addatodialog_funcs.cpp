@@ -58,8 +58,12 @@ void AddAtoDialog::checkEntries()
 
 void AddAtoDialog::on_addAtoButton_clicked(bool checked)
 {
-    QString atoFileName = ui.atoList->currentItem()->text();
+    if (ui.atoList->currentRow() == -1)
+    {
+       return;
+    }
 
+    QString atoFileName = ui.atoList->currentItem()->text();
     int lastAtoFile = ui.atoTable->rowCount();
     ui.atoTable->setRowCount(lastAtoFile+1);
     ui.atoTable->setItem(lastAtoFile,0, new QTableWidgetItem(atoFileName));
@@ -68,7 +72,7 @@ void AddAtoDialog::on_addAtoButton_clicked(bool checked)
 
 void AddAtoDialog::on_removeAtoButton_clicked(bool checked)
 {
-    if (ui.atoTable->rowCount() != 0 )
+    if (ui.atoTable->rowCount() != 0)
     {
         int row = ui.atoTable->currentRow();
         ui.atoTable->removeRow(row);
