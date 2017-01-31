@@ -5,6 +5,7 @@
 #include <QWidget>
 #include "ui_settingsdialog.h"
 #include <QDir>
+#include <QSettings>
 
 class MainWindow;
 

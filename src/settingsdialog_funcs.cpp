@@ -17,50 +17,16 @@ SettingsDialog::SettingsDialog(MainWindow *parent) : QDialog(parent)
     connect(ui.okButton, SIGNAL(clicked()), this, SLOT(writeSettingsFile()));
     connect(ui.cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
 
-    currentDir=mainWindow_->exeDir();
-
     readSettings();
 }
 
 void SettingsDialog::readSettings()
 {
-    QString settingsFile = currentDir.path()+"/settings";
-    settingsFile = QDir::toNativeSeparators(settingsFile);
-    QFile file(settingsFile);
-    if (!file.exists()) return;
-    if(!file.open(QFile::ReadOnly | QFile::Text))
-    {
-        QMessageBox msgBox;
-        msgBox.setText("Could not open settings file");
-        msgBox.exec();
-        return;
-    }
-    QTextStream stream(&file);
-    QString line;
-    QStringList dataLine;
-    dataLine.clear();
+    QSettings settings;
 
-    do
-    {
-        line = stream.readLine();
-        dataLine = line.split("  ", QString::SkipEmptyParts);
-        if (dataLine.count() != 0)
-        {
-            if (dataLine.at(0) == "EPSRbindir")
-            {
-                ui.epsrBinDirlineEdit->setText(dataLine.at(1));
-            }
-            if (dataLine.at(0) == "EPSRdir")
-            {
-                ui.epsrDirlineEdit->setText(dataLine.at(1));
-            }
-            if (dataLine.at(0) == "visualiser")
-            {
-                ui.visualiserLineEdit->setText(dataLine.at(1));
-            }
-        }
-    } while (!stream.atEnd());
-    file.close();
+    ui.epsrBinDirlineEdit->setText(settings.value("EPSRbindir").toString());
+    ui.epsrDirlineEdit->setText(settings.value("EPSRdir").toString());
+    ui.visualiserLineEdit->setText(settings.value("visualiser").toString());
 }
 
 void SettingsDialog::on_okButton_clicked(bool checked)
@@ -139,29 +105,11 @@ void SettingsDialog::writeSettingsFile()
         return;
     }
 
-    QString settingsFile = currentDir.path()+"/settings";
-    QFile file(settingsFile);
-    if(!file.open(QFile::WriteOnly | QFile::Text))
-    {
-        QMessageBox msgBox;
-        msgBox.setText("Could not write to settings file");
-        msgBox.exec();
-        return;
-    }
-    QTextStream streamWrite(&file);
-
-    streamWrite << "EPSRbindir  " << ui.epsrBinDirlineEdit->text() << "\n";
-
-    if (!ui.epsrDirlineEdit->text().isEmpty())
-    {
-        streamWrite << "EPSRdir  " << ui.epsrDirlineEdit->text() << "\n";
-    }
-    if (!ui.visualiserLineEdit->text().isEmpty())
-    {
-        streamWrite << "visualiser  " << ui.visualiserLineEdit->text() << "\n";
-    }
-    file.resize(0);
-    file.close();
+    QSettings settings;
+    settings.setValue("EPSRbindir", ui.epsrBinDirlineEdit->text()+"/");
+    settings.setValue("EPSRdir", ui.epsrDirlineEdit->text()+"/");
+    settings.setValue("visualiser", ui.visualiserLineEdit->text());
+    settings.sync();
 
     accept();
 }

@@ -28,6 +28,7 @@
 #include <QWidget>
 #include <QContextMenuEvent>
 #include <QProcess>
+#include <QSettings>
 
 MainWindow::MainWindow(QMainWindow *parent) : QMainWindow(parent), messagesDialog(this)
 {
@@ -58,11 +59,7 @@ MainWindow::MainWindow(QMainWindow *parent) : QMainWindow(parent), messagesDialo
     }
 #endif
 
-#ifdef _WIN32
-    exeDir_ = QDir::currentPath(); //QApplication::applicationDirPath() doesn't work on Windows10
-#else
     exeDir_ = QApplication::applicationDirPath(); //QDir::currentPath() doesn't work on OSX
-#endif
 
     createActions();
 
@@ -242,51 +239,15 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
 void MainWindow::readSettings()
 {
-    QString settingsFile = exeDir_.path()+"/settings";
-    settingsFile = QDir::toNativeSeparators(settingsFile);
-    QFile file(settingsFile);
-    if(!file.exists())
-    {
-        return;
-    }
-    if(!file.open(QFile::ReadOnly | QFile::Text))
-    {
-        QMessageBox msgBox;
-        msgBox.setText("Could not open settings file");
-        msgBox.exec();
-        return;
-    }
-    QTextStream stream(&file);
-    QString line;
-    QStringList dataLine;
-    dataLine.clear();
+    QSettings settings;
 
-    ui.epsrManualAct->setEnabled(false);
-    do
-    {
-        line = stream.readLine();
-        dataLine = line.split("  ", QString::SkipEmptyParts);
-        if (dataLine.count() != 0)
-        {
-            if (dataLine.at(0) == "EPSRdir")    //this is actually the preferred directory that contains the working directory
-            {
-                epsrDir_ = dataLine.at(1)+"/";
-                epsrDir_ = QDir::toNativeSeparators(epsrDir_);
-            }
-            if (dataLine.at(0) == "EPSRbindir")
-            {
-                epsrBinDir_ = dataLine.at(1)+"/";
-                epsrBinDir_ = QDir::toNativeSeparators(epsrBinDir_);
-                ui.epsrManualAct->setEnabled(true);
-            }
-            if (dataLine.at(0) == "visualiser")
-            {
-                visualiserExe_ = dataLine.at(1);
-                visualiserExe_ = QDir::toNativeSeparators(visualiserExe_);
-            }
-        }
-    } while (!stream.atEnd());
-    file.close();
+    epsrDir_ = settings.value("EPSRdir").toString();
+    epsrBinDir_ = settings.value("EPSRbindir").toString();
+    visualiserExe_ = settings.value("visualiser").toString();
+
+    epsrDir_ = QDir::toNativeSeparators(epsrDir_);
+    epsrBinDir_ = QDir::toNativeSeparators(epsrBinDir_);
+    visualiserExe_ = QDir::toNativeSeparators(visualiserExe_);
 }
 
 void MainWindow::createNew()
@@ -361,36 +322,6 @@ void MainWindow::createNew()
         ui.epsrManualAct->setEnabled(true);
         ui.notesAct->setEnabled(true);
 
-        //activate buttons (in case disabled from previous project) **************************isn't this done during reset()?!??!*******************************************************
-        ui.createMolFileButton->setEnabled(true);
-        ui.molFileLoadButton->setEnabled(true);
-        ui.createAtomButton->setEnabled(true);
-        ui.createLatticeButton->setEnabled(true);
-        ui.makeMolExtButton->setEnabled(true);
-        ui.removeMolFileButton->setEnabled(true);
-        ui.addLJRowAboveButton->setEnabled(true);
-        ui.addLJRowBelowButton->setEnabled(true);
-        ui.deleteLJRowButton->setEnabled(true);
-        ui.mixatoButton->setEnabled(false);
-        ui.addatoButton->setEnabled(false);
-        ui.loadBoxButton->setEnabled(false);
-        ui.randomiseButton->setEnabled(false);
-        ui.boxCompositionButton->setEnabled(false);
-        ui.updateAtoFileButton->setEnabled(false);
-        ui.fmoleButton->setEnabled(false);
-        ui.reloadBoxButton->setEnabled(false);
-        ui.removeComponentButton->setEnabled(false);
-        ui.atoEPSRButton->setEnabled(false);
-        ui.dataFileBrowseButton->setEnabled(false);
-        ui.removeDataFileButton->setEnabled(false);
-        ui.makeWtsButton->setEnabled(false);
-        ui.setupEPSRButton->setEnabled(false);
-        ui.updateInpPcofFilesButton->setEnabled(false);
-        ui.reloadEPSRinpButton->setEnabled(false);
-        ui.setupOutButton->setEnabled(false);
-        ui.setupPlotButton->setEnabled(false);
-        ui.applyOutputsButton->setEnabled(false);
-
         //Activate available outputs list
         getOutputType();
 
@@ -439,10 +370,10 @@ void MainWindow::reset()
     ui.boxAtoAxisB->clear();
     ui.boxAtoAxisG->clear();
     ui.boxAtoVol->clear();
-    ui.temperatureLineEdit->setText("300");
-    ui.vibtempLineEdit->setText("65");
-    ui.angtempLineEdit->setText("1");
-    ui.dihtempLineEdit->setText("1");
+    ui.temperatureLineEdit->clear();
+    ui.vibtempLineEdit->clear();
+    ui.angtempLineEdit->clear();
+    ui.dihtempLineEdit->clear();
     ui.atoTetherTable->clearContents();
     ui.atoTetherTable->setRowCount(0);
     atoFileName_.clear();
@@ -628,9 +559,12 @@ void MainWindow::open()
                 if (dataLine.at(0) == "boxAtoFileName")
                 {
                     atoFileName_ = dataLine.at(1);
+                    if (readAtoFileBoxDetails() == false)
+                    {
+                        return;
+                    }
                     messageText_ += "Box .ato filename is "+atoFileName_+"\n";
                     ui.boxAtoLabel->setText(atoFileName_);
-                    readAtoFileBoxDetails();
                     checkBoxCharge();
                     ui.randomiseButton->setEnabled(true);
                     ui.plotBoxAct->setEnabled(true);
@@ -666,11 +600,17 @@ void MainWindow::open()
                 if (dataLine.at(0) == "EPSRinp")
                 {
                     epsrInpFileName_ = dataLine.at(1)+".EPSR.inp";
+                    if (readEPSRinpFile() == false)
+                    {
+                        return;
+                    }
+                    if (readEPSRpcofFile() == false)
+                    {
+                        return;
+                    }
                     messageText_ += "EPSR inp filename is "+epsrInpFileName_+"\n";
                     ui.epsrInpFileName->setText(epsrInpFileName_);
-                    readEPSRinpFile();
                     updateInpFileTables();
-                    readEPSRpcofFile();
                     updatePcofFileTables();
                     ui.updateInpPcofFilesButton->setEnabled(true);
                     ui.reloadEPSRinpButton->setEnabled(true);
@@ -2615,7 +2555,10 @@ void MainWindow::settings()
         epsrBinDir_.clear();
         epsrDir_.clear();
         visualiserExe_.clear();
+
         readSettings();
+
+        ui.messagesLineEdit->setText("Updated settings");
     }
 }
 
@@ -2632,11 +2575,6 @@ QString MainWindow::atoFileName()
 QString MainWindow::epsrInpFileName()
 {
     return epsrInpFileName_;
-}
-
-QDir MainWindow::exeDir()
-{
-    return exeDir_;
 }
 
 QString MainWindow::epsrDir()
@@ -2804,7 +2742,7 @@ void MainWindow::deleteBoxAtoFile()
     if(file.exists() == true)
     {
         QMessageBox::StandardButton msgBox;
-        msgBox  = QMessageBox::question(this, "Warning", "This will delete the existing box .ato file and any wts and EPSR.inp files.\nProceed?", QMessageBox::Ok|QMessageBox::Cancel);
+        msgBox  = QMessageBox::question(this, "Warning", "This will delete the existing box .ato file and any wts files.\nProceed?", QMessageBox::Ok|QMessageBox::Cancel);
         if (msgBox == QMessageBox::Cancel)
         {
             return;
@@ -2844,18 +2782,17 @@ void MainWindow::deleteBoxAtoFile()
             ui.numberDensityLineEdit->clear();
 
             //remove wts files and clear data and wts tables
-            ui.dataFileLineEdit->clear();
             dataFileList.clear();
-            wtsFileList.clear();
             dataFileTypeList.clear();
+            wtsFileList.clear();
             normalisationList.clear();
-            ui.dataFileTable->clearContents();
-            ui.dataFileTable->setRowCount(0);
+            ui.normalisationComboBox->setCurrentIndex(0);
             ui.atomWtsTable->clearContents();
             ui.atomWtsTable->setRowCount(0);
-            QMessageBox msgBox;
-            msgBox.setText("here");
-            msgBox.exec();
+            ui.dataFileTable->removeRow(0);
+            ui.makeWtsButton->setEnabled(false);
+            ui.setupEPSRButton->setEnabled(false);
+            ui.dataFileLineEdit->clear();
             QDir dir(workingDir_);
             dir.setNameFilters(QStringList() << "*.NWTS.dat" << "*.XWTS.dat" << "*.wts");
             dir.setFilter(QDir::Files);
@@ -2863,66 +2800,7 @@ void MainWindow::deleteBoxAtoFile()
             {
                 dir.remove(dirFile);
             }
-/*
-            //remove inp file and clear name if exists
-            if (!epsrInpFileName_.isEmpty())
-            {
-                QDir dir2(workingDir_);
-    #ifdef _WIN32
-                dir2.setNameFilters(QStringList() << "*.EPSR.*" << "run*.bat" << "*.pcof");
-    #else
-                dir2.setNameFilters(QStringList() << "*.EPSR.*" << "run*.sh" << "*.pcof");
-    #endif
-                dir2.setFilter(QDir::Files);
-                foreach (QString EPSRfile, dir2.entryList())
-                {
-                    dir2.remove(EPSRfile);
-                }
 
-                epsrInpFileName_.clear();
-                ui.epsrInpFileName->clear();
-                ui.inpSettingsTable->clearContents();
-                ui.inpSettingsTable->setRowCount(0);
-                ui.dataFileSettingsTable->clearContents();
-                ui.dataFileSettingsTable->setRowCount(0);
-                ui.pcofSettingsTable->clearContents();
-                ui.pcofSettingsTable->setRowCount(0);
-                ui.minDistanceTable->clearContents();
-                ui.minDistanceTable->setRowCount(0);
-                epsrInpFileName_.clear();
-                ui.dataFileTable->clearContents();
-                ui.dataFileTable->setRowCount(0);
-                ui.atomWtsTable->clearContents();
-                ui.atomWtsTable->setRowCount(0);
-                ui.dlputilsOutCheckBox->setChecked(false);
-
-                //clear plots
-                ui.plot1->clearGraphs();
-                ui.plot1->clearItems();
-                ui.plot1->replot();
-                ui.plot2->clearGraphs();
-                ui.plot2->clearItems();
-                ui.plot2->replot();
-
-                //enable/disable buttons
-                ui.runAct->setEnabled(false);
-                ui.stopAct->setEnabled(false);
-                ui.plotAct->setEnabled(false);
-                ui.plotEPSRshellAct->setEnabled(false);
-                ui.plot3dAct->setEnabled(false);
-                ui.plotBoxAct->setEnabled(false);
-                ui.plot1Button->setEnabled(false);
-                ui.plot2Button->setEnabled(false);
-                ui.dataFileBrowseButton->setEnabled(true);
-                ui.removeDataFileButton->setEnabled(true);
-                ui.updateInpPcofFilesButton->setEnabled(false);
-                ui.reloadEPSRinpButton->setEnabled(false);
-                ui.setupOutButton->setEnabled(false);
-                ui.setupPlotButton->setEnabled(false);
-                ui.applyOutputsButton->setEnabled(false);
-                ui.dlputilsOutCheckBox->setEnabled(false);
-            }
-*/
             //enable/disable buttons
             ui.randomiseButton->setEnabled(false);
             ui.boxCompositionButton->setEnabled(false);

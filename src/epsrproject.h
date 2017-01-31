@@ -108,7 +108,7 @@ public:
     QString workingDir();
     QString atoFileName();
     QString epsrInpFileName();
-    QDir exeDir();
+    QSettings EPSRguiSettings();
     QString epsrDir();
     QString epsrBinDir();
     QStringList atomTypes();
@@ -252,7 +252,7 @@ private slots:
     void on_reloadEPSRinpButton_clicked(bool checked);
 
 private:
-    void readEPSRinpFile();
+    bool readEPSRinpFile();
     void updateInpFileTables();
     void updateInpFile();
     bool readEPSRpcofFile();
