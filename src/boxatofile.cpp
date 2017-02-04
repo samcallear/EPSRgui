@@ -367,10 +367,9 @@ void MainWindow::on_addatoButton_clicked(bool checked)
 
 void MainWindow::on_loadBoxButton_clicked (bool checked)
 {
-    //must manually change moltypeXX to the name of the associated .mol file at the bottom of the box.ato file bfore starting load box
+    //must manually change moltypeXX to the name of the associated .mol file at the bottom of the box.ato file before starting load box
     QMessageBox msgBox;
-    msgBox.setText("In the following dialog window, choose the .ato file to be used as the simulation box.\nEnsure it has the components listed at the bottom of the file, instead of moltypeXX."
-                   "\nThe number of each component in the box will need to be entered into the table manually.");
+    msgBox.setText("In the following dialog window, choose the .ato file to be used as the simulation box.\nEnsure it has the components listed at the bottom of the file, instead of moltypeXX.");
     msgBox.exec();
 
     QString atoFile = QFileDialog::getOpenFileName(this, "Choose EPSR box .ato file", workingDir_, tr(".ato files (*.ato)"));
@@ -402,15 +401,55 @@ void MainWindow::on_loadBoxButton_clicked (bool checked)
             }
         }
 
+        //run changeato to make sure it is in the correct format
+        QDir::setCurrent(workingDir_);
+        QString atoBaseFileName = atoFileName_.split(".",QString::SkipEmptyParts).at(0);
+
+        processEPSR_.setProcessChannelMode(QProcess::ForwardedChannels);
+    #ifdef _WIN32
+        processEPSR_.start(epsrBinDir_+"changeato.exe", QStringList() << workingDir_ << "changeato" << atoBaseFileName);
+    #else
+        processEPSR_.startDetached(epsrBinDir_+"changeato", QStringList() << workingDir_ << "changeato" << atoBaseFileName);
+    #endif
+        if (!processEPSR_.waitForStarted()) return;
+        processEPSR_.write("e\n");
+        processEPSR_.write("\n");
+        processEPSR_.write("y\n");
+        if (!processEPSR_.waitForFinished(60000)) return;
+
         //get all the details from the box .ato file
         readAtoFileBoxDetails();
 
-        //check if the component .mol files are in the project folder
+        //check if the component .mol files are in the project folder and moltype isn't at the bottom of the file
         for (int i = 0; i < atoComponentList.count(); i++)
         {
             QFile checkFile(workingDir_+atoComponentList.at(i)+".mol");
             if (!checkFile.exists())
             {
+                atoFileName_.clear();
+                ui.numberDensityLineEdit->clear();
+                ui.boxAtoLabel->clear();
+                ui.boxAtoCharge->clear();
+                ui.boxAtoMols->clear();
+                ui.boxAtoAtoms->clear();
+                ui.boxAtoLengthA->clear();
+                ui.boxAtoLengthB->clear();
+                ui.boxAtoLengthC->clear();
+                ui.boxAtoAxisA->clear();
+                ui.boxAtoAxisB->clear();
+                ui.boxAtoAxisG->clear();
+                ui.boxAtoVol->clear();
+                ui.temperatureLineEdit->clear();
+                ui.vibtempLineEdit->clear();
+                ui.angtempLineEdit->clear();
+                ui.dihtempLineEdit->clear();
+                ui.atoTetherTable->clearContents();
+                ui.atoTetherTable->setRowCount(0);
+                atoFileName_.clear();
+                baseFileName_.clear();
+                ui.ecoreLineEdit->clear();
+                ui.dcoreLineEdit->clear();
+
                 QMessageBox msgBox;
                 msgBox.setText("Could not open find one of the component .mol files.\nCheck all component .mol and .ato files are in the project folder and that the box does not have moltypeXX at the bottom and try again.");
                 msgBox.exec();
@@ -456,6 +495,10 @@ void MainWindow::on_loadBoxButton_clicked (bool checked)
         ui.mixatoButton->setEnabled(true);
         ui.addatoButton->setEnabled(true);
         ui.loadBoxButton->setEnabled(true);
+
+        messageText_ += "\n"+atoFileName_+" box loaded\n";
+        messagesDialog.refreshMessages();
+        ui.messagesLineEdit->setText("Box loaded");
 
         //save .pro file
         save();
