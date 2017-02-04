@@ -16,6 +16,7 @@ private:
 public:
     MakeMolLattDialog(MainWindow *parent = 0);
     Ui::makeMolLattDialog ui;
+    QString getAtoFile();
     int aCells();
     int bCells();
     int cCells();

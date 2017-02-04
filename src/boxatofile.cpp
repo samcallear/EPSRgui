@@ -449,6 +449,14 @@ void MainWindow::on_loadBoxButton_clicked (bool checked)
         ui.removeDataFileButton->setEnabled(true);
         ui.deleteBoxAtoFileAct->setEnabled(true);
 
+        ui.molFileTabWidget->setEnabled(true);
+        ui.viewMolFileButton->setEnabled(true);
+        ui.removeMolFileButton->setEnabled(true);
+        ui.updateMolFileButton->setEnabled(true);
+        ui.mixatoButton->setEnabled(true);
+        ui.addatoButton->setEnabled(true);
+        ui.loadBoxButton->setEnabled(true);
+
         //save .pro file
         save();
     }
@@ -466,7 +474,6 @@ void MainWindow::on_makelatticeatoButton_clicked(bool checked)
         QMessageBox msgBox;
         msgBox.setText("Only one component can be made into a molecular lattice.\nAfter the molecular lattice has been created, use Addato to add additional components.");
         msgBox.exec();
-        return;
     }
 
     MakeMolLattDialog makeMolLattDialog(this);
@@ -480,11 +487,11 @@ void MainWindow::on_makelatticeatoButton_clicked(bool checked)
 
     if (mollattDialog == MakeMolLattDialog::Accepted)
     {
+        //get ato file for expanding into a lattice
+        QString atoFileName = makeMolLattDialog.getAtoFile();
+
         //list ato files in folder alphabetically and get the one that is listed in EPSRgui as a component
         QDir::setCurrent(workingDir_);
-        QString baseMolFileName = molFileName_.split(".", QString::SkipEmptyParts).at(0);
-        QString atoFileName = baseMolFileName+".ato";
-
         QDir dir;
         QStringList atoFilter;
         atoFilter << "*.ato";
@@ -528,14 +535,33 @@ void MainWindow::on_makelatticeatoButton_clicked(bool checked)
 
         if (!processEPSR_.waitForFinished(1800000)) return;
 
-        messageText_ += "\nMolecular lattice made\n";
-        messagesDialog.refreshMessages();
-        ui.messagesLineEdit->setText("Molecular lattice made");
-
         atoFileName_ = projectName_+"box.ato";
+        if (readAtoFileBoxDetails() == false)
+        {
+            atoFileName_.clear();
+            QMessageBox msgBox;
+            msgBox.setText("Could not read box .ato file.");
+            msgBox.exec();
+            return;
+        }
+
+        //update molFilList and atoFileTable
+        ui.molFileList->clear();
+        ui.atoFileTable->clearContents();
+        ui.atoFileTable->setRowCount(0);
+        nMolFiles = atoComponentList.count();
+        ui.atoFileTable->setRowCount(nMolFiles);
+        for (int i = 0; i < nMolFiles; i++)
+        {
+            ui.molFileList->addItem(atoComponentList.at(i)+".mol");
+            QTableWidgetItem *item = new QTableWidgetItem(atoComponentList.at(i)+".ato");
+            item->setFlags(item->flags() & ~Qt::ItemIsEditable);
+            ui.atoFileTable->setItem(i,0, item);
+            ui.atoFileTable->setItem(i,2, new QTableWidgetItem(QString::number(nInBox.at(i))));
+            ui.molFileList->setCurrentRow(i);
+        }
 
         ui.boxAtoLabel->setText(atoFileName_);
-        readAtoFileBoxDetails();
         checkBoxCharge();
         ui.randomiseButton->setEnabled(true);
         ui.plotBoxAct->setEnabled(true);
@@ -547,8 +573,11 @@ void MainWindow::on_makelatticeatoButton_clicked(bool checked)
         ui.removeComponentButton->setEnabled(true);
         ui.dataFileBrowseButton->setEnabled(true);
         ui.removeDataFileButton->setEnabled(true);
-
         ui.deleteBoxAtoFileAct->setEnabled(true);
+
+        messageText_ += "\nMolecular lattice made\n";
+        messagesDialog.refreshMessages();
+        ui.messagesLineEdit->setText("Molecular lattice made");
 
         //save .pro file
         save();
