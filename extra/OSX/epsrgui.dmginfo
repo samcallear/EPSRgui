@@ -24,7 +24,7 @@ APP_ICON="extra/epsrgui1024.png"
 APP_LICENSE="COPYING"
 
 # -- APP_EXTRA : Directory containing additional files to contain in bundle (or NONE)
-APP_EXTRA="NONE"
+APP_EXTRA="resources/"
 
 # -- APP_DSSTORE : Specifies a directory containing DS_Store and background image for dmg (or NONE)
 APP_DSSTORE="NONE"
