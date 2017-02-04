@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "EPSRgui"
-#define MyAppVersion "0.1"
+#define MyAppVersion "1.0"
 #define MyAppPublisher "Sam Callear"
 #define MyAppURL "https://www.projectaten.com/"
 #define MyAppExeName "EPSRgui.exe"
@@ -40,7 +40,7 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "..\..\release\EPSRgui.exe"; DestDir: "{app}\bin"; Flags: ignoreversion
+Source: "..\..\release\EPSRgui.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "EPSRgui.ico"; DestDir: "{app}\bin"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 ; Source: "{#GnuWinDir}\bin\freetype6.dll"; DestDir: "{app}\bin"
@@ -62,6 +62,7 @@ Source: "{#QtDir}\plugins\iconengines\qsvgicon.dll"; DestDir: "{app}\bin\iconeng
 Source: "{#QtDir}\plugins\platforms\qwindows.dll"; DestDir: "{app}\bin\platforms"; Flags: ignoreversion
 Source: "{#QtDir}\plugins\imageformats\*.dll"; DestDir: "{app}\bin\imageformats"; Flags: ignoreversion
 ; Source: "C:\Windows\System32\D3DCompiler_43.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
+Source: "..\..\EPSRgui Manual.pdf"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
 Name: "{group}\{#MyAppName}"; IconFilename: "{app}\bin\EPSRgui.ico"; Filename: "{app}\bin\{#MyAppExeName}"; WorkingDir: "{app}"
