@@ -40,7 +40,7 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "..\..\release\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\..\release\{#MyAppExeName}"; DestDir: "{app}\bin"; Flags: ignoreversion
 Source: "EPSRgui.ico"; DestDir: "{app}\bin"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 ; Source: "{#GnuWinDir}\bin\freetype6.dll"; DestDir: "{app}\bin"
@@ -66,8 +66,8 @@ Source: "..\..\EPSRgui Manual.pdf"; DestDir: "{app}"; Flags: ignoreversion
 ;Name: "{group}\Uninstall\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"; Comment: "Uninstall JTSDK";
 
 [Icons]
-Name: "{group}\{#MyAppName}"; IconFilename: "{app}\bin\EPSRgui.ico"; Filename: "{app}{#MyAppExeName}"; WorkingDir: "{app}"
-Name: "{commondesktop}\{#MyAppName}"; IconFilename: "{app}\bin\EPSRgui.ico"; Filename: "{app}{#MyAppExeName}"; WorkingDir: "{app}"; Tasks: desktopicon
+Name: "{group}\{#MyAppName}"; IconFilename: "{app}\bin\EPSRgui.ico"; Filename: "{app}\bin\{#MyAppExeName}"; WorkingDir: "{app}"
+Name: "{commondesktop}\{#MyAppName}"; IconFilename: "{app}\bin\EPSRgui.ico"; Filename: "{app}\bin\{#MyAppExeName}"; WorkingDir: "{app}"; Tasks: desktopicon
 
 [Run]
 Filename: "{app}\bin\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
