@@ -62,7 +62,7 @@ Source: "{#QtDir}\plugins\iconengines\qsvgicon.dll"; DestDir: "{app}\bin\iconeng
 Source: "{#QtDir}\plugins\platforms\qwindows.dll"; DestDir: "{app}\bin\platforms"; Flags: ignoreversion
 Source: "{#QtDir}\plugins\imageformats\*.dll"; DestDir: "{app}\bin\imageformats"; Flags: ignoreversion
 ; Source: "C:\Windows\System32\D3DCompiler_43.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
-Source: "..\..\EPSRgui Manual.pdf"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\..\EPSRgui Manual.pdf"; DestDir: "{app}\bin"; Flags: ignoreversion
 ;Name: "{group}\Uninstall\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"; Comment: "Uninstall JTSDK";
 
 [Icons]
