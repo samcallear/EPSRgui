@@ -106,9 +106,23 @@ void SettingsDialog::writeSettingsFile()
     }
 
     QSettings settings;
-    settings.setValue("EPSRbindir", ui.epsrBinDirlineEdit->text()+"/");
-    settings.setValue("EPSRdir", ui.epsrDirlineEdit->text()+"/");
-    settings.setValue("visualiser", ui.visualiserLineEdit->text());
+    settings.setValue("EPSRbindir", ui.epsrBinDirlineEdit->text());
+    if (!ui.epsrDirlineEdit->text().isEmpty())
+    {
+        settings.setValue("EPSRdir", ui.epsrDirlineEdit->text());
+    }
+    else
+    {
+        settings.remove("EPSRdir");
+    }
+    if (!ui.visualiserLineEdit->text().isEmpty())
+    {
+        settings.setValue("visualiser", ui.visualiserLineEdit->text());
+    }
+    else
+    {
+        settings.remove("visulaiser");
+    }
     settings.sync();
 
     accept();

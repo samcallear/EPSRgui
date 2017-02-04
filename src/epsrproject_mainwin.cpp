@@ -244,7 +244,15 @@ void MainWindow::readSettings()
     QSettings settings;
 
     epsrDir_ = settings.value("EPSRdir").toString();
+    if (!epsrDir_.isEmpty())
+    {
+        epsrDir_ = QDir::toNativeSeparators(epsrDir_+"/");
+    }
     epsrBinDir_ = settings.value("EPSRbindir").toString();
+    if (!epsrDir_.isEmpty())
+    {
+        epsrBinDir_ = QDir::toNativeSeparators(epsrBinDir_+"/");
+    }
     visualiserExe_ = settings.value("visualiser").toString();
 
     epsrDir_ = QDir::toNativeSeparators(epsrDir_);
