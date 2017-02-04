@@ -95,13 +95,43 @@ void MainWindow::on_mixatoButton_clicked(bool checked)
 
         if (!processEPSR_.waitForFinished(1800000)) return;
 
-        messageText_ += "\nfinished writing "+atoFileName_+" file\n";
-        messagesDialog.refreshMessages();
-        ui.messagesLineEdit->setText("Finished writing box .ato file");
+        if (readAtoFileBoxDetails() == false)
+        {
+            atoFileName_.clear();
+            return;
+        }
+        QStringList testAtoAtomTypes = atoAtomTypes;
+        if (testAtoAtomTypes.removeDuplicates() >= 1)
+        {
+            ui.boxAtoLabel->clear();
+            ui.boxAtoCharge->clear();
+            ui.boxAtoMols->clear();
+            ui.boxAtoAtoms->clear();
+            ui.boxAtoLengthA->clear();
+            ui.boxAtoLengthB->clear();
+            ui.boxAtoLengthC->clear();
+            ui.boxAtoAxisA->clear();
+            ui.boxAtoAxisB->clear();
+            ui.boxAtoAxisG->clear();
+            ui.boxAtoVol->clear();
+            ui.temperatureLineEdit->clear();
+            ui.vibtempLineEdit->clear();
+            ui.angtempLineEdit->clear();
+            ui.dihtempLineEdit->clear();
+            ui.atoTetherTable->clearContents();
+            ui.atoTetherTable->setRowCount(0);
+            atoFileName_.clear();
+            baseFileName_.clear();
+            ui.ecoreLineEdit->clear();
+            ui.dcoreLineEdit->clear();
 
-        ui.boxAtoLabel->setText(atoFileName_);
-        readAtoFileBoxDetails();
+            QMessageBox msgBox;
+            msgBox.setText("The box contains duplicate atom types.\n Check that all the components have unique atom types.");
+            msgBox.exec();
+            return;
+        }
         checkBoxCharge();
+        ui.boxAtoLabel->setText(atoFileName_);
         ui.randomiseButton->setEnabled(true);
         ui.plotBoxAct->setEnabled(true);
         ui.boxCompositionButton->setEnabled(true);
@@ -112,13 +142,24 @@ void MainWindow::on_mixatoButton_clicked(bool checked)
         ui.removeComponentButton->setEnabled(true);
         ui.dataFileBrowseButton->setEnabled(true);
         ui.removeDataFileButton->setEnabled(true);
-
         ui.deleteBoxAtoFileAct->setEnabled(true);
+
+        messageText_ += "\nfinished writing "+atoFileName_+" file\n";
+        messagesDialog.refreshMessages();
+        ui.messagesLineEdit->setText("Finished writing box .ato file");
 
         //save .pro file
         save();
 
         jmolFile_.removePath(workingDir_);
+        dir.setPath(workingDir_);
+        QStringList jmolFilter;
+        jmolFilter << "*.jmol";
+        QStringList jmolFiles = dir.entryList(jmolFilter, QDir::Files);
+        foreach (QString jmolFile, jmolFiles)
+        {
+            jmolFile_.removePath(jmolFile);
+        }
     }
 }
 
@@ -305,6 +346,14 @@ void MainWindow::on_addatoButton_clicked(bool checked)
         save();
 
         jmolFile_.removePath(workingDir_);
+        dir.setPath(workingDir_);
+        QStringList jmolFilter;
+        jmolFilter << "*.jmol";
+        QStringList jmolFiles = dir.entryList(jmolFilter, QDir::Files);
+        foreach (QString jmolFile, jmolFiles)
+        {
+            jmolFile_.removePath(jmolFile);
+        }
 
         BoxCompositionDialog boxCompositionDialog(this);
 
@@ -505,6 +554,14 @@ void MainWindow::on_makelatticeatoButton_clicked(bool checked)
         save();
 
         jmolFile_.removePath(workingDir_);
+        dir.setPath(workingDir_);
+        QStringList jmolFilter;
+        jmolFilter << "*.jmol";
+        QStringList jmolFiles = dir.entryList(jmolFilter, QDir::Files);
+        foreach (QString jmolFile, jmolFiles)
+        {
+            jmolFile_.removePath(jmolFile);
+        }
     }
 }
 

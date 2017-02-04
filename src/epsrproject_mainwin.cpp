@@ -118,6 +118,8 @@ MainWindow::MainWindow(QMainWindow *parent) : QMainWindow(parent), messagesDialo
     connect(&processEPSR_, SIGNAL(readyReadStandardOutput()), this, SLOT(outputfromEPSRprocessReady()));
     connect(&epsrFinished_, SIGNAL(fileChanged(const QString &)), this, SLOT(enableButtons()));
     connect(&jmolFile_, SIGNAL(directoryChanged(const QString &)), this, SLOT(makeMolFile()));
+    connect(&jmolFile_, SIGNAL(fileChanged(const QString &)), this, SLOT(makeMolFile()));
+
 }
 
 void MainWindow::createActions()
@@ -362,6 +364,7 @@ void MainWindow::reset()
     ui.numberDensityLineEdit->clear();
     ui.boxAtoLabel->clear();
     ui.boxAtoCharge->clear();
+    ui.boxAtoAtoms->clear();
     ui.boxAtoMols->clear();
     ui.boxAtoLengthA->clear();
     ui.boxAtoLengthB->clear();
@@ -374,6 +377,8 @@ void MainWindow::reset()
     ui.vibtempLineEdit->clear();
     ui.angtempLineEdit->clear();
     ui.dihtempLineEdit->clear();
+    ui.ecoreLineEdit->clear();
+    ui.dcoreLineEdit->clear();
     ui.atoTetherTable->clearContents();
     ui.atoTetherTable->setRowCount(0);
     atoFileName_.clear();
@@ -2708,6 +2713,7 @@ void MainWindow::deleteEPSRinpFile()
             ui.plotAct->setEnabled(false);
             ui.plotEPSRshellAct->setEnabled(false);
             ui.plot3dAct->setEnabled(false);
+            ui.deleteEPSRinpFileAct->setEnabled(false);
             ui.plot1Button->setEnabled(false);
             ui.plot2Button->setEnabled(false);
             ui.dataFileBrowseButton->setEnabled(true);
@@ -2802,6 +2808,7 @@ void MainWindow::deleteBoxAtoFile()
             }
 
             //enable/disable buttons
+            ui.deleteBoxAtoFileAct->setEnabled(false);
             ui.randomiseButton->setEnabled(false);
             ui.boxCompositionButton->setEnabled(false);
             ui.updateAtoFileButton->setEnabled(false);

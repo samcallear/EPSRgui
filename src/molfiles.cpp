@@ -40,6 +40,12 @@ void MainWindow::on_createMolFileButton_clicked(bool checked)
 
         //add path to QFileSystemWatcher
         jmolFile_.addPath(workingDir_);
+        QDir dir;
+        dir.setPath(workingDir_);
+        QStringList jmolFilter;
+        jmolFilter << "*.jmol";
+        QStringList jmolFiles = dir.entryList(jmolFilter, QDir::Files);
+        jmolFile_.addPaths(jmolFiles);
     }
 }
 
@@ -58,7 +64,7 @@ void MainWindow::makeMolFile()
         return;
     }
 
-    //check the file was modified in the last second
+    //check the file was modified in the last 2 seconds
     QFileInfo fi(jmolFiles.at(0));
     if (fi.lastModified().msecsTo(QDateTime::currentDateTime()) > 2000 )
     {
@@ -67,6 +73,10 @@ void MainWindow::makeMolFile()
 
     //stop QFileSystemWatcher so don't get double ups message
     jmolFile_.removePath(workingDir_);
+    foreach (QString jmolFile, jmolFiles)
+    {
+        jmolFile_.removePath(jmolFile);
+    }
 
     QString jmolFileName = jmolFiles.at(0);
 
@@ -210,6 +220,7 @@ void MainWindow::makeMolFile()
 
     //restart QFileSystemWatcher
     jmolFile_.addPath(workingDir_);
+    jmolFile_.addPaths(jmolFiles);
 
     ui.messagesLineEdit->setText("Finished making .mol and .ato files");
 }
@@ -496,10 +507,7 @@ void MainWindow::on_createAtomButton_clicked(bool checked)
 void MainWindow::on_createLatticeButton_clicked(bool checked)
 {
     //make the .ato file for the lattice (the lattice can only be single atoms as 'molecules' not multiatom moleucles)
-    if (!makeLatticeDialog)
-    {
-        makeLatticeDialog = new MakeLatticeDialog(this);
-    }
+    makeLatticeDialog = new MakeLatticeDialog(this);
 
     makeLatticeDialog->setModal(true);
     makeLatticeDialog->show();
@@ -673,6 +681,7 @@ void MainWindow::on_createLatticeButton_clicked(bool checked)
 
             ui.boxAtoLabel->setText(atoFileName_);
             readAtoFileBoxDetails();
+            checkBoxCharge();
 
             //update atoFileTable to contain atom .ato files
             ui.atoFileTable->setRowCount(atomTypes.count());
@@ -684,7 +693,16 @@ void MainWindow::on_createLatticeButton_clicked(bool checked)
                 ui.atoFileTable->setItem(i,1, new QTableWidgetItem(atomCharges.at(i)));
                 ui.atoFileTable->setItem(i,2, new QTableWidgetItem(QString::number(numberAtomTypes.at(i))));
             }
-            checkBoxCharge();                      
+
+            ui.deleteBoxAtoFileAct->setDisabled(false);
+            ui.updateAtoFileButton->setDisabled(false);
+            ui.removeComponentButton->setDisabled(false);
+            ui.atoEPSRButton->setDisabled(false);
+            ui.reloadBoxButton->setDisabled(false);
+            ui.boxCompositionButton->setDisabled(false);
+            ui.randomiseButton->setDisabled(false);
+            ui.fmoleButton->setDisabled(false);
+            ui.dataFileBrowseButton->setDisabled(false);
         }
 
         // otherwise use lattice as a component **NB** This is the only workflow that doesn't use a .mol file.
