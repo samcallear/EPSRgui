@@ -2920,6 +2920,9 @@ void MainWindow::openEPSRguiManual()
 {
 #ifdef Q_OS_MAC
     QString guimanual = exeDir_.path().split("MacOS", QString::KeepEmptyParts).at(0)+"SharedSupport/EPSRgui Manual.pdf";
+    QMessageBox msgBox;
+    msgBox.setText(guimanual);
+    msgBox.exec();
 #else
     QString guimanual = exeDir_.path()+"/EPSRgui Manual.pdf";
 #endif
