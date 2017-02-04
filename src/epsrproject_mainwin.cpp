@@ -2803,7 +2803,7 @@ void MainWindow::deleteBoxAtoFile()
             ui.normalisationComboBox->setCurrentIndex(0);
             ui.atomWtsTable->clearContents();
             ui.atomWtsTable->setRowCount(0);
-            ui.dataFileTable->removeRow(0);
+            ui.dataFileTable->setRowCount(0);
             ui.makeWtsButton->setEnabled(false);
             ui.setupEPSRButton->setEnabled(false);
             ui.dataFileLineEdit->clear();
