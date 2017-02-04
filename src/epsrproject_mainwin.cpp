@@ -2918,7 +2918,14 @@ void MainWindow::openEPSRmanual()
 
 void MainWindow::openEPSRguiManual()
 {
+#ifdef Q_OS_MAC
+    QMessageBox msgBox;
+    msgBox.setText(exeDir_.path());
+    msgBox.exec();
+    QString guimanual = exeDir_.path()+"/SharedServices/EPSRgui Manual.pdf";
+#else
     QString guimanual = exeDir_.path()+"/EPSRgui Manual.pdf";
+#endif
     QDesktopServices::openUrl(QUrl("file:///"+guimanual, QUrl::TolerantMode));
 }
 
