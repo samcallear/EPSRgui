@@ -2927,8 +2927,7 @@ void MainWindow::openEPSRguiManual()
     {
         guimanual = exeDir_.path()+"/resources/EPSRgui Manual.pdf";
     }
-#else
-#ifdef _WIN32
+#elif _WIN32
     QString guimanual = exeDir_.path()+"/EPSRgui Manual.pdf";
 #else
     QString guimanual = exeDir_.path()+"/resources/EPSRgui Manual.pdf";
