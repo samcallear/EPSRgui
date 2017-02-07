@@ -2712,9 +2712,11 @@ void MainWindow::deleteEPSRinpFile()
             //clear plots
             ui.plot1->clearGraphs();
             ui.plot1->clearItems();
+            ui.plot1->clearPlottables();
             ui.plot1->replot();
             ui.plot2->clearGraphs();
             ui.plot2->clearItems();
+            ui.plot2->clearPlottables();
             ui.plot2->replot();
 
             //enable/disable buttons
