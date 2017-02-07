@@ -806,7 +806,7 @@ bool MainWindow::Pplot1()
 
     // give the axes some labels:
     ui.plot1->xAxis->setLabel("iteration");
-    ui.plot1->yAxis->setLabel("Pressure");
+    ui.plot1->yAxis->setLabel("Pressure / kbar");
 
     //plot
     ui.plot1->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
