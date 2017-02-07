@@ -774,7 +774,7 @@ void MainWindow::on_makeMolExtButton_clicked(bool checked)
     if (visualiserExe_.isEmpty())
     {
         QMessageBox msgBox;
-        msgBox.setText("Please set a preferred visualiser in Settings.");
+        msgBox.setText("Please set an EPSR (.ato and .mol) compatible visualiser in Settings.");
         msgBox.exec();
         return;
     }
@@ -784,7 +784,7 @@ void MainWindow::on_makeMolExtButton_clicked(bool checked)
     QProcess processAten;
     processAten.setProcessChannelMode(QProcess::ForwardedChannels);
     processAten.startDetached(visualiserExe_, QStringList() << atoFileName_);
-    ui.messagesLineEdit->setText("Preferred visualiser started");
+    ui.messagesLineEdit->setText("Alternative visualiser started");
 }
 
 void MainWindow::setSelectedMolFile()
