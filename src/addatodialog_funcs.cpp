@@ -16,7 +16,7 @@ AddAtoDialog::AddAtoDialog(MainWindow *parent) : QDialog(parent)
     QString boxAtoFileName = mainWindow_->atoFileName();
 
     for (int i = 0; i < atoFileList.count(); i++)
-    {
+    {        
         ui.atoComboBox->addItem(atoFileList.at(i));
         ui.atoList->addItem(atoFileList.at(i));
     }
@@ -66,7 +66,9 @@ void AddAtoDialog::on_addAtoButton_clicked(bool checked)
     QString atoFileName = ui.atoList->currentItem()->text();
     int lastAtoFile = ui.atoTable->rowCount();
     ui.atoTable->setRowCount(lastAtoFile+1);
-    ui.atoTable->setItem(lastAtoFile,0, new QTableWidgetItem(atoFileName));
+    QTableWidgetItem *item = new QTableWidgetItem(atoFileName);
+    item->setFlags(item->flags() & ~Qt::ItemIsEditable);
+    ui.atoTable->setItem(lastAtoFile,0, item);
     ui.atoTable->setItem(lastAtoFile,1, new QTableWidgetItem("0"));
 }
 
