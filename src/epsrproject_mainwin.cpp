@@ -472,6 +472,8 @@ void MainWindow::reset()
 
     //disable menu actions
     ui.saveAsAct->setEnabled(false);
+    ui.deleteBoxAtoFileAct->setEnabled(false);
+    ui.deleteEPSRinpFileAct->setEnabled(false);
     ui.checkAct->setEnabled(false);
     ui.runAct->setEnabled(false);
     ui.stopAct->setEnabled(false);
@@ -2920,8 +2922,17 @@ void MainWindow::openEPSRguiManual()
 {
 #ifdef Q_OS_MAC
     QString guimanual = exeDir_.path().split("MacOS", QString::KeepEmptyParts).at(0)+"SharedSupport/EPSRgui Manual.pdf";
+    QFile guimanualfile(guimanual);
+    if (!guimanualfile.exists())
+    {
+        guimanual = exeDir_.path()+"/resources/EPSRgui Manual.pdf";
+    }
 #else
+#ifdef _WIN32
     QString guimanual = exeDir_.path()+"/EPSRgui Manual.pdf";
+#else
+    QString guimanual = exeDir_.path()+"/resources/EPSRgui Manual.pdf";
+    guimanual = QDir::toNativeSeparators(guimanual);
 #endif
     QDesktopServices::openUrl(QUrl("file:///"+guimanual, QUrl::TolerantMode));
 }
