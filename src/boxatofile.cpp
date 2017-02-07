@@ -75,7 +75,6 @@ void MainWindow::on_mixatoButton_clicked(bool checked)
 
         processEPSR_.write(qPrintable(QString::number(nIndex)+"\n"));
 
-
         for (int i = 0 ; i < nMolFiles; i++)
         {
             int newlines = atoFileIndexes.at(i).toInt();
@@ -98,6 +97,27 @@ void MainWindow::on_mixatoButton_clicked(bool checked)
         if (readAtoFileBoxDetails() == false)
         {
             atoFileName_.clear();
+            ui.boxAtoLabel->clear();
+            ui.boxAtoCharge->clear();
+            ui.boxAtoMols->clear();
+            ui.boxAtoAtoms->clear();
+            ui.boxAtoLengthA->clear();
+            ui.boxAtoLengthB->clear();
+            ui.boxAtoLengthC->clear();
+            ui.boxAtoAxisA->clear();
+            ui.boxAtoAxisB->clear();
+            ui.boxAtoAxisG->clear();
+            ui.boxAtoVol->clear();
+            ui.temperatureLineEdit->clear();
+            ui.vibtempLineEdit->clear();
+            ui.angtempLineEdit->clear();
+            ui.dihtempLineEdit->clear();
+            ui.atoTetherTable->clearContents();
+            ui.atoTetherTable->setRowCount(0);
+            atoFileName_.clear();
+            baseFileName_.clear();
+            ui.ecoreLineEdit->clear();
+            ui.dcoreLineEdit->clear();
             return;
         }
         QStringList testAtoAtomTypes = atoAtomTypes;
@@ -914,6 +934,7 @@ bool MainWindow::readAtoFileBoxDetails()
         }
     }
     nPartials = count;
+    return true;
 }
 
 void MainWindow::on_boxCompositionButton_clicked(bool checked)
