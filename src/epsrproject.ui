@@ -2183,7 +2183,7 @@
                </sizepolicy>
               </property>
               <property name="title">
-               <string>Data Files</string>
+               <string>Data files</string>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_3">
                <item>
