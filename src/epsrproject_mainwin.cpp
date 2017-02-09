@@ -2931,7 +2931,7 @@ void MainWindow::openEPSRguiManual()
         guimanual = exeDir_.path()+"/resources/EPSRgui Manual.pdf";
     }
 #elif _WIN32
-    QString guimanual = exeDir_.path().split("bin", QString::KeepEmptyParts.at(0))+"/EPSRgui Manual.pdf";
+    QString guimanual = exeDir_.path().split("bin", QString::KeepEmptyParts).at(0)+"resources/EPSRgui Manual.pdf";
 
 #else
     QString guimanual = exeDir_.path()+"/resources/EPSRgui Manual.pdf";
