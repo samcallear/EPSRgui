@@ -2897,6 +2897,7 @@ void MainWindow::openEPSRmanual()
     QString docDirstr = epsrBinDir_.split("bin", QString::SkipEmptyParts).at(0);
     docDirstr = docDirstr+"doc/";
     QDir docDir = QDir::toNativeSeparators(docDirstr);
+    docDir.setSorting(QDir::Time);
     QStringList pdfFiles = docDir.entryList(filters, QDir::Files);
     if (pdfFiles.isEmpty())
     {
