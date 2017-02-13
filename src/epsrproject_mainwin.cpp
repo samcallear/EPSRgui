@@ -1786,12 +1786,18 @@ void MainWindow::import()
                             || batline.contains("triangles")
                             || batline.contains("voids"))
                     {
-                        batdataLine = batline.split(" ", QString::SkipEmptyParts);
-                        ui.runOutEPSRList->addItem(batdataLine.at(0)+": "+batdataLine.at(1));
+                        if (!batline.contains("#"))
+                        {
+                            batdataLine = batline.split(" ", QString::SkipEmptyParts);
+                            ui.runOutEPSRList->addItem(batdataLine.at(0)+": "+batdataLine.at(1));
+                        }
                     }
                     if (batline.contains("writexyz"))
                     {
-                        ui.dlputilsOutCheckBox->setChecked(true);
+                        if (!batline.contains("#"))
+                        {
+                            ui.dlputilsOutCheckBox->setChecked(true);
+                        }
                     }
                 }while (!batline.isNull());
                 batFile.close();
