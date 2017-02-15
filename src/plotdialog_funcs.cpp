@@ -1434,6 +1434,12 @@ bool PlotDialog::partialsplot()
         }
     }
 
+    //read x max to work out where to put data labels
+    if (!ui.xMaxLineEdit->text().isEmpty())
+    {
+        xMax = ui.xMaxLineEdit->text().toDouble();
+    }
+
     // create graph and assign data to it:
     if (ui.datagrcheckBox->isChecked() && ui.CNcheckBox->isChecked())
     {
@@ -1710,6 +1716,12 @@ bool PlotDialog::gofrintraplot()
         }
     }
 
+    //read x max to work out where to put data labels
+    if (!ui.xMaxLineEdit->text().isEmpty())
+    {
+        xMax = ui.xMaxLineEdit->text().toDouble();
+    }
+
     // create graph and assign data to it:
     QPen pen;
     QString pairLabel;
@@ -1882,6 +1894,12 @@ bool PlotDialog::sqterplot()
                 yMax = columns[pair].at(j);
             }
         }
+    }
+
+    //read x max to work out where to put data labels
+    if (!ui.xMaxLineEdit->text().isEmpty())
+    {
+        xMax = ui.xMaxLineEdit->text().toDouble();
     }
 
     // create graph and assign data to it:
@@ -2057,6 +2075,12 @@ bool PlotDialog::sqtraplot()
                 yMax = columns[pair].at(j);
             }
         }
+    }
+
+    //read x max to work out where to put data labels
+    if (!ui.xMaxLineEdit->text().isEmpty())
+    {
+        xMax = ui.xMaxLineEdit->text().toDouble();
     }
 
     // create graph and assign data to it:
