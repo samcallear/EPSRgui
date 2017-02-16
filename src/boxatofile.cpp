@@ -421,21 +421,17 @@ void MainWindow::on_loadBoxButton_clicked (bool checked)
             }
         }
 
-        //run changeato to make sure it is in the correct format
+        //run fmole 0 times to make sure everything is consistent and update ato with dihedrals etc
         QDir::setCurrent(workingDir_);
         QString atoBaseFileName = atoFileName_.split(".",QString::SkipEmptyParts).at(0);
 
-        processEPSR_.setProcessChannelMode(QProcess::ForwardedChannels);
     #ifdef _WIN32
-        processEPSR_.start(epsrBinDir_+"changeato.exe", QStringList() << workingDir_ << "changeato" << atoBaseFileName);
+        processEPSR_.start(epsrBinDir_+"fmole.exe", QStringList() << workingDir_ << "fmole" << atoBaseFileName << "0" << "0");
     #else
-        processEPSR_.startDetached(epsrBinDir_+"changeato", QStringList() << workingDir_ << "changeato" << atoBaseFileName);
+        processEPSR_.start(epsrBinDir_+"fmole", QStringList() << workingDir_ << "fmole" << atoBaseFileName << "0" << "0");
     #endif
         if (!processEPSR_.waitForStarted()) return;
-        processEPSR_.write("e\n");
-        processEPSR_.write("\n");
-        processEPSR_.write("y\n");
-        if (!processEPSR_.waitForFinished(60000)) return;
+        if (!processEPSR_.waitForFinished()) return;
 
         //get all the details from the box .ato file
         readAtoFileBoxDetails();
@@ -1146,23 +1142,6 @@ void MainWindow::on_updateAtoFileButton_clicked(bool checked)
     //rename temp file as box .ato file to copy over changes and delete temp file
     QFile::remove(workingDir_+atoFileName_);
     QFile::rename(workingDir_+"temp.txt", workingDir_+atoFileName_);
-/*
-    //run changeato to reformat in EPSR style (req'd as use QRegExp for ecoredcore in readAtoFileBoxDEtails())
-    QDir::setCurrent(workingDir_);
-    QString atoBaseFileName = atoFileName_.split(".",QString::SkipEmptyParts).at(0);
-
-    processEPSR_.setProcessChannelMode(QProcess::ForwardedChannels);
- #ifdef _WIN32
-    processEPSR_.start(epsrBinDir_+"changeato.exe", QStringList() << workingDir_ << "changeato" << atoBaseFileName);
- #else
-    processEPSR_.start(epsrBinDir_+"changeato", QStringList() << workingDir_ << "changeato" << atoBaseFileName);
- #endif
-    if (!processEPSR_.waitForStarted()) return;
-    processEPSR_.write("e\n");
-    processEPSR_.write("\n");
-    processEPSR_.write("y\n");
-    if (!processEPSR_.waitForFinished(60000)) return;
-*/
 
     //run fmole 0 times to make sure everything is consistent and update ato with dihedrals etc
     QDir::setCurrent(workingDir_);
