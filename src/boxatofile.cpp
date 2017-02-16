@@ -1167,12 +1167,12 @@ void MainWindow::on_updateAtoFileButton_clicked(bool checked)
     //run fmole 0 times to make sure everything is consistent and update ato with dihedrals etc
     QDir::setCurrent(workingDir_);
 
-    QString molBaseFileName = molFileName_.split(".",QString::SkipEmptyParts).at(0);
+    QString atoBaseFileName = atoFileName_.split(".",QString::SkipEmptyParts).at(0);
 
 #ifdef _WIN32
-    processEPSR_.start(epsrBinDir_+"fmole.exe", QStringList() << workingDir_ << "fmole" << molBaseFileName << "0" << "0");
+    processEPSR_.start(epsrBinDir_+"fmole.exe", QStringList() << workingDir_ << "fmole" << atoBaseFileName << "0" << "0");
 #else
-    processEPSR_.start(epsrBinDir_+"fmole", QStringList() << workingDir_ << "fmole" << molBaseFileName << "0" << "0");
+    processEPSR_.start(epsrBinDir_+"fmole", QStringList() << workingDir_ << "fmole" << atoBaseFileName << "0" << "0");
 #endif
     if (!processEPSR_.waitForStarted()) return;
 
