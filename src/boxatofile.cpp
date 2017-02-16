@@ -1155,7 +1155,7 @@ void MainWindow::on_updateAtoFileButton_clicked(bool checked)
  #ifdef _WIN32
      processEPSR_.start(epsrBinDir_+"changeato.exe", QStringList() << workingDir_ << "changeato" << atoBaseFileName);
  #else
-     processEPSR_.startDetached(epsrBinDir_+"changeato", QStringList() << workingDir_ << "changeato" << atoBaseFileName);
+     processEPSR_.start(epsrBinDir_+"changeato", QStringList() << workingDir_ << "changeato" << atoBaseFileName);
  #endif
      if (!processEPSR_.waitForStarted()) return;
      processEPSR_.write("e\n");
