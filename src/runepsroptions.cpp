@@ -401,7 +401,7 @@ void MainWindow::setupPlot()
     if (!fi.exists())
     {
 
-        QString coeffFileName = QFileDialog::getOpenFileName(this, "Choose SHARM coefficients file", workingDir_, tr(".h01 files (*.h01)"));
+        QString coeffFileName = QFileDialog::getOpenFileName(this, "Choose SHARM coefficients file", workingDir_, tr(".SHARM.h01 files (*.h01)"));
         if (coeffFileName.isEmpty())
         {
             return;
