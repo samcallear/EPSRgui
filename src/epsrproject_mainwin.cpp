@@ -2011,9 +2011,58 @@ void MainWindow::runEPSR()
 #else
     QFile batFile(workingDir_+"run"+baseFileName+".sh");
 #endif
+//this needs sorting out ***********************************************************************************************************************************
+    /*
+    if (batFile.exists())
+    {
+        if(!batFile.open(QFile::ReadWrite | QFile::Text))
+        {
+            QMessageBox msgBox;
+            msgBox.setText("Could not open script file.");
+            msgBox.exec();
+            return;
+        }
+
+        //read script file to check paths are correct
+        QTextStream stream(&batFile);
+        QString line;
+        QStringList dataLine;
+
+        line = stream.readLine();
+        dataLine = line.split(" ", QString::KeepEmptyParts);
+        if (dataLine.count() <= 2)
+        {
+            batFile.close();
+            batFile.remove();
+            break;
+        }
+        if (dataLine.at(2) != epsrBinDir_)
+        {
+            //replace with correct epsrBinDir_
+        }
+        line = stream.readLine();
+        dataLine = line.split(" ", QString::KeepEmptyParts);
+        if (dataLine.count() <= 2)
+        {
+            batFile.close();
+            batFile.remove();
+            break;
+        }
+        if (dataLine.at(2) != workingDir_)
+        {
+            //replace with correct workingDir_
+        }
+        do
+        {
+            line = stream.readLine();
+            streamWrite << line+"\n";
+        } while (!line.isNull());
+
+        batFile.close();
+    } */
 
     // if script file already exists, don't overwrite it
-    if (batFile.exists() == false)
+    if (!batFile.exists())
     {
         if(!batFile.open(QFile::WriteOnly | QFile::Text))
         {
@@ -2025,24 +2074,24 @@ void MainWindow::runEPSR()
 
         //write script file to run epsr
         QTextStream stream(&batFile);
-    #ifdef _WIN32
+#ifdef _WIN32
         stream << "set EPSRbin=" << epsrBinDir_ << "\n"
                 << "set EPSRrun=" << workingDir_ << "\n"
                 << ":loop\n"
                 << "%EPSRbin%epsr.exe " << workingDir_ << " epsr " << baseFileName << "\n"
                 << "if not exist %EPSRrun%killepsr ( goto loop ) else del %EPSRrun%killepsr\n";
-    #else
-            stream << "export EPSRbin=" << epsrBinDir_ << "\n"
-                    << "export EPSRrun=" << workingDir_ << "\n"
-                    << "while :\n"
-                    << "do\n"
-                    << "  \"$EPSRbin\"'epsr' " << workingDir_ << " epsr " << baseFileName << "\n"
-                    << "  if ([ -e " << workingDir_ << "killepsr ])\n"
-                    << "  then break\n"
-                    << "  fi\n"
-                    << "done\n"
-                    << "rm -r " << workingDir_ << "killepsr\n";
-    #endif
+#else
+        stream << "export EPSRbin=" << epsrBinDir_ << "\n"
+                << "export EPSRrun=" << workingDir_ << "\n"
+                << "while :\n"
+                << "do\n"
+                << "  \"$EPSRbin\"'epsr' " << workingDir_ << " epsr " << baseFileName << "\n"
+                << "  if ([ -e " << workingDir_ << "killepsr ])\n"
+                << "  then break\n"
+                << "  fi\n"
+                << "done\n"
+                << "rm -r " << workingDir_ << "killepsr\n";
+#endif
         batFile.close();
     }
 

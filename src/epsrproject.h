@@ -294,6 +294,7 @@ private slots:
     void on_addOutputButton_clicked(bool checked);
     void on_removeOutputButton_clicked(bool checked);
     void on_applyOutputsButton_clicked(bool checked);
+    void on_applyCommandButton_clicked(bool checked);
 
     //main window embedded plots
 private:
