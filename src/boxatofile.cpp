@@ -761,6 +761,7 @@ bool MainWindow::readAtoFileBoxDetails()
     tetherAtoms.clear();
     tetherList.clear();
     int atomctr = 0;
+    int qatomctr = 0;
     atoComponentList.clear();
     atoAtomTypes.clear();
     numberAtomTypes.clear();
@@ -815,6 +816,10 @@ bool MainWindow::readAtoFileBoxDetails()
         if (atomLabelrx.exactMatch(line))
         {
             atomctr++;
+            if (line.contains("q") || line.contains("Q"))
+            {
+                qatomctr++;
+            }
             dataLine = line.split("  ", QString::SkipEmptyParts);
             QString data = dataLine.at(0).trimmed();
             if (atoAtomTypes.isEmpty())
@@ -909,7 +914,7 @@ bool MainWindow::readAtoFileBoxDetails()
     }
 
     //calculate atomic number density and input into box
-    double totalNumberAtoms = ui.boxAtoAtoms->text().toDouble();
+    double totalNumberAtoms = ui.boxAtoAtoms->text().toDouble()-qatomctr; //number of atoms minus the q/Q atoms
     double boxVolume = ui.boxAtoVol->text().toDouble();
     double numberDensity = totalNumberAtoms/boxVolume;
     QString numberDensityStr;
