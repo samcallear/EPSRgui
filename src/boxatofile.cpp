@@ -1314,24 +1314,14 @@ void MainWindow::on_removeComponentButton_clicked(bool checked)
         //get component row
         int componentToRemove = removeComponentDialog.returnComponent();  //row is row in atoFileList
 
-        //get range of lines to remove
-        QList<int> totlinesPerComponentList;
-        totlinesPerComponentList.clear();
-        for (int i = 0; i < ui.molFileList->count(); i++) //write atoFileList and then change this to atoFileList******************************************
-        {
-            totlinesPerComponentList.append(nLinesPerComponentList.at(i)*nInBox.at(i));
-        }
+        //get first atom for this component
+        QString componentFirstAtom = firstAtomList.at(componentToRemove);
 
-        int firstLineToRemove = atoHeaderLines;
-        for (int i = 0; i < componentToRemove; i++)
-        {
-            firstLineToRemove = firstLineToRemove+totlinesPerComponentList.at(i);
-        }
-        int lastLineToRemove = atoHeaderLines;
-        for (int i = 0; i < componentToRemove+1; i++) //write atoFileList and then change this to atoFileList******************************************
-        {
-            lastLineToRemove = lastLineToRemove+totlinesPerComponentList.at(i);
-        }
+        //get number of lines for this component
+        int nLinesForComponent = nLinesPerComponentList.at(componentToRemove);
+
+        //total number of components in box
+        int newNumberComponents = ui.boxAtoMols->text().toInt()-nInBox.at(componentToRemove);
 
         //get list of atomTypesToRemove from component.ato file
         QFile fileCompRead(workingDir_+ui.atoFileTable->item(componentToRemove,0)->text());
@@ -1359,9 +1349,7 @@ void MainWindow::on_removeComponentButton_clicked(bool checked)
         } while (!lineComp.isNull());
         fileCompRead.close();
 
-        //calc new number of components present
-        int nTotComponents = ui.boxAtoMols->text().toInt()-nInBox.at(componentToRemove);
-
+        //open box.ato file to read from and a temp file to write to
         QFile fileRead(workingDir_+atoFileName_);
         QFile fileWrite(workingDir_+"temp.txt");
 
@@ -1383,14 +1371,17 @@ void MainWindow::on_removeComponentButton_clicked(bool checked)
         QTextStream streamRead(&fileRead);
         QTextStream streamWrite(&fileWrite);
         QString line;
+        QString secondLine;
         QStringList dataLine;
         dataLine.clear();
-        int lineCtr = atoHeaderLines;
+        QString original;
+        original.clear();
         int componentCtr = 0;
+        QRegExp atomPairrx(" ([A-Z][A-Za-z0-9 ]{2}) ([A-Za-z ]{1,2})   ([0-1]{1})");
 
         //copy over header
         line = streamRead.readLine();
-        line = line.replace(2, 6, " "+QString::number(nTotComponents)); //this isn't the correct formatting*******************************
+        line = line.replace(2, 6, " "+QString::number(newNumberComponents)); //this isn't the correct formatting*******************************
         streamWrite << line << "\n";
         for (int i = 0; i < atoHeaderLines-1; i++)
         {
@@ -1398,26 +1389,41 @@ void MainWindow::on_removeComponentButton_clicked(bool checked)
             streamWrite << line << "\n";
         }
 
-        //copy over lines that aren't in the remove list
-        QRegExp atomPairrx(" ([A-Z][A-Za-z0-9 ]{2}) ([A-Za-z ]{1,2})   ([0-1]{1})");
+        //copy over components to keep
         do {
             line = streamRead.readLine();
-            lineCtr++;
+            dataLine = line.split(" ", QString::SkipEmptyParts);
+
             if (atomPairrx.exactMatch(line))
             {
                 break;
             }
-            if (lineCtr <= firstLineToRemove || lineCtr >= lastLineToRemove+1)
+            if (dataLine.count() == 10)
             {
-                dataLine = line.split(" ", QString::SkipEmptyParts);
-                if (dataLine.count() == 10)
+                secondLine = streamRead.readLine();
+                dataLine = secondLine.split(" ", QString::SkipEmptyParts);
+                if (dataLine.at(0).trimmed() == componentFirstAtom)
+                {
+                    for (int i = 0; i < nLinesForComponent-2; i++)
+                    {
+                        line = streamRead.readLine();
+                    }
+                }
+                else
                 {
                     componentCtr++;
                     line = line.replace(109, 6, " "+QString::number(componentCtr)); //this isn't the correct formatting*******************************
+                    original.append(line+"\n");
+                    original.append(secondLine+"\n");
                 }
-                streamWrite << line << "\n";
             }
-        } while (!line.isNull());
+            else
+            {
+                original.append(line+"\n");
+            }
+        } while(!line.isNull());
+
+        streamWrite << original;
 
         //LJ param section
         for (int i = 0; i < atoAtomTypes.count(); i++)
@@ -1472,20 +1478,27 @@ void MainWindow::on_removeComponentButton_clicked(bool checked)
         streamWrite << line << "\n";
 
         //each component number density ****************this isn't correct but its recalculated when EPSR is run********************************
-        for (int i = 0; i < componentToRemove; i++)
+        for (int i = 0; i < atoAtomTypes.count(); i++)
         {
             line = streamRead.readLine();
-            streamWrite << line << "\n";
-        }
-        line = streamRead.readLine();
-        for (int i = componentToRemove+1; i < ui.molFileList->count(); i++)
-        {
-            line = streamRead.readLine();
-            streamWrite << line << "\n";
+            dataLine = line.split(" ", QString::SkipEmptyParts);
+            int test = 0;
+            for (int j = 0; j < atomTypesToRemove.count(); j++)
+            {
+                if (dataLine.at(3) == atomTypesToRemove.at(j))
+                {
+                    test = 1;
+                }
+            }
+            if (test == 0)
+            {
+                streamWrite << line << "\n";
+            }
         }
 
-        fileRead.close();
+        fileWrite.resize(0);
         fileWrite.close();
+        fileRead.close();
 
         //rename temp file as box .ato file to copy over changes and delete temp file
         QFile::remove(workingDir_+atoFileName_);
@@ -1504,5 +1517,6 @@ void MainWindow::on_removeComponentButton_clicked(bool checked)
         messageText_ += "\nbox .ato file updated\n";
         messagesDialog.refreshMessages();
         ui.messagesLineEdit->setText("Component removed and box .ato file updated");
+
     }
 }
