@@ -284,10 +284,24 @@ void MainWindow::on_addatoButton_clicked(bool checked)
 
         if (!processEPSR_.waitForFinished(1800000)) return;
 
-        //read ato file to check what has happened
+        //run fmole 0 times to move the components into the expected order in the LJ table and density list at bottom of ato file
+        QDir::setCurrent(workingDir_);
+
+        QString atoBaseFileName = atoFileName_.split(".",QString::SkipEmptyParts).at(0);
+
+    #ifdef _WIN32
+        processEPSR_.start(epsrBinDir_+"fmole.exe", QStringList() << workingDir_ << "fmole" << atoBaseFileName << "0" << "0");
+    #else
+        processEPSR_.start(epsrBinDir_+"fmole", QStringList() << workingDir_ << "fmole" << atoBaseFileName << "0" << "0");
+    #endif
+        if (!processEPSR_.waitForStarted()) return;
+
+        if (!processEPSR_.waitForFinished()) return;
+
+        //read ato file to see what happened
         readAtoFileBoxDetails();
 
-        //if the number of first atoms is different to the number of components in the atofiletable, then assume unsuccessful
+        //if the number of first atoms is different to the number of components in the atofiletable, then assume unsuccessful as 0 added
         if (firstAtomList.count() != ui.atoFileTable->rowCount())
         {
             //roll back to previous box.ato file
@@ -306,6 +320,9 @@ void MainWindow::on_addatoButton_clicked(bool checked)
                 }
             }
 
+            //read in old ato file
+            readAtoFileBoxDetails();
+
             messageText_ += "\nAddato unsuccessful\n";
             messagesDialog.refreshMessages();
             ui.messagesLineEdit->setText("Addato unsuccessful");
@@ -316,35 +333,27 @@ void MainWindow::on_addatoButton_clicked(bool checked)
             return;
         }
 
-        //otherwise update everything accordingly
         messageText_ += "\nAddato successful - finished writing "+atoFileName_+" file\n";
         messagesDialog.refreshMessages();
         ui.messagesLineEdit->setText("Addato successful - Finished writing box .ato file");
 
-        //roll back to previous box.ato file
+        //remove copy of box.ato file
         QFile::remove(workingDir_+atoFileName_+".copy");
 
         //update ui.atoFileTable to include number of mols added for relevant .ato files
-        if (container != atoFileName_)
-        {
-            for (int i = 0; i < ui.atoFileTable->rowCount(); i++)
-            {
-                if (ui.atoFileTable->item(i,0)->text() == container)
-                {
-                    ui.atoFileTable->item(i,2)->setText("1");
-                }
-            }
-        }
-
+//        if (container != atoFileName_)
+//        {
+//            for (int i = 0; i < ui.atoFileTable->rowCount(); i++)
+//            {
+//                if (ui.atoFileTable->item(i,0)->text() == container)
+//                {
+//                    ui.atoFileTable->item(i,2)->setText("1");
+//                }
+//            }
+//        }
         for (int i = 0; i < ui.atoFileTable->rowCount(); i++)
         {
-            for (int j = 0; j < atoFilesToAdd.count(); j++)
-            {
-                if (atoFilesToAdd.at(j) == ui.atoFileTable->item(i,0)->text())
-                {
-                    ui.atoFileTable->item(i,2)->setText(numberOfMolecules.at(j));
-                }
-            }
+            ui.atoFileTable->item(i,2)->setText(QString::number(nInBox.at(i)));
         }
 
         ui.boxAtoLabel->setText(atoFileName_);
@@ -1294,9 +1303,12 @@ void MainWindow::on_removeComponentButton_clicked(bool checked)
         return;
     }
 
-    QMessageBox msgBox;
-    msgBox.setText("After removing a component weights files may need to be remade.");
-    msgBox.exec();
+    if (wtsFileList.count() != 0)
+    {
+        QMessageBox msgBox;
+        msgBox.setText("After removing a component weights files may need to be remade.");
+        msgBox.exec();
+    }
 
     readAtoFileBoxDetails();
 
@@ -1517,6 +1529,5 @@ void MainWindow::on_removeComponentButton_clicked(bool checked)
         messageText_ += "\nbox .ato file updated\n";
         messagesDialog.refreshMessages();
         ui.messagesLineEdit->setText("Component removed and box .ato file updated");
-
     }
 }
