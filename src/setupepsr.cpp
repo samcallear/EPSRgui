@@ -219,7 +219,16 @@ void MainWindow::updateInpFileTables()
         QTableWidgetItem *itemkeyword = new QTableWidgetItem(inpKeywords.at(i));
         itemkeyword->setFlags(itemkeyword->flags() & ~Qt::ItemIsEditable);
         ui.inpSettingsTable->setItem(i,0, itemkeyword);
-        ui.inpSettingsTable->setItem(i,1, new QTableWidgetItem(inpValues.at(i)));
+        if (inpKeywords.at(i) == "fnameato" || inpKeywords.at(i) == "fnamepcof")
+        {
+            QTableWidgetItem *itemvalue = new QTableWidgetItem(inpValues.at(i));
+            itemvalue->setFlags(itemvalue->flags() & ~Qt::ItemIsEditable);
+            ui.inpSettingsTable->setItem(i,1, itemvalue);
+        }
+        else
+        {
+            ui.inpSettingsTable->setItem(i,1, new QTableWidgetItem(inpValues.at(i)));
+        }
         QTableWidgetItem *itemdescrip = new QTableWidgetItem(inpDescriptions.at(i));
         itemdescrip->setFlags(itemdescrip->flags() & ~Qt::ItemIsEditable);
         ui.inpSettingsTable->setItem(i,2, itemdescrip);

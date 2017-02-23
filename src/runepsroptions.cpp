@@ -295,9 +295,9 @@ void MainWindow::addOutputsToScript()
             QString outputFileName = outputFileNames.at(i);
             QString outputFileType = outputFileTypes.at(i);
 #ifdef _WIN32
-            lineToAdd = "%EPSRbin%"+outputFileType+".exe "+workingDir_+" "+outputFileType+" "+outputFileName+"\n";
+            lineToAdd = "%EPSRbin%"+outputFileType+".exe %EPSRrun% "+outputFileType+" "+outputFileName+"\n";
 #else
-            lineToAdd = "  \"$EPSRbin\"'"+outputFileType+"' "+workingDir_+" "+outputFileType+" "+outputFileName+"\n";
+            lineToAdd = "  \"$EPSRbin\"'"+outputFileType+"' \"$EPSRrun\" "+outputFileType+" "+outputFileName+"\n";
 #endif
             original.append(lineToAdd);
         }
@@ -335,9 +335,9 @@ void MainWindow::addOutputsToScript()
         QString halfboxLengthCStr = QString::number(halfboxLengthC);
         QString atoBaseFileName = atoFileName_.split(".",QString::SkipEmptyParts).at(0);
 #ifdef _WIN32
-        lineToAdd = "%EPSRbin%writexyz.exe "+workingDir_+" writexyz "+atoBaseFileName+" y 0 "+halfboxLengthAStr+" "+halfboxLengthBStr+" -"+halfboxLengthCStr+" "+halfboxLengthCStr+" 0 0 0 0\n";
+        lineToAdd = "%EPSRbin%writexyz.exe %EPSRrun% writexyz "+atoBaseFileName+" y 0 "+halfboxLengthAStr+" "+halfboxLengthBStr+" -"+halfboxLengthCStr+" "+halfboxLengthCStr+" 0 0 0 0\n";
 #else
-        lineToAdd = "  \"$EPSRbin\"'writexyz' "+workingDir_+" writexyz "+atoBaseFileName+" y 0 "+halfboxLengthAStr+" "+halfboxLengthBStr+" -"+halfboxLengthCStr+" "+halfboxLengthCStr+" 0 0 0 0\n";
+        lineToAdd = "  \"$EPSRbin\"'writexyz' \"$EPSRrun\" writexyz "+atoBaseFileName+" y 0 "+halfboxLengthAStr+" "+halfboxLengthBStr+" -"+halfboxLengthCStr+" "+halfboxLengthCStr+" 0 0 0 0\n";
 #endif
         original.append(lineToAdd);
     }

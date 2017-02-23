@@ -68,6 +68,7 @@ MainWindow::MainWindow(QMainWindow *parent) : QMainWindow(parent), messagesDialo
     ui.plot2Button->setEnabled(false);
 
     ui.fileMenu->setFocus();
+    ui.messagesLineEdit->setReadOnly(true);
 
     //set accepted characters in box tab
     QRegExp numberDensityrx("^\\d*\\.?\\d*$");
@@ -652,11 +653,11 @@ void MainWindow::open()
                     getOutputsRunning();
                     //open .bat file to check if dlputils line is in there
                     QString inpBaseFileName = epsrInpFileName_.split(".",QString::SkipEmptyParts).at(0);
-                #ifdef _WIN32
+#ifdef _WIN32
                     QFile batFile(workingDir_+"run"+inpBaseFileName+".bat");
-                #else
+#else
                     QFile batFile(workingDir_+"run"+inpBaseFileName+".sh");
-                #endif
+#endif
                     if (batFile.exists() == true)
                     {
                         if (batFile.open(QFile::ReadWrite | QFile::Text))
@@ -677,6 +678,47 @@ void MainWindow::open()
             }
         } while (!stream.atEnd());
         file.close();
+
+        //re-write bat file if it exists to have correct epsrBinDir_, workingDir_ and format for operating system
+        if (!epsrInpFileName_.isEmpty())
+        {
+            QString inpBaseFileName = epsrInpFileName_.split(".",QString::SkipEmptyParts).at(0);
+#ifdef _WIN32
+            QFile batFile(workingDir_+"run"+inpBaseFileName+".bat");
+#else
+            QFile batFile(workingDir_+"run"+inpBaseFileName+".sh");
+#endif
+            if (batFile.exists())
+            {
+                //make a new skeleton bat file
+                if (batFile.open(QFile::WriteOnly | QFile::Text))
+                {
+                    QTextStream stream(&batFile);
+                    QString baseFileName = epsrInpFileName_.split(".",QString::SkipEmptyParts).at(0);
+#ifdef _WIN32
+                    stream << "set EPSRbin=" << epsrBinDir_ << "\n"
+                            << "set EPSRrun=" << workingDir_ << "\n"
+                            << ":loop\n"
+                            << "%EPSRbin%epsr.exe %EPSRrun% epsr " << baseFileName << "\n"
+                            << "if not exist %EPSRrun%killepsr ( goto loop ) else del %EPSRrun%killepsr\n";
+#else
+                    stream << "export EPSRbin=" << epsrBinDir_ << "\n"
+                            << "export EPSRrun=" << workingDir_ << "\n"
+                            << "while :\n"
+                            << "do\n"
+                            << "  \"$EPSRbin\"'epsr' \"$EPSRrun\" epsr " << baseFileName << "\n"
+                            << "  if ([ -e " << workingDir_ << "killepsr ])\n"
+                            << "  then break\n"
+                            << "  fi\n"
+                            << "done\n"
+                            << "rm -r " << workingDir_ << "killepsr\n";
+#endif
+                    batFile.close();
+                }
+                //add any outputs to skeleton bat file
+                addOutputsToScript();
+            }
+        }
 
         // fill out datafile table
         ui.dataFileTable->setColumnCount(4);
@@ -1850,14 +1892,14 @@ void MainWindow::import()
             writebatstream << "set EPSRbin=" << epsrBinDir_ << "\n"
                     << "set EPSRrun=" << workingDir_ << "\n"
                     << ":loop\n"
-                    << "%EPSRbin%epsr.exe " << workingDir_ << " epsr " << baseFileName << "\n"
+                    << "%EPSRbin%epsr.exe %EPSRrun% epsr " << baseFileName << "\n"
                     << "if not exist %EPSRrun%killepsr ( goto loop ) else del %EPSRrun%killepsr\n";
 #else
             writebatstream << "export EPSRbin=" << epsrBinDir_ << "\n"
                     << "export EPSRrun=" << workingDir_ << "\n"
                     << "while :\n"
                     << "do\n"
-                    << "  \"$EPSRbin\"'epsr' " << workingDir_ << " epsr " << baseFileName << "\n"
+                    << "  \"$EPSRbin\"'epsr' \"$EPSRrun\" epsr " << baseFileName << "\n"
                     << "  if ([ -e " << workingDir_ << "killepsr ])\n"
                     << "  then break\n"
                     << "  fi\n"
@@ -1875,122 +1917,6 @@ void MainWindow::import()
         messagesDialog.refreshMessages();
         ui.messagesLineEdit->setText("New project "+projectName_+" imported");
     }
-}
-
-void MainWindow::runEPSRcheck()
-{
-    updateInpFile();
-    updatePcofFile();
-
-    //check everything required is present in the folder???*********************************************************************************************
-
-    QDir::setCurrent(workingDir_);
-    QProcess processrunEPSRcheck;
-    QString atoBaseFileName = atoFileName_.split(".",QString::SkipEmptyParts).at(0);
-
-#ifdef _WIN32
-    processrunEPSRcheck.startDetached(epsrBinDir_+"epsr.exe", QStringList() << workingDir_ << "epsr" << atoBaseFileName);
-#else
-    processrunEPSRcheck.startDetached(epsrBinDir_+"epsr", QStringList() << workingDir_ << "epsr" << atoBaseFileName);
-#endif
-
-    //show EPSR is running
-    ui.epsrRunningSign->setText("EPSR running");
-    ui.epsrRunningSign->setEnabled(true);
-    ui.stopAct->setEnabled(true);
-    ui.runAct->setEnabled(false);
-    ui.checkAct->setEnabled(false);
-
-    //disable editing buttons while EPSR is running
-    ui.newAct->setEnabled(false);
-    ui.openAct->setEnabled(false);
-    ui.saveAsAct->setEnabled(false);
-    ui.saveCopyAct->setEnabled(false);
-    ui.importAct->setEnabled(false);
-    ui.exitAct->setEnabled(false);
-    ui.deleteBoxAtoFileAct->setEnabled(false);
-    ui.deleteEPSRinpFileAct->setEnabled(false);
-
-    ui.updateMolFileButton->setDisabled(true);
-    ui.updateAtoFileButton->setDisabled(true);
-    ui.randomiseButton->setDisabled(true);
-    ui.fmoleButton->setDisabled(true);
-    ui.atoEPSRButton->setDisabled(true);
-    ui.makeWtsButton->setDisabled(true);
-
-    ui.createMolFileButton->setEnabled(false);
-    ui.molFileLoadButton->setEnabled(false);
-    ui.createAtomButton->setEnabled(false);
-    ui.createLatticeButton->setEnabled(false);
-    ui.makeMolExtButton->setEnabled(false);
-    ui.dockatoButton->setEnabled(false);
-    ui.makelatticeatoButton->setEnabled(false);
-    ui.removeMolFileButton->setEnabled(false);
-    ui.addLJRowAboveButton->setEnabled(false);
-    ui.addLJRowBelowButton->setEnabled(false);
-    ui.deleteLJRowButton->setEnabled(false);
-    ui.addDistRowAboveButton->setEnabled(false);
-    ui.addDistRowBelowButton->setEnabled(false);
-    ui.deleteDistRowButton->setEnabled(false);
-    ui.addAngRowAboveButton->setEnabled(false);
-    ui.addAngRowBelowButton->setEnabled(false);
-    ui.deleteAngRowButton->setEnabled(false);
-    ui.addDihRowAboveButton->setEnabled(false);
-    ui.addDihRowBelowButton->setEnabled(false);
-    ui.deleteDihRowButton->setEnabled(false);
-    ui.deleteDihAllButton->setEnabled(false);
-    ui.addRotRowAboveButton->setEnabled(false);
-    ui.addRotRowBelowButton->setEnabled(false);
-    ui.deleteRotRowButton->setEnabled(false);
-    ui.deleteRotAllButton->setEnabled(false);
-    ui.molChangeAtobutton->setEnabled(false);
-    ui.molFmoleButton->setEnabled(false);
-    ui.mixatoButton->setEnabled(false);
-    ui.addatoButton->setEnabled(false);
-    ui.loadBoxButton->setEnabled(false);
-    ui.dataFileBrowseButton->setEnabled(false);
-    ui.removeDataFileButton->setEnabled(false);
-    ui.setupEPSRButton->setEnabled(false);
-    ui.updateInpPcofFilesButton->setEnabled(false);
-    ui.setupOutButton->setEnabled(false);
-    ui.setupPlotButton->setEnabled(false);
-    ui.applyOutputsButton->setEnabled(false);
-    ui.addOutputButton->setEnabled(false);
-    ui.removeOutputButton->setEnabled(false);
-    ui.dlputilsOutCheckBox->setEnabled(false);
-
-    ui.messagesLineEdit->setText("EPSR is running for 1 iteration");
-    messageText_ += "\nEPSR is running for 1 iteration in a terminal window.\n";
-    messagesDialog.refreshMessages();
-
-    //enable plotting as data files should now exist ************if this is clicked before files exist does program crash?
-    ui.inpSettingsTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    ui.dataFileSettingsTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    ui.pcofSettingsTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    ui.minDistanceTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    ui.plot1Button->setEnabled(true);
-    ui.plot2Button->setEnabled(true);
-
-    // kill any other timers that might be still running if a setup was quit but not saved
-    killTimer(outputTimerId_);
-    outputTimerId_ = -1;
-    killTimer(molChangeatoFinishedTimerId_);
-    molChangeatoFinishedTimerId_ = -1;
-    killTimer(changeatoFinishedTimerId_);
-    changeatoFinishedTimerId_ = -1;
-
-    //use the killepsr file to determine when epsr has finished and run enableButtons() once it has
-    QFile file(workingDir_+"killepsr");
-    if(!file.open(QFile::WriteOnly))
-    {
-        QMessageBox msgBox;
-        msgBox.setText("Could not stop EPSR script");
-        msgBox.exec();
-        return;
-    }
-    file.close();
-    epsrFinished_.addPath(workingDir_+"killepsr");
-    file.remove();
 }
 
 void MainWindow::runEPSRonce()
@@ -2011,55 +1937,6 @@ void MainWindow::runEPSR()
 #else
     QFile batFile(workingDir_+"run"+baseFileName+".sh");
 #endif
-//this needs sorting out ***********************************************************************************************************************************
-    /*
-    if (batFile.exists())
-    {
-        if(!batFile.open(QFile::ReadWrite | QFile::Text))
-        {
-            QMessageBox msgBox;
-            msgBox.setText("Could not open script file.");
-            msgBox.exec();
-            return;
-        }
-
-        //read script file to check paths are correct
-        QTextStream stream(&batFile);
-        QString line;
-        QStringList dataLine;
-
-        line = stream.readLine();
-        dataLine = line.split(" ", QString::KeepEmptyParts);
-        if (dataLine.count() <= 2)
-        {
-            batFile.close();
-            batFile.remove();
-            break;
-        }
-        if (dataLine.at(2) != epsrBinDir_)
-        {
-            //replace with correct epsrBinDir_
-        }
-        line = stream.readLine();
-        dataLine = line.split(" ", QString::KeepEmptyParts);
-        if (dataLine.count() <= 2)
-        {
-            batFile.close();
-            batFile.remove();
-            break;
-        }
-        if (dataLine.at(2) != workingDir_)
-        {
-            //replace with correct workingDir_
-        }
-        do
-        {
-            line = stream.readLine();
-            streamWrite << line+"\n";
-        } while (!line.isNull());
-
-        batFile.close();
-    } */
 
     // if script file already exists, don't overwrite it
     if (!batFile.exists())
@@ -2078,14 +1955,14 @@ void MainWindow::runEPSR()
         stream << "set EPSRbin=" << epsrBinDir_ << "\n"
                 << "set EPSRrun=" << workingDir_ << "\n"
                 << ":loop\n"
-                << "%EPSRbin%epsr.exe " << workingDir_ << " epsr " << baseFileName << "\n"
+                << "%EPSRbin%epsr.exe %EPSRrun% epsr " << baseFileName << "\n"
                 << "if not exist %EPSRrun%killepsr ( goto loop ) else del %EPSRrun%killepsr\n";
 #else
         stream << "export EPSRbin=" << epsrBinDir_ << "\n"
                 << "export EPSRrun=" << workingDir_ << "\n"
                 << "while :\n"
                 << "do\n"
-                << "  \"$EPSRbin\"'epsr' " << workingDir_ << " epsr " << baseFileName << "\n"
+                << "  \"$EPSRbin\"'epsr' \"$EPSRrun\" epsr " << baseFileName << "\n"
                 << "  if ([ -e " << workingDir_ << "killepsr ])\n"
                 << "  then break\n"
                 << "  fi\n"
@@ -2370,13 +2247,13 @@ void MainWindow::plotEPSRshell()
     stream << "set EPSRbin=" << epsrBinDir_ << "\n"
             << "set EPSRrun=" << workingDir_ << "\n"
             << "set EPSRgnu=" << gnuBinDir << "\n"
-            << "%EPSRbin%plot.exe " << workingDir_ << " plot\n";
+            << "%EPSRbin%plot.exe %EPSRrun% plot\n";
 #else
     stream << "export EPSRbin=" << epsrBinDir_ << "\n"
             << "export EPSRrun=" << workingDir_ << "\n"
             << "export EPSRgnu=" << gnuBinDir << "\n"
-            << "  \"$EPSRbin\"'plot' " << workingDir_ << " plot\n";
-  #endif
+            << "  \"$EPSRbin\"'plot' \"$EPSRrun\" plot\n";
+#endif
     batFile.close();
 
     QDir::setCurrent(workingDir_);
@@ -2419,11 +2296,11 @@ void MainWindow::plotJmol()
 #ifdef _WIN32
         stream << "set EPSRbin=" << epsrBinDir_ << "\n"
                 << "set EPSRrun=" << workingDir_ << "\n"
-                << "%EPSRbin%plot3djmol.exe " << workingDir_ << " plot3djmol " << jmolFileName << "\n";
+                << "%EPSRbin%plot3djmol.exe %EPSRrun% plot3djmol " << jmolFileName << "\n";
 #else
         stream << "export EPSRbin=" << epsrBinDir_ << "\n"
                 << "export EPSRrun=" << workingDir_ << "\n"
-                << "  \"$EPSRbin\"'plot3djmol' " << workingDir_ << " plot3djmol " << jmolFileName << "\n";
+                << "  \"$EPSRbin\"'plot3djmol' \"$EPSRrun\" plot3djmol " << jmolFileName << "\n";
 #endif
         batFile.close();
 
@@ -2477,12 +2354,12 @@ void MainWindow::splot2d()
         stream << "set EPSRbin=" << epsrBinDir_ << "\n"
                 << "set EPSRrun=" << workingDir_ << "\n"
                 << "set EPSRgnu=" << gnuBinDir << "\n"
-                << "%EPSRbin%splot2d.exe " << workingDir_ << " splot2d " << basePlotFileName << "\n";
+                << "%EPSRbin%splot2d.exe %EPSRrun% splot2d " << basePlotFileName << "\n";
 #else
         stream << "export EPSRbin=" << epsrBinDir_ << "\n"
                 << "export EPSRrun=" << workingDir_ << "\n"
                 << "export EPSRgnu=" << gnuBinDir << "\n"
-                << "  \"$EPSRbin\"'splot2d' " << workingDir_ << " splot2d " << basePlotFileName << "\n";
+                << "  \"$EPSRbin\"'splot2d' \"$EPSRrun\" splot2d " << basePlotFileName << "\n";
   #endif
         batFile.close();
 
@@ -2530,13 +2407,13 @@ void MainWindow::plot2d()
 #ifdef _WIN32
         stream << "set EPSRbin=" << epsrBinDir_ << "\n"
                 << "set EPSRrun=" << workingDir_ << "\n"
-                << "%EPSRbin%plot2d.exe " << workingDir_ << " plot2d " << basePlotFileName << "\n"
-                << workingDir_+"pgplot.gif\n";
+                << "%EPSRbin%plot2d.exe %EPSRrun% plot2d " << basePlotFileName << "\n"
+                << "%EPSRrun%pgplot.gif\n";
 #else
         stream << "export EPSRbin=" << epsrBinDir_ << "\n"
                 << "export EPSRrun=" << workingDir_ << "\n"
-                << "  \"$EPSRbin\"'plot2d' " << workingDir_ << " plot2d " << basePlotFileName << "\n"
-                << workingDir_+"pgplot.gif\n";
+                << "  \"$EPSRbin\"'plot2d' \"$EPSRrun\" plot2d " << basePlotFileName << "\n"
+                << "\"$EPSRrun\"pgplot.gif\n";
 #endif
         batFile.close();
 
@@ -2584,13 +2461,13 @@ void MainWindow::plot3d()
 #ifdef _WIN32
         stream << "set EPSRbin=" << epsrBinDir_ << "\n"
                 << "set EPSRrun=" << workingDir_ << "\n"
-                << "%EPSRbin%plot3d.exe " << workingDir_ << " plot3d " << basePlotFileName << "\n"
-                << workingDir_+"pgplot.gif\n";
+                << "%EPSRbin%plot3d.exe %EPSRrun% plot3d " << basePlotFileName << "\n"
+                << "%EPSRbin%pgplot.gif\n";
 #else
         stream << "export EPSRbin=" << epsrBinDir_ << "\n"
                 << "export EPSRrun=" << workingDir_ << "\n"
-                << "  \"$EPSRbin\"'plot3d' " << workingDir_ << " plot3d " << basePlotFileName << "\n"
-                << workingDir_+"pgplot.gif\n";
+                << "  \"$EPSRbin\"'plot3d' \"$EPSRrun\" plot3d " << basePlotFileName << "\n"
+                << "\"$EPSRrun\"pgplot.gif\n";
 #endif
         batFile.close();
 

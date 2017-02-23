@@ -119,12 +119,12 @@ void MainWindow::makeMolFile()
         stream << "set EPSRbin=" << epsrBinDir_ << "\n"
                << "set EPSRrun=" << workingDir_ << "\n"
                << "CD " << workingDir_ << "\n"
-               << "%EPSRbin%readmole.exe " << workingDir_ << " readmole .jmol " << jmolBaseFileName << "\n";
+               << "%EPSRbin%readmole.exe %EPSRrun% readmole .jmol " << jmolBaseFileName << "\n";
 #else
         stream << "export EPSRbin=" << epsrBinDir_ << "\n"
                << "export EPSRrun=" << workingDir_ << "\n"
                << "cd " << workingDir_ << "\n"
-               << "\"$EPSRbin\"'readmole' " << workingDir_ << " readmole .jmol " << jmolBaseFileName << "\n";
+               << "\"$EPSRbin\"'readmole' \"$EPSRrun\" readmole .jmol " << jmolBaseFileName << "\n";
 #endif
         jmolBatFile.close();
 
@@ -836,11 +836,11 @@ void MainWindow::on_viewMolFileButton_clicked(bool checked)
 #ifdef _WIN32
         stream << "set EPSRbin=" << epsrBinDir_ << "\n"
                << "set EPSRrun=" << workingDir_ << "\n"
-               << "%EPSRbin%plotato.exe " << workingDir_ << " plotato " << atoBaseFileName << " 3 0 0\n";
+               << "%EPSRbin%plotato.exe %EPSRrun% plotato " << atoBaseFileName << " 3 0 0\n";
 #else
         stream << "export EPSRbin=" << epsrBinDir_ << "\n"
                << "export EPSRrun=" << workingDir_ << "\n"
-               << "\"$EPSRbin\"'plotato' " << workingDir_ << " plotato " << atoBaseFileName << " 3 0 0\n";
+               << "\"$EPSRbin\"'plotato' \"$EPSRrun\" plotato " << atoBaseFileName << " 3 0 0\n";
 #endif
         jmolFile.close();
 
