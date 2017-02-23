@@ -707,11 +707,11 @@ void MainWindow::open()
                             << "while :\n"
                             << "do\n"
                             << "  \"$EPSRbin\"'epsr' \"$EPSRrun\" epsr " << baseFileName << "\n"
-                            << "  if ([ -e " << workingDir_ << "killepsr ])\n"
+                            << "  if ([ -e \"$EPSRrun\"killepsr ])\n"
                             << "  then break\n"
                             << "  fi\n"
                             << "done\n"
-                            << "rm -r " << workingDir_ << "killepsr\n";
+                            << "rm -r \"$EPSRrun\"killepsr\n";
 #endif
                     batFile.close();
                 }
@@ -1963,11 +1963,11 @@ void MainWindow::runEPSR()
                 << "while :\n"
                 << "do\n"
                 << "  \"$EPSRbin\"'epsr' \"$EPSRrun\" epsr " << baseFileName << "\n"
-                << "  if ([ -e " << workingDir_ << "killepsr ])\n"
+                << "  if ([ -e \"$EPSRrun\"killepsr ])\n"
                 << "  then break\n"
                 << "  fi\n"
                 << "done\n"
-                << "rm -r " << workingDir_ << "killepsr\n";
+                << "rm -r \"$EPSRrun\"killepsr\n";
 #endif
         batFile.close();
     }

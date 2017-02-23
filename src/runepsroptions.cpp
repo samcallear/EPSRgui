@@ -352,11 +352,11 @@ void MainWindow::addOutputsToScript()
 #ifdef _WIN32
     original.append("if not exist %EPSRrun%killepsr ( goto loop ) else del %EPSRrun%killepsr\n");
 #else
-    original.append("  if ([ -e " << workingDir_ << "killepsr ])\n");
+    original.append("  if ([ -e \"$EPSRrun\"killepsr ])\n");
     original.append("  then break\n");
     original.append("  fi\n");
     original.append("done\n");
-    original.append("rm -r " << workingDir_ << "killepsr\n");
+    original.append("rm -r \"$EPSRrun\"killepsr\n");
 #endif
 
     //write to file
