@@ -218,6 +218,8 @@ void MainWindow::closeEvent(QCloseEvent *event)
         }
     }
 
+    save();
+
     //delete plotting .bat/.sh files
     QDir::setCurrent(workingDir_);
     QDir dir;
