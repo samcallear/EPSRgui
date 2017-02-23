@@ -47,7 +47,6 @@ private slots:
     void import();
     void runEPSRonce();
     void runEPSR();
-    void runEPSRcheck();
     void plot();
     void plotBox();
     void plotEPSRshell();
