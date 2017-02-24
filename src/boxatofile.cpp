@@ -896,7 +896,7 @@ bool MainWindow::readAtoFileBoxDetails()
     lastInstance.clear();
     firstInstance.append(1);
     lastInstance.append(nInBox.at(0));
-    for (int i = 1; i < ui.molFileList->count(); i++) //write atoFileList and then change this to atoFileList******************************************
+    for (int i = 1; i < atoComponentList.count(); i++) //write atoFileList and then change this to atoFileList******************************************
     {
         firstInstance.append(lastInstance.at(i-1)+1);
         lastInstance.append(firstInstance.at(i)+nInBox.at(i)-1);
@@ -904,8 +904,7 @@ bool MainWindow::readAtoFileBoxDetails()
 
     //get number of lines for each component
     nLinesPerComponentList.clear();
-    fullnLinesPerComponentList.removeAt(0);
-    for (int i = 0; i < ui.molFileList->count(); i++) //write atoFileList and then change this to atoFileList******************************************
+    for (int i = 0; i < atoComponentList.count(); i++) //write atoFileList and then change this to atoFileList******************************************
     {
         nLinesPerComponentList.append(fullnLinesPerComponentList.at(firstInstance.at(i)));
     }
@@ -1325,6 +1324,14 @@ void MainWindow::on_removeComponentButton_clicked(bool checked)
     {
         //get component row
         int componentToRemove = removeComponentDialog.returnComponent();  //row is row in atoFileList
+
+        if (ui.atoFileTable->item(componentToRemove,2)->text().toInt() == 0)
+        {
+            QMessageBox msgBox;
+            msgBox.setText("This component is not present in the simulation box");
+            msgBox.exec();
+            return;
+        }
 
         //get first atom for this component
         QString componentFirstAtom = firstAtomList.at(componentToRemove);
