@@ -660,9 +660,9 @@ void MainWindow::refreshDataFileTable()
             itemwts->setFlags(itemwts->flags() & ~Qt::ItemIsEditable);
             ui.dataFileTable->setItem(i,2, itemwts);
         }
-        ui.dataFileTable->setColumnWidth(0, 200);
+        ui.dataFileTable->setColumnWidth(0, 300);
         ui.dataFileTable->setColumnWidth(1, 90);
-        ui.dataFileTable->setColumnWidth(2, 200);
+        ui.dataFileTable->setColumnWidth(2, 300);
 
         ui.dataFileTable->setSelectionBehavior(QAbstractItemView::SelectRows);
         ui.dataFileTable->setSelectionMode(QAbstractItemView::SingleSelection);

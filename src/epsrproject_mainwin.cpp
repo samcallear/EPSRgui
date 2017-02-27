@@ -729,10 +729,6 @@ void MainWindow::open()
         }
 
         // fill out datafile table
-//        ui.dataFileTable->setColumnCount(3);
-//        QStringList datafileheader;
-//        datafileheader << "Data File" << "Normalisation" << "Weights File";
-//        ui.dataFileTable->setHorizontalHeaderLabels(datafileheader);
         ui.dataFileTable->verticalHeader()->setVisible(false);
         ui.dataFileTable->horizontalHeader()->setVisible(true);
 
@@ -751,9 +747,9 @@ void MainWindow::open()
                 itemwts->setFlags(itemwts->flags() & ~Qt::ItemIsEditable);
                 ui.dataFileTable->setItem(i,2, itemwts);
             }
-            ui.dataFileTable->setColumnWidth(0, 200);
+            ui.dataFileTable->setColumnWidth(0, 300);
             ui.dataFileTable->setColumnWidth(1, 90);
-            ui.dataFileTable->setColumnWidth(2, 200);
+            ui.dataFileTable->setColumnWidth(2, 300);
 
             ui.dataFileTable->setSelectionBehavior(QAbstractItemView::SelectRows);
             ui.dataFileTable->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -1635,10 +1631,6 @@ void MainWindow::import()
         }
 
         // fill out wts table
-//        ui.dataFileTable->setColumnCount(3);
-//        QStringList datafileheader;
-//        datafileheader << "Data File" << "Normalisation" << "Weights File";
-//        ui.dataFileTable->setHorizontalHeaderLabels(datafileheader);
         ui.dataFileTable->verticalHeader()->setVisible(false);
         ui.dataFileTable->horizontalHeader()->setVisible(true);
 
@@ -1657,9 +1649,9 @@ void MainWindow::import()
                 itemwts->setFlags(itemwts->flags() & ~Qt::ItemIsEditable);
                 ui.dataFileTable->setItem(i,2, itemwts);
             }
-            ui.dataFileTable->setColumnWidth(0, 200);
+            ui.dataFileTable->setColumnWidth(0, 300);
             ui.dataFileTable->setColumnWidth(1, 90);
-            ui.dataFileTable->setColumnWidth(2, 200);
+            ui.dataFileTable->setColumnWidth(2, 300);
 
             ui.dataFileTable->setSelectionBehavior(QAbstractItemView::SelectRows);
             ui.dataFileTable->setSelectionMode(QAbstractItemView::SingleSelection);
