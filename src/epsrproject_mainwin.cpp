@@ -675,6 +675,12 @@ void MainWindow::open()
                             } while (!batline.isNull());
                             batFile.close();
                         }
+                        //if bat file exists, make killepsr file in case EPSRgui crashed while running EPSR (this is then deleted on runEPSR())
+                        QFile file(workingDir_+"killepsr");
+                        if(file.open(QFile::WriteOnly))
+                        {
+                            file.close();
+                        }
                     }
                 }
             }
@@ -1929,6 +1935,13 @@ void MainWindow::runEPSRonce()
 
 void MainWindow::runEPSR()
 {
+    //remove killepsr if it exists
+    QFile file(workingDir_+"killepsr");
+    if (file.exists())
+    {
+            QFile::remove(workingDir_+"killepsr");
+    }
+
     updateInpFile();
     updatePcofFile();
 
