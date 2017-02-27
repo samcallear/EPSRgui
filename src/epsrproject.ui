@@ -2254,6 +2254,21 @@
                      <verstretch>0</verstretch>
                     </sizepolicy>
                    </property>
+                   <column>
+                    <property name="text">
+                     <string>Data File</string>
+                    </property>
+                   </column>
+                   <column>
+                    <property name="text">
+                     <string>Normalisation</string>
+                    </property>
+                   </column>
+                   <column>
+                    <property name="text">
+                     <string>Weights File</string>
+                    </property>
+                   </column>
                   </widget>
                  </item>
                  <item>

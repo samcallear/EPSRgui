@@ -403,7 +403,6 @@ void MainWindow::reset()
     wtsBaseFileName_.clear();
     dataFileExt_.clear();
     dataFileList.clear();
-    dataFileTypeList.clear();
     wtsFileList.clear();
     normalisationList.clear();
 
@@ -599,7 +598,6 @@ void MainWindow::open()
                 }
                 if (dataLine.at(0) == "data")
                 {
-                    dataFileTypeList.append(dataLine.at(1));
                     dataFileList.append(dataLine.at(2));
                     normalisationList.append(dataLine.at(3));
                     ui.makeWtsButton->setEnabled(true);
@@ -731,10 +729,10 @@ void MainWindow::open()
         }
 
         // fill out datafile table
-        ui.dataFileTable->setColumnCount(4);
-        QStringList datafileheader;
-        datafileheader << "Data File" << "Data File Type" << "Normalisation" << "Weights File";
-        ui.dataFileTable->setHorizontalHeaderLabels(datafileheader);
+//        ui.dataFileTable->setColumnCount(3);
+//        QStringList datafileheader;
+//        datafileheader << "Data File" << "Normalisation" << "Weights File";
+//        ui.dataFileTable->setHorizontalHeaderLabels(datafileheader);
         ui.dataFileTable->verticalHeader()->setVisible(false);
         ui.dataFileTable->horizontalHeader()->setVisible(true);
 
@@ -746,18 +744,16 @@ void MainWindow::open()
                 QTableWidgetItem *itemdata = new QTableWidgetItem(dataFileList.at(i));
                 itemdata->setFlags(itemdata->flags() & ~Qt::ItemIsEditable);
                 ui.dataFileTable->setItem(i,0, itemdata);
-                ui.dataFileTable->setItem(i,1, new QTableWidgetItem(dataFileTypeList.at(i)));
                 QTableWidgetItem *itemnorm = new QTableWidgetItem(normalisationList.at(i));
                 itemnorm->setFlags(itemnorm->flags() & ~Qt::ItemIsEditable);
-                ui.dataFileTable->setItem(i,2, itemnorm);
+                ui.dataFileTable->setItem(i,1, itemnorm);
                 QTableWidgetItem *itemwts = new QTableWidgetItem(wtsFileList.at(i));
                 itemwts->setFlags(itemwts->flags() & ~Qt::ItemIsEditable);
-                ui.dataFileTable->setItem(i,3, itemwts);
+                ui.dataFileTable->setItem(i,2, itemwts);
             }
             ui.dataFileTable->setColumnWidth(0, 200);
             ui.dataFileTable->setColumnWidth(1, 90);
-            ui.dataFileTable->setColumnWidth(2, 90);
-            ui.dataFileTable->setColumnWidth(3, 200);
+            ui.dataFileTable->setColumnWidth(2, 200);
 
             ui.dataFileTable->setSelectionBehavior(QAbstractItemView::SelectRows);
             ui.dataFileTable->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -838,7 +834,7 @@ bool MainWindow::save()
     {
         for (int i = 0; i < dataFileList.count(); i++)
         {
-            streamWrite << "data " << dataFileTypeList.at(i) << " " << dataFileList.at(i) << " " << normalisationList.at(i) << "\n";
+            streamWrite << "data 5 " << dataFileList.at(i) << " " << normalisationList.at(i) << "\n"; //nrtype no longer used, but to enable backwards compatibility of .pro file, keep a value here anyway
         }
         for (int i = 0; i < wtsFileList.count(); i++)
         {
@@ -1476,7 +1472,6 @@ void MainWindow::import()
         numberMolList.clear();
         dataFileList.clear();
         wtsFileList.clear();
-        dataFileTypeList.clear();
         normalisationList.clear();
 
         do
@@ -1498,7 +1493,6 @@ void MainWindow::import()
                 }
                 if (dataLine.at(0) == "data")
                 {
-                    dataFileTypeList.append(dataLine.at(1));
                     dataFileList.append(dataLine.at(2));
                     normalisationList.append(dataLine.at(3));
                     ui.makeWtsButton->setEnabled(true);
@@ -1641,10 +1635,10 @@ void MainWindow::import()
         }
 
         // fill out wts table
-        ui.dataFileTable->setColumnCount(4);
-        QStringList datafileheader;
-        datafileheader << "Data File" << "Data File Type" << "Normalisation" << "Weights File";
-        ui.dataFileTable->setHorizontalHeaderLabels(datafileheader);
+//        ui.dataFileTable->setColumnCount(3);
+//        QStringList datafileheader;
+//        datafileheader << "Data File" << "Normalisation" << "Weights File";
+//        ui.dataFileTable->setHorizontalHeaderLabels(datafileheader);
         ui.dataFileTable->verticalHeader()->setVisible(false);
         ui.dataFileTable->horizontalHeader()->setVisible(true);
 
@@ -1656,18 +1650,16 @@ void MainWindow::import()
                 QTableWidgetItem *itemdata = new QTableWidgetItem(dataFileList.at(i));
                 itemdata->setFlags(itemdata->flags() & ~Qt::ItemIsEditable);
                 ui.dataFileTable->setItem(i,0, itemdata);
-                ui.dataFileTable->setItem(i,1, new QTableWidgetItem(dataFileTypeList.at(i)));
                 QTableWidgetItem *itemnorm = new QTableWidgetItem(normalisationList.at(i));
                 itemnorm->setFlags(itemnorm->flags() & ~Qt::ItemIsEditable);
-                ui.dataFileTable->setItem(i,2, itemnorm);
+                ui.dataFileTable->setItem(i,1, itemnorm);
                 QTableWidgetItem *itemwts = new QTableWidgetItem(wtsFileList.at(i));
                 itemwts->setFlags(itemwts->flags() & ~Qt::ItemIsEditable);
-                ui.dataFileTable->setItem(i,3, itemwts);
+                ui.dataFileTable->setItem(i,2, itemwts);
             }
             ui.dataFileTable->setColumnWidth(0, 200);
             ui.dataFileTable->setColumnWidth(1, 90);
-            ui.dataFileTable->setColumnWidth(2, 90);
-            ui.dataFileTable->setColumnWidth(3, 200);
+            ui.dataFileTable->setColumnWidth(2, 200);
 
             ui.dataFileTable->setSelectionBehavior(QAbstractItemView::SelectRows);
             ui.dataFileTable->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -2754,7 +2746,6 @@ void MainWindow::deleteBoxAtoFile()
 
             //remove wts files and clear data and wts tables
             dataFileList.clear();
-            dataFileTypeList.clear();
             wtsFileList.clear();
             normalisationList.clear();
             ui.normalisationComboBox->setCurrentIndex(0);

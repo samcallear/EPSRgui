@@ -240,7 +240,6 @@ public:
     QList<WtsComponent> wtscomponents;
 
     QStringList dataFileList;
-    QStringList dataFileTypeList;
     QStringList wtsFileList;
     QStringList normalisationList;
 

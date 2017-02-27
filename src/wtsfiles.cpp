@@ -72,7 +72,6 @@ void MainWindow::on_dataFileBrowseButton_clicked(bool checked)
         ui.dataFileLineEdit->setText(newDataFileName);
 
         dataFileList.append(dataFileName);
-        dataFileTypeList.append("5");
 
         dataFileName_ = dataFileName;
         if (ui.neutronDataRB->isChecked())
@@ -371,13 +370,6 @@ void MainWindow::on_makeWtsButton_clicked(bool checked)
         return;
     }
 
-    //update dataFileTypeList to contain what is in dataFileTable
-    dataFileTypeList.clear();
-    for (int i = 0; i < ui.dataFileTable->rowCount(); i++)
-    {
-        dataFileTypeList.append(ui.dataFileTable->item(i,1)->text());
-    }
-
     //make weights files
     if (QFile::exists(workingDir_+wtsBaseFileName_+".NWTS.dat"))
     {
@@ -650,10 +642,6 @@ void MainWindow::refreshDataFileTable()
     int row = ui.dataFileTable->currentRow();
     int nRows = ui.dataFileTable->rowCount();
     ui.dataFileTable->clearContents();
-    ui.dataFileTable->setColumnCount(4);
-    QStringList datafileheader;
-    datafileheader << "Data File" << "Data File Type" << "Normalisation" << "Weights File";
-    ui.dataFileTable->setHorizontalHeaderLabels(datafileheader);
     ui.dataFileTable->verticalHeader()->setVisible(false);
     ui.dataFileTable->horizontalHeader()->setVisible(true);
 
@@ -665,18 +653,16 @@ void MainWindow::refreshDataFileTable()
             QTableWidgetItem *itemdata = new QTableWidgetItem(dataFileList.at(i));
             itemdata->setFlags(itemdata->flags() & ~Qt::ItemIsEditable);
             ui.dataFileTable->setItem(i,0, itemdata);
-            ui.dataFileTable->setItem(i,1, new QTableWidgetItem(dataFileTypeList.at(i)));
             QTableWidgetItem *itemnorm = new QTableWidgetItem(normalisationList.at(i));
             itemnorm->setFlags(itemnorm->flags() & ~Qt::ItemIsEditable);
-            ui.dataFileTable->setItem(i,2, itemnorm);
+            ui.dataFileTable->setItem(i,1, itemnorm);
             QTableWidgetItem *itemwts = new QTableWidgetItem(wtsFileList.at(i));
             itemwts->setFlags(itemwts->flags() & ~Qt::ItemIsEditable);
-            ui.dataFileTable->setItem(i,3, itemwts);
+            ui.dataFileTable->setItem(i,2, itemwts);
         }
         ui.dataFileTable->setColumnWidth(0, 200);
         ui.dataFileTable->setColumnWidth(1, 90);
-        ui.dataFileTable->setColumnWidth(2, 90);
-        ui.dataFileTable->setColumnWidth(3, 200);
+        ui.dataFileTable->setColumnWidth(2, 200);
 
         ui.dataFileTable->setSelectionBehavior(QAbstractItemView::SelectRows);
         ui.dataFileTable->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -742,7 +728,6 @@ void MainWindow::on_removeDataFileButton_clicked(bool checked)
     if (dataFileList.count() > 1)
     {
         dataFileList.takeAt(row);
-        dataFileTypeList.takeAt(row);
         wtsFileList.takeAt(row);
         normalisationList.takeAt(row);
         setSelectedDataFile();
@@ -751,7 +736,6 @@ void MainWindow::on_removeDataFileButton_clicked(bool checked)
     else
     {
         dataFileList.clear();
-        dataFileTypeList.clear();
         wtsFileList.clear();
         normalisationList.clear();
         ui.normalisationComboBox->setCurrentIndex(0);
