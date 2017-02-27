@@ -458,6 +458,7 @@ void MainWindow::reset()
     ui.setupOutButton->setEnabled(false);
     ui.setupPlotTypeComboBox->setCurrentIndex(0);
     ui.applyOutputsButton->setEnabled(false);
+    ui.applyCommandButton->setEnabled(false);
     ui.setupPlotButton->setEnabled(false);
     ui.dlputilsOutCheckBox->setEnabled(false);
     ui.plot1Button->setEnabled(false);
@@ -635,6 +636,7 @@ void MainWindow::open()
                     ui.setupOutButton->setEnabled(true);
                     ui.setupPlotButton->setEnabled(true);
                     ui.applyOutputsButton->setEnabled(true);
+                    ui.applyCommandButton->setEnabled(true);
                     ui.dlputilsOutCheckBox->setEnabled(true);
                     ui.deleteBoxAtoFileAct->setEnabled(true);
                     ui.plot1Button->setEnabled(true);
@@ -1778,6 +1780,7 @@ void MainWindow::import()
             ui.setupOutButton->setEnabled(true);
             ui.setupPlotButton->setEnabled(true);
             ui.applyOutputsButton->setEnabled(true);
+            ui.applyCommandButton->setEnabled(true);
             ui.dlputilsOutCheckBox->setEnabled(true);
             ui.deleteBoxAtoFileAct->setEnabled(true);
             ui.plot1Button->setEnabled(true);
@@ -2059,6 +2062,7 @@ void MainWindow::runEPSR()
     ui.updateInpPcofFilesButton->setEnabled(false);
     ui.setupOutButton->setEnabled(false);
     ui.applyOutputsButton->setEnabled(false);
+    ui.applyCommandButton->setEnabled(false);
     ui.addOutputButton->setEnabled(false);
     ui.removeOutputButton->setEnabled(false);
     ui.dlputilsOutCheckBox->setEnabled(false);
@@ -2166,6 +2170,7 @@ void MainWindow::enableButtons()
     ui.updateInpPcofFilesButton->setEnabled(true);
     ui.setupOutButton->setEnabled(true);
     ui.applyOutputsButton->setEnabled(true);
+    ui.applyCommandButton->setEnabled(true);
     ui.addOutputButton->setEnabled(true);
     ui.removeOutputButton->setEnabled(true);
     ui.dlputilsOutCheckBox->setEnabled(true);
@@ -2683,6 +2688,7 @@ void MainWindow::deleteEPSRinpFile()
             ui.setupOutButton->setEnabled(false);
             ui.setupPlotButton->setEnabled(false);
             ui.applyOutputsButton->setEnabled(false);
+            ui.applyCommandButton->setEnabled(false);
             ui.dlputilsOutCheckBox->setEnabled(false);
 
             messageText_ += "EPSR.inp and associated files deleted\n";
@@ -2784,6 +2790,7 @@ void MainWindow::deleteBoxAtoFile()
             ui.setupOutButton->setEnabled(false);
             ui.setupPlotButton->setEnabled(false);
             ui.applyOutputsButton->setEnabled(false);
+            ui.applyCommandButton->setEnabled(false);
             ui.dlputilsOutCheckBox->setEnabled(false);
 
             //clear plots
