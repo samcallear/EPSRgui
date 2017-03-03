@@ -109,8 +109,27 @@ void MainWindow::getOutputsRunning()
     QStringList dataLine;
     dataLine.clear();
 
+#ifdef _WIN32
+    line = stream.readLine();   //readLine for 4 lines to get to run epsr line
+    line = stream.readLine();
+    line = stream.readLine();
+    line = stream.readLine();
+#else
+    line = stream.readLine();   //readLine for 5 lines to get to run epsr line
+    line = stream.readLine();
+    line = stream.readLine();
+    line = stream.readLine();
+    line = stream.readLine();
+#endif
+
     do {
         line = stream.readLine();
+#ifdef _WIN32
+        if (line.contains("%EPSRrun%killepsr")) break;
+#else
+        if (line.contains("\"$EPSRrun\"killepsr")) break;
+#endif
+        else
         if (line.contains("chains")
                 || line.contains("clusters")
                 || line.contains("coord")
@@ -126,6 +145,10 @@ void MainWindow::getOutputsRunning()
         {
             dataLine = line.split(" ", QString::SkipEmptyParts);
             ui.runOutEPSRList->addItem(dataLine.at(2)+": "+dataLine.at(3));
+        }
+        else
+        {
+             ui.additionalCommandsTextEdit->appendPlainText(line);
         }
     }while (!line.isNull());
     file.close();
