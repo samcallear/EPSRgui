@@ -1750,7 +1750,16 @@ bool MainWindow::updateMolFile()
     for (int i = 0; i < ui.molLJTable->rowCount(); ++i)
     {
         //need to pad atom label with a blank space at end (item 0) and charges with a blank space if '-' not present (item 4)
-        streamWrite << "potential " << ui.molLJTable->item(i,0)->text() << "  " << ui.molLJTable->item(i,1)->text() << "  " << ui.molLJTable->item(i,2)->text() << "  " << ui.molLJTable->item(i,3)->text() << " " << ui.molLJTable->item(i,4)->text() << " " << ui.molLJTable->item(i,5)->text() << "\n";
+        QString epsilon;
+        QString sigma;
+        QString aw;
+        QString charge;
+        double epsilonD = ui.molLJTable->item(i,1)->text().toDouble();
+        double sigmaD = ui.molLJTable->item(i,2)->text().toDouble();
+        double awD = ui.molLJTable->item(i,3)->text().toDouble();
+        double chargeD = ui.molLJTable->item(i,4)->text().toDouble();
+        streamWrite << "potential " << ui.molLJTable->item(i,0)->text() << "  " << epsilon.setNum(epsilonD, 'E', 5) << "  " << sigma.setNum(sigmaD, 'E', 5)
+                    << "  " << aw.setNum(awD, 'E', 5) << " " << charge.setNum(chargeD, 'E', 5) << " " << ui.molLJTable->item(i,5)->text() << "\n";
     }
     streamWrite << "temperature  0.300000E+03\n"
               "vibtemp  0.650000E+02\n"
