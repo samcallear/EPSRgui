@@ -438,7 +438,7 @@ void MainWindow::makeNwts()
     QString dataNormTypeStr = QString::number(dataNormType);
     int row = ui.dataFileTable->currentRow();
 
-    ui.dataFileTable->item(row,2)->setText(dataNormTypeStr);
+    ui.dataFileTable->item(row,1)->setText(dataNormTypeStr);
 
     //make normalisationList consistent with dataFileTable normalisation column
     normalisationList.clear();
@@ -452,7 +452,7 @@ void MainWindow::makeNwts()
 
     wtscomponents.clear();
 
-    for (int i = 0; i < N_components; ++i)
+    for (int i = 0; i < N_components; i++)
     {
         wtscomponents.append(WtsComponent());
         wtscomponents.last().atom=ui.atomWtsTable->item(i,0)->text();
@@ -461,7 +461,26 @@ void MainWindow::makeNwts()
         wtscomponents.last().abundance1=ui.atomWtsTable->item(i,3)->text();
         wtscomponents.last().isotope2=ui.atomWtsTable->item(i,4)->text();
         wtscomponents.last().abundance2=ui.atomWtsTable->item(i,5)->text();
-     }
+    }
+
+    //check atom types are the same as in boxatofile
+    if (atoAtomTypes.count() != N_components)
+    {
+        QMessageBox msgBox;
+        msgBox.setText("Mismatch between number of atom types in simulation box and weights setup file");
+        msgBox.exec();
+        return;
+    }
+    for (int i = 0; i < N_components; i++)
+    {
+        if (atoAtomTypes.at(i) != wtscomponents.at(i).atom)
+        {
+            QMessageBox msgBox;
+            msgBox.setText("Mismatch between atom types in simulation box and weights setup file");
+            msgBox.exec();
+            return;
+        }
+    }
 
     QTextStream streamRead(&fileRead);
     QTextStream streamWrite(&fileWrite);
@@ -556,13 +575,13 @@ void MainWindow::makeXwts()
     QString dataNormTypeStr = QString::number(dataNormType);
     int row = ui.dataFileTable->currentRow();
 
-    ui.dataFileTable->item(row,2)->setText(dataNormTypeStr);
+    ui.dataFileTable->item(row,1)->setText(dataNormTypeStr);
 
     //make normalisationList consistent with dataFileTable normalisation column
     normalisationList.clear();
     for (int i = 0; i < dataFileList.count(); i++)
     {
-        normalisationList.append(ui.dataFileTable->item(i,2)->text());
+        normalisationList.append(ui.dataFileTable->item(i,1)->text());
     }
 
     QString istr;
@@ -576,6 +595,24 @@ void MainWindow::makeXwts()
 //    wtscomponents.last().atom=ui.atomWtsTable->item(i,0)->text();
 //     }
 
+    //check atom types are the same as in boxatofile
+    if (atoAtomTypes.count() != N_components)
+    {
+        QMessageBox msgBox;
+        msgBox.setText("Mismatch between number of atom types in simulation box and weights setup file");
+        msgBox.exec();
+        return;
+    }
+    for (int i = 0; i < N_components; i++)
+    {
+        if (atoAtomTypes.at(i) != wtscomponents.at(i).atom)
+        {
+            QMessageBox msgBox;
+            msgBox.setText("Mismatch between atom types in simulation box and weights setup file");
+            msgBox.exec();
+            return;
+        }
+    }
 
     QTextStream streamRead(&fileRead);
     QTextStream streamWrite(&fileWrite);
