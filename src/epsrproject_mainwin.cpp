@@ -510,8 +510,6 @@ void MainWindow::open()
 
     if (!newFileName.isEmpty())
     {
-        ui.messagesLineEdit->setText("Please wait: opening project "+projectName_);
-
         //clear all tables
         reset();
 
@@ -524,6 +522,8 @@ void MainWindow::open()
             epsrDir_ = workingDir_.split(projectName_,QString::SkipEmptyParts).at(0);
             epsrDir_ = QDir::toNativeSeparators(epsrDir_);
         }
+
+        ui.messagesLineEdit->setText("Please wait: opening project "+projectName_);
 
         messageText_ += "\n***************************************************************************\n";
         messageText_ += "Current EPSR project name is "+projectName_+"\n";
