@@ -581,6 +581,7 @@ void MainWindow::open()
                     atoFileName_ = dataLine.at(1);
                     if (readAtoFileBoxDetails() == false)
                     {
+                        ui.messagesLineEdit->setText("Simulation box corrupt");
                         return;
                     }
                     messageText_ += "Box .ato filename is "+atoFileName_+"\n";

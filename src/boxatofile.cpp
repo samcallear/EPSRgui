@@ -684,6 +684,13 @@ bool MainWindow::readAtoFileBoxDetails()
     line = stream.readLine();
     dataLine = line.split(" ", QString::SkipEmptyParts);
     QString numberMol = dataLine.at(0);
+    if (dataLine.count() == 0)
+    {
+        QMessageBox msgBox;
+        msgBox.setText("Box .ato file is empty.");
+        msgBox.exec();
+        return false;
+    }
     if (dataLine.count() == 3)
     {
         double boxLength = dataLine.at(1).toDouble();
@@ -755,6 +762,13 @@ bool MainWindow::readAtoFileBoxDetails()
 
     line = stream.readLine();
     dataLine = line.split("  ", QString::SkipEmptyParts);
+    if (dataLine.count() < 8)
+    {
+        QMessageBox msgBox;
+        msgBox.setText("Box .ato file is corrupt (line 2)");
+        msgBox.exec();
+        return false;
+    }
     ui.atoTetherTolLineEdit->setText(dataLine.at(0).trimmed());
     ui.intraTransSSLineEdit->setText(dataLine.at(1));
     ui.grpRotSSLineEdit->setText(dataLine.at(2));
@@ -783,6 +797,14 @@ bool MainWindow::readAtoFileBoxDetails()
         line = stream.readLine();
         dataLine = line.split(" ",QString::SkipEmptyParts);
         lineCtr++;
+        if (dataLine.count() == 0)
+        {
+            QMessageBox msgBox;
+            msgBox.setText("Box .ato file is corrupt");
+            msgBox.exec();
+            return false;
+        }
+        else
         if (dataLine.count() > 9)
         {
             if (line.contains("T") == true || line.contains("F") == true)
