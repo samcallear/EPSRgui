@@ -2792,6 +2792,7 @@ void MainWindow::showNotes()
 {
     NotesDialog notesDialog(this);
 
+    notesDialog.setModal(true);
     notesDialog.show();
     notesDialog.raise();
     notesDialog.activateWindow();
