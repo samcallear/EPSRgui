@@ -51,7 +51,10 @@ void SettingsDialog::on_browseEPSRDirButton_clicked(bool checked)
         prefEPSRdir = QFileDialog::getExistingDirectory(this, "Choose EPSR directory", ui.epsrDirlineEdit->text());
     }
 
-    ui.epsrDirlineEdit->setText(prefEPSRdir);
+    if (!prefEPSRdir.isEmpty())
+    {
+        ui.epsrDirlineEdit->setText(prefEPSRdir);
+    }
 }
 
 void SettingsDialog::on_browseEPSRBinDirButton_clicked(bool checked)
@@ -66,7 +69,10 @@ void SettingsDialog::on_browseEPSRBinDirButton_clicked(bool checked)
         prefEPSRbindir = QFileDialog::getExistingDirectory(this, "Choose EPSR bin directory", ui.epsrBinDirlineEdit->text());
     }
 
-    ui.epsrBinDirlineEdit->setText(prefEPSRbindir);
+    if (!prefEPSRbindir.isEmpty())
+    {
+        ui.epsrBinDirlineEdit->setText(prefEPSRbindir);
+    }
 }
 
 void SettingsDialog::on_browseVisualiserExeButton_clicked(bool checked)
@@ -76,7 +82,11 @@ void SettingsDialog::on_browseVisualiserExeButton_clicked(bool checked)
 #else
     QString prefVisExe = QFileDialog::getOpenFileName(this, "Choose visualiser exectuable", currentDir.path(), tr("All files (*.*)"));
 #endif
-    ui.visualiserLineEdit->setText(prefVisExe);
+
+    if (!prefVisExe.isEmpty())
+    {
+        ui.visualiserLineEdit->setText(prefVisExe);
+    }
 }
 
 void SettingsDialog::writeSettingsFile()

@@ -52,8 +52,11 @@ void ImportDialog::on_browseBoxButton_clicked(bool checked)
     if (!workingDir_.isEmpty())
     {
         boxFileName = QFileDialog::getOpenFileName(this, "Choose simulation box .ato file", workingDir_, tr("box .ato files (*.ato)"));
-        atoFileName_ = QFileInfo(boxFileName).fileName();
-        ui.boxLineEdit->setText(atoFileName_);
+        if (!boxFileName.isEmpty())
+        {
+            atoFileName_ = QFileInfo(boxFileName).fileName();
+            ui.boxLineEdit->setText(atoFileName_);
+        }
     }
     else
     {
@@ -70,8 +73,11 @@ void ImportDialog::on_browseInpButton_clicked(bool checked)
     if (!workingDir_.isEmpty())
     {
         inpFileName = QFileDialog::getOpenFileName(this, "Choose simulation input file", workingDir_, tr(".EPSR.inp files (*.inp)"));
-        epsrInpFileName_ = QFileInfo(inpFileName).fileName();
-        ui.inpLineEdit->setText(epsrInpFileName_);
+        if (!inpFileName.isEmpty())
+        {
+            epsrInpFileName_ = QFileInfo(inpFileName).fileName();
+            ui.inpLineEdit->setText(epsrInpFileName_);
+        }
     }
     else
     {
@@ -88,8 +94,11 @@ void ImportDialog::on_browseScriptButton_clicked(bool checked)
     if (!workingDir_.isEmpty())
     {
         scriptFileName = QFileDialog::getOpenFileName(this, "Choose simulation script file", workingDir_, tr(".txt files (*.txt)"));
-        scriptFile_ = QFileInfo(scriptFileName).fileName();
-        ui.scriptLineEdit->setText(scriptFile_);
+        if (!scriptFileName.isEmpty())
+        {
+            scriptFile_ = QFileInfo(scriptFileName).fileName();
+            ui.scriptLineEdit->setText(scriptFile_);
+        }
     }
     else
     {
