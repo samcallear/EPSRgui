@@ -340,11 +340,19 @@ void PlotDialog::getplottype()
         else
         if (ptType == 8)
         {
-            //ereq plot
+            //ereq vs fit plot
             ereqPlot();
         }
         else
         if (ptType == 9)
+        {
+            //ereq vs iteration
+            plotFileExt_ = ".EPSR.erg";
+            dataColumn_ = 3;
+            yPlot();
+        }
+        else
+        if (ptType == 10)
         {
             //empirical potentials
             empPotPlot();
@@ -785,7 +793,7 @@ bool PlotDialog::yPlot()
     if(!file.open(QFile::ReadOnly | QFile::Text))
     {
         QMessageBox msgBox;
-        msgBox.setText("Could not open .erg file.");
+        msgBox.setText("Could not open file to plot.");
         msgBox.exec();
         return 0;
     }
@@ -870,6 +878,11 @@ bool PlotDialog::yPlot()
     if (dataColumn_ == 2)
     {
         ui.customPlot->yAxis->setLabel("R-factor");
+    }
+    else
+    if (dataColumn_ == 3)
+    {
+        ui.customPlot->yAxis->setLabel("Absolute energy / kJ mol\u207B\u00B9");
     }
 
     //plot

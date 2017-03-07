@@ -110,6 +110,11 @@
                 </item>
                 <item>
                  <property name="text">
+                  <string>ereq vs iteration</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
                   <string>empirical potentials</string>
                  </property>
                 </item>
