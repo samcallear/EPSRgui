@@ -516,7 +516,8 @@ void MainWindow::makeNwts()
     if (!wtsfile.exists())
     {
         QMessageBox msgBox;
-        msgBox.setText("Could not make wts file");
+        msgBox.setText("An error occured while EPSR was making the wts file.\n"
+                       "Check that the atom types are as listed in the simulation box and there are no errors in the exchaneable atoms or isotope abundances\n");
         msgBox.exec();
         return;
     }
