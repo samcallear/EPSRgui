@@ -24,6 +24,7 @@ class SetupOutputDialog;
 class NotesDialog;
 class RemoveComponentDialog;
 class MakeMolLattDialog;
+class ExchangeableAtomsDialog;
 
 class MainWindow : public QMainWindow
 {
@@ -113,6 +114,8 @@ public:
     QStringList atomTypes();
     QVector<int> numberOfEachAtomType();
     QStringList listAtoFiles();
+    QStringList listWtsFiles();
+    QString wtsBaseFileName();
     QString outputFileName();
     QString outputSetupFileType();
     QString outputFileExt();
@@ -122,6 +125,7 @@ public:
     QString plotFileExt();
     QString coeffFileName();
     QByteArray messageText();
+    QStringList exchangeableAtomsList();
 
 public slots:
     void createNew();
@@ -226,6 +230,7 @@ private slots:
     void setSelectedDataFile();
     void on_removeDataFileButton_clicked(bool checked);
     void on_makeWtsButton_clicked(bool checked);
+    void on_exchangeableAtomsButton_clicked(bool checked);
 
 private:
     bool makeNwtsSetup();
@@ -238,10 +243,10 @@ private:
 
 public:
     QList<WtsComponent> wtscomponents;
-
     QStringList dataFileList;
     QStringList wtsFileList;
     QStringList normalisationList;
+    int addExchangeableAtoms;
 
     // Setup EPSR Inp File Tab
 private slots:

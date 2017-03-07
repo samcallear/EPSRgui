@@ -8,6 +8,7 @@
 #include "epsrproject.h"
 #include "wtscomponent.h"
 #include "datafilesettings.h"
+#include "exchangeableatomsdialog.h"
 
 void MainWindow::on_dataFileBrowseButton_clicked(bool checked)
 {
@@ -442,7 +443,7 @@ void MainWindow::makeNwts()
     normalisationList.clear();
     for (int i = 0; i < dataFileList.count(); i++)
     {
-        normalisationList.append(ui.dataFileTable->item(i,2)->text());
+        normalisationList.append(ui.dataFileTable->item(i,1)->text());
     }
 
     QString istr;
@@ -703,11 +704,13 @@ void MainWindow::setSelectedDataFile()
     if (QFile::exists(workingDir_+wtsBaseFileName_+".NWTS.dat"))
     {
         readNwtsSetup();
+        ui.exchangeableAtomsButton->setEnabled(true);
     }
     else
     if (QFile::exists(workingDir_+wtsBaseFileName_+".XWTS.dat"))
     {
         readXwtsSetup();
+        ui.exchangeableAtomsButton->setEnabled(false);
     }
 }
 
@@ -745,6 +748,7 @@ void MainWindow::on_removeDataFileButton_clicked(bool checked)
         ui.makeWtsButton->setEnabled(false);
         ui.setupEPSRButton->setEnabled(false);
         ui.dataFileLineEdit->clear();
+        ui.exchangeableAtomsButton->setEnabled(false);
     }
 
     //save .pro file
@@ -752,3 +756,68 @@ void MainWindow::on_removeDataFileButton_clicked(bool checked)
 
     ui.messagesLineEdit->setText("Data file removed");
 }
+
+void MainWindow::on_exchangeableAtomsButton_clicked(bool checked)
+{
+    if (wtsFileList.count() < 2) return;
+
+    ExchangeableAtomsDialog exchangeableAtomsDialog(this);
+
+    exchangeableAtomsDialog.setModal(true);
+    exchangeableAtomsDialog.show();
+    exchangeableAtomsDialog.raise();
+    exchangeableAtomsDialog.activateWindow();
+
+    addExchangeableAtoms = exchangeableAtomsDialog.exec();
+
+    if (addExchangeableAtoms == ExchangeableAtomsDialog::Accepted)
+    {
+        QString wtsSetupFile = exchangeableAtomsDialog.getWtsFile();
+
+        //open and read weights setup file
+        QString wtsFileName = workingDir_+wtsSetupFile;
+        QFile file(wtsFileName);
+        if(!file.open(QFile::ReadOnly | QFile::Text))
+        {
+            QMessageBox msgBox;
+            msgBox.setText("Could not open wts setup file");
+            msgBox.exec();
+            return;
+        }
+        QTextStream stream(&file);
+        QString line;
+        QStringList dataLine;
+        dataLine.clear();
+
+        QStringList exchangeableAtoms;
+        exchangeableAtoms.clear();
+
+        do
+        {
+            line = stream.readLine();
+            dataLine = line.split(" ", QString::SkipEmptyParts);
+            if (dataLine.count() == 0) continue;
+            if (dataLine.at(0) == "iexchange")
+            {
+                exchangeableAtoms.append(dataLine.at(1));
+            }
+        } while (!stream.atEnd());
+        file.close();
+
+        if (wtscomponents.count() != exchangeableAtoms.count())
+        {
+            QMessageBox msgBox;
+            msgBox.setText("There is a mismatch between the weights setup files");
+            msgBox.exec();
+            return;
+        }
+
+        //show data in Table
+        for (int i = 0; i < wtscomponents.count(); ++i)
+        {
+            ui.atomWtsTable->setItem(i,1, new QTableWidgetItem(exchangeableAtoms.at(i)));
+        }
+        return;
+    }
+}
+

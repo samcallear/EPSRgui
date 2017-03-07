@@ -13,6 +13,7 @@
 #include "plotboxdialog.h"
 #include "setupoutputdialog.h"
 #include "notesdialog.h"
+#include "exchangeableatomsdialog.h"
 
 #include <QtGui>
 #include <QMainWindow>
@@ -448,6 +449,7 @@ void MainWindow::reset()
     ui.removeComponentButton->setEnabled(false);
     ui.dataFileBrowseButton->setEnabled(false);
     ui.removeDataFileButton->setEnabled(false);
+    ui.exchangeableAtomsButton->setEnabled(false);
     ui.makeWtsButton->setEnabled(false);
     ui.setupEPSRButton->setEnabled(false);
     ui.ESPRtabWidget->setCurrentIndex(0);
@@ -729,41 +731,7 @@ void MainWindow::open()
         }
 
         // fill out datafile table
-        ui.dataFileTable->verticalHeader()->setVisible(false);
-        ui.dataFileTable->horizontalHeader()->setVisible(true);
-
-        if (!dataFileList.isEmpty())
-        {
-            ui.dataFileTable->setRowCount(dataFileList.count());
-            for (int i = 0; i < dataFileList.count(); i++)
-            {
-                QTableWidgetItem *itemdata = new QTableWidgetItem(dataFileList.at(i));
-                itemdata->setFlags(itemdata->flags() & ~Qt::ItemIsEditable);
-                ui.dataFileTable->setItem(i,0, itemdata);
-                QTableWidgetItem *itemnorm = new QTableWidgetItem(normalisationList.at(i));
-                itemnorm->setFlags(itemnorm->flags() & ~Qt::ItemIsEditable);
-                ui.dataFileTable->setItem(i,1, itemnorm);
-                QTableWidgetItem *itemwts = new QTableWidgetItem(wtsFileList.at(i));
-                itemwts->setFlags(itemwts->flags() & ~Qt::ItemIsEditable);
-                ui.dataFileTable->setItem(i,2, itemwts);
-            }
-            ui.dataFileTable->setColumnWidth(0, 300);
-            ui.dataFileTable->setColumnWidth(1, 90);
-            ui.dataFileTable->setColumnWidth(2, 300);
-
-            ui.dataFileTable->setSelectionBehavior(QAbstractItemView::SelectRows);
-            ui.dataFileTable->setSelectionMode(QAbstractItemView::SingleSelection);
-            ui.dataFileTable->setCurrentCell(dataFileList.count()-1,0);
-        }
-
-        // fill out wts column
-        if (!wtsFileList.isEmpty())
-        for (int i = 0; i < dataFileList.count(); i++)
-        {
-            QTableWidgetItem *itemwts = new QTableWidgetItem(wtsFileList.at(i));
-            itemwts->setFlags(itemwts->flags() & ~Qt::ItemIsEditable);
-            ui.dataFileTable->setItem(i,3, itemwts);
-        }
+        refreshDataFileTable();
 
         //activate tabs
         ui.tabWidget->setEnabled(true);
@@ -942,11 +910,11 @@ bool MainWindow::saveAs()
         {
             for (int i = 0; i < ui.dataFileTable->rowCount(); i++)
             {
-                streamWrite << "data " << ui.dataFileTable->item(i,1)->text() << " " << ui.dataFileTable->item(i,0)->text() << " " << ui.dataFileTable->item(i,2)->text() << "\n";
+                streamWrite << "data 5 " << ui.dataFileTable->item(i,0)->text() << " " << ui.dataFileTable->item(i,1)->text() << "\n";
             }
             for (int i = 0; i < wtsFileList.count(); i++)
             {
-                streamWrite << "wts " << ui.dataFileTable->item(i,3)->text() << "\n";
+                streamWrite << "wts " << ui.dataFileTable->item(i,2)->text() << "\n";
             }
         }
 
@@ -1223,11 +1191,11 @@ bool MainWindow::saveCopy()
         {
             for (int i = 0; i < ui.dataFileTable->rowCount(); i++)
             {
-                streamWrite << "data " << ui.dataFileTable->item(i,1)->text() << " " << ui.dataFileTable->item(i,0)->text() << " " << ui.dataFileTable->item(i,2)->text() << "\n";
+                streamWrite << "data 5 " << ui.dataFileTable->item(i,0)->text() << " " << ui.dataFileTable->item(i,1)->text() << "\n";
             }
             for (int i = 0; i < wtsFileList.count(); i++)
             {
-                streamWrite << "wts " << ui.dataFileTable->item(i,3)->text() << "\n";
+                streamWrite << "wts " << ui.dataFileTable->item(i,2)->text() << "\n";
             }
         }
 
@@ -2556,6 +2524,16 @@ QStringList MainWindow::listAtoFiles()
         atoFileList.append(ui.atoFileTable->item(i,0)->text());
     }
     return atoFileList;
+}
+
+QStringList MainWindow::listWtsFiles()
+{
+    return wtsFileList;
+}
+
+QString MainWindow::wtsBaseFileName()
+{
+    return wtsBaseFileName_;
 }
 
 QString MainWindow::outputFileName()
