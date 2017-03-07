@@ -603,6 +603,7 @@ void MainWindow::open()
                 {
                     dataFileList.append(dataLine.at(2));
                     normalisationList.append(dataLine.at(3));
+                    ui.exchangeableAtomsButton->setEnabled(true);
                     ui.makeWtsButton->setEnabled(true);
                     ui.setupEPSRButton->setEnabled(true); //a wts file is checked for on clicking this button
                 }
@@ -1460,6 +1461,7 @@ void MainWindow::import()
                 {
                     dataFileList.append(dataLine.at(2));
                     normalisationList.append(dataLine.at(3));
+                    ui.exchangeableAtomsButton->setEnabled(true);
                     ui.makeWtsButton->setEnabled(true);
                 }
                 if (dataLine.at(0) == "wts")
@@ -1976,6 +1978,7 @@ void MainWindow::runEPSR()
     ui.randomiseButton->setDisabled(true);
     ui.fmoleButton->setDisabled(true);
     ui.atoEPSRButton->setDisabled(true);
+    ui.exchangeableAtomsButton->setDisabled(true);
     ui.makeWtsButton->setDisabled(true);
 
     ui.createMolFileButton->setEnabled(false);
@@ -2084,6 +2087,7 @@ void MainWindow::enableButtons()
     ui.randomiseButton->setEnabled(true);
     ui.fmoleButton->setEnabled(true);
     ui.atoEPSRButton->setEnabled(true);
+    ui.exchangeableAtomsButton->setEnabled(true);
     ui.makeWtsButton->setEnabled(true);
 
     ui.createMolFileButton->setEnabled(true);
@@ -2746,6 +2750,7 @@ void MainWindow::deleteBoxAtoFile()
             ui.removeComponentButton->setEnabled(false);
             ui.dataFileBrowseButton->setEnabled(false);
             ui.removeDataFileButton->setEnabled(false);
+            ui.exchangeableAtomsButton->setEnabled(false);
             ui.makeWtsButton->setEnabled(false);
             ui.setupEPSRButton->setEnabled(false);
             ui.updateInpPcofFilesButton->setEnabled(false);
