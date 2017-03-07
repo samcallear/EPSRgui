@@ -1633,7 +1633,6 @@ bool MainWindow::updateMolFile()
         }
     }
 
-
     QDir::setCurrent(workingDir_);
 
     QFile fileRead(workingDir_+molFileName_);
@@ -1920,6 +1919,13 @@ bool MainWindow::updateMolFile()
     messageText_ += "\nfinished updating molecule ato file\n";
     messagesDialog.refreshMessages();
     ui.messagesLineEdit->setText(".mol file updated");
+
+    if (!atoFileName_.isEmpty())
+    {
+        QMessageBox msgBox;
+        msgBox.setText("Now run fmole to apply the changes to the simulation box.");
+        msgBox.exec();
+    }
 
     return true;
 }
