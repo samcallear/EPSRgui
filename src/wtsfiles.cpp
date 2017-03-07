@@ -93,6 +93,7 @@ void MainWindow::on_dataFileBrowseButton_clicked(bool checked)
             refreshDataFileTable();
         }
     }
+    ui.exchangeableAtomsButton->setEnabled(true);
     ui.makeWtsButton->setEnabled(true);
     ui.setupEPSRButton->setEnabled(true);
 
@@ -745,6 +746,7 @@ void MainWindow::on_removeDataFileButton_clicked(bool checked)
         ui.atomWtsTable->clearContents();
         ui.atomWtsTable->setRowCount(0);
         ui.dataFileTable->removeRow(0);
+        ui.exchangeableAtomsButton->setEnabled(false);
         ui.makeWtsButton->setEnabled(false);
         ui.setupEPSRButton->setEnabled(false);
         ui.dataFileLineEdit->clear();

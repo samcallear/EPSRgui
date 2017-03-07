@@ -2723,6 +2723,7 @@ void MainWindow::deleteBoxAtoFile()
             ui.atomWtsTable->clearContents();
             ui.atomWtsTable->setRowCount(0);
             ui.dataFileTable->setRowCount(0);
+            ui.exchangeableAtomsButton->setEnabled(false);
             ui.makeWtsButton->setEnabled(false);
             ui.setupEPSRButton->setEnabled(false);
             ui.dataFileLineEdit->clear();
