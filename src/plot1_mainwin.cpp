@@ -315,7 +315,7 @@ bool MainWindow::fqplot1()
         ui.plot1->xAxis->setScaleLogBase(100);
         ui.plot1->xAxis->setNumberFormat("eb");
         ui.plot1->xAxis->setNumberPrecision(0);
-        ui.plot1->xAxis->setSubTickCount(10);
+        ui.plot1->xAxis->setSubTickCount(9);
     }
     else
     {
@@ -330,7 +330,7 @@ bool MainWindow::fqplot1()
         ui.plot1->yAxis->setScaleLogBase(100);
         ui.plot1->yAxis->setNumberFormat("eb");
         ui.plot1->yAxis->setNumberPrecision(0);
-        ui.plot1->yAxis->setSubTickCount(10);
+        ui.plot1->yAxis->setSubTickCount(9);
     }
     else
     {
@@ -542,7 +542,7 @@ bool MainWindow::frplot1()
         ui.plot1->xAxis->setScaleLogBase(100);
         ui.plot1->xAxis->setNumberFormat("eb");
         ui.plot1->xAxis->setNumberPrecision(0);
-        ui.plot1->xAxis->setSubTickCount(10);
+        ui.plot1->xAxis->setSubTickCount(9);
     }
     else
     {
@@ -557,7 +557,7 @@ bool MainWindow::frplot1()
         ui.plot1->yAxis->setScaleLogBase(100);
         ui.plot1->yAxis->setNumberFormat("eb");
         ui.plot1->yAxis->setNumberPrecision(0);
-        ui.plot1->yAxis->setSubTickCount(10);
+        ui.plot1->yAxis->setSubTickCount(9);
     }
     else
     {
@@ -623,7 +623,7 @@ bool MainWindow::Eplot1()
         ui.plot1->xAxis->setScaleLogBase(100);
         ui.plot1->xAxis->setNumberFormat("eb");
         ui.plot1->xAxis->setNumberPrecision(0);
-        ui.plot1->xAxis->setSubTickCount(10);
+        ui.plot1->xAxis->setSubTickCount(9);
     }
     else
     {
@@ -631,6 +631,7 @@ bool MainWindow::Eplot1()
         ui.plot1->xAxis->setNumberFormat("g");
         ui.plot1->xAxis->setNumberPrecision(3);
         ui.plot1->xAxis->setAutoTickStep(true);
+//        ui.plot1->xAxis->setTickStep(x.count()/10);
     }
     if (ui.plot1LogY->isChecked() == true)
     {
@@ -638,7 +639,7 @@ bool MainWindow::Eplot1()
         ui.plot1->yAxis->setScaleLogBase(100);
         ui.plot1->yAxis->setNumberFormat("eb");
         ui.plot1->yAxis->setNumberPrecision(0);
-        ui.plot1->yAxis->setSubTickCount(10);
+        ui.plot1->yAxis->setSubTickCount(9);
     }
     else
     {
@@ -701,7 +702,7 @@ bool MainWindow::Rplot1()
         ui.plot1->xAxis->setScaleLogBase(100);
         ui.plot1->xAxis->setNumberFormat("eb");
         ui.plot1->xAxis->setNumberPrecision(0);
-        ui.plot1->xAxis->setSubTickCount(10);
+        ui.plot1->xAxis->setSubTickCount(9);
     }
     else
     {
@@ -716,7 +717,7 @@ bool MainWindow::Rplot1()
         ui.plot1->yAxis->setScaleLogBase(100);
         ui.plot1->yAxis->setNumberFormat("eb");
         ui.plot1->yAxis->setNumberPrecision(0);
-        ui.plot1->yAxis->setSubTickCount(10);
+        ui.plot1->yAxis->setSubTickCount(9);
     }
     else
     {
@@ -779,7 +780,7 @@ bool MainWindow::Pplot1()
         ui.plot1->xAxis->setScaleLogBase(100);
         ui.plot1->xAxis->setNumberFormat("eb");
         ui.plot1->xAxis->setNumberPrecision(0);
-        ui.plot1->xAxis->setSubTickCount(10);
+        ui.plot1->xAxis->setSubTickCount(9);
     }
     else
     {
@@ -794,7 +795,7 @@ bool MainWindow::Pplot1()
         ui.plot1->yAxis->setScaleLogBase(100);
         ui.plot1->yAxis->setNumberFormat("eb");
         ui.plot1->yAxis->setNumberPrecision(0);
-        ui.plot1->yAxis->setSubTickCount(10);
+        ui.plot1->yAxis->setSubTickCount(9);
     }
     else
     {

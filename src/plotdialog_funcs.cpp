@@ -714,7 +714,7 @@ bool PlotDialog::datasetPlot()
         ui.customPlot->xAxis->setScaleLogBase(100);
         ui.customPlot->xAxis->setNumberFormat("eb");
         ui.customPlot->xAxis->setNumberPrecision(0);
-        ui.customPlot->xAxis->setSubTickCount(10);
+        ui.customPlot->xAxis->setSubTickCount(9);
     }
     else
     {
@@ -729,7 +729,7 @@ bool PlotDialog::datasetPlot()
         ui.customPlot->yAxis->setScaleLogBase(100);
         ui.customPlot->yAxis->setNumberFormat("eb");
         ui.customPlot->yAxis->setNumberPrecision(0);
-        ui.customPlot->yAxis->setSubTickCount(10);
+        ui.customPlot->yAxis->setSubTickCount(9);
     }
     else
     {
@@ -843,7 +843,7 @@ bool PlotDialog::yPlot()
         ui.customPlot->xAxis->setScaleLogBase(100);
         ui.customPlot->xAxis->setNumberFormat("eb");
         ui.customPlot->xAxis->setNumberPrecision(0);
-        ui.customPlot->xAxis->setSubTickCount(10);
+        ui.customPlot->xAxis->setSubTickCount(9);
     }
     else
     {
@@ -858,7 +858,7 @@ bool PlotDialog::yPlot()
         ui.customPlot->yAxis->setScaleLogBase(100);
         ui.customPlot->yAxis->setNumberFormat("eb");
         ui.customPlot->yAxis->setNumberPrecision(0);
-        ui.customPlot->yAxis->setSubTickCount(10);
+        ui.customPlot->yAxis->setSubTickCount(9);
     }
     else
     {
@@ -1005,7 +1005,7 @@ bool PlotDialog::histPlot()
         ui.customPlot->xAxis->setScaleLogBase(100);
         ui.customPlot->xAxis->setNumberFormat("eb");
         ui.customPlot->xAxis->setNumberPrecision(0);
-        ui.customPlot->xAxis->setSubTickCount(10);
+        ui.customPlot->xAxis->setSubTickCount(9);
     }
     else
     {
@@ -1020,7 +1020,7 @@ bool PlotDialog::histPlot()
         ui.customPlot->yAxis->setScaleLogBase(100);
         ui.customPlot->yAxis->setNumberFormat("eb");
         ui.customPlot->yAxis->setNumberPrecision(0);
-        ui.customPlot->yAxis->setSubTickCount(10);
+        ui.customPlot->yAxis->setSubTickCount(9);
     }
     else
     {
@@ -1183,7 +1183,7 @@ bool PlotDialog::Pplot()
         ui.customPlot->xAxis->setScaleLogBase(100);
         ui.customPlot->xAxis->setNumberFormat("eb");
         ui.customPlot->xAxis->setNumberPrecision(0);
-        ui.customPlot->xAxis->setSubTickCount(10);
+        ui.customPlot->xAxis->setSubTickCount(9);
     }
     else
     {
@@ -1198,7 +1198,7 @@ bool PlotDialog::Pplot()
         ui.customPlot->yAxis->setScaleLogBase(100);
         ui.customPlot->yAxis->setNumberFormat("eb");
         ui.customPlot->yAxis->setNumberPrecision(0);
-        ui.customPlot->yAxis->setSubTickCount(10);
+        ui.customPlot->yAxis->setSubTickCount(9);
     }
     else
     {
