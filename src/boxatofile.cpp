@@ -1013,6 +1013,13 @@ void MainWindow::on_updateAtoFileButton_clicked(bool checked)
         return;
     }
 
+    //convert any lower case f/t to upper case
+    for (int i = 0; i < ui.atoTetherTable->rowCount(); i++)
+    {
+        QString tetherAtom = ui.atoTetherTable->item(i,1)->text().toUpper();
+        ui.atoTetherTable->setItem(i,1, new QTableWidgetItem(tetherAtom));
+    }
+
     QRegExp noNegIntrx("^\\d*$");
     for (int i = 0; i < ui.atoTetherTable->rowCount(); i++)
     {
