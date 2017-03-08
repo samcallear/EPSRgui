@@ -301,9 +301,9 @@ private slots:
 
     //main window embedded plots
 private:
-    bool plot1();
+    void plot1();
+    void plot2();
     bool getplottype1();
-    bool plot2();
     bool getplottype2();
     bool fqplot1();
     bool frplot1();

@@ -719,9 +719,8 @@ bool PlotDialog::datasetPlot()
     else
     {
         ui.customPlot->xAxis->setScaleType(QCPAxis::stLinear);
-        ui.customPlot->xAxis->setNumberFormat("g");
-        ui.customPlot->xAxis->setNumberPrecision(2);
-        ui.customPlot->xAxis->setAutoTickStep(true);
+        ui.customPlot->xAxis->setNumberFormat("gb");
+        ui.customPlot->xAxis->setNumberPrecision(9);
     }
     if (ui.logYButton->isChecked() == true)
     {
@@ -734,9 +733,8 @@ bool PlotDialog::datasetPlot()
     else
     {
         ui.customPlot->yAxis->setScaleType(QCPAxis::stLinear);
-        ui.customPlot->yAxis->setNumberFormat("g");
-        ui.customPlot->yAxis->setNumberPrecision(2);
-        ui.customPlot->yAxis->setAutoTickStep(true);
+        ui.customPlot->yAxis->setNumberFormat("gb");
+        ui.customPlot->yAxis->setNumberPrecision(9);
     }
 
     // give the axes some labels:
@@ -745,40 +743,31 @@ bool PlotDialog::datasetPlot()
 
     //plot
     ui.customPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
-    if (ui.xMinLineEdit->text().isEmpty() && ui.xMaxLineEdit->text().isEmpty() && ui.yMinLineEdit->text().isEmpty() && ui.yMaxLineEdit->text().isEmpty())
+    ui.customPlot->rescaleAxes();
+    if (!ui.xMinLineEdit->text().isEmpty())
     {
-        ui.customPlot->rescaleAxes();
+        ui.customPlot->xAxis->setRangeLower(ui.xMinLineEdit->text().toDouble());
     }
-    else
+    else (ui.customPlot->xAxis->setRangeLower(xMin));
+
+    if (!ui.xMaxLineEdit->text().isEmpty())
     {
-        if (!ui.xMinLineEdit->text().isEmpty())
-        {
-            ui.customPlot->xAxis->setRangeLower(ui.xMinLineEdit->text().toDouble());
-        }
-        else
-        ui.customPlot->xAxis->setRangeLower(xMin);
-
-        if (!ui.xMaxLineEdit->text().isEmpty())
-        {
-            ui.customPlot->xAxis->setRangeUpper(ui.xMaxLineEdit->text().toDouble());
-        }
-        else
-        ui.customPlot->xAxis->setRangeUpper(xMax);
-
-        if (!ui.yMinLineEdit->text().isEmpty())
-        {
-            ui.customPlot->yAxis->setRangeLower(ui.yMinLineEdit->text().toDouble());
-        }
-        else
-        ui.customPlot->yAxis->setRangeLower(yMin);
-
-        if (!ui.yMaxLineEdit->text().isEmpty())
-        {
-            ui.customPlot->yAxis->setRangeUpper(ui.yMaxLineEdit->text().toDouble());
-        }
-        else
-        ui.customPlot->yAxis->setRangeUpper(yMax);
+        ui.customPlot->xAxis->setRangeUpper(ui.xMaxLineEdit->text().toDouble());
     }
+    else (ui.customPlot->xAxis->setRangeUpper(xMax));
+
+    if (!ui.yMinLineEdit->text().isEmpty())
+    {
+        ui.customPlot->yAxis->setRangeLower(ui.yMinLineEdit->text().toDouble());
+    }
+    else (ui.customPlot->yAxis->setRangeLower(yMin));
+
+    if (!ui.yMaxLineEdit->text().isEmpty())
+    {
+        ui.customPlot->yAxis->setRangeUpper(ui.yMaxLineEdit->text().toDouble());
+    }
+    else (ui.customPlot->yAxis->setRangeUpper(yMax+(yMax/10)));
+
     ui.customPlot->replot();
     return 0;
 }
@@ -848,9 +837,8 @@ bool PlotDialog::yPlot()
     else
     {
         ui.customPlot->xAxis->setScaleType(QCPAxis::stLinear);
-        ui.customPlot->xAxis->setNumberFormat("g");
-        ui.customPlot->xAxis->setNumberPrecision(2);
-        ui.customPlot->xAxis->setAutoTickStep(true);
+        ui.customPlot->xAxis->setNumberFormat("gb");
+        ui.customPlot->xAxis->setNumberPrecision(9);
     }
     if (ui.logYButton->isChecked() == true)
     {
@@ -863,9 +851,8 @@ bool PlotDialog::yPlot()
     else
     {
         ui.customPlot->yAxis->setScaleType(QCPAxis::stLinear);
-        ui.customPlot->yAxis->setNumberFormat("g");
-        ui.customPlot->yAxis->setNumberPrecision(2);
-        ui.customPlot->yAxis->setAutoTickStep(true);
+        ui.customPlot->yAxis->setNumberFormat("gb");
+        ui.customPlot->yAxis->setNumberPrecision(9);
     }
 
     // give the axes some labels:
@@ -887,40 +874,31 @@ bool PlotDialog::yPlot()
 
     //plot
     ui.customPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
-    if (ui.xMinLineEdit->text().isEmpty() && ui.xMaxLineEdit->text().isEmpty() && ui.yMinLineEdit->text().isEmpty() && ui.yMaxLineEdit->text().isEmpty())
+    ui.customPlot->rescaleAxes();
+    if (!ui.xMinLineEdit->text().isEmpty())
     {
-        ui.customPlot->rescaleAxes();
+        ui.customPlot->xAxis->setRangeLower(ui.xMinLineEdit->text().toDouble());
     }
-    else
+    else (ui.customPlot->xAxis->setRangeLower(xMin));
+
+    if (!ui.xMaxLineEdit->text().isEmpty())
     {
-        if (!ui.xMinLineEdit->text().isEmpty())
-        {
-            ui.customPlot->xAxis->setRangeLower(ui.xMinLineEdit->text().toDouble());
-        }
-        else
-        ui.customPlot->xAxis->setRangeLower(xMin);
-
-        if (!ui.xMaxLineEdit->text().isEmpty())
-        {
-            ui.customPlot->xAxis->setRangeUpper(ui.xMaxLineEdit->text().toDouble());
-        }
-        else
-        ui.customPlot->xAxis->setRangeUpper(xMax);
-
-        if (!ui.yMinLineEdit->text().isEmpty())
-        {
-            ui.customPlot->yAxis->setRangeLower(ui.yMinLineEdit->text().toDouble());
-        }
-        else
-        ui.customPlot->yAxis->setRangeLower(yMin);
-
-        if (!ui.yMaxLineEdit->text().isEmpty())
-        {
-            ui.customPlot->yAxis->setRangeUpper(ui.yMaxLineEdit->text().toDouble());
-        }
-        else
-        ui.customPlot->yAxis->setRangeUpper(yMax);
+        ui.customPlot->xAxis->setRangeUpper(ui.xMaxLineEdit->text().toDouble());
     }
+    else (ui.customPlot->xAxis->setRangeUpper(xMax));
+
+    if (!ui.yMinLineEdit->text().isEmpty())
+    {
+        ui.customPlot->yAxis->setRangeLower(ui.yMinLineEdit->text().toDouble());
+    }
+    else (ui.customPlot->yAxis->setRangeLower(yMin));
+
+    if (!ui.yMaxLineEdit->text().isEmpty())
+    {
+        ui.customPlot->yAxis->setRangeUpper(ui.yMaxLineEdit->text().toDouble());
+    }
+    else (ui.customPlot->yAxis->setRangeUpper(yMax));
+
     ui.customPlot->replot();
     return 0;
 }
@@ -1010,9 +988,8 @@ bool PlotDialog::histPlot()
     else
     {
         ui.customPlot->xAxis->setScaleType(QCPAxis::stLinear);
-        ui.customPlot->xAxis->setNumberFormat("g");
-        ui.customPlot->xAxis->setNumberPrecision(3);
-        ui.customPlot->xAxis->setAutoTickStep(true);
+        ui.customPlot->xAxis->setNumberFormat("gb");
+        ui.customPlot->xAxis->setNumberPrecision(9);
     }
     if (ui.logYButton->isChecked() == true)
     {
@@ -1025,9 +1002,8 @@ bool PlotDialog::histPlot()
     else
     {
         ui.customPlot->yAxis->setScaleType(QCPAxis::stLinear);
-        ui.customPlot->yAxis->setNumberFormat("g");
-        ui.customPlot->yAxis->setNumberPrecision(3);
-        ui.customPlot->yAxis->setAutoTickStep(true);
+        ui.customPlot->yAxis->setNumberFormat("gb");
+        ui.customPlot->yAxis->setNumberPrecision(9);
     }
 
     // give the axes some labels:
@@ -1074,40 +1050,31 @@ bool PlotDialog::histPlot()
 
     //plot
     ui.customPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
-    if (ui.xMinLineEdit->text().isEmpty() && ui.xMaxLineEdit->text().isEmpty() && ui.yMinLineEdit->text().isEmpty() && ui.yMaxLineEdit->text().isEmpty())
+    ui.customPlot->rescaleAxes();
+    if (!ui.xMinLineEdit->text().isEmpty())
     {
-        ui.customPlot->rescaleAxes();
+        ui.customPlot->xAxis->setRangeLower(ui.xMinLineEdit->text().toDouble());
     }
-    else
+    else (ui.customPlot->xAxis->setRangeLower(xMin));
+
+    if (!ui.xMaxLineEdit->text().isEmpty())
     {
-        if (!ui.xMinLineEdit->text().isEmpty())
-        {
-            ui.customPlot->xAxis->setRangeLower(ui.xMinLineEdit->text().toDouble());
-        }
-        else
-        ui.customPlot->xAxis->setRangeLower(xMin);
-
-        if (!ui.xMaxLineEdit->text().isEmpty())
-        {
-            ui.customPlot->xAxis->setRangeUpper(ui.xMaxLineEdit->text().toDouble());
-        }
-        else
-        ui.customPlot->xAxis->setRangeUpper(xMax);        //read this from data??
-
-        if (!ui.yMinLineEdit->text().isEmpty())
-        {
-            ui.customPlot->yAxis->setRangeLower(ui.yMinLineEdit->text().toDouble());
-        }
-        else
-        ui.customPlot->yAxis->setRangeLower(yMin);     //read this from data!!**************************************************
-
-        if (!ui.yMaxLineEdit->text().isEmpty())
-        {
-            ui.customPlot->yAxis->setRangeUpper(ui.yMaxLineEdit->text().toDouble());
-        }
-        else
-        ui.customPlot->yAxis->setRangeUpper(yMax);     //read this from data!!**************************************************
+        ui.customPlot->xAxis->setRangeUpper(ui.xMaxLineEdit->text().toDouble());
     }
+    else (ui.customPlot->xAxis->setRangeUpper(xMax));
+
+    if (!ui.yMinLineEdit->text().isEmpty())
+    {
+        ui.customPlot->yAxis->setRangeLower(ui.yMinLineEdit->text().toDouble());
+    }
+    else (ui.customPlot->yAxis->setRangeLower(yMin));
+
+    if (!ui.yMaxLineEdit->text().isEmpty())
+    {
+        ui.customPlot->yAxis->setRangeUpper(ui.yMaxLineEdit->text().toDouble());
+    }
+    else (ui.customPlot->yAxis->setRangeUpper(yMax));
+
     ui.customPlot->replot();
     return 0;
 }
@@ -1188,9 +1155,8 @@ bool PlotDialog::Pplot()
     else
     {
         ui.customPlot->xAxis->setScaleType(QCPAxis::stLinear);
-        ui.customPlot->xAxis->setNumberFormat("g");
-        ui.customPlot->xAxis->setNumberPrecision(2);
-        ui.customPlot->xAxis->setAutoTickStep(true);
+        ui.customPlot->xAxis->setNumberFormat("gb");
+        ui.customPlot->xAxis->setNumberPrecision(9);
     }
     if (ui.logYButton->isChecked() == true)
     {
@@ -1203,9 +1169,8 @@ bool PlotDialog::Pplot()
     else
     {
         ui.customPlot->yAxis->setScaleType(QCPAxis::stLinear);
-        ui.customPlot->yAxis->setNumberFormat("g");
-        ui.customPlot->yAxis->setNumberPrecision(2);
-        ui.customPlot->yAxis->setAutoTickStep(true);
+        ui.customPlot->yAxis->setNumberFormat("gb");
+        ui.customPlot->yAxis->setNumberPrecision(9);
     }
 
     // give the axes some labels:
@@ -1214,40 +1179,31 @@ bool PlotDialog::Pplot()
 
     //plot
     ui.customPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
-    if (ui.xMinLineEdit->text().isEmpty() && ui.xMaxLineEdit->text().isEmpty() && ui.yMinLineEdit->text().isEmpty() && ui.yMaxLineEdit->text().isEmpty())
+    ui.customPlot->rescaleAxes();
+    if (!ui.xMinLineEdit->text().isEmpty())
     {
-        ui.customPlot->rescaleAxes();
+        ui.customPlot->xAxis->setRangeLower(ui.xMinLineEdit->text().toDouble());
     }
-    else
+    else (ui.customPlot->xAxis->setRangeLower(xMin));
+
+    if (!ui.xMaxLineEdit->text().isEmpty())
     {
-        if (!ui.xMinLineEdit->text().isEmpty())
-        {
-            ui.customPlot->xAxis->setRangeLower(ui.xMinLineEdit->text().toDouble());
-        }
-        else
-        ui.customPlot->xAxis->setRangeLower(xMin);
-
-        if (!ui.xMaxLineEdit->text().isEmpty())
-        {
-            ui.customPlot->xAxis->setRangeUpper(ui.xMaxLineEdit->text().toDouble());
-        }
-        else
-        ui.customPlot->xAxis->setRangeUpper(xMax);
-
-        if (!ui.yMinLineEdit->text().isEmpty())
-        {
-            ui.customPlot->yAxis->setRangeLower(ui.yMinLineEdit->text().toDouble());
-        }
-        else
-        ui.customPlot->yAxis->setRangeLower(yMin);
-
-        if (!ui.yMaxLineEdit->text().isEmpty())
-        {
-            ui.customPlot->yAxis->setRangeUpper(ui.yMaxLineEdit->text().toDouble());
-        }
-        else
-        ui.customPlot->yAxis->setRangeUpper(yMax);
+        ui.customPlot->xAxis->setRangeUpper(ui.xMaxLineEdit->text().toDouble());
     }
+    else (ui.customPlot->xAxis->setRangeUpper(xMax));
+
+    if (!ui.yMinLineEdit->text().isEmpty())
+    {
+        ui.customPlot->yAxis->setRangeLower(ui.yMinLineEdit->text().toDouble());
+    }
+    else (ui.customPlot->yAxis->setRangeLower(yMin));
+
+    if (!ui.yMaxLineEdit->text().isEmpty())
+    {
+        ui.customPlot->yAxis->setRangeUpper(ui.yMaxLineEdit->text().toDouble());
+    }
+    else (ui.customPlot->yAxis->setRangeUpper(yMax));
+
     ui.customPlot->replot();
     return 0;
 }
@@ -1547,33 +1503,59 @@ bool PlotDialog::partialsplot()
 
     //plot
     ui.customPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
+    ui.customPlot->rescaleAxes();
     if (!ui.xMinLineEdit->text().isEmpty())
     {
         ui.customPlot->xAxis->setRangeLower(ui.xMinLineEdit->text().toDouble());
     }
-    else
-    ui.customPlot->xAxis->setRangeLower(xMin);
+    else (ui.customPlot->xAxis->setRangeLower(xMin));
 
     if (!ui.xMaxLineEdit->text().isEmpty())
     {
         ui.customPlot->xAxis->setRangeUpper(ui.xMaxLineEdit->text().toDouble());
     }
-    else
-    ui.customPlot->xAxis->setRangeUpper(xMax);
+    else (ui.customPlot->xAxis->setRangeUpper(xMax));
 
     if (!ui.yMinLineEdit->text().isEmpty())
     {
         ui.customPlot->yAxis->setRangeLower(ui.yMinLineEdit->text().toDouble());
     }
-    else
-    ui.customPlot->yAxis->setRangeLower(yMin);
+    else (ui.customPlot->yAxis->setRangeLower(yMin));
 
     if (!ui.yMaxLineEdit->text().isEmpty())
     {
         ui.customPlot->yAxis->setRangeUpper(ui.yMaxLineEdit->text().toDouble());
     }
+    else (ui.customPlot->yAxis->setRangeUpper(yMax));
+
+    if (ui.logXButton->isChecked() == true)
+    {
+        ui.customPlot->xAxis->setScaleType(QCPAxis::stLogarithmic);
+        ui.customPlot->xAxis->setScaleLogBase(100);
+        ui.customPlot->xAxis->setNumberFormat("eb");
+        ui.customPlot->xAxis->setNumberPrecision(0);
+        ui.customPlot->xAxis->setSubTickCount(9);
+    }
     else
-    ui.customPlot->yAxis->setRangeUpper(yMax);
+    {
+        ui.customPlot->xAxis->setScaleType(QCPAxis::stLinear);
+        ui.customPlot->xAxis->setNumberFormat("gb");
+        ui.customPlot->xAxis->setNumberPrecision(9);
+    }
+    if (ui.logYButton->isChecked() == true)
+    {
+        ui.customPlot->yAxis->setScaleType(QCPAxis::stLogarithmic);
+        ui.customPlot->yAxis->setScaleLogBase(100);
+        ui.customPlot->yAxis->setNumberFormat("eb");
+        ui.customPlot->yAxis->setNumberPrecision(0);
+        ui.customPlot->yAxis->setSubTickCount(9);
+    }
+    else
+    {
+        ui.customPlot->yAxis->setScaleType(QCPAxis::stLinear);
+        ui.customPlot->yAxis->setNumberFormat("gb");
+        ui.customPlot->yAxis->setNumberPrecision(9);
+    }
 
     ui.customPlot->replot();
     return 0;
@@ -1757,33 +1739,59 @@ bool PlotDialog::gofrintraplot()
 
     //plot
     ui.customPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
+    ui.customPlot->rescaleAxes();
     if (!ui.xMinLineEdit->text().isEmpty())
     {
         ui.customPlot->xAxis->setRangeLower(ui.xMinLineEdit->text().toDouble());
     }
-    else
-    ui.customPlot->xAxis->setRangeLower(xMin);
+    else (ui.customPlot->xAxis->setRangeLower(xMin));
 
     if (!ui.xMaxLineEdit->text().isEmpty())
     {
         ui.customPlot->xAxis->setRangeUpper(ui.xMaxLineEdit->text().toDouble());
     }
-    else
-    ui.customPlot->xAxis->setRangeUpper(xMax);
+    else (ui.customPlot->xAxis->setRangeUpper(xMax));
 
     if (!ui.yMinLineEdit->text().isEmpty())
     {
         ui.customPlot->yAxis->setRangeLower(ui.yMinLineEdit->text().toDouble());
     }
-    else
-    ui.customPlot->yAxis->setRangeLower(yMin);
+    else (ui.customPlot->yAxis->setRangeLower(yMin));
 
     if (!ui.yMaxLineEdit->text().isEmpty())
     {
         ui.customPlot->yAxis->setRangeUpper(ui.yMaxLineEdit->text().toDouble());
     }
+    else (ui.customPlot->yAxis->setRangeUpper(yMax));
+
+    if (ui.logXButton->isChecked() == true)
+    {
+        ui.customPlot->xAxis->setScaleType(QCPAxis::stLogarithmic);
+        ui.customPlot->xAxis->setScaleLogBase(100);
+        ui.customPlot->xAxis->setNumberFormat("eb");
+        ui.customPlot->xAxis->setNumberPrecision(0);
+        ui.customPlot->xAxis->setSubTickCount(9);
+    }
     else
-    ui.customPlot->yAxis->setRangeUpper(yMax);
+    {
+        ui.customPlot->xAxis->setScaleType(QCPAxis::stLinear);
+        ui.customPlot->xAxis->setNumberFormat("gb");
+        ui.customPlot->xAxis->setNumberPrecision(9);
+    }
+    if (ui.logYButton->isChecked() == true)
+    {
+        ui.customPlot->yAxis->setScaleType(QCPAxis::stLogarithmic);
+        ui.customPlot->yAxis->setScaleLogBase(100);
+        ui.customPlot->yAxis->setNumberFormat("eb");
+        ui.customPlot->yAxis->setNumberPrecision(0);
+        ui.customPlot->yAxis->setSubTickCount(9);
+    }
+    else
+    {
+        ui.customPlot->yAxis->setScaleType(QCPAxis::stLinear);
+        ui.customPlot->yAxis->setNumberFormat("gb");
+        ui.customPlot->yAxis->setNumberPrecision(9);
+    }
 
     ui.customPlot->replot();
     return 0;
@@ -1937,33 +1945,59 @@ bool PlotDialog::sqterplot()
 
     //plot
     ui.customPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
+    ui.customPlot->rescaleAxes();
     if (!ui.xMinLineEdit->text().isEmpty())
     {
         ui.customPlot->xAxis->setRangeLower(ui.xMinLineEdit->text().toDouble());
     }
-    else
-    ui.customPlot->xAxis->setRangeLower(xMin);
+    else (ui.customPlot->xAxis->setRangeLower(xMin));
 
     if (!ui.xMaxLineEdit->text().isEmpty())
     {
         ui.customPlot->xAxis->setRangeUpper(ui.xMaxLineEdit->text().toDouble());
     }
-    else
-    ui.customPlot->xAxis->setRangeUpper(xMax);
+    else (ui.customPlot->xAxis->setRangeUpper(xMax));
 
     if (!ui.yMinLineEdit->text().isEmpty())
     {
         ui.customPlot->yAxis->setRangeLower(ui.yMinLineEdit->text().toDouble());
     }
-    else
-    ui.customPlot->yAxis->setRangeLower(yMin);
+    else (ui.customPlot->yAxis->setRangeLower(yMin));
 
     if (!ui.yMaxLineEdit->text().isEmpty())
     {
         ui.customPlot->yAxis->setRangeUpper(ui.yMaxLineEdit->text().toDouble());
     }
+    else (ui.customPlot->yAxis->setRangeUpper(yMax));
+
+    if (ui.logXButton->isChecked() == true)
+    {
+        ui.customPlot->xAxis->setScaleType(QCPAxis::stLogarithmic);
+        ui.customPlot->xAxis->setScaleLogBase(100);
+        ui.customPlot->xAxis->setNumberFormat("eb");
+        ui.customPlot->xAxis->setNumberPrecision(0);
+        ui.customPlot->xAxis->setSubTickCount(9);
+    }
     else
-    ui.customPlot->yAxis->setRangeUpper(yMax);
+    {
+        ui.customPlot->xAxis->setScaleType(QCPAxis::stLinear);
+        ui.customPlot->xAxis->setNumberFormat("gb");
+        ui.customPlot->xAxis->setNumberPrecision(9);
+    }
+    if (ui.logYButton->isChecked() == true)
+    {
+        ui.customPlot->yAxis->setScaleType(QCPAxis::stLogarithmic);
+        ui.customPlot->yAxis->setScaleLogBase(100);
+        ui.customPlot->yAxis->setNumberFormat("eb");
+        ui.customPlot->yAxis->setNumberPrecision(0);
+        ui.customPlot->yAxis->setSubTickCount(9);
+    }
+    else
+    {
+        ui.customPlot->yAxis->setScaleType(QCPAxis::stLinear);
+        ui.customPlot->yAxis->setNumberFormat("gb");
+        ui.customPlot->yAxis->setNumberPrecision(9);
+    }
 
     ui.customPlot->replot();
     return 0;
@@ -2118,33 +2152,59 @@ bool PlotDialog::sqtraplot()
 
     //plot
     ui.customPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
+    ui.customPlot->rescaleAxes();
     if (!ui.xMinLineEdit->text().isEmpty())
     {
         ui.customPlot->xAxis->setRangeLower(ui.xMinLineEdit->text().toDouble());
     }
-    else
-    ui.customPlot->xAxis->setRangeLower(xMin);
+    else (ui.customPlot->xAxis->setRangeLower(xMin));
 
     if (!ui.xMaxLineEdit->text().isEmpty())
     {
         ui.customPlot->xAxis->setRangeUpper(ui.xMaxLineEdit->text().toDouble());
     }
-    else
-    ui.customPlot->xAxis->setRangeUpper(xMax);
+    else (ui.customPlot->xAxis->setRangeUpper(xMax));
 
     if (!ui.yMinLineEdit->text().isEmpty())
     {
         ui.customPlot->yAxis->setRangeLower(ui.yMinLineEdit->text().toDouble());
     }
-    else
-    ui.customPlot->yAxis->setRangeLower(yMin);
+    else (ui.customPlot->yAxis->setRangeLower(yMin));
 
     if (!ui.yMaxLineEdit->text().isEmpty())
     {
         ui.customPlot->yAxis->setRangeUpper(ui.yMaxLineEdit->text().toDouble());
     }
+    else (ui.customPlot->yAxis->setRangeUpper(yMax));
+
+    if (ui.logXButton->isChecked() == true)
+    {
+        ui.customPlot->xAxis->setScaleType(QCPAxis::stLogarithmic);
+        ui.customPlot->xAxis->setScaleLogBase(100);
+        ui.customPlot->xAxis->setNumberFormat("eb");
+        ui.customPlot->xAxis->setNumberPrecision(0);
+        ui.customPlot->xAxis->setSubTickCount(9);
+    }
     else
-    ui.customPlot->yAxis->setRangeUpper(yMax);
+    {
+        ui.customPlot->xAxis->setScaleType(QCPAxis::stLinear);
+        ui.customPlot->xAxis->setNumberFormat("gb");
+        ui.customPlot->xAxis->setNumberPrecision(9);
+    }
+    if (ui.logYButton->isChecked() == true)
+    {
+        ui.customPlot->yAxis->setScaleType(QCPAxis::stLogarithmic);
+        ui.customPlot->yAxis->setScaleLogBase(100);
+        ui.customPlot->yAxis->setNumberFormat("eb");
+        ui.customPlot->yAxis->setNumberPrecision(0);
+        ui.customPlot->yAxis->setSubTickCount(9);
+    }
+    else
+    {
+        ui.customPlot->yAxis->setScaleType(QCPAxis::stLinear);
+        ui.customPlot->yAxis->setNumberFormat("gb");
+        ui.customPlot->yAxis->setNumberPrecision(9);
+    }
 
     ui.customPlot->replot();
     return 0;
@@ -2286,40 +2346,60 @@ bool PlotDialog::ereqPlot()
 
     //plot
     ui.customPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
-    if (ui.xMinLineEdit->text().isEmpty() && ui.xMaxLineEdit->text().isEmpty() && ui.yMinLineEdit->text().isEmpty() && ui.yMaxLineEdit->text().isEmpty())
+    ui.customPlot->rescaleAxes();
+    if (!ui.xMinLineEdit->text().isEmpty())
     {
-        ui.customPlot->rescaleAxes();
+        ui.customPlot->xAxis->setRangeLower(ui.xMinLineEdit->text().toDouble());
+    }
+    else (ui.customPlot->xAxis->setRangeLower(xMin));
+
+    if (!ui.xMaxLineEdit->text().isEmpty())
+    {
+        ui.customPlot->xAxis->setRangeUpper(ui.xMaxLineEdit->text().toDouble());
+    }
+    else (ui.customPlot->xAxis->setRangeUpper(xMax));
+
+    if (!ui.yMinLineEdit->text().isEmpty())
+    {
+        ui.customPlot->yAxis->setRangeLower(ui.yMinLineEdit->text().toDouble());
+    }
+    else (ui.customPlot->yAxis->setRangeLower(yMin));
+
+    if (!ui.yMaxLineEdit->text().isEmpty())
+    {
+        ui.customPlot->yAxis->setRangeUpper(ui.yMaxLineEdit->text().toDouble());
+    }
+    else (ui.customPlot->yAxis->setRangeUpper(yMax));
+
+    if (ui.logXButton->isChecked() == true)
+    {
+        ui.customPlot->xAxis->setScaleType(QCPAxis::stLogarithmic);
+        ui.customPlot->xAxis->setScaleLogBase(100);
+        ui.customPlot->xAxis->setNumberFormat("eb");
+        ui.customPlot->xAxis->setNumberPrecision(0);
+        ui.customPlot->xAxis->setSubTickCount(9);
     }
     else
     {
-        if (!ui.xMinLineEdit->text().isEmpty())
-        {
-            ui.customPlot->xAxis->setRangeLower(ui.xMinLineEdit->text().toDouble());
-        }
-        else
-        ui.customPlot->xAxis->setRangeLower(xMin);
-
-        if (!ui.xMaxLineEdit->text().isEmpty())
-        {
-            ui.customPlot->xAxis->setRangeUpper(ui.xMaxLineEdit->text().toDouble());
-        }
-        else
-        ui.customPlot->xAxis->setRangeUpper(xMax);
-
-        if (!ui.yMinLineEdit->text().isEmpty())
-        {
-            ui.customPlot->yAxis->setRangeLower(ui.yMinLineEdit->text().toDouble());
-        }
-        else
-        ui.customPlot->yAxis->setRangeLower(yMin);
-
-        if (!ui.yMaxLineEdit->text().isEmpty())
-        {
-            ui.customPlot->yAxis->setRangeUpper(ui.yMaxLineEdit->text().toDouble());
-        }
-        else
-        ui.customPlot->yAxis->setRangeUpper(yMax);
+        ui.customPlot->xAxis->setScaleType(QCPAxis::stLinear);
+        ui.customPlot->xAxis->setNumberFormat("gb");
+        ui.customPlot->xAxis->setNumberPrecision(9);
     }
+    if (ui.logYButton->isChecked() == true)
+    {
+        ui.customPlot->yAxis->setScaleType(QCPAxis::stLogarithmic);
+        ui.customPlot->yAxis->setScaleLogBase(100);
+        ui.customPlot->yAxis->setNumberFormat("eb");
+        ui.customPlot->yAxis->setNumberPrecision(0);
+        ui.customPlot->yAxis->setSubTickCount(9);
+    }
+    else
+    {
+        ui.customPlot->yAxis->setScaleType(QCPAxis::stLinear);
+        ui.customPlot->yAxis->setNumberFormat("gb");
+        ui.customPlot->yAxis->setNumberPrecision(9);
+    }
+
     ui.customPlot->replot();
     return 0;
 }
@@ -2467,33 +2547,59 @@ bool PlotDialog::empPotPlot()
 
     //plot
     ui.customPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
+    ui.customPlot->rescaleAxes();
     if (!ui.xMinLineEdit->text().isEmpty())
     {
         ui.customPlot->xAxis->setRangeLower(ui.xMinLineEdit->text().toDouble());
     }
-    else
-    ui.customPlot->xAxis->setRangeLower(xMin);
+    else (ui.customPlot->xAxis->setRangeLower(xMin));
 
     if (!ui.xMaxLineEdit->text().isEmpty())
     {
         ui.customPlot->xAxis->setRangeUpper(ui.xMaxLineEdit->text().toDouble());
     }
-    else
-    ui.customPlot->xAxis->setRangeUpper(xMax);
+    else (ui.customPlot->xAxis->setRangeUpper(xMax));
 
     if (!ui.yMinLineEdit->text().isEmpty())
     {
         ui.customPlot->yAxis->setRangeLower(ui.yMinLineEdit->text().toDouble());
     }
-    else
-    ui.customPlot->yAxis->setRangeLower(yMin);
+    else (ui.customPlot->yAxis->setRangeLower(yMin));
 
     if (!ui.yMaxLineEdit->text().isEmpty())
     {
         ui.customPlot->yAxis->setRangeUpper(ui.yMaxLineEdit->text().toDouble());
     }
+    else (ui.customPlot->yAxis->setRangeUpper(yMax));
+
+    if (ui.logXButton->isChecked() == true)
+    {
+        ui.customPlot->xAxis->setScaleType(QCPAxis::stLogarithmic);
+        ui.customPlot->xAxis->setScaleLogBase(100);
+        ui.customPlot->xAxis->setNumberFormat("eb");
+        ui.customPlot->xAxis->setNumberPrecision(0);
+        ui.customPlot->xAxis->setSubTickCount(9);
+    }
     else
-    ui.customPlot->yAxis->setRangeUpper(yMax);
+    {
+        ui.customPlot->xAxis->setScaleType(QCPAxis::stLinear);
+        ui.customPlot->xAxis->setNumberFormat("gb");
+        ui.customPlot->xAxis->setNumberPrecision(9);
+    }
+    if (ui.logYButton->isChecked() == true)
+    {
+        ui.customPlot->yAxis->setScaleType(QCPAxis::stLogarithmic);
+        ui.customPlot->yAxis->setScaleLogBase(100);
+        ui.customPlot->yAxis->setNumberFormat("eb");
+        ui.customPlot->yAxis->setNumberPrecision(0);
+        ui.customPlot->yAxis->setSubTickCount(9);
+    }
+    else
+    {
+        ui.customPlot->yAxis->setScaleType(QCPAxis::stLinear);
+        ui.customPlot->yAxis->setNumberFormat("gb");
+        ui.customPlot->yAxis->setNumberPrecision(9);
+    }
 
     ui.customPlot->replot();
     return 0;
