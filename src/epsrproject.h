@@ -108,7 +108,6 @@ public:
     QString workingDir();
     QString atoFileName();
     QString epsrInpFileName();
-    QSettings EPSRguiSettings();
     QString epsrDir();
     QString epsrBinDir();
     QStringList atomTypes();

@@ -27,6 +27,11 @@ void SettingsDialog::readSettings()
     ui.epsrBinDirlineEdit->setText(settings.value("EPSRbindir").toString());
     ui.epsrDirlineEdit->setText(settings.value("EPSRdir").toString());
     ui.visualiserLineEdit->setText(settings.value("visualiser").toString());
+    if (settings.value("fmoleReminder").toInt() == 0)
+    {
+        ui.fmoleReminderCheckBox->setChecked(false);
+    }
+    else (ui.fmoleReminderCheckBox->setChecked(true));
 }
 
 void SettingsDialog::on_okButton_clicked(bool checked)
@@ -131,7 +136,15 @@ void SettingsDialog::writeSettingsFile()
     }
     else
     {
-        settings.remove("visulaiser");
+        settings.remove("visualiser");
+    }
+    if (ui.fmoleReminderCheckBox->isChecked())
+    {
+        settings.setValue("fmoleReminder", 1);
+    }
+    else
+    {
+        settings.setValue("fmoleReminder", 0);
     }
     settings.sync();
 

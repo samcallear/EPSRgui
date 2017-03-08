@@ -1920,7 +1920,9 @@ bool MainWindow::updateMolFile()
     messagesDialog.refreshMessages();
     ui.messagesLineEdit->setText(".mol file updated");
 
-    if (!atoFileName_.isEmpty())
+    QSettings settings;
+
+    if (!atoFileName_.isEmpty() && settings.value("fmoleReminder").toInt() != 0)
     {
         QMessageBox msgBox;
         msgBox.setText("Now run fmole to apply the changes to the simulation box.");
