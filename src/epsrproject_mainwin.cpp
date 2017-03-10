@@ -195,48 +195,51 @@ void MainWindow::createActions()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    if (ui.epsrRunningSign->isEnabled() == true)
+    if (!projectName_.isEmpty())
     {
-        QMessageBox::StandardButton msgBox;
-        msgBox  = QMessageBox::question(this, "Warning", "EPSR is currently running. \nTo close EPSRgui and stop EPSR at the end of the current iteration, click OK.",
-                                        QMessageBox::Ok|QMessageBox::Cancel);
-        if (msgBox == QMessageBox::Cancel)
+        if (ui.epsrRunningSign->isEnabled() == true)
         {
-            event->ignore();
-            return;
-        }
-        else
-        {
-            QFile file(workingDir_+"killepsr");
-            if(!file.open(QFile::WriteOnly))
+            QMessageBox::StandardButton msgBox;
+            msgBox  = QMessageBox::question(this, "Warning", "EPSR is currently running. \nTo close EPSRgui and stop EPSR at the end of the current iteration, click OK.",
+                                            QMessageBox::Ok|QMessageBox::Cancel);
+            if (msgBox == QMessageBox::Cancel)
             {
-                QMessageBox msgBox;
-                msgBox.setText("Could not stop EPSR script");
-                msgBox.exec();
+                event->ignore();
                 return;
             }
-            file.close();
+            else
+            {
+                QFile file(workingDir_+"killepsr");
+                if(!file.open(QFile::WriteOnly))
+                {
+                    QMessageBox msgBox;
+                    msgBox.setText("Could not stop EPSR script");
+                    msgBox.exec();
+                    return;
+                }
+                file.close();
+            }
         }
-    }
 
-    save();
+        save();
 
-    //delete plotting .bat/.sh files
-    QDir::setCurrent(workingDir_);
-    QDir dir;
-    QStringList batFilter;
-#ifdef _WIN32
-    batFilter << "plot*.bat";
-#else
-    batFilter << "plot*.sh";
-#endif
-    QStringList batFiles = dir.entryList(batFilter, QDir::Files);
-    if (!batFiles.isEmpty())
-    {
-        for (int i = 0; i < batFiles.count(); i++)
+        //delete plotting .bat/.sh files
+        QDir::setCurrent(workingDir_);
+        QDir dir;
+        QStringList batFilter;
+    #ifdef _WIN32
+        batFilter << "plot*.bat";
+    #else
+        batFilter << "plot*.sh";
+    #endif
+        QStringList batFiles = dir.entryList(batFilter, QDir::Files);
+        if (!batFiles.isEmpty())
         {
-            QFile file(batFiles.at(i));
-            file.remove();
+            for (int i = 0; i < batFiles.count(); i++)
+            {
+                QFile file(batFiles.at(i));
+                file.remove();
+            }
         }
     }
 
@@ -817,13 +820,13 @@ bool MainWindow::save()
 
     file.close();
 
-    return false;
-
     if (!epsrInpFileName_.isEmpty())
     {
         updateInpFile();
         updatePcofFile();
     }
+
+    return true;
 }
 
 bool MainWindow::saveAs()
