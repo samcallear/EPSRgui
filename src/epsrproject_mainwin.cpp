@@ -667,22 +667,9 @@ void MainWindow::open()
 #else
                     QFile batFile(workingDir_+"run"+inpBaseFileName+".sh");
 #endif
+                    //if bat file exists, make killepsr file in case EPSRgui crashed while running EPSR (this is then deleted on runEPSR())
                     if (batFile.exists() == true)
                     {
-                        if (batFile.open(QFile::ReadWrite | QFile::Text))
-                        {
-                            QTextStream batstream(&batFile);
-                            QString batline;
-                            do {
-                                batline = batstream.readLine();
-                                if(batline.contains("writexyz"))
-                                {
-                                    ui.dlputilsOutCheckBox->setChecked(true);
-                                }
-                            } while (!batline.isNull());
-                            batFile.close();
-                        }
-                        //if bat file exists, make killepsr file in case EPSRgui crashed while running EPSR (this is then deleted on runEPSR())
                         QFile file(workingDir_+"killepsr");
                         if(file.open(QFile::WriteOnly))
                         {

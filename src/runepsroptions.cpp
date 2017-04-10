@@ -147,6 +147,11 @@ void MainWindow::getOutputsRunning()
             ui.runOutEPSRList->addItem(dataLine.at(2)+": "+dataLine.at(3));
         }
         else
+        if (line.contains("writexyz"))
+        {
+            ui.dlputilsOutCheckBox->setChecked(true);
+        }
+        else
         {
              ui.additionalCommandsTextEdit->appendPlainText(line);
         }
